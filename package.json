@@ -1,0 +1,14 @@
+{
+  "name": "towncord",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "echo \"Define workspace build scripts\"",
+    "dev": "echo \"Define workspace dev scripts\"",
+    "test": "echo \"Define workspace tests\""
+  }
+}
