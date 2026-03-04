@@ -225,12 +225,14 @@ def alpha_bounds_x(image, max_y):
   min_x = None
   max_x = None
 
+  pixels = image.load()
   for x in range(image.width):
-    if not column_has_alpha(image, x, max_y):
-      continue
-    if min_x is None:
-      min_x = x
-    max_x = x
+    for y in range(max_y):
+      if pixels[x, y][3] != 0:
+        if min_x is None:
+          min_x = x
+        max_x = x
+        break
 
   return min_x, max_x
 

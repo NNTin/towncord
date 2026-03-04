@@ -164,7 +164,7 @@ function buildLayout(rule, png) {
       1,
       frameCountMode === "round" ? Math.round(rawFrameCount) : Math.floor(rawFrameCount),
     );
-    const remainderX = availableWidth - (frameCount * frameWidth);
+    const remainderX = Math.max(0, availableWidth - frameCount * frameWidth);
 
     return {
       type: "strip",
