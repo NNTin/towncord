@@ -9,6 +9,8 @@ export type AnimationGroup = {
   directions: SpriteDirection[];
   keyMap: Partial<Record<SpriteDirection, string>>;
   undirectedKey: string | null;
+  /** true when the sprite sheet's "side" frame faces left (flip logic is inverted) */
+  sideNaturallyFacesLeft: boolean;
 };
 
 export type AnimationGroups = Map<string, AnimationGroup>;
@@ -29,8 +31,12 @@ export function parseAnimationGroups(animationKeys: string[]): AnimationGroups {
     if (!key.startsWith(FEMALE_PREFIX)) continue;
 
     const parts = key.split(".");
-    const baseType = parts[4];
-    const lastSegment = parts[5];
+    // parts[0..3] = "characters.bloomseed.player.female"
+    // parts[4..n-2] = baseType segments (e.g. ["run"] or ["tool", "slash"])
+    // parts[n-1] = last segment with optional direction suffix
+    if (parts.length < 6) continue;
+    const baseType = parts.slice(4, parts.length - 1).join("-");
+    const lastSegment = parts[parts.length - 1];
     if (!baseType) continue;
 
     if (!groups.has(baseType)) {
@@ -40,6 +46,7 @@ export function parseAnimationGroups(animationKeys: string[]): AnimationGroups {
         directions: [],
         keyMap: {},
         undirectedKey: null,
+        sideNaturallyFacesLeft: baseType.startsWith("tool-"),
       });
     }
 
@@ -68,8 +75,9 @@ export function resolveAnimation(
   const group = groups.get(baseType);
   if (!group) return null;
 
-  const flipX = direction === "left";
-  const spriteDir: SpriteDirection = direction === "left" || direction === "right" ? "side" : direction;
+  const isHorizontal = direction === "left" || direction === "right";
+  const flipX = group.sideNaturallyFacesLeft ? direction === "right" : direction === "left";
+  const spriteDir: SpriteDirection = isHorizontal ? "side" : direction;
 
   if (group.hasDirections) {
     const key = group.keyMap[spriteDir];
