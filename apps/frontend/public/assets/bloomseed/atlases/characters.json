@@ -1,9 +1,2009 @@
 {
   "frames": {
-    "characters.bloomseed.player.female.tool.slash.slash-down#0": {
+    "characters.bloomseed.player.female.carry.carry-idle-down#0": {
       "frame": {
         "x": 2,
         "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-down#1": {
+      "frame": {
+        "x": 68,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-down#2": {
+      "frame": {
+        "x": 134,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-down#3": {
+      "frame": {
+        "x": 200,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-side#0": {
+      "frame": {
+        "x": 266,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-side#1": {
+      "frame": {
+        "x": 332,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-side#2": {
+      "frame": {
+        "x": 398,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-side#3": {
+      "frame": {
+        "x": 464,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-up#0": {
+      "frame": {
+        "x": 530,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-up#1": {
+      "frame": {
+        "x": 596,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-up#2": {
+      "frame": {
+        "x": 662,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-idle-up#3": {
+      "frame": {
+        "x": 728,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#0": {
+      "frame": {
+        "x": 794,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#1": {
+      "frame": {
+        "x": 860,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#2": {
+      "frame": {
+        "x": 926,
+        "y": 2,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#3": {
+      "frame": {
+        "x": 2,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#4": {
+      "frame": {
+        "x": 68,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-down#5": {
+      "frame": {
+        "x": 134,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#0": {
+      "frame": {
+        "x": 200,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#1": {
+      "frame": {
+        "x": 266,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#2": {
+      "frame": {
+        "x": 332,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#3": {
+      "frame": {
+        "x": 398,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#4": {
+      "frame": {
+        "x": 464,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-side#5": {
+      "frame": {
+        "x": 530,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#0": {
+      "frame": {
+        "x": 596,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#1": {
+      "frame": {
+        "x": 662,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#2": {
+      "frame": {
+        "x": 728,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#3": {
+      "frame": {
+        "x": 794,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#4": {
+      "frame": {
+        "x": 860,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.carry.carry-run-up#5": {
+      "frame": {
+        "x": 926,
+        "y": 68,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#0": {
+      "frame": {
+        "x": 2,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#1": {
+      "frame": {
+        "x": 68,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#2": {
+      "frame": {
+        "x": 134,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#3": {
+      "frame": {
+        "x": 200,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#4": {
+      "frame": {
+        "x": 266,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#5": {
+      "frame": {
+        "x": 332,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#6": {
+      "frame": {
+        "x": 398,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#7": {
+      "frame": {
+        "x": 464,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#8": {
+      "frame": {
+        "x": 530,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.collapse.collapse#9": {
+      "frame": {
+        "x": 596,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#0": {
+      "frame": {
+        "x": 662,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#1": {
+      "frame": {
+        "x": 728,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#2": {
+      "frame": {
+        "x": 794,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#3": {
+      "frame": {
+        "x": 860,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#4": {
+      "frame": {
+        "x": 926,
+        "y": 134,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-down#5": {
+      "frame": {
+        "x": 2,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#0": {
+      "frame": {
+        "x": 68,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#1": {
+      "frame": {
+        "x": 134,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#2": {
+      "frame": {
+        "x": 200,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#3": {
+      "frame": {
+        "x": 266,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#4": {
+      "frame": {
+        "x": 332,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-side#5": {
+      "frame": {
+        "x": 398,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#0": {
+      "frame": {
+        "x": 464,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#1": {
+      "frame": {
+        "x": 530,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#2": {
+      "frame": {
+        "x": 596,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#3": {
+      "frame": {
+        "x": 662,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#4": {
+      "frame": {
+        "x": 728,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.death.death-up#5": {
+      "frame": {
+        "x": 794,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-down#0": {
+      "frame": {
+        "x": 860,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-down#1": {
+      "frame": {
+        "x": 926,
+        "y": 200,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-down#2": {
+      "frame": {
+        "x": 2,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-down#3": {
+      "frame": {
+        "x": 68,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-side#0": {
+      "frame": {
+        "x": 134,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-side#1": {
+      "frame": {
+        "x": 200,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-side#2": {
+      "frame": {
+        "x": 266,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-side#3": {
+      "frame": {
+        "x": 332,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-up#0": {
+      "frame": {
+        "x": 398,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-up#1": {
+      "frame": {
+        "x": 464,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-up#2": {
+      "frame": {
+        "x": 530,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.hit.hit-up#3": {
+      "frame": {
+        "x": 596,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-down#0": {
+      "frame": {
+        "x": 662,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-down#1": {
+      "frame": {
+        "x": 728,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-down#2": {
+      "frame": {
+        "x": 794,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-down#3": {
+      "frame": {
+        "x": 860,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-side#0": {
+      "frame": {
+        "x": 926,
+        "y": 266,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-side#1": {
+      "frame": {
+        "x": 2,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-side#2": {
+      "frame": {
+        "x": 68,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-side#3": {
+      "frame": {
+        "x": 134,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-up#0": {
+      "frame": {
+        "x": 200,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-up#1": {
+      "frame": {
+        "x": 266,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-up#2": {
+      "frame": {
+        "x": 332,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.idle.idle-up#3": {
+      "frame": {
+        "x": 398,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#0": {
+      "frame": {
+        "x": 464,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#1": {
+      "frame": {
+        "x": 530,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#2": {
+      "frame": {
+        "x": 596,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#3": {
+      "frame": {
+        "x": 662,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#4": {
+      "frame": {
+        "x": 728,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-down#5": {
+      "frame": {
+        "x": 794,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#0": {
+      "frame": {
+        "x": 860,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#1": {
+      "frame": {
+        "x": 926,
+        "y": 332,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#2": {
+      "frame": {
+        "x": 2,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#3": {
+      "frame": {
+        "x": 68,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#4": {
+      "frame": {
+        "x": 134,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-side#5": {
+      "frame": {
+        "x": 200,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#0": {
+      "frame": {
+        "x": 266,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#1": {
+      "frame": {
+        "x": 332,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#2": {
+      "frame": {
+        "x": 398,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#3": {
+      "frame": {
+        "x": 464,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#4": {
+      "frame": {
+        "x": 530,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.run.run-up#5": {
+      "frame": {
+        "x": 596,
+        "y": 398,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.tool.slash.slash-down#0": {
+      "frame": {
+        "x": 662,
+        "y": 398,
         "w": 64,
         "h": 64
       },
@@ -22,8 +2022,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-down#1": {
       "frame": {
-        "x": 68,
-        "y": 2,
+        "x": 728,
+        "y": 398,
         "w": 64,
         "h": 64
       },
@@ -42,8 +2042,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-down#2": {
       "frame": {
-        "x": 134,
-        "y": 2,
+        "x": 794,
+        "y": 398,
         "w": 64,
         "h": 64
       },
@@ -62,28 +2062,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-down#3": {
       "frame": {
-        "x": 200,
-        "y": 2,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.slash.slash-down#4": {
-      "frame": {
-        "x": 266,
-        "y": 2,
+        "x": 860,
+        "y": 398,
         "w": 64,
         "h": 64
       },
@@ -102,8 +2082,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-side#0": {
       "frame": {
-        "x": 332,
-        "y": 2,
+        "x": 926,
+        "y": 398,
         "w": 64,
         "h": 64
       },
@@ -122,8 +2102,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-side#1": {
       "frame": {
-        "x": 398,
-        "y": 2,
+        "x": 2,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -142,8 +2122,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-side#2": {
       "frame": {
-        "x": 464,
-        "y": 2,
+        "x": 68,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -162,28 +2142,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-side#3": {
       "frame": {
-        "x": 530,
-        "y": 2,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.slash.slash-side#4": {
-      "frame": {
-        "x": 596,
-        "y": 2,
+        "x": 134,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -202,8 +2162,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-up#0": {
       "frame": {
-        "x": 662,
-        "y": 2,
+        "x": 200,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -222,8 +2182,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-up#1": {
       "frame": {
-        "x": 728,
-        "y": 2,
+        "x": 266,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -242,8 +2202,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-up#2": {
       "frame": {
-        "x": 794,
-        "y": 2,
+        "x": 332,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -262,28 +2222,8 @@
     },
     "characters.bloomseed.player.female.tool.slash.slash-up#3": {
       "frame": {
-        "x": 860,
-        "y": 2,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.slash.slash-up#4": {
-      "frame": {
-        "x": 926,
-        "y": 2,
+        "x": 398,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -302,8 +2242,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-down#0": {
       "frame": {
-        "x": 2,
-        "y": 68,
+        "x": 464,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -322,8 +2262,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-down#1": {
       "frame": {
-        "x": 68,
-        "y": 68,
+        "x": 530,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -342,8 +2282,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-down#2": {
       "frame": {
-        "x": 134,
-        "y": 68,
+        "x": 596,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -362,8 +2302,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-down#3": {
       "frame": {
-        "x": 200,
-        "y": 68,
+        "x": 662,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -382,8 +2322,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-side#0": {
       "frame": {
-        "x": 266,
-        "y": 68,
+        "x": 728,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -402,8 +2342,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-side#1": {
       "frame": {
-        "x": 332,
-        "y": 68,
+        "x": 794,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -422,8 +2362,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-side#2": {
       "frame": {
-        "x": 398,
-        "y": 68,
+        "x": 860,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -442,8 +2382,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-side#3": {
       "frame": {
-        "x": 464,
-        "y": 68,
+        "x": 926,
+        "y": 464,
         "w": 64,
         "h": 64
       },
@@ -462,8 +2402,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-up#0": {
       "frame": {
-        "x": 530,
-        "y": 68,
+        "x": 2,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -482,8 +2422,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-up#1": {
       "frame": {
-        "x": 596,
-        "y": 68,
+        "x": 68,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -502,8 +2442,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-up#2": {
       "frame": {
-        "x": 662,
-        "y": 68,
+        "x": 134,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -522,8 +2462,8 @@
     },
     "characters.bloomseed.player.female.tool.smash.smash-up#3": {
       "frame": {
-        "x": 728,
-        "y": 68,
+        "x": 200,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -542,8 +2482,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-down#0": {
       "frame": {
-        "x": 794,
-        "y": 68,
+        "x": 266,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -562,8 +2502,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-down#1": {
       "frame": {
-        "x": 860,
-        "y": 68,
+        "x": 332,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -582,8 +2522,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-down#2": {
       "frame": {
-        "x": 926,
-        "y": 68,
+        "x": 398,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -602,28 +2542,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-down#3": {
       "frame": {
-        "x": 2,
-        "y": 134,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.stab.sword-stab-down#4": {
-      "frame": {
-        "x": 68,
-        "y": 134,
+        "x": 464,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -642,8 +2562,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-side#0": {
       "frame": {
-        "x": 134,
-        "y": 134,
+        "x": 530,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -662,8 +2582,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-side#1": {
       "frame": {
-        "x": 200,
-        "y": 134,
+        "x": 596,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -682,8 +2602,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-side#2": {
       "frame": {
-        "x": 266,
-        "y": 134,
+        "x": 662,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -702,28 +2622,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-side#3": {
       "frame": {
-        "x": 332,
-        "y": 134,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.stab.sword-stab-side#4": {
-      "frame": {
-        "x": 398,
-        "y": 134,
+        "x": 728,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -742,8 +2642,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-up#0": {
       "frame": {
-        "x": 464,
-        "y": 134,
+        "x": 794,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -762,8 +2662,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-up#1": {
       "frame": {
-        "x": 530,
-        "y": 134,
+        "x": 860,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -782,8 +2682,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-up#2": {
       "frame": {
-        "x": 596,
-        "y": 134,
+        "x": 926,
+        "y": 530,
         "w": 64,
         "h": 64
       },
@@ -802,8 +2702,8 @@
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-up#3": {
       "frame": {
-        "x": 662,
-        "y": 134,
+        "x": 2,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -820,10 +2720,70 @@
         "h": 64
       }
     },
-    "characters.bloomseed.player.female.tool.stab.sword-stab-up#4": {
+    "characters.bloomseed.player.female.tool.watering.watering-down#0": {
       "frame": {
-        "x": 728,
-        "y": 134,
+        "x": 68,
+        "y": 596,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.tool.watering.watering-down#1": {
+      "frame": {
+        "x": 134,
+        "y": 596,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.tool.watering.watering-down#2": {
+      "frame": {
+        "x": 200,
+        "y": 596,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.tool.watering.watering-down#3": {
+      "frame": {
+        "x": 266,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -842,8 +2802,8 @@
     },
     "characters.bloomseed.player.female.tool.watering.watering-side#0": {
       "frame": {
-        "x": 794,
-        "y": 134,
+        "x": 332,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -862,8 +2822,8 @@
     },
     "characters.bloomseed.player.female.tool.watering.watering-side#1": {
       "frame": {
-        "x": 860,
-        "y": 134,
+        "x": 398,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -882,8 +2842,8 @@
     },
     "characters.bloomseed.player.female.tool.watering.watering-side#2": {
       "frame": {
-        "x": 926,
-        "y": 134,
+        "x": 464,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -902,8 +2862,8 @@
     },
     "characters.bloomseed.player.female.tool.watering.watering-side#3": {
       "frame": {
-        "x": 2,
-        "y": 200,
+        "x": 530,
+        "y": 596,
         "w": 64,
         "h": 64
       },
@@ -918,1494 +2878,14 @@
       "sourceSize": {
         "w": 64,
         "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.tool.watering.watering-side#4": {
-      "frame": {
-        "x": 68,
-        "y": 200,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-down#0": {
-      "frame": {
-        "x": 134,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-down#1": {
-      "frame": {
-        "x": 184,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-down#2": {
-      "frame": {
-        "x": 234,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-side#0": {
-      "frame": {
-        "x": 284,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-side#1": {
-      "frame": {
-        "x": 334,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-side#2": {
-      "frame": {
-        "x": 384,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-up#0": {
-      "frame": {
-        "x": 434,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-up#1": {
-      "frame": {
-        "x": 484,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-idle-up#2": {
-      "frame": {
-        "x": 534,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-down#0": {
-      "frame": {
-        "x": 584,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-down#1": {
-      "frame": {
-        "x": 634,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-down#2": {
-      "frame": {
-        "x": 684,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-down#3": {
-      "frame": {
-        "x": 734,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-side#0": {
-      "frame": {
-        "x": 784,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-side#1": {
-      "frame": {
-        "x": 834,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-side#2": {
-      "frame": {
-        "x": 884,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-side#3": {
-      "frame": {
-        "x": 934,
-        "y": 200,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-up#0": {
-      "frame": {
-        "x": 2,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-up#1": {
-      "frame": {
-        "x": 52,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-up#2": {
-      "frame": {
-        "x": 102,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.carry.carry-run-up#3": {
-      "frame": {
-        "x": 152,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#0": {
-      "frame": {
-        "x": 202,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#1": {
-      "frame": {
-        "x": 252,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#2": {
-      "frame": {
-        "x": 302,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#3": {
-      "frame": {
-        "x": 352,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#4": {
-      "frame": {
-        "x": 402,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#5": {
-      "frame": {
-        "x": 452,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.collapse.collapse#6": {
-      "frame": {
-        "x": 502,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-down#0": {
-      "frame": {
-        "x": 552,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-down#1": {
-      "frame": {
-        "x": 602,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-down#2": {
-      "frame": {
-        "x": 652,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-down#3": {
-      "frame": {
-        "x": 702,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-side#0": {
-      "frame": {
-        "x": 752,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-side#1": {
-      "frame": {
-        "x": 802,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-side#2": {
-      "frame": {
-        "x": 852,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-side#3": {
-      "frame": {
-        "x": 902,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-up#0": {
-      "frame": {
-        "x": 952,
-        "y": 266,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-up#1": {
-      "frame": {
-        "x": 2,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-up#2": {
-      "frame": {
-        "x": 52,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.death.death-up#3": {
-      "frame": {
-        "x": 102,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-down#0": {
-      "frame": {
-        "x": 152,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-down#1": {
-      "frame": {
-        "x": 202,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-down#2": {
-      "frame": {
-        "x": 252,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-side#0": {
-      "frame": {
-        "x": 302,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-side#1": {
-      "frame": {
-        "x": 352,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-side#2": {
-      "frame": {
-        "x": 402,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-up#0": {
-      "frame": {
-        "x": 452,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-up#1": {
-      "frame": {
-        "x": 502,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.hit.hit-up#2": {
-      "frame": {
-        "x": 552,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-down#0": {
-      "frame": {
-        "x": 602,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-down#1": {
-      "frame": {
-        "x": 652,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-down#2": {
-      "frame": {
-        "x": 702,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-side#0": {
-      "frame": {
-        "x": 752,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-side#1": {
-      "frame": {
-        "x": 802,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-side#2": {
-      "frame": {
-        "x": 852,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-up#0": {
-      "frame": {
-        "x": 902,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-up#1": {
-      "frame": {
-        "x": 952,
-        "y": 316,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.idle.idle-up#2": {
-      "frame": {
-        "x": 2,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-down#0": {
-      "frame": {
-        "x": 52,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-down#1": {
-      "frame": {
-        "x": 102,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-down#2": {
-      "frame": {
-        "x": 152,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-down#3": {
-      "frame": {
-        "x": 202,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-side#0": {
-      "frame": {
-        "x": 252,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-side#1": {
-      "frame": {
-        "x": 302,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-side#2": {
-      "frame": {
-        "x": 352,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-side#3": {
-      "frame": {
-        "x": 402,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-up#0": {
-      "frame": {
-        "x": 452,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-up#1": {
-      "frame": {
-        "x": 502,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-up#2": {
-      "frame": {
-        "x": 552,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.run.run-up#3": {
-      "frame": {
-        "x": 602,
-        "y": 366,
-        "w": 48,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 48,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 48,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.tool.watering.watering-down#0": {
-      "frame": {
-        "x": 652,
-        "y": 366,
-        "w": 64,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.tool.watering.watering-down#1": {
-      "frame": {
-        "x": 718,
-        "y": 366,
-        "w": 64,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 48
-      }
-    },
-    "characters.bloomseed.player.female.tool.watering.watering-down#2": {
-      "frame": {
-        "x": 784,
-        "y": 366,
-        "w": 64,
-        "h": 48
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 48
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 48
       }
     },
     "characters.bloomseed.player.female.tool.watering.watering-up#0": {
       "frame": {
-        "x": 850,
-        "y": 366,
+        "x": 596,
+        "y": 596,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
@@ -2413,19 +2893,19 @@
         "x": 0,
         "y": 0,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "sourceSize": {
         "w": 64,
-        "h": 48
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.tool.watering.watering-up#1": {
       "frame": {
-        "x": 916,
-        "y": 366,
+        "x": 662,
+        "y": 596,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
@@ -2433,19 +2913,19 @@
         "x": 0,
         "y": 0,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "sourceSize": {
         "w": 64,
-        "h": 48
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.tool.watering.watering-up#2": {
       "frame": {
-        "x": 2,
-        "y": 416,
+        "x": 728,
+        "y": 596,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
@@ -2453,251 +2933,391 @@
         "x": 0,
         "y": 0,
         "w": 64,
-        "h": 48
+        "h": 64
       },
       "sourceSize": {
         "w": 64,
-        "h": 48
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.tool.watering.watering-up#3": {
+      "frame": {
+        "x": 794,
+        "y": 596,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-down#0": {
       "frame": {
-        "x": 68,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 860,
+        "y": 596,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-down#1": {
       "frame": {
-        "x": 118,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 926,
+        "y": 596,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-down#2": {
       "frame": {
-        "x": 168,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 2,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-down#3": {
       "frame": {
-        "x": 218,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 68,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-down#4": {
+      "frame": {
+        "x": 134,
+        "y": 662,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-down#5": {
+      "frame": {
+        "x": 200,
+        "y": 662,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-side#0": {
       "frame": {
-        "x": 268,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 266,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-side#1": {
       "frame": {
-        "x": 318,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 332,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-side#2": {
       "frame": {
-        "x": 368,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 398,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-side#3": {
       "frame": {
-        "x": 418,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 464,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-side#4": {
+      "frame": {
+        "x": 530,
+        "y": 662,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-side#5": {
+      "frame": {
+        "x": 596,
+        "y": 662,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-up#0": {
       "frame": {
-        "x": 468,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 662,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-up#1": {
       "frame": {
-        "x": 518,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 728,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-up#2": {
       "frame": {
-        "x": 568,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 794,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       }
     },
     "characters.bloomseed.player.female.walk.walk-up#3": {
       "frame": {
-        "x": 618,
-        "y": 416,
-        "w": 48,
-        "h": 48
+        "x": 860,
+        "y": 662,
+        "w": 64,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
       },
       "sourceSize": {
-        "w": 48,
-        "h": 48
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-up#4": {
+      "frame": {
+        "x": 926,
+        "y": 662,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "characters.bloomseed.player.female.walk.walk-up#5": {
+      "frame": {
+        "x": 2,
+        "y": 728,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
       }
     }
   },
@@ -2707,8 +3327,8 @@
     "image": "characters.png",
     "format": "RGBA8888",
     "size": {
-      "w": 1002,
-      "h": 466
+      "w": 992,
+      "h": 794
     },
     "scale": "1"
   }

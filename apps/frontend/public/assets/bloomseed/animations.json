@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-04T19:42:05.861Z",
+  "generatedAt": "2026-03-04T22:20:44.600Z",
   "namespace": "bloomseed",
   "animations": {
     "characters.bloomseed.player.female.carry.carry-idle-down": {
@@ -7,7 +7,8 @@
       "frames": [
         "characters.bloomseed.player.female.carry.carry-idle-down#0",
         "characters.bloomseed.player.female.carry.carry-idle-down#1",
-        "characters.bloomseed.player.female.carry.carry-idle-down#2"
+        "characters.bloomseed.player.female.carry.carry-idle-down#2",
+        "characters.bloomseed.player.female.carry.carry-idle-down#3"
       ]
     },
     "characters.bloomseed.player.female.carry.carry-idle-side": {
@@ -15,7 +16,8 @@
       "frames": [
         "characters.bloomseed.player.female.carry.carry-idle-side#0",
         "characters.bloomseed.player.female.carry.carry-idle-side#1",
-        "characters.bloomseed.player.female.carry.carry-idle-side#2"
+        "characters.bloomseed.player.female.carry.carry-idle-side#2",
+        "characters.bloomseed.player.female.carry.carry-idle-side#3"
       ]
     },
     "characters.bloomseed.player.female.carry.carry-idle-up": {
@@ -23,7 +25,8 @@
       "frames": [
         "characters.bloomseed.player.female.carry.carry-idle-up#0",
         "characters.bloomseed.player.female.carry.carry-idle-up#1",
-        "characters.bloomseed.player.female.carry.carry-idle-up#2"
+        "characters.bloomseed.player.female.carry.carry-idle-up#2",
+        "characters.bloomseed.player.female.carry.carry-idle-up#3"
       ]
     },
     "characters.bloomseed.player.female.carry.carry-run-down": {
@@ -32,7 +35,9 @@
         "characters.bloomseed.player.female.carry.carry-run-down#0",
         "characters.bloomseed.player.female.carry.carry-run-down#1",
         "characters.bloomseed.player.female.carry.carry-run-down#2",
-        "characters.bloomseed.player.female.carry.carry-run-down#3"
+        "characters.bloomseed.player.female.carry.carry-run-down#3",
+        "characters.bloomseed.player.female.carry.carry-run-down#4",
+        "characters.bloomseed.player.female.carry.carry-run-down#5"
       ]
     },
     "characters.bloomseed.player.female.carry.carry-run-side": {
@@ -41,7 +46,9 @@
         "characters.bloomseed.player.female.carry.carry-run-side#0",
         "characters.bloomseed.player.female.carry.carry-run-side#1",
         "characters.bloomseed.player.female.carry.carry-run-side#2",
-        "characters.bloomseed.player.female.carry.carry-run-side#3"
+        "characters.bloomseed.player.female.carry.carry-run-side#3",
+        "characters.bloomseed.player.female.carry.carry-run-side#4",
+        "characters.bloomseed.player.female.carry.carry-run-side#5"
       ]
     },
     "characters.bloomseed.player.female.carry.carry-run-up": {
@@ -50,7 +57,9 @@
         "characters.bloomseed.player.female.carry.carry-run-up#0",
         "characters.bloomseed.player.female.carry.carry-run-up#1",
         "characters.bloomseed.player.female.carry.carry-run-up#2",
-        "characters.bloomseed.player.female.carry.carry-run-up#3"
+        "characters.bloomseed.player.female.carry.carry-run-up#3",
+        "characters.bloomseed.player.female.carry.carry-run-up#4",
+        "characters.bloomseed.player.female.carry.carry-run-up#5"
       ]
     },
     "characters.bloomseed.player.female.collapse.collapse": {
@@ -62,7 +71,10 @@
         "characters.bloomseed.player.female.collapse.collapse#3",
         "characters.bloomseed.player.female.collapse.collapse#4",
         "characters.bloomseed.player.female.collapse.collapse#5",
-        "characters.bloomseed.player.female.collapse.collapse#6"
+        "characters.bloomseed.player.female.collapse.collapse#6",
+        "characters.bloomseed.player.female.collapse.collapse#7",
+        "characters.bloomseed.player.female.collapse.collapse#8",
+        "characters.bloomseed.player.female.collapse.collapse#9"
       ]
     },
     "characters.bloomseed.player.female.death.death-down": {
@@ -71,7 +83,9 @@
         "characters.bloomseed.player.female.death.death-down#0",
         "characters.bloomseed.player.female.death.death-down#1",
         "characters.bloomseed.player.female.death.death-down#2",
-        "characters.bloomseed.player.female.death.death-down#3"
+        "characters.bloomseed.player.female.death.death-down#3",
+        "characters.bloomseed.player.female.death.death-down#4",
+        "characters.bloomseed.player.female.death.death-down#5"
       ]
     },
     "characters.bloomseed.player.female.death.death-side": {
@@ -80,7 +94,9 @@
         "characters.bloomseed.player.female.death.death-side#0",
         "characters.bloomseed.player.female.death.death-side#1",
         "characters.bloomseed.player.female.death.death-side#2",
-        "characters.bloomseed.player.female.death.death-side#3"
+        "characters.bloomseed.player.female.death.death-side#3",
+        "characters.bloomseed.player.female.death.death-side#4",
+        "characters.bloomseed.player.female.death.death-side#5"
       ]
     },
     "characters.bloomseed.player.female.death.death-up": {
@@ -89,7 +105,9 @@
         "characters.bloomseed.player.female.death.death-up#0",
         "characters.bloomseed.player.female.death.death-up#1",
         "characters.bloomseed.player.female.death.death-up#2",
-        "characters.bloomseed.player.female.death.death-up#3"
+        "characters.bloomseed.player.female.death.death-up#3",
+        "characters.bloomseed.player.female.death.death-up#4",
+        "characters.bloomseed.player.female.death.death-up#5"
       ]
     },
     "characters.bloomseed.player.female.hit.hit-down": {
@@ -97,7 +115,8 @@
       "frames": [
         "characters.bloomseed.player.female.hit.hit-down#0",
         "characters.bloomseed.player.female.hit.hit-down#1",
-        "characters.bloomseed.player.female.hit.hit-down#2"
+        "characters.bloomseed.player.female.hit.hit-down#2",
+        "characters.bloomseed.player.female.hit.hit-down#3"
       ]
     },
     "characters.bloomseed.player.female.hit.hit-side": {
@@ -105,7 +124,8 @@
       "frames": [
         "characters.bloomseed.player.female.hit.hit-side#0",
         "characters.bloomseed.player.female.hit.hit-side#1",
-        "characters.bloomseed.player.female.hit.hit-side#2"
+        "characters.bloomseed.player.female.hit.hit-side#2",
+        "characters.bloomseed.player.female.hit.hit-side#3"
       ]
     },
     "characters.bloomseed.player.female.hit.hit-up": {
@@ -113,7 +133,8 @@
       "frames": [
         "characters.bloomseed.player.female.hit.hit-up#0",
         "characters.bloomseed.player.female.hit.hit-up#1",
-        "characters.bloomseed.player.female.hit.hit-up#2"
+        "characters.bloomseed.player.female.hit.hit-up#2",
+        "characters.bloomseed.player.female.hit.hit-up#3"
       ]
     },
     "characters.bloomseed.player.female.idle.idle-down": {
@@ -121,7 +142,8 @@
       "frames": [
         "characters.bloomseed.player.female.idle.idle-down#0",
         "characters.bloomseed.player.female.idle.idle-down#1",
-        "characters.bloomseed.player.female.idle.idle-down#2"
+        "characters.bloomseed.player.female.idle.idle-down#2",
+        "characters.bloomseed.player.female.idle.idle-down#3"
       ]
     },
     "characters.bloomseed.player.female.idle.idle-side": {
@@ -129,7 +151,8 @@
       "frames": [
         "characters.bloomseed.player.female.idle.idle-side#0",
         "characters.bloomseed.player.female.idle.idle-side#1",
-        "characters.bloomseed.player.female.idle.idle-side#2"
+        "characters.bloomseed.player.female.idle.idle-side#2",
+        "characters.bloomseed.player.female.idle.idle-side#3"
       ]
     },
     "characters.bloomseed.player.female.idle.idle-up": {
@@ -137,7 +160,8 @@
       "frames": [
         "characters.bloomseed.player.female.idle.idle-up#0",
         "characters.bloomseed.player.female.idle.idle-up#1",
-        "characters.bloomseed.player.female.idle.idle-up#2"
+        "characters.bloomseed.player.female.idle.idle-up#2",
+        "characters.bloomseed.player.female.idle.idle-up#3"
       ]
     },
     "characters.bloomseed.player.female.run.run-down": {
@@ -146,7 +170,9 @@
         "characters.bloomseed.player.female.run.run-down#0",
         "characters.bloomseed.player.female.run.run-down#1",
         "characters.bloomseed.player.female.run.run-down#2",
-        "characters.bloomseed.player.female.run.run-down#3"
+        "characters.bloomseed.player.female.run.run-down#3",
+        "characters.bloomseed.player.female.run.run-down#4",
+        "characters.bloomseed.player.female.run.run-down#5"
       ]
     },
     "characters.bloomseed.player.female.run.run-side": {
@@ -155,7 +181,9 @@
         "characters.bloomseed.player.female.run.run-side#0",
         "characters.bloomseed.player.female.run.run-side#1",
         "characters.bloomseed.player.female.run.run-side#2",
-        "characters.bloomseed.player.female.run.run-side#3"
+        "characters.bloomseed.player.female.run.run-side#3",
+        "characters.bloomseed.player.female.run.run-side#4",
+        "characters.bloomseed.player.female.run.run-side#5"
       ]
     },
     "characters.bloomseed.player.female.run.run-up": {
@@ -164,7 +192,9 @@
         "characters.bloomseed.player.female.run.run-up#0",
         "characters.bloomseed.player.female.run.run-up#1",
         "characters.bloomseed.player.female.run.run-up#2",
-        "characters.bloomseed.player.female.run.run-up#3"
+        "characters.bloomseed.player.female.run.run-up#3",
+        "characters.bloomseed.player.female.run.run-up#4",
+        "characters.bloomseed.player.female.run.run-up#5"
       ]
     },
     "characters.bloomseed.player.female.tool.slash.slash-down": {
@@ -173,8 +203,7 @@
         "characters.bloomseed.player.female.tool.slash.slash-down#0",
         "characters.bloomseed.player.female.tool.slash.slash-down#1",
         "characters.bloomseed.player.female.tool.slash.slash-down#2",
-        "characters.bloomseed.player.female.tool.slash.slash-down#3",
-        "characters.bloomseed.player.female.tool.slash.slash-down#4"
+        "characters.bloomseed.player.female.tool.slash.slash-down#3"
       ]
     },
     "characters.bloomseed.player.female.tool.slash.slash-side": {
@@ -183,8 +212,7 @@
         "characters.bloomseed.player.female.tool.slash.slash-side#0",
         "characters.bloomseed.player.female.tool.slash.slash-side#1",
         "characters.bloomseed.player.female.tool.slash.slash-side#2",
-        "characters.bloomseed.player.female.tool.slash.slash-side#3",
-        "characters.bloomseed.player.female.tool.slash.slash-side#4"
+        "characters.bloomseed.player.female.tool.slash.slash-side#3"
       ]
     },
     "characters.bloomseed.player.female.tool.slash.slash-up": {
@@ -193,8 +221,7 @@
         "characters.bloomseed.player.female.tool.slash.slash-up#0",
         "characters.bloomseed.player.female.tool.slash.slash-up#1",
         "characters.bloomseed.player.female.tool.slash.slash-up#2",
-        "characters.bloomseed.player.female.tool.slash.slash-up#3",
-        "characters.bloomseed.player.female.tool.slash.slash-up#4"
+        "characters.bloomseed.player.female.tool.slash.slash-up#3"
       ]
     },
     "characters.bloomseed.player.female.tool.smash.smash-down": {
@@ -230,8 +257,7 @@
         "characters.bloomseed.player.female.tool.stab.sword-stab-down#0",
         "characters.bloomseed.player.female.tool.stab.sword-stab-down#1",
         "characters.bloomseed.player.female.tool.stab.sword-stab-down#2",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-down#3",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-down#4"
+        "characters.bloomseed.player.female.tool.stab.sword-stab-down#3"
       ]
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-side": {
@@ -240,8 +266,7 @@
         "characters.bloomseed.player.female.tool.stab.sword-stab-side#0",
         "characters.bloomseed.player.female.tool.stab.sword-stab-side#1",
         "characters.bloomseed.player.female.tool.stab.sword-stab-side#2",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-side#3",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-side#4"
+        "characters.bloomseed.player.female.tool.stab.sword-stab-side#3"
       ]
     },
     "characters.bloomseed.player.female.tool.stab.sword-stab-up": {
@@ -250,8 +275,7 @@
         "characters.bloomseed.player.female.tool.stab.sword-stab-up#0",
         "characters.bloomseed.player.female.tool.stab.sword-stab-up#1",
         "characters.bloomseed.player.female.tool.stab.sword-stab-up#2",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-up#3",
-        "characters.bloomseed.player.female.tool.stab.sword-stab-up#4"
+        "characters.bloomseed.player.female.tool.stab.sword-stab-up#3"
       ]
     },
     "characters.bloomseed.player.female.tool.watering.watering-down": {
@@ -259,7 +283,8 @@
       "frames": [
         "characters.bloomseed.player.female.tool.watering.watering-down#0",
         "characters.bloomseed.player.female.tool.watering.watering-down#1",
-        "characters.bloomseed.player.female.tool.watering.watering-down#2"
+        "characters.bloomseed.player.female.tool.watering.watering-down#2",
+        "characters.bloomseed.player.female.tool.watering.watering-down#3"
       ]
     },
     "characters.bloomseed.player.female.tool.watering.watering-side": {
@@ -268,8 +293,7 @@
         "characters.bloomseed.player.female.tool.watering.watering-side#0",
         "characters.bloomseed.player.female.tool.watering.watering-side#1",
         "characters.bloomseed.player.female.tool.watering.watering-side#2",
-        "characters.bloomseed.player.female.tool.watering.watering-side#3",
-        "characters.bloomseed.player.female.tool.watering.watering-side#4"
+        "characters.bloomseed.player.female.tool.watering.watering-side#3"
       ]
     },
     "characters.bloomseed.player.female.tool.watering.watering-up": {
@@ -277,7 +301,8 @@
       "frames": [
         "characters.bloomseed.player.female.tool.watering.watering-up#0",
         "characters.bloomseed.player.female.tool.watering.watering-up#1",
-        "characters.bloomseed.player.female.tool.watering.watering-up#2"
+        "characters.bloomseed.player.female.tool.watering.watering-up#2",
+        "characters.bloomseed.player.female.tool.watering.watering-up#3"
       ]
     },
     "characters.bloomseed.player.female.walk.walk-down": {
@@ -286,7 +311,9 @@
         "characters.bloomseed.player.female.walk.walk-down#0",
         "characters.bloomseed.player.female.walk.walk-down#1",
         "characters.bloomseed.player.female.walk.walk-down#2",
-        "characters.bloomseed.player.female.walk.walk-down#3"
+        "characters.bloomseed.player.female.walk.walk-down#3",
+        "characters.bloomseed.player.female.walk.walk-down#4",
+        "characters.bloomseed.player.female.walk.walk-down#5"
       ]
     },
     "characters.bloomseed.player.female.walk.walk-side": {
@@ -295,7 +322,9 @@
         "characters.bloomseed.player.female.walk.walk-side#0",
         "characters.bloomseed.player.female.walk.walk-side#1",
         "characters.bloomseed.player.female.walk.walk-side#2",
-        "characters.bloomseed.player.female.walk.walk-side#3"
+        "characters.bloomseed.player.female.walk.walk-side#3",
+        "characters.bloomseed.player.female.walk.walk-side#4",
+        "characters.bloomseed.player.female.walk.walk-side#5"
       ]
     },
     "characters.bloomseed.player.female.walk.walk-up": {
@@ -304,7 +333,9 @@
         "characters.bloomseed.player.female.walk.walk-up#0",
         "characters.bloomseed.player.female.walk.walk-up#1",
         "characters.bloomseed.player.female.walk.walk-up#2",
-        "characters.bloomseed.player.female.walk.walk-up#3"
+        "characters.bloomseed.player.female.walk.walk-up#3",
+        "characters.bloomseed.player.female.walk.walk-up#4",
+        "characters.bloomseed.player.female.walk.walk-up#5"
       ]
     },
     "equipment.bloomseed.tools.axe-gold-down": {
@@ -550,364 +581,328 @@
         "equipment.bloomseed.tools.pickaxe-wood-up#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-gold-down": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-gold-down#0",
-        "equipment.bloomseed.tools.sickle-gold-down#1",
-        "equipment.bloomseed.tools.sickle-gold-down#2",
-        "equipment.bloomseed.tools.sickle-gold-down#3",
-        "equipment.bloomseed.tools.sickle-gold-down#4"
+        "equipment.bloomseed.tools.sickle.sickle-gold-down#0",
+        "equipment.bloomseed.tools.sickle.sickle-gold-down#1",
+        "equipment.bloomseed.tools.sickle.sickle-gold-down#2",
+        "equipment.bloomseed.tools.sickle.sickle-gold-down#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-gold-side": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-gold-side#0",
-        "equipment.bloomseed.tools.sickle-gold-side#1",
-        "equipment.bloomseed.tools.sickle-gold-side#2",
-        "equipment.bloomseed.tools.sickle-gold-side#3",
-        "equipment.bloomseed.tools.sickle-gold-side#4"
+        "equipment.bloomseed.tools.sickle.sickle-gold-side#0",
+        "equipment.bloomseed.tools.sickle.sickle-gold-side#1",
+        "equipment.bloomseed.tools.sickle.sickle-gold-side#2",
+        "equipment.bloomseed.tools.sickle.sickle-gold-side#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-gold-up": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-gold-up#0",
-        "equipment.bloomseed.tools.sickle-gold-up#1",
-        "equipment.bloomseed.tools.sickle-gold-up#2",
-        "equipment.bloomseed.tools.sickle-gold-up#3",
-        "equipment.bloomseed.tools.sickle-gold-up#4"
+        "equipment.bloomseed.tools.sickle.sickle-gold-up#0",
+        "equipment.bloomseed.tools.sickle.sickle-gold-up#1",
+        "equipment.bloomseed.tools.sickle.sickle-gold-up#2",
+        "equipment.bloomseed.tools.sickle.sickle-gold-up#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-iron-down": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-iron-down#0",
-        "equipment.bloomseed.tools.sickle-iron-down#1",
-        "equipment.bloomseed.tools.sickle-iron-down#2",
-        "equipment.bloomseed.tools.sickle-iron-down#3",
-        "equipment.bloomseed.tools.sickle-iron-down#4"
+        "equipment.bloomseed.tools.sickle.sickle-iron-down#0",
+        "equipment.bloomseed.tools.sickle.sickle-iron-down#1",
+        "equipment.bloomseed.tools.sickle.sickle-iron-down#2",
+        "equipment.bloomseed.tools.sickle.sickle-iron-down#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-iron-side": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-iron-side#0",
-        "equipment.bloomseed.tools.sickle-iron-side#1",
-        "equipment.bloomseed.tools.sickle-iron-side#2",
-        "equipment.bloomseed.tools.sickle-iron-side#3",
-        "equipment.bloomseed.tools.sickle-iron-side#4"
+        "equipment.bloomseed.tools.sickle.sickle-iron-side#0",
+        "equipment.bloomseed.tools.sickle.sickle-iron-side#1",
+        "equipment.bloomseed.tools.sickle.sickle-iron-side#2",
+        "equipment.bloomseed.tools.sickle.sickle-iron-side#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-iron-up": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-iron-up#0",
-        "equipment.bloomseed.tools.sickle-iron-up#1",
-        "equipment.bloomseed.tools.sickle-iron-up#2",
-        "equipment.bloomseed.tools.sickle-iron-up#3",
-        "equipment.bloomseed.tools.sickle-iron-up#4"
+        "equipment.bloomseed.tools.sickle.sickle-iron-up#0",
+        "equipment.bloomseed.tools.sickle.sickle-iron-up#1",
+        "equipment.bloomseed.tools.sickle.sickle-iron-up#2",
+        "equipment.bloomseed.tools.sickle.sickle-iron-up#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-wood-down": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-wood-down#0",
-        "equipment.bloomseed.tools.sickle-wood-down#1",
-        "equipment.bloomseed.tools.sickle-wood-down#2",
-        "equipment.bloomseed.tools.sickle-wood-down#3",
-        "equipment.bloomseed.tools.sickle-wood-down#4"
+        "equipment.bloomseed.tools.sickle.sickle-wood-down#0",
+        "equipment.bloomseed.tools.sickle.sickle-wood-down#1",
+        "equipment.bloomseed.tools.sickle.sickle-wood-down#2",
+        "equipment.bloomseed.tools.sickle.sickle-wood-down#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-wood-side": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-wood-side#0",
-        "equipment.bloomseed.tools.sickle-wood-side#1",
-        "equipment.bloomseed.tools.sickle-wood-side#2",
-        "equipment.bloomseed.tools.sickle-wood-side#3",
-        "equipment.bloomseed.tools.sickle-wood-side#4"
+        "equipment.bloomseed.tools.sickle.sickle-wood-side#0",
+        "equipment.bloomseed.tools.sickle.sickle-wood-side#1",
+        "equipment.bloomseed.tools.sickle.sickle-wood-side#2",
+        "equipment.bloomseed.tools.sickle.sickle-wood-side#3"
       ]
     },
-    "equipment.bloomseed.tools.sickle-wood-up": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.sickle-wood-up#0",
-        "equipment.bloomseed.tools.sickle-wood-up#1",
-        "equipment.bloomseed.tools.sickle-wood-up#2",
-        "equipment.bloomseed.tools.sickle-wood-up#3",
-        "equipment.bloomseed.tools.sickle-wood-up#4"
+        "equipment.bloomseed.tools.sickle.sickle-wood-up#0",
+        "equipment.bloomseed.tools.sickle.sickle-wood-up#1",
+        "equipment.bloomseed.tools.sickle.sickle-wood-up#2",
+        "equipment.bloomseed.tools.sickle.sickle-wood-up#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-gold-down": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-gold-down#0",
-        "equipment.bloomseed.tools.watering-can-gold-down#1",
-        "equipment.bloomseed.tools.watering-can-gold-down#2",
-        "equipment.bloomseed.tools.watering-can-gold-down#3",
-        "equipment.bloomseed.tools.watering-can-gold-down#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-down#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-down#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-down#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-down#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-gold-side": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-gold-side#0",
-        "equipment.bloomseed.tools.watering-can-gold-side#1",
-        "equipment.bloomseed.tools.watering-can-gold-side#2",
-        "equipment.bloomseed.tools.watering-can-gold-side#3",
-        "equipment.bloomseed.tools.watering-can-gold-side#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-side#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-side#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-side#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-side#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-gold-up": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-gold-up#0",
-        "equipment.bloomseed.tools.watering-can-gold-up#1",
-        "equipment.bloomseed.tools.watering-can-gold-up#2",
-        "equipment.bloomseed.tools.watering-can-gold-up#3",
-        "equipment.bloomseed.tools.watering-can-gold-up#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-up#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-up#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-up#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-gold-up#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-iron-down": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-iron-down#0",
-        "equipment.bloomseed.tools.watering-can-iron-down#1",
-        "equipment.bloomseed.tools.watering-can-iron-down#2",
-        "equipment.bloomseed.tools.watering-can-iron-down#3",
-        "equipment.bloomseed.tools.watering-can-iron-down#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-down#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-down#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-down#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-down#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-iron-side": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-iron-side#0",
-        "equipment.bloomseed.tools.watering-can-iron-side#1",
-        "equipment.bloomseed.tools.watering-can-iron-side#2",
-        "equipment.bloomseed.tools.watering-can-iron-side#3",
-        "equipment.bloomseed.tools.watering-can-iron-side#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-side#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-side#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-side#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-side#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-iron-up": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-iron-up#0",
-        "equipment.bloomseed.tools.watering-can-iron-up#1",
-        "equipment.bloomseed.tools.watering-can-iron-up#2",
-        "equipment.bloomseed.tools.watering-can-iron-up#3",
-        "equipment.bloomseed.tools.watering-can-iron-up#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-up#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-up#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-up#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-iron-up#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-wood-down": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-wood-down#0",
-        "equipment.bloomseed.tools.watering-can-wood-down#1",
-        "equipment.bloomseed.tools.watering-can-wood-down#2",
-        "equipment.bloomseed.tools.watering-can-wood-down#3",
-        "equipment.bloomseed.tools.watering-can-wood-down#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-down#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-down#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-down#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-down#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-wood-side": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-wood-side#0",
-        "equipment.bloomseed.tools.watering-can-wood-side#1",
-        "equipment.bloomseed.tools.watering-can-wood-side#2",
-        "equipment.bloomseed.tools.watering-can-wood-side#3",
-        "equipment.bloomseed.tools.watering-can-wood-side#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-side#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-side#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-side#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-side#3"
       ]
     },
-    "equipment.bloomseed.tools.watering-can-wood-up": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.tools.watering-can-wood-up#0",
-        "equipment.bloomseed.tools.watering-can-wood-up#1",
-        "equipment.bloomseed.tools.watering-can-wood-up#2",
-        "equipment.bloomseed.tools.watering-can-wood-up#3",
-        "equipment.bloomseed.tools.watering-can-wood-up#4"
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-up#0",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-up#1",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-up#2",
+        "equipment.bloomseed.tools.watering-can.watering-can-wood-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-gold-down#0",
-        "equipment.bloomseed.weapons.sword-slash-gold-down#1",
-        "equipment.bloomseed.weapons.sword-slash-gold-down#2",
-        "equipment.bloomseed.weapons.sword-slash-gold-down#3",
-        "equipment.bloomseed.weapons.sword-slash-gold-down#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-gold-side#0",
-        "equipment.bloomseed.weapons.sword-slash-gold-side#1",
-        "equipment.bloomseed.weapons.sword-slash-gold-side#2",
-        "equipment.bloomseed.weapons.sword-slash-gold-side#3",
-        "equipment.bloomseed.weapons.sword-slash-gold-side#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-up": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-gold-up#0",
-        "equipment.bloomseed.weapons.sword-slash-gold-up#1",
-        "equipment.bloomseed.weapons.sword-slash-gold-up#2",
-        "equipment.bloomseed.weapons.sword-slash-gold-up#3",
-        "equipment.bloomseed.weapons.sword-slash-gold-up#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-down": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-iron-down#0",
-        "equipment.bloomseed.weapons.sword-slash-iron-down#1",
-        "equipment.bloomseed.weapons.sword-slash-iron-down#2",
-        "equipment.bloomseed.weapons.sword-slash-iron-down#3",
-        "equipment.bloomseed.weapons.sword-slash-iron-down#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-iron-side#0",
-        "equipment.bloomseed.weapons.sword-slash-iron-side#1",
-        "equipment.bloomseed.weapons.sword-slash-iron-side#2",
-        "equipment.bloomseed.weapons.sword-slash-iron-side#3",
-        "equipment.bloomseed.weapons.sword-slash-iron-side#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-iron-up#0",
-        "equipment.bloomseed.weapons.sword-slash-iron-up#1",
-        "equipment.bloomseed.weapons.sword-slash-iron-up#2",
-        "equipment.bloomseed.weapons.sword-slash-iron-up#3",
-        "equipment.bloomseed.weapons.sword-slash-iron-up#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-wood-down#0",
-        "equipment.bloomseed.weapons.sword-slash-wood-down#1",
-        "equipment.bloomseed.weapons.sword-slash-wood-down#2",
-        "equipment.bloomseed.weapons.sword-slash-wood-down#3",
-        "equipment.bloomseed.weapons.sword-slash-wood-down#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-wood-side#0",
-        "equipment.bloomseed.weapons.sword-slash-wood-side#1",
-        "equipment.bloomseed.weapons.sword-slash-wood-side#2",
-        "equipment.bloomseed.weapons.sword-slash-wood-side#3",
-        "equipment.bloomseed.weapons.sword-slash-wood-side#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-up": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-slash-wood-up#0",
-        "equipment.bloomseed.weapons.sword-slash-wood-up#1",
-        "equipment.bloomseed.weapons.sword-slash-wood-up#2",
-        "equipment.bloomseed.weapons.sword-slash-wood-up#3",
-        "equipment.bloomseed.weapons.sword-slash-wood-up#4"
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#0",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#1",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#2",
+        "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-down": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-gold-down#0",
-        "equipment.bloomseed.weapons.sword-stab-gold-down#1",
-        "equipment.bloomseed.weapons.sword-stab-gold-down#2",
-        "equipment.bloomseed.weapons.sword-stab-gold-down#3",
-        "equipment.bloomseed.weapons.sword-stab-gold-down#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-side": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-gold-side#0",
-        "equipment.bloomseed.weapons.sword-stab-gold-side#1",
-        "equipment.bloomseed.weapons.sword-stab-gold-side#2",
-        "equipment.bloomseed.weapons.sword-stab-gold-side#3",
-        "equipment.bloomseed.weapons.sword-stab-gold-side#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-gold-up#0",
-        "equipment.bloomseed.weapons.sword-stab-gold-up#1",
-        "equipment.bloomseed.weapons.sword-stab-gold-up#2",
-        "equipment.bloomseed.weapons.sword-stab-gold-up#3",
-        "equipment.bloomseed.weapons.sword-stab-gold-up#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-iron-down#0",
-        "equipment.bloomseed.weapons.sword-stab-iron-down#1",
-        "equipment.bloomseed.weapons.sword-stab-iron-down#2",
-        "equipment.bloomseed.weapons.sword-stab-iron-down#3",
-        "equipment.bloomseed.weapons.sword-stab-iron-down#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-iron-side#0",
-        "equipment.bloomseed.weapons.sword-stab-iron-side#1",
-        "equipment.bloomseed.weapons.sword-stab-iron-side#2",
-        "equipment.bloomseed.weapons.sword-stab-iron-side#3",
-        "equipment.bloomseed.weapons.sword-stab-iron-side#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-iron-up#0",
-        "equipment.bloomseed.weapons.sword-stab-iron-up#1",
-        "equipment.bloomseed.weapons.sword-stab-iron-up#2",
-        "equipment.bloomseed.weapons.sword-stab-iron-up#3",
-        "equipment.bloomseed.weapons.sword-stab-iron-up#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-down": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-wood-down#0",
-        "equipment.bloomseed.weapons.sword-stab-wood-down#1",
-        "equipment.bloomseed.weapons.sword-stab-wood-down#2",
-        "equipment.bloomseed.weapons.sword-stab-wood-down#3",
-        "equipment.bloomseed.weapons.sword-stab-wood-down#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-wood-side#0",
-        "equipment.bloomseed.weapons.sword-stab-wood-side#1",
-        "equipment.bloomseed.weapons.sword-stab-wood-side#2",
-        "equipment.bloomseed.weapons.sword-stab-wood-side#3",
-        "equipment.bloomseed.weapons.sword-stab-wood-side#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#3"
       ]
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-up": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up": {
       "atlasKey": "bloomseed.equipment",
       "frames": [
-        "equipment.bloomseed.weapons.sword-stab-wood-up#0",
-        "equipment.bloomseed.weapons.sword-stab-wood-up#1",
-        "equipment.bloomseed.weapons.sword-stab-wood-up#2",
-        "equipment.bloomseed.weapons.sword-stab-wood-up#3",
-        "equipment.bloomseed.weapons.sword-stab-wood-up#4"
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#0",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#1",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#2",
+        "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#3"
       ]
     },
     "mobs.bloomseed.animals.chicken.chicken-eat": {
@@ -1021,9 +1016,7 @@
         "mobs.bloomseed.animals.cow.cow-eat#3",
         "mobs.bloomseed.animals.cow.cow-eat#4",
         "mobs.bloomseed.animals.cow.cow-eat#5",
-        "mobs.bloomseed.animals.cow.cow-eat#6",
-        "mobs.bloomseed.animals.cow.cow-eat#7",
-        "mobs.bloomseed.animals.cow.cow-eat#8"
+        "mobs.bloomseed.animals.cow.cow-eat#6"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-idle-down": {
@@ -1032,8 +1025,7 @@
         "mobs.bloomseed.animals.cow.cow-idle-down#0",
         "mobs.bloomseed.animals.cow.cow-idle-down#1",
         "mobs.bloomseed.animals.cow.cow-idle-down#2",
-        "mobs.bloomseed.animals.cow.cow-idle-down#3",
-        "mobs.bloomseed.animals.cow.cow-idle-down#4"
+        "mobs.bloomseed.animals.cow.cow-idle-down#3"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-idle-side": {
@@ -1042,8 +1034,7 @@
         "mobs.bloomseed.animals.cow.cow-idle-side#0",
         "mobs.bloomseed.animals.cow.cow-idle-side#1",
         "mobs.bloomseed.animals.cow.cow-idle-side#2",
-        "mobs.bloomseed.animals.cow.cow-idle-side#3",
-        "mobs.bloomseed.animals.cow.cow-idle-side#4"
+        "mobs.bloomseed.animals.cow.cow-idle-side#3"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-idle-up": {
@@ -1052,8 +1043,7 @@
         "mobs.bloomseed.animals.cow.cow-idle-up#0",
         "mobs.bloomseed.animals.cow.cow-idle-up#1",
         "mobs.bloomseed.animals.cow.cow-idle-up#2",
-        "mobs.bloomseed.animals.cow.cow-idle-up#3",
-        "mobs.bloomseed.animals.cow.cow-idle-up#4"
+        "mobs.bloomseed.animals.cow.cow-idle-up#3"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-pet": {
@@ -1065,9 +1055,7 @@
         "mobs.bloomseed.animals.cow.cow-pet#3",
         "mobs.bloomseed.animals.cow.cow-pet#4",
         "mobs.bloomseed.animals.cow.cow-pet#5",
-        "mobs.bloomseed.animals.cow.cow-pet#6",
-        "mobs.bloomseed.animals.cow.cow-pet#7",
-        "mobs.bloomseed.animals.cow.cow-pet#8"
+        "mobs.bloomseed.animals.cow.cow-pet#6"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-sleep": {
@@ -1076,8 +1064,7 @@
         "mobs.bloomseed.animals.cow.cow-sleep#0",
         "mobs.bloomseed.animals.cow.cow-sleep#1",
         "mobs.bloomseed.animals.cow.cow-sleep#2",
-        "mobs.bloomseed.animals.cow.cow-sleep#3",
-        "mobs.bloomseed.animals.cow.cow-sleep#4"
+        "mobs.bloomseed.animals.cow.cow-sleep#3"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-walk-down": {
@@ -1088,9 +1075,7 @@
         "mobs.bloomseed.animals.cow.cow-walk-down#2",
         "mobs.bloomseed.animals.cow.cow-walk-down#3",
         "mobs.bloomseed.animals.cow.cow-walk-down#4",
-        "mobs.bloomseed.animals.cow.cow-walk-down#5",
-        "mobs.bloomseed.animals.cow.cow-walk-down#6",
-        "mobs.bloomseed.animals.cow.cow-walk-down#7"
+        "mobs.bloomseed.animals.cow.cow-walk-down#5"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-walk-side": {
@@ -1101,9 +1086,7 @@
         "mobs.bloomseed.animals.cow.cow-walk-side#2",
         "mobs.bloomseed.animals.cow.cow-walk-side#3",
         "mobs.bloomseed.animals.cow.cow-walk-side#4",
-        "mobs.bloomseed.animals.cow.cow-walk-side#5",
-        "mobs.bloomseed.animals.cow.cow-walk-side#6",
-        "mobs.bloomseed.animals.cow.cow-walk-side#7"
+        "mobs.bloomseed.animals.cow.cow-walk-side#5"
       ]
     },
     "mobs.bloomseed.animals.cow.cow-walk-up": {
@@ -1114,8 +1097,7 @@
         "mobs.bloomseed.animals.cow.cow-walk-up#2",
         "mobs.bloomseed.animals.cow.cow-walk-up#3",
         "mobs.bloomseed.animals.cow.cow-walk-up#4",
-        "mobs.bloomseed.animals.cow.cow-walk-up#5",
-        "mobs.bloomseed.animals.cow.cow-walk-up#6"
+        "mobs.bloomseed.animals.cow.cow-walk-up#5"
       ]
     },
     "mobs.bloomseed.enemies.bat.bat-alert": {
