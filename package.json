@@ -12,6 +12,9 @@
     "assets:bloomseed:phaser": "node scripts/assets/export-bloomseed-phaser-pack.mjs",
     "assets:bloomseed:phaser:dry": "node scripts/assets/export-bloomseed-phaser-pack.mjs --dry-run",
     "assets:bloomseed": "npm run assets:bloomseed:extract && npm run assets:bloomseed:phaser",
+    "dev:frontend": "npm run -w @towncord/frontend dev",
+    "build:frontend": "npm run -w @towncord/frontend build",
+    "typecheck:frontend": "npm run -w @towncord/frontend typecheck",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
     "test": "echo \"Define workspace tests\""
