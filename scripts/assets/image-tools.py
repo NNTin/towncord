@@ -192,8 +192,9 @@ def column_is_visible(image, x, max_y):
   if x < 0 or x >= image.width:
     return False
 
+  pixels = image.load()
   for y in range(max_y):
-    if image.getpixel((x, y))[3] != 0:
+    if pixels[x, y][3] != 0:
       return True
   return False
 
