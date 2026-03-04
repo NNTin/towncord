@@ -27,6 +27,13 @@ def parse_args():
   pack_parser.add_argument("--padding", type=int, default=2)
   pack_parser.add_argument("--dry-run", action="store_true")
 
+  gif_parser = subparsers.add_parser("gif", help="Render a frame-based GIF from a strip/sheet image.")
+  gif_parser.add_argument("--src", required=True)
+  gif_parser.add_argument("--dest")
+  gif_parser.add_argument("--layout-json", required=True)
+  gif_parser.add_argument("--fps", type=int, default=8)
+  gif_parser.add_argument("--dry-run", action="store_true")
+
   return parser.parse_args()
 
 
@@ -252,6 +259,73 @@ def pack_command(args):
   print(json.dumps(result))
 
 
+def layout_frames(layout, image_width, image_height):
+  if layout["type"] == "strip":
+    frame_width = int(layout["frameWidth"])
+    frame_height = int(layout.get("frameHeight", image_height))
+    frame_count = int(layout.get("frameCount", max(1, image_width // frame_width)))
+
+    frames = []
+    for index in range(frame_count):
+      frames.append((index * frame_width, 0, frame_width, frame_height))
+    return frames
+
+  if layout["type"] == "sheet":
+    cell_width = int(layout["cellWidth"])
+    cell_height = int(layout["cellHeight"])
+    columns = int(layout.get("columns", max(1, image_width // cell_width)))
+    rows = int(layout.get("rows", max(1, image_height // cell_height)))
+
+    frames = []
+    for row in range(rows):
+      for column in range(columns):
+        frames.append((column * cell_width, row * cell_height, cell_width, cell_height))
+    return frames
+
+  return [(0, 0, image_width, image_height)]
+
+
+def gif_command(args):
+  source = Path(args.src)
+  layout = json.loads(args.layout_json)
+  image = Image.open(source).convert("RGBA")
+  frames = layout_frames(layout, image.width, image.height)
+
+  if len(frames) == 0:
+    raise RuntimeError("No frames resolved for GIF render.")
+
+  duration_ms = max(1, int(round(1000 / max(1, args.fps))))
+  gif_frames = []
+
+  for x, y, w, h in frames:
+    crop = image.crop((x, y, x + w, y + h))
+    gif_frames.append(crop.convert("P", palette=Image.ADAPTIVE))
+
+  if not args.dry_run:
+    if not args.dest:
+      raise RuntimeError("--dest is required unless --dry-run is set")
+    destination = Path(args.dest)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    gif_frames[0].save(
+      destination,
+      save_all=True,
+      append_images=gif_frames[1:],
+      duration=duration_ms,
+      loop=0,
+      optimize=False,
+      disposal=2,
+    )
+
+  result = {
+    "source": str(source),
+    "frameCount": len(gif_frames),
+    "width": gif_frames[0].width,
+    "height": gif_frames[0].height,
+    "fps": max(1, args.fps),
+  }
+  print(json.dumps(result))
+
+
 def main():
   args = parse_args()
   if args.command == "trim":
@@ -259,6 +333,9 @@ def main():
     return
   if args.command == "pack":
     pack_command(args)
+    return
+  if args.command == "gif":
+    gif_command(args)
     return
   raise RuntimeError(f"Unknown command: {args.command}")
 

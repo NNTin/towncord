@@ -74,7 +74,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "carry"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Collapse",
@@ -83,7 +83,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "collapse"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Death",
@@ -92,7 +92,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "death"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Hit",
@@ -101,7 +101,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "hit"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Idle",
@@ -110,7 +110,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "idle"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Run",
@@ -119,7 +119,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "run"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Character/Female_Body/Walk",
@@ -128,7 +128,7 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "walk"],
-      defaults: { frameWidth: 48, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48 },
     },
     {
       source: "Mobs/Animals/Chicken",
