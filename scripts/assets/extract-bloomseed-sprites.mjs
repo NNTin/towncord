@@ -158,8 +158,13 @@ function buildLayout(rule, png) {
     const frameHeight = rule.defaults?.frameHeight ?? png.height;
     const offsetX = Math.max(0, rule.defaults?.offsetX ?? 0);
     const availableWidth = Math.max(0, png.width - offsetX);
-    const frameCount = Math.max(1, Math.floor(availableWidth / frameWidth));
-    const remainderX = availableWidth % frameWidth;
+    const frameCountMode = rule.defaults?.frameCountMode ?? "floor";
+    const rawFrameCount = availableWidth / frameWidth;
+    const frameCount = Math.max(
+      1,
+      frameCountMode === "round" ? Math.round(rawFrameCount) : Math.floor(rawFrameCount),
+    );
+    const remainderX = availableWidth - (frameCount * frameWidth);
 
     return {
       type: "strip",
@@ -167,6 +172,7 @@ function buildLayout(rule, png) {
       frameHeight,
       frameCount,
       offsetX,
+      frameCountMode,
       columns: frameCount,
       rows: 1,
       remainderX,
@@ -214,6 +220,10 @@ function buildNormalize(rule) {
   const frameWidth = Number(rule.normalize.frameWidth);
   const frameHeight = Number(rule.normalize.frameHeight);
   const anchor = rule.normalize.anchor ?? "center";
+  const trimAlpha = rule.normalize.trimAlpha ?? false;
+  const offsetX = Number(rule.normalize.offsetX ?? 0);
+  const offsetY = Number(rule.normalize.offsetY ?? 0);
+  const centerOddX = rule.normalize.centerOddX ?? false;
 
   if (
     !Number.isInteger(frameWidth) ||
@@ -232,10 +242,26 @@ function buildNormalize(rule) {
     );
   }
 
+  if (!Number.isInteger(offsetX) || !Number.isInteger(offsetY)) {
+    throw new Error(
+      `Invalid normalize offsets for rule "${rule.source}". Expected integer offsetX/offsetY.`,
+    );
+  }
+
+  if (typeof centerOddX !== "boolean") {
+    throw new Error(
+      `Invalid normalize centerOddX for rule "${rule.source}". Expected a boolean.`,
+    );
+  }
+
   return {
     frameWidth,
     frameHeight,
     anchor,
+    trimAlpha,
+    offsetX,
+    offsetY,
+    centerOddX,
   };
 }
 

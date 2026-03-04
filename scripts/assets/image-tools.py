@@ -67,21 +67,29 @@ def trim_command(args):
     offset_x = int(layout.get("offsetX", 0))
     available_width = max(0, image.width - offset_x)
     frame_count = int(layout.get("frameCount", max(1, available_width // frame_width)))
-    crop_width = frame_width * frame_count
-    crop_x = align_strip_crop_x(image, offset_x, crop_width, frame_height)
-    crop = clamp_crop((crop_x, 0, crop_width, frame_height), image.width, image.height)
+    desired_width = max(1, frame_width * frame_count)
+    desired_height = max(1, frame_height)
+    crop_x = align_strip_crop_x(image, offset_x, desired_width, desired_height)
+    source_x = max(0, min(image.width, crop_x))
+    source_width = max(0, min(image.width - source_x, desired_width))
+    source_height = max(0, min(image.height, desired_height))
+    crop = (source_x, 0, source_width, source_height)
     trim_mode = "grid"
+    trimmed = Image.new("RGBA", (desired_width, desired_height), (0, 0, 0, 0))
+    if source_width > 0 and source_height > 0:
+      source_crop = image.crop((source_x, 0, source_x + source_width, source_height))
+      trimmed.paste(source_crop, (0, 0))
 
     trimmed_layout = {
       "type": "strip",
       "frameWidth": frame_width,
-      "frameHeight": frame_height,
-      "frameCount": crop[2] // frame_width,
+      "frameHeight": desired_height,
+      "frameCount": frame_count,
       "offsetX": 0,
-      "columns": crop[2] // frame_width,
+      "columns": frame_count,
       "rows": 1,
-      "remainderX": crop[2] % frame_width,
-      "exact": (crop[2] % frame_width) == 0,
+      "remainderX": 0,
+      "exact": source_width == desired_width and source_height == desired_height,
     }
   elif layout["type"] == "sheet":
     cell_width = int(layout["cellWidth"])
@@ -113,7 +121,8 @@ def trim_command(args):
     }
 
   x, y, w, h = crop
-  trimmed = image.crop((x, y, x + w, y + h))
+  if layout["type"] != "strip":
+    trimmed = image.crop((x, y, x + w, y + h))
   normalize = parse_normalize_spec(layout.get("normalize"))
 
   if normalize is not None:
@@ -157,6 +166,10 @@ def parse_normalize_spec(normalize):
   frame_width = int(normalize["frameWidth"])
   frame_height = int(normalize["frameHeight"])
   anchor = normalize.get("anchor", "center")
+  trim_alpha = bool(normalize.get("trimAlpha", False))
+  offset_x = int(normalize.get("offsetX", 0))
+  offset_y = int(normalize.get("offsetY", 0))
+  center_odd_x = bool(normalize.get("centerOddX", False))
 
   if frame_width <= 0 or frame_height <= 0:
     raise RuntimeError("Normalize frame dimensions must be positive.")
@@ -168,6 +181,10 @@ def parse_normalize_spec(normalize):
     "frameWidth": frame_width,
     "frameHeight": frame_height,
     "anchor": anchor,
+    "trimAlpha": trim_alpha,
+    "offsetX": offset_x,
+    "offsetY": offset_y,
+    "centerOddX": center_odd_x,
   }
 
 
@@ -226,6 +243,10 @@ def normalize_strip_image(image, layout, normalize):
   target_frame_width = int(normalize["frameWidth"])
   target_frame_height = int(normalize["frameHeight"])
   anchor = normalize["anchor"]
+  trim_alpha = bool(normalize.get("trimAlpha", False))
+  offset_x = int(normalize.get("offsetX", 0))
+  offset_y = int(normalize.get("offsetY", 0))
+  center_odd_x = bool(normalize.get("centerOddX", False))
 
   normalized = Image.new(
     "RGBA",
@@ -245,13 +266,21 @@ def normalize_strip_image(image, layout, normalize):
     )
     normalized_frame = frame
 
-    # Some source strips use oversized logical cells (e.g. 80x64) with sparse
-    # pixels. For downscaling to a smaller normalized cell, trim transparent
-    # padding per frame first.
-    if source_frame_width > target_frame_width or source_frame_height > target_frame_height:
-      alpha_box = frame.getchannel("A").getbbox()
-      if alpha_box is None:
-        continue
+    alpha_box = frame.getchannel("A").getbbox()
+    if alpha_box is None:
+      continue
+
+    # Optional full alpha trim for rules that explicitly request it.
+    if trim_alpha:
+      normalized_frame = frame.crop(alpha_box)
+    # If width is oversized (e.g. 80x64 to 64x64), trim horizontally to the
+    # alpha bounds but keep the original vertical band so character height
+    # alignment remains consistent with non-tool animations.
+    elif source_frame_width > target_frame_width and source_frame_height <= target_frame_height:
+      left, _, right, _ = alpha_box
+      normalized_frame = frame.crop((left, 0, right, source_frame_height))
+    # Fallback: when height is oversized we need full trim to fit target.
+    elif source_frame_height > target_frame_height:
       normalized_frame = frame.crop(alpha_box)
 
     frame_width = normalized_frame.width
@@ -262,11 +291,19 @@ def normalize_strip_image(image, layout, normalize):
         "Normalized frame content exceeds target frame dimensions."
       )
 
-    target_x = (index * target_frame_width) + ((target_frame_width - frame_width) // 2)
+    cell_x = index * target_frame_width
+    x_delta = target_frame_width - frame_width
+    odd_center_bias = 1 if center_odd_x and (x_delta % 2) != 0 else 0
+    target_x = cell_x + (x_delta // 2) + odd_center_bias + offset_x
     if anchor == "bottom-center":
-      target_y = target_frame_height - frame_height
+      target_y = (target_frame_height - frame_height) + offset_y
     else:
-      target_y = (target_frame_height - frame_height) // 2
+      target_y = ((target_frame_height - frame_height) // 2) + offset_y
+
+    if target_x < cell_x or (target_x + frame_width) > (cell_x + target_frame_width):
+      raise RuntimeError("Normalized frame content exceeds horizontal frame bounds.")
+    if target_y < 0 or (target_y + frame_height) > target_frame_height:
+      raise RuntimeError("Normalized frame content exceeds vertical frame bounds.")
 
     normalized.paste(normalized_frame, (target_x, target_y))
 
