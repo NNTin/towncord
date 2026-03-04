@@ -1,0 +1,260 @@
+#!/usr/bin/env node
+
+import { promises as fs } from "node:fs";
+import os from "node:os";
+import { execFile } from "node:child_process";
+import path from "node:path";
+import { promisify } from "node:util";
+
+const rootDir = process.cwd();
+const sourceRoot = path.resolve(rootDir, "assets/sprites");
+const frontendPublicRoot = path.resolve(rootDir, "apps/frontend/public");
+const phaserRoot = path.join(frontendPublicRoot, "assets/bloomseed");
+const atlasRoot = path.join(phaserRoot, "atlases");
+const imageToolsPath = path.resolve(rootDir, "scripts/assets/image-tools.py");
+const dryRun = process.argv.slice(2).includes("--dry-run");
+const execFileAsync = promisify(execFile);
+
+async function main() {
+  const sourceManifest = await readJson(path.join(sourceRoot, "manifest.json"));
+  const categoryManifests = await Promise.all(
+    sourceManifest.categories.map(async (category) => {
+      const manifestPath = path.join(sourceRoot, category.manifestPath);
+      return readJson(manifestPath);
+    }),
+  );
+
+  if (!dryRun) {
+    await fs.rm(phaserRoot, { recursive: true, force: true });
+    await fs.mkdir(atlasRoot, { recursive: true });
+  }
+
+  const atlasOutputs = [];
+
+  for (const manifest of categoryManifests) {
+    const frames = buildFrameList(manifest.assets);
+    const atlasKey = `bloomseed.${manifest.category}`;
+    const imageRelative = `assets/bloomseed/atlases/${manifest.category}.png`;
+    const jsonRelative = `assets/bloomseed/atlases/${manifest.category}.json`;
+    const outputImage = path.join(atlasRoot, `${manifest.category}.png`);
+    const outputAtlasJson = path.join(atlasRoot, `${manifest.category}.json`);
+
+    const packResult = await packCategoryAtlas({
+      atlasName: manifest.category,
+      frames,
+      outputImage,
+      outputAtlasJson,
+    });
+
+    atlasOutputs.push({
+      category: manifest.category,
+      atlasKey,
+      textureURL: imageRelative,
+      atlasURL: jsonRelative,
+      frameCount: packResult.frameCount,
+      width: packResult.width,
+      height: packResult.height,
+    });
+  }
+
+  const animations = buildAnimationIndex(categoryManifests);
+  const pack = buildPack(sourceManifest, atlasOutputs);
+
+  if (!dryRun) {
+    await writeJson(path.join(phaserRoot, "animations.json"), animations);
+    await writeJson(path.join(phaserRoot, "manifest.json"), {
+      namespace: sourceManifest.namespace,
+      atlases: atlasOutputs,
+      animationCount: Object.keys(animations.animations).length,
+    });
+    await writeJson(path.join(phaserRoot, "pack.json"), pack);
+  }
+
+  console.log(
+    `${dryRun ? "Dry run completed" : "Export completed"}: ${atlasOutputs.length} atlases.`,
+  );
+
+  for (const atlas of atlasOutputs) {
+    console.log(
+      `- ${atlas.category}: ${atlas.frameCount} frames, ${atlas.width}x${atlas.height}`,
+    );
+  }
+}
+
+function buildFrameList(assets) {
+  const frames = [];
+
+  for (const asset of assets) {
+    const sourceFile = path.join(sourceRoot, asset.outputPath);
+
+    if (asset.layout?.type === "strip") {
+      for (let index = 0; index < asset.layout.frameCount; index += 1) {
+        frames.push({
+          name: `${asset.id}#${index}`,
+          source: sourceFile,
+          rect: {
+            x: index * asset.layout.frameWidth,
+            y: 0,
+            w: asset.layout.frameWidth,
+            h: asset.layout.frameHeight,
+          },
+          w: asset.layout.frameWidth,
+          h: asset.layout.frameHeight,
+        });
+      }
+      continue;
+    }
+
+    if (asset.layout?.type === "sheet") {
+      let index = 0;
+      for (let row = 0; row < asset.layout.rows; row += 1) {
+        for (let column = 0; column < asset.layout.columns; column += 1) {
+          frames.push({
+            name: `${asset.id}#${index}`,
+            source: sourceFile,
+            rect: {
+              x: column * asset.layout.cellWidth,
+              y: row * asset.layout.cellHeight,
+              w: asset.layout.cellWidth,
+              h: asset.layout.cellHeight,
+            },
+            w: asset.layout.cellWidth,
+            h: asset.layout.cellHeight,
+          });
+          index += 1;
+        }
+      }
+      continue;
+    }
+
+    frames.push({
+      name: asset.id,
+      source: sourceFile,
+      rect: {
+        x: 0,
+        y: 0,
+        w: asset.image.width,
+        h: asset.image.height,
+      },
+      w: asset.image.width,
+      h: asset.image.height,
+    });
+  }
+
+  return frames;
+}
+
+async function packCategoryAtlas({
+  atlasName,
+  frames,
+  outputImage,
+  outputAtlasJson,
+}) {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "bloomseed-atlas-"));
+  const inputJsonPath = path.join(tempDir, `${atlasName}.json`);
+  await writeJson(inputJsonPath, { atlasName, frames });
+
+  const commandArgs = [
+    imageToolsPath,
+    "pack",
+    "--input-json",
+    inputJsonPath,
+    "--output-image",
+    outputImage,
+    "--output-atlas-json",
+    outputAtlasJson,
+    "--max-width",
+    "2048",
+    "--padding",
+    "2",
+  ];
+
+  if (dryRun) {
+    commandArgs.push("--dry-run");
+  }
+
+  try {
+    const { stdout } = await execFileAsync("python3", commandArgs, {
+      maxBuffer: 16 * 1024 * 1024,
+    });
+    return JSON.parse(stdout.trim());
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
+}
+
+function buildAnimationIndex(categoryManifests) {
+  const animations = {};
+
+  for (const manifest of categoryManifests) {
+    const atlasKey = `bloomseed.${manifest.category}`;
+
+    for (const asset of manifest.assets) {
+      let frames = [];
+
+      if (asset.layout?.type === "strip") {
+        frames = Array.from({ length: asset.layout.frameCount }, (_, index) => (
+          `${asset.id}#${index}`
+        ));
+      } else if (asset.layout?.type === "sheet") {
+        const frameCount = asset.layout.columns * asset.layout.rows;
+        frames = Array.from({ length: frameCount }, (_, index) => (
+          `${asset.id}#${index}`
+        ));
+      } else {
+        frames = [asset.id];
+      }
+
+      animations[asset.id] = {
+        atlasKey,
+        frames,
+      };
+    }
+  }
+
+  return {
+    generatedAt: new Date().toISOString(),
+    namespace: "bloomseed",
+    animations,
+  };
+}
+
+function buildPack(sourceManifest, atlasOutputs) {
+  return {
+    meta: {
+      generatedAt: new Date().toISOString(),
+      generator: "scripts/assets/export-bloomseed-phaser-pack.mjs",
+      namespace: sourceManifest.namespace,
+      sourceManifest: "assets/sprites/manifest.json",
+      publicRoot: "apps/frontend/public/assets/bloomseed",
+      format: "phaser-asset-pack",
+    },
+    bloomseed: {
+      files: [
+        ...atlasOutputs.map((atlas) => ({
+          type: "atlas",
+          key: atlas.atlasKey,
+          textureURL: atlas.textureURL,
+          atlasURL: atlas.atlasURL,
+        })),
+        {
+          type: "json",
+          key: "bloomseed.animations",
+          url: "assets/bloomseed/animations.json",
+        },
+      ],
+    },
+  };
+}
+
+async function readJson(filePath) {
+  const contents = await fs.readFile(filePath, "utf8");
+  return JSON.parse(contents);
+}
+
+async function writeJson(filePath, value) {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+await main();

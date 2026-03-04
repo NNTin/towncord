@@ -1,0 +1,60 @@
+{
+  "namespace": "bloomseed",
+  "atlases": [
+    {
+      "category": "characters",
+      "atlasKey": "bloomseed.characters",
+      "textureURL": "assets/bloomseed/atlases/characters.png",
+      "atlasURL": "assets/bloomseed/atlases/characters.json",
+      "frameCount": 135,
+      "width": 1002,
+      "height": 466
+    },
+    {
+      "category": "equipment",
+      "atlasKey": "bloomseed.equipment",
+      "textureURL": "assets/bloomseed/atlases/equipment.png",
+      "atlasURL": "assets/bloomseed/atlases/equipment.json",
+      "frameCount": 288,
+      "width": 2048,
+      "height": 662
+    },
+    {
+      "category": "mobs",
+      "atlasKey": "bloomseed.mobs",
+      "textureURL": "assets/bloomseed/atlases/mobs.png",
+      "atlasURL": "assets/bloomseed/atlases/mobs.json",
+      "frameCount": 216,
+      "width": 2020,
+      "height": 660
+    },
+    {
+      "category": "props",
+      "atlasKey": "bloomseed.props",
+      "textureURL": "assets/bloomseed/atlases/props.png",
+      "atlasURL": "assets/bloomseed/atlases/props.json",
+      "frameCount": 1113,
+      "width": 1022,
+      "height": 730
+    },
+    {
+      "category": "tilesets",
+      "atlasKey": "bloomseed.tilesets",
+      "textureURL": "assets/bloomseed/atlases/tilesets.png",
+      "atlasURL": "assets/bloomseed/atlases/tilesets.json",
+      "frameCount": 2764,
+      "width": 1010,
+      "height": 902
+    },
+    {
+      "category": "ui",
+      "atlasKey": "bloomseed.ui",
+      "textureURL": "assets/bloomseed/atlases/ui.png",
+      "atlasURL": "assets/bloomseed/atlases/ui.json",
+      "frameCount": 97,
+      "width": 254,
+      "height": 128
+    }
+  ],
+  "animationCount": 170
+}

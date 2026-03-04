@@ -1,0 +1,250 @@
+/**
+ * Bloomseed import configuration.
+ *
+ * The importer owns the algorithm.
+ * This file owns content policy:
+ * - which source folders map to which runtime folders
+ * - which files should be ignored
+ * - which metadata defaults apply to a matched folder
+ */
+
+/**
+ * @typedef {Object} ImportRule
+ * @property {string} source
+ * @property {string} target
+ * @property {string} kind
+ * @property {string} parser
+ * @property {string} atlas
+ * @property {string[]} [tags]
+ * @property {{ frameWidth?: number, frameHeight?: number, cellWidth?: number, cellHeight?: number }} [defaults]
+ */
+
+export const bloomseedConfig = {
+  namespace: "bloomseed",
+  sourceRoot: "assets/.raw/bloomseed",
+  targetRoot: "assets/sprites",
+  ignoredFiles: [
+    "Read_me.txt",
+  ],
+  ignoredExtensions: [
+    ".gif",
+  ],
+  /** @type {ImportRule[]} */
+  rules: [
+    {
+      source: "Character/Female_Body/Tool/Smash",
+      target: "characters/bloomseed/player/female/tool/smash",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "tool", "smash"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Character/Female_Body/Tool/Slash",
+      target: "characters/bloomseed/player/female/tool/slash",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "tool", "slash"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Character/Female_Body/Tool/Stab",
+      target: "characters/bloomseed/player/female/tool/stab",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "tool", "stab"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Character/Female_Body/Tool/Watering",
+      target: "characters/bloomseed/player/female/tool/watering",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "tool", "watering"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Character/Female_Body/Carry",
+      target: "characters/bloomseed/player/female/carry",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "carry"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Collapse",
+      target: "characters/bloomseed/player/female/collapse",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "collapse"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Death",
+      target: "characters/bloomseed/player/female/death",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "death"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Hit",
+      target: "characters/bloomseed/player/female/hit",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "hit"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Idle",
+      target: "characters/bloomseed/player/female/idle",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "idle"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Run",
+      target: "characters/bloomseed/player/female/run",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "run"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Character/Female_Body/Walk",
+      target: "characters/bloomseed/player/female/walk",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "walk"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Mobs/Animals/Chicken",
+      target: "mobs/bloomseed/animals/chicken",
+      kind: "animation",
+      parser: "strip",
+      atlas: "mobs",
+      tags: ["mob", "animal", "chicken"],
+      defaults: { frameWidth: 48 },
+    },
+    {
+      source: "Mobs/Animals/Cow",
+      target: "mobs/bloomseed/animals/cow",
+      kind: "animation",
+      parser: "strip",
+      atlas: "mobs",
+      tags: ["mob", "animal", "cow"],
+      defaults: { frameWidth: 48, frameHeight: 48 },
+    },
+    {
+      source: "Mobs/Enemies/Bat",
+      target: "mobs/bloomseed/enemies/bat",
+      kind: "animation",
+      parser: "strip",
+      atlas: "mobs",
+      tags: ["mob", "enemy", "bat"],
+      defaults: { frameWidth: 80, frameHeight: 64 },
+    },
+    {
+      source: "Mobs/Enemies/Slime",
+      target: "mobs/bloomseed/enemies/slime",
+      kind: "animation",
+      parser: "strip",
+      atlas: "mobs",
+      tags: ["mob", "enemy", "slime"],
+      defaults: { frameWidth: 112 },
+    },
+    {
+      source: "Environment/Tilesets",
+      target: "tilesets/bloomseed/environment",
+      kind: "tileset",
+      parser: "sheet",
+      atlas: "tilesets",
+      tags: ["environment", "tileset"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+    {
+      source: "Environment/Structure",
+      target: "tilesets/bloomseed/structure",
+      kind: "tileset",
+      parser: "sheet",
+      atlas: "tilesets",
+      tags: ["environment", "structure"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+    {
+      source: "Environment/Props/Animated/Chest",
+      target: "props/bloomseed/animated/chest",
+      kind: "prop",
+      parser: "single",
+      atlas: "props",
+      tags: ["prop", "animated", "chest"],
+    },
+    {
+      source: "Environment/Props/Animated/Water_Props",
+      target: "props/bloomseed/animated/water",
+      kind: "prop",
+      parser: "sheet",
+      atlas: "props",
+      tags: ["prop", "animated", "water"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+    {
+      source: "Environment/Props/Static",
+      target: "props/bloomseed/static",
+      kind: "prop",
+      parser: "sheet",
+      atlas: "props",
+      tags: ["prop", "static"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+    {
+      source: "Equipment/Tools",
+      target: "equipment/bloomseed/tools",
+      kind: "equipment",
+      parser: "strip",
+      atlas: "equipment",
+      tags: ["equipment", "tool"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Equipment/Weapons",
+      target: "equipment/bloomseed/weapons",
+      kind: "equipment",
+      parser: "strip",
+      atlas: "equipment",
+      tags: ["equipment", "weapon"],
+      defaults: { frameWidth: 64 },
+    },
+    {
+      source: "Equipment/Icons",
+      target: "ui/bloomseed/equipment",
+      kind: "icon",
+      parser: "sheet",
+      atlas: "ui",
+      tags: ["ui", "icon", "equipment"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+    {
+      source: "Icons",
+      target: "ui/bloomseed/general",
+      kind: "icon",
+      parser: "sheet",
+      atlas: "ui",
+      tags: ["ui", "icon"],
+      defaults: { cellWidth: 16, cellHeight: 16 },
+    },
+  ],
+};

@@ -7,6 +7,11 @@
     "packages/*"
   ],
   "scripts": {
+    "assets:bloomseed:extract": "node scripts/assets/extract-bloomseed-sprites.mjs",
+    "assets:bloomseed:extract:dry": "node scripts/assets/extract-bloomseed-sprites.mjs --dry-run",
+    "assets:bloomseed:phaser": "node scripts/assets/export-bloomseed-phaser-pack.mjs",
+    "assets:bloomseed:phaser:dry": "node scripts/assets/export-bloomseed-phaser-pack.mjs --dry-run",
+    "assets:bloomseed": "npm run assets:bloomseed:extract && npm run assets:bloomseed:phaser",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
     "test": "echo \"Define workspace tests\""
