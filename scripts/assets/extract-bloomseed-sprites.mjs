@@ -151,21 +151,27 @@ function buildLayout(rule, png) {
     return null;
   }
 
+  const normalize = buildNormalize(rule);
+
   if (rule.parser === "strip") {
     const frameWidth = rule.defaults?.frameWidth ?? png.height;
     const frameHeight = rule.defaults?.frameHeight ?? png.height;
-    const frameCount = Math.max(1, Math.floor(png.width / frameWidth));
-    const remainderX = png.width % frameWidth;
+    const offsetX = Math.max(0, rule.defaults?.offsetX ?? 0);
+    const availableWidth = Math.max(0, png.width - offsetX);
+    const frameCount = Math.max(1, Math.floor(availableWidth / frameWidth));
+    const remainderX = availableWidth % frameWidth;
 
     return {
       type: "strip",
       frameWidth,
       frameHeight,
       frameCount,
+      offsetX,
       columns: frameCount,
       rows: 1,
       remainderX,
-      exact: remainderX === 0,
+      exact: remainderX === 0 && offsetX === 0,
+      normalize,
     };
   }
 
@@ -186,6 +192,7 @@ function buildLayout(rule, png) {
       remainderX,
       remainderY,
       exact: remainderX === 0 && remainderY === 0,
+      normalize,
     };
   }
 
@@ -195,6 +202,40 @@ function buildLayout(rule, png) {
     frameHeight: png.height,
     frameCount: 1,
     exact: true,
+    normalize,
+  };
+}
+
+function buildNormalize(rule) {
+  if (!rule.normalize) {
+    return null;
+  }
+
+  const frameWidth = Number(rule.normalize.frameWidth);
+  const frameHeight = Number(rule.normalize.frameHeight);
+  const anchor = rule.normalize.anchor ?? "center";
+
+  if (
+    !Number.isInteger(frameWidth) ||
+    !Number.isInteger(frameHeight) ||
+    frameWidth <= 0 ||
+    frameHeight <= 0
+  ) {
+    throw new Error(
+      `Invalid normalize dimensions for rule "${rule.source}". Expected positive integer frameWidth/frameHeight.`,
+    );
+  }
+
+  if (!["center", "bottom-center"].includes(anchor)) {
+    throw new Error(
+      `Invalid normalize anchor "${anchor}" for rule "${rule.source}".`,
+    );
+  }
+
+  return {
+    frameWidth,
+    frameHeight,
+    anchor,
   };
 }
 

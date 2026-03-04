@@ -16,7 +16,8 @@
  * @property {string} parser
  * @property {string} atlas
  * @property {string[]} [tags]
- * @property {{ frameWidth?: number, frameHeight?: number, cellWidth?: number, cellHeight?: number }} [defaults]
+ * @property {{ frameWidth?: number, frameHeight?: number, cellWidth?: number, cellHeight?: number, offsetX?: number }} [defaults]
+ * @property {{ frameWidth: number, frameHeight: number, anchor?: "center" | "bottom-center" }} [normalize]
  */
 
 export const bloomseedConfig = {
@@ -39,6 +40,7 @@ export const bloomseedConfig = {
       atlas: "characters",
       tags: ["character", "player", "female", "tool", "smash"],
       defaults: { frameWidth: 64 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Tool/Slash",
@@ -47,7 +49,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "tool", "slash"],
-      defaults: { frameWidth: 64 },
+      defaults: { frameWidth: 80, frameHeight: 64 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Tool/Stab",
@@ -56,7 +59,18 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "tool", "stab"],
-      defaults: { frameWidth: 64 },
+      defaults: { frameWidth: 80, frameHeight: 64 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
+    },
+    {
+      source: "Character/Female_Body/Tool/Watering/Watering_Side.png",
+      target: "characters/bloomseed/player/female/tool/watering",
+      kind: "animation",
+      parser: "strip",
+      atlas: "characters",
+      tags: ["character", "player", "female", "tool", "watering", "side"],
+      defaults: { frameWidth: 80, frameHeight: 64 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Tool/Watering",
@@ -65,7 +79,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "tool", "watering"],
-      defaults: { frameWidth: 64 },
+      defaults: { frameWidth: 48, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Carry",
@@ -74,7 +89,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "carry"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Collapse",
@@ -83,7 +99,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "collapse"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Death",
@@ -92,7 +109,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "death"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Hit",
@@ -101,7 +119,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "hit"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Idle",
@@ -110,7 +129,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "idle"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Run",
@@ -119,7 +139,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "run"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Character/Female_Body/Walk",
@@ -128,7 +149,8 @@ export const bloomseedConfig = {
       parser: "strip",
       atlas: "characters",
       tags: ["character", "player", "female", "walk"],
-      defaults: { frameWidth: 32, frameHeight: 48 },
+      defaults: { frameWidth: 32, frameHeight: 48, offsetX: 8 },
+      normalize: { frameWidth: 64, frameHeight: 64, anchor: "bottom-center" },
     },
     {
       source: "Mobs/Animals/Chicken",
