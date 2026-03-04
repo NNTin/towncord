@@ -3,7 +3,7 @@ import { BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY } from "./PreloadScene";
 
 export const WORLD_SCENE_KEY = "world";
 const PREFERRED_ANIMATION_KEY =
-  "characters.bloomseed.player.female.tool.smash.smash-side";
+  "characters.bloomseed.player.female.run.run-up";
 
 export class WorldScene extends Phaser.Scene {
   constructor() {

@@ -6,16 +6,16 @@
       "atlasKey": "bloomseed.characters",
       "textureURL": "assets/bloomseed/atlases/characters.png",
       "atlasURL": "assets/bloomseed/atlases/characters.json",
-      "frameCount": 135,
-      "width": 1002,
-      "height": 466
+      "frameCount": 166,
+      "width": 992,
+      "height": 794
     },
     {
       "category": "equipment",
       "atlasKey": "bloomseed.equipment",
       "textureURL": "assets/bloomseed/atlases/equipment.png",
       "atlasURL": "assets/bloomseed/atlases/equipment.json",
-      "frameCount": 288,
+      "frameCount": 252,
       "width": 2048,
       "height": 662
     },
@@ -24,8 +24,8 @@
       "atlasKey": "bloomseed.mobs",
       "textureURL": "assets/bloomseed/atlases/mobs.png",
       "atlasURL": "assets/bloomseed/atlases/mobs.json",
-      "frameCount": 216,
-      "width": 2020,
+      "frameCount": 203,
+      "width": 2048,
       "height": 660
     },
     {

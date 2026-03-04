@@ -64,19 +64,32 @@ def trim_command(args):
   if layout["type"] == "strip":
     frame_width = int(layout["frameWidth"])
     frame_height = int(layout.get("frameHeight", image.height))
-    frame_count = int(layout.get("frameCount", max(1, image.width // frame_width)))
-    crop = clamp_crop((0, 0, frame_width * frame_count, frame_height), image.width, image.height)
+    offset_x = int(layout.get("offsetX", 0))
+    available_width = max(0, image.width - offset_x)
+    frame_count = int(layout.get("frameCount", max(1, available_width // frame_width)))
+    desired_width = max(1, frame_width * frame_count)
+    desired_height = max(1, frame_height)
+    crop_x = align_strip_crop_x(image, offset_x, desired_width, desired_height)
+    source_x = max(0, min(image.width, crop_x))
+    source_width = max(0, min(image.width - source_x, desired_width))
+    source_height = max(0, min(image.height, desired_height))
+    crop = (source_x, 0, source_width, source_height)
     trim_mode = "grid"
+    trimmed = Image.new("RGBA", (desired_width, desired_height), (0, 0, 0, 0))
+    if source_width > 0 and source_height > 0:
+      source_crop = image.crop((source_x, 0, source_x + source_width, source_height))
+      trimmed.paste(source_crop, (0, 0))
 
     trimmed_layout = {
       "type": "strip",
       "frameWidth": frame_width,
-      "frameHeight": frame_height,
-      "frameCount": crop[2] // frame_width,
-      "columns": crop[2] // frame_width,
+      "frameHeight": desired_height,
+      "frameCount": frame_count,
+      "offsetX": 0,
+      "columns": frame_count,
       "rows": 1,
-      "remainderX": crop[2] % frame_width,
-      "exact": (crop[2] % frame_width) == 0,
+      "remainderX": 0,
+      "exact": source_width == desired_width and source_height == desired_height,
     }
   elif layout["type"] == "sheet":
     cell_width = int(layout["cellWidth"])
@@ -108,7 +121,14 @@ def trim_command(args):
     }
 
   x, y, w, h = crop
-  trimmed = image.crop((x, y, x + w, y + h))
+  if layout["type"] != "strip":
+    trimmed = image.crop((x, y, x + w, y + h))
+  normalize = parse_normalize_spec(layout.get("normalize"))
+
+  if normalize is not None:
+    if trimmed_layout["type"] != "strip":
+      raise RuntimeError("Frame normalization is currently only supported for strip layouts.")
+    trimmed, trimmed_layout = normalize_strip_image(trimmed, trimmed_layout, normalize)
 
   if not args.dry_run:
     if not args.dest:
@@ -119,7 +139,7 @@ def trim_command(args):
 
   result = {
     "original": original,
-    "image": {"width": w, "height": h, "format": "png"},
+    "image": {"width": trimmed.width, "height": trimmed.height, "format": "png"},
     "trim": {
       "mode": trim_mode,
       "box": {"x": x, "y": y, "width": w, "height": h},
@@ -134,6 +154,169 @@ def trim_command(args):
   }
 
   print(json.dumps(result))
+
+
+def parse_normalize_spec(normalize):
+  if normalize is None:
+    return None
+
+  if not isinstance(normalize, dict):
+    raise RuntimeError("Layout normalize config must be an object.")
+
+  frame_width = int(normalize["frameWidth"])
+  frame_height = int(normalize["frameHeight"])
+  anchor = normalize.get("anchor", "center")
+  trim_alpha = bool(normalize.get("trimAlpha", False))
+  offset_x = int(normalize.get("offsetX", 0))
+  offset_y = int(normalize.get("offsetY", 0))
+  center_odd_x = bool(normalize.get("centerOddX", False))
+
+  if frame_width <= 0 or frame_height <= 0:
+    raise RuntimeError("Normalize frame dimensions must be positive.")
+
+  if anchor not in ("center", "bottom-center"):
+    raise RuntimeError(f"Unsupported normalize anchor '{anchor}'.")
+
+  return {
+    "frameWidth": frame_width,
+    "frameHeight": frame_height,
+    "anchor": anchor,
+    "trimAlpha": trim_alpha,
+    "offsetX": offset_x,
+    "offsetY": offset_y,
+    "centerOddX": center_odd_x,
+  }
+
+
+def column_has_alpha(image, x, max_y):
+  if x < 0 or x >= image.width:
+    return False
+
+  for y in range(max_y):
+    if image.getpixel((x, y))[3] != 0:
+      return True
+  return False
+
+
+def align_strip_crop_x(image, initial_x, crop_width, crop_height):
+  if crop_width <= 0:
+    return initial_x
+
+  min_x = 0
+  max_x = max(0, image.width - crop_width)
+  x = max(min_x, min(max_x, initial_x))
+  max_y = max(1, min(image.height, crop_height))
+  alpha_min_x, alpha_max_x = alpha_bounds_x(image, max_y)
+
+  if alpha_min_x is None or alpha_max_x is None:
+    return x
+
+  # Shift crop window only as needed so opaque pixels are fully contained.
+  if alpha_max_x > (x + crop_width - 1):
+    x = min(max_x, alpha_max_x - crop_width + 1)
+
+  if alpha_min_x < x:
+    x = max(min_x, alpha_min_x)
+
+  return max(min_x, min(max_x, x))
+
+
+def alpha_bounds_x(image, max_y):
+  min_x = None
+  max_x = None
+
+  pixels = image.load()
+  for x in range(image.width):
+    for y in range(max_y):
+      if pixels[x, y][3] != 0:
+        if min_x is None:
+          min_x = x
+        max_x = x
+        break
+
+  return min_x, max_x
+
+
+def normalize_strip_image(image, layout, normalize):
+  source_frame_width = int(layout["frameWidth"])
+  source_frame_height = int(layout["frameHeight"])
+  frame_count = int(layout["frameCount"])
+
+  target_frame_width = int(normalize["frameWidth"])
+  target_frame_height = int(normalize["frameHeight"])
+  anchor = normalize["anchor"]
+  trim_alpha = bool(normalize.get("trimAlpha", False))
+  offset_x = int(normalize.get("offsetX", 0))
+  offset_y = int(normalize.get("offsetY", 0))
+  center_odd_x = bool(normalize.get("centerOddX", False))
+
+  normalized = Image.new(
+    "RGBA",
+    (target_frame_width * frame_count, target_frame_height),
+    (0, 0, 0, 0),
+  )
+
+  for index in range(frame_count):
+    source_x = index * source_frame_width
+    frame = image.crop(
+      (
+        source_x,
+        0,
+        source_x + source_frame_width,
+        source_frame_height,
+      )
+    )
+    normalized_frame = frame
+
+    alpha_box = frame.getchannel("A").getbbox()
+    if alpha_box is None:
+      continue
+
+    # Optional full alpha trim for rules that explicitly request it.
+    if trim_alpha:
+      normalized_frame = frame.crop(alpha_box)
+    # If width is oversized (e.g. 80x64 to 64x64), trim horizontally to the
+    # alpha bounds but keep the original vertical band so character height
+    # alignment remains consistent with non-tool animations.
+    elif source_frame_width > target_frame_width and source_frame_height <= target_frame_height:
+      left, _, right, _ = alpha_box
+      normalized_frame = frame.crop((left, 0, right, source_frame_height))
+    # Fallback: when height is oversized we need full trim to fit target.
+    elif source_frame_height > target_frame_height:
+      normalized_frame = frame.crop(alpha_box)
+
+    frame_width = normalized_frame.width
+    frame_height = normalized_frame.height
+
+    if frame_width > target_frame_width or frame_height > target_frame_height:
+      raise RuntimeError(
+        "Normalized frame content exceeds target frame dimensions."
+      )
+
+    cell_x = index * target_frame_width
+    x_delta = target_frame_width - frame_width
+    odd_center_bias = 1 if center_odd_x and (x_delta % 2) != 0 else 0
+    target_x = cell_x + (x_delta // 2) + odd_center_bias + offset_x
+    if anchor == "bottom-center":
+      target_y = (target_frame_height - frame_height) + offset_y
+    else:
+      target_y = ((target_frame_height - frame_height) // 2) + offset_y
+
+    if target_x < cell_x or (target_x + frame_width) > (cell_x + target_frame_width):
+      raise RuntimeError("Normalized frame content exceeds horizontal frame bounds.")
+    if target_y < 0 or (target_y + frame_height) > target_frame_height:
+      raise RuntimeError("Normalized frame content exceeds vertical frame bounds.")
+
+    normalized.paste(normalized_frame, (target_x, target_y))
+
+  normalized_layout = dict(layout)
+  normalized_layout["frameWidth"] = target_frame_width
+  normalized_layout["frameHeight"] = target_frame_height
+  normalized_layout["columns"] = frame_count
+  normalized_layout["remainderX"] = 0
+  normalized_layout["exact"] = True
+
+  return normalized, normalized_layout
 
 
 def next_power_of_two(value):

@@ -2160,11 +2160,11 @@
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-down#0": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-down#0": {
       "frame": {
         "x": 992,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2172,19 +2172,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-down#1": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-down#1": {
       "frame": {
-        "x": 1058,
+        "x": 1074,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2192,19 +2192,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-down#2": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-down#2": {
       "frame": {
-        "x": 1124,
+        "x": 1156,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2212,19 +2212,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-down#3": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-down#3": {
       "frame": {
-        "x": 1190,
+        "x": 1238,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2232,19 +2232,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-down#4": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-side#0": {
       "frame": {
-        "x": 1256,
+        "x": 1320,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2252,19 +2252,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-side#0": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-side#1": {
       "frame": {
-        "x": 1322,
+        "x": 1402,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2272,19 +2272,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-side#1": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-side#2": {
       "frame": {
-        "x": 1388,
+        "x": 1484,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2292,19 +2292,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-side#2": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-side#3": {
       "frame": {
-        "x": 1454,
+        "x": 1566,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2312,19 +2312,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-side#3": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-up#0": {
       "frame": {
-        "x": 1520,
+        "x": 1648,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2332,19 +2332,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-side#4": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-up#1": {
       "frame": {
-        "x": 1586,
+        "x": 1730,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2352,19 +2352,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-up#0": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-up#2": {
       "frame": {
-        "x": 1652,
+        "x": 1812,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2372,19 +2372,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-up#1": {
+    "equipment.bloomseed.tools.sickle.sickle-gold-up#3": {
       "frame": {
-        "x": 1718,
+        "x": 1894,
         "y": 200,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2392,99 +2392,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-gold-up#2": {
-      "frame": {
-        "x": 1784,
-        "y": 200,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-gold-up#3": {
-      "frame": {
-        "x": 1850,
-        "y": 200,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-gold-up#4": {
-      "frame": {
-        "x": 1916,
-        "y": 200,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-iron-down#0": {
-      "frame": {
-        "x": 1982,
-        "y": 200,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-iron-down#1": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-down#0": {
       "frame": {
         "x": 2,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2492,19 +2412,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-down#2": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2512,19 +2432,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-down#3": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2532,19 +2452,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-down#4": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2552,19 +2472,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-side#0": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2572,19 +2492,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-side#1": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2592,19 +2512,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-side#2": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2612,19 +2532,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-side#3": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2632,19 +2552,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-side#4": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2652,19 +2572,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-up#0": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-up#1": {
       "frame": {
-        "x": 596,
+        "x": 740,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2672,19 +2592,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-up#1": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-up#2": {
       "frame": {
-        "x": 662,
+        "x": 822,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2692,19 +2612,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-up#2": {
+    "equipment.bloomseed.tools.sickle.sickle-iron-up#3": {
       "frame": {
-        "x": 728,
+        "x": 904,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2712,19 +2632,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-up#3": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-down#0": {
       "frame": {
-        "x": 794,
+        "x": 986,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2732,19 +2652,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-iron-up#4": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-down#1": {
       "frame": {
-        "x": 860,
+        "x": 1068,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2752,19 +2672,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-down#0": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-down#2": {
       "frame": {
-        "x": 926,
+        "x": 1150,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2772,19 +2692,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-down#1": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-down#3": {
       "frame": {
-        "x": 992,
+        "x": 1232,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2792,19 +2712,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-down#2": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-side#0": {
       "frame": {
-        "x": 1058,
+        "x": 1314,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2812,19 +2732,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-down#3": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-side#1": {
       "frame": {
-        "x": 1124,
+        "x": 1396,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2832,19 +2752,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-down#4": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-side#2": {
       "frame": {
-        "x": 1190,
+        "x": 1478,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2852,19 +2772,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-side#0": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-side#3": {
       "frame": {
-        "x": 1256,
+        "x": 1560,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2872,19 +2792,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-side#1": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-up#0": {
       "frame": {
-        "x": 1322,
+        "x": 1642,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2892,19 +2812,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-side#2": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-up#1": {
       "frame": {
-        "x": 1388,
+        "x": 1724,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2912,19 +2832,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-side#3": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-up#2": {
       "frame": {
-        "x": 1454,
+        "x": 1806,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2932,19 +2852,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-side#4": {
+    "equipment.bloomseed.tools.sickle.sickle-wood-up#3": {
       "frame": {
-        "x": 1520,
+        "x": 1888,
         "y": 266,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -2952,159 +2872,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.sickle-wood-up#0": {
-      "frame": {
-        "x": 1586,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-wood-up#1": {
-      "frame": {
-        "x": 1652,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-wood-up#2": {
-      "frame": {
-        "x": 1718,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-wood-up#3": {
-      "frame": {
-        "x": 1784,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.sickle-wood-up#4": {
-      "frame": {
-        "x": 1850,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-gold-down#0": {
-      "frame": {
-        "x": 1916,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-gold-down#1": {
-      "frame": {
-        "x": 1982,
-        "y": 266,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-gold-down#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-down#0": {
       "frame": {
         "x": 2,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3112,19 +2892,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-down#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3132,19 +2912,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-down#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3152,19 +2932,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-side#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3172,19 +2952,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-side#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3192,19 +2972,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-side#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3212,19 +2992,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-side#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3232,19 +3012,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-side#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3252,19 +3032,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-up#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3272,19 +3052,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-up#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-up#1": {
       "frame": {
-        "x": 596,
+        "x": 740,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3292,19 +3072,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-up#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-up#2": {
       "frame": {
-        "x": 662,
+        "x": 822,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3312,19 +3092,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-up#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-gold-up#3": {
       "frame": {
-        "x": 728,
+        "x": 904,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3332,19 +3112,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-gold-up#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-down#0": {
       "frame": {
-        "x": 794,
+        "x": 986,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3352,19 +3132,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-down#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-down#1": {
       "frame": {
-        "x": 860,
+        "x": 1068,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3372,19 +3152,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-down#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-down#2": {
       "frame": {
-        "x": 926,
+        "x": 1150,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3392,19 +3172,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-down#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-down#3": {
       "frame": {
-        "x": 992,
+        "x": 1232,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3412,19 +3192,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-down#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-side#0": {
       "frame": {
-        "x": 1058,
+        "x": 1314,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3432,19 +3212,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-down#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-side#1": {
       "frame": {
-        "x": 1124,
+        "x": 1396,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3452,19 +3232,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-side#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-side#2": {
       "frame": {
-        "x": 1190,
+        "x": 1478,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3472,19 +3252,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-side#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-side#3": {
       "frame": {
-        "x": 1256,
+        "x": 1560,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3492,19 +3272,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-side#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-up#0": {
       "frame": {
-        "x": 1322,
+        "x": 1642,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3512,19 +3292,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-side#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-up#1": {
       "frame": {
-        "x": 1388,
+        "x": 1724,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3532,19 +3312,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-side#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-up#2": {
       "frame": {
-        "x": 1454,
+        "x": 1806,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3552,19 +3332,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-up#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-iron-up#3": {
       "frame": {
-        "x": 1520,
+        "x": 1888,
         "y": 332,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3572,159 +3352,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-iron-up#1": {
-      "frame": {
-        "x": 1586,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-iron-up#2": {
-      "frame": {
-        "x": 1652,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-iron-up#3": {
-      "frame": {
-        "x": 1718,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-iron-up#4": {
-      "frame": {
-        "x": 1784,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-wood-down#0": {
-      "frame": {
-        "x": 1850,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-wood-down#1": {
-      "frame": {
-        "x": 1916,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-wood-down#2": {
-      "frame": {
-        "x": 1982,
-        "y": 332,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.tools.watering-can-wood-down#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-down#0": {
       "frame": {
         "x": 2,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3732,19 +3372,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-down#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3752,19 +3392,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-side#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3772,19 +3412,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-side#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3792,19 +3432,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-side#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3812,19 +3452,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-side#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3832,19 +3472,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-side#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3852,19 +3492,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-up#0": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3872,19 +3512,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-up#1": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3892,19 +3532,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-up#2": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-up#1": {
       "frame": {
-        "x": 596,
+        "x": 740,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3912,19 +3552,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-up#3": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-up#2": {
       "frame": {
-        "x": 662,
+        "x": 822,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3932,19 +3572,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.tools.watering-can-wood-up#4": {
+    "equipment.bloomseed.tools.watering-can.watering-can-wood-up#3": {
       "frame": {
-        "x": 728,
+        "x": 904,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3952,19 +3592,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#0": {
       "frame": {
-        "x": 794,
+        "x": 986,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3972,19 +3612,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#1": {
       "frame": {
-        "x": 860,
+        "x": 1068,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -3992,19 +3632,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#2": {
       "frame": {
-        "x": 926,
+        "x": 1150,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4012,19 +3652,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-down#3": {
       "frame": {
-        "x": 992,
+        "x": 1232,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4032,19 +3672,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-down#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#0": {
       "frame": {
-        "x": 1058,
+        "x": 1314,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4052,19 +3692,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#1": {
       "frame": {
-        "x": 1124,
+        "x": 1396,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4072,19 +3712,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#2": {
       "frame": {
-        "x": 1190,
+        "x": 1478,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4092,19 +3732,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-side#3": {
       "frame": {
-        "x": 1256,
+        "x": 1560,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4112,19 +3752,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#0": {
       "frame": {
-        "x": 1322,
+        "x": 1642,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4132,19 +3772,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#1": {
       "frame": {
-        "x": 1388,
+        "x": 1724,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4152,19 +3792,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-up#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#2": {
       "frame": {
-        "x": 1454,
+        "x": 1806,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4172,19 +3812,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-gold-up#3": {
       "frame": {
-        "x": 1520,
+        "x": 1888,
         "y": 398,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4192,159 +3832,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-gold-up#2": {
-      "frame": {
-        "x": 1586,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-gold-up#3": {
-      "frame": {
-        "x": 1652,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-gold-up#4": {
-      "frame": {
-        "x": 1718,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-iron-down#0": {
-      "frame": {
-        "x": 1784,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-iron-down#1": {
-      "frame": {
-        "x": 1850,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-iron-down#2": {
-      "frame": {
-        "x": 1916,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-iron-down#3": {
-      "frame": {
-        "x": 1982,
-        "y": 398,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-iron-down#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#0": {
       "frame": {
         "x": 2,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4352,19 +3852,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4372,19 +3872,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4392,19 +3892,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4412,19 +3912,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4432,19 +3932,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4452,19 +3952,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4472,19 +3972,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4492,19 +3992,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4512,19 +4012,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#1": {
       "frame": {
-        "x": 596,
+        "x": 740,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4532,19 +4032,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-iron-up#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#2": {
       "frame": {
-        "x": 662,
+        "x": 822,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4552,19 +4052,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-iron-up#3": {
       "frame": {
-        "x": 728,
+        "x": 904,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4572,19 +4072,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#0": {
       "frame": {
-        "x": 794,
+        "x": 986,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4592,19 +4092,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#1": {
       "frame": {
-        "x": 860,
+        "x": 1068,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4612,19 +4112,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#2": {
       "frame": {
-        "x": 926,
+        "x": 1150,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4632,19 +4132,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-down#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-down#3": {
       "frame": {
-        "x": 992,
+        "x": 1232,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4652,19 +4152,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#0": {
       "frame": {
-        "x": 1058,
+        "x": 1314,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4672,19 +4172,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#1": {
       "frame": {
-        "x": 1124,
+        "x": 1396,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4692,19 +4192,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#2": {
       "frame": {
-        "x": 1190,
+        "x": 1478,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4712,19 +4212,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-side#3": {
       "frame": {
-        "x": 1256,
+        "x": 1560,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4732,19 +4232,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#0": {
       "frame": {
-        "x": 1322,
+        "x": 1642,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4752,19 +4252,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-up#0": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#1": {
       "frame": {
-        "x": 1388,
+        "x": 1724,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4772,19 +4272,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#2": {
       "frame": {
-        "x": 1454,
+        "x": 1806,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4792,19 +4292,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-up#2": {
+    "equipment.bloomseed.weapons.sword.sword-slash.sword-slash-wood-up#3": {
       "frame": {
-        "x": 1520,
+        "x": 1888,
         "y": 464,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4812,159 +4312,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-slash-wood-up#3": {
-      "frame": {
-        "x": 1586,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-slash-wood-up#4": {
-      "frame": {
-        "x": 1652,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-down#0": {
-      "frame": {
-        "x": 1718,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-down#1": {
-      "frame": {
-        "x": 1784,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-down#2": {
-      "frame": {
-        "x": 1850,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-down#3": {
-      "frame": {
-        "x": 1916,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-down#4": {
-      "frame": {
-        "x": 1982,
-        "y": 464,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-gold-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#0": {
       "frame": {
         "x": 2,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4972,19 +4332,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -4992,19 +4352,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5012,19 +4372,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5032,19 +4392,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5052,19 +4412,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5072,19 +4432,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5092,19 +4452,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5112,19 +4472,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5132,19 +4492,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-gold-up#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#1": {
       "frame": {
-        "x": 596,
+        "x": 740,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5152,19 +4512,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#2": {
       "frame": {
-        "x": 662,
+        "x": 822,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5172,19 +4532,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-gold-up#3": {
       "frame": {
-        "x": 728,
+        "x": 904,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5192,19 +4552,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#0": {
       "frame": {
-        "x": 794,
+        "x": 986,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5212,19 +4572,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#1": {
       "frame": {
-        "x": 860,
+        "x": 1068,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5232,19 +4592,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-down#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#2": {
       "frame": {
-        "x": 926,
+        "x": 1150,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5252,19 +4612,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-down#3": {
       "frame": {
-        "x": 992,
+        "x": 1232,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5272,19 +4632,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#0": {
       "frame": {
-        "x": 1058,
+        "x": 1314,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5292,19 +4652,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#1": {
       "frame": {
-        "x": 1124,
+        "x": 1396,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5312,19 +4672,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#2": {
       "frame": {
-        "x": 1190,
+        "x": 1478,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5332,19 +4692,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-side#3": {
       "frame": {
-        "x": 1256,
+        "x": 1560,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5352,19 +4712,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#0": {
       "frame": {
-        "x": 1322,
+        "x": 1642,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5372,19 +4732,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#1": {
       "frame": {
-        "x": 1388,
+        "x": 1724,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5392,19 +4752,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#2": {
       "frame": {
-        "x": 1454,
+        "x": 1806,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5412,19 +4772,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-iron-up#3": {
       "frame": {
-        "x": 1520,
+        "x": 1888,
         "y": 530,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5432,159 +4792,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-iron-up#4": {
-      "frame": {
-        "x": 1586,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-down#0": {
-      "frame": {
-        "x": 1652,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-down#1": {
-      "frame": {
-        "x": 1718,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-down#2": {
-      "frame": {
-        "x": 1784,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-down#3": {
-      "frame": {
-        "x": 1850,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-down#4": {
-      "frame": {
-        "x": 1916,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-up#0": {
-      "frame": {
-        "x": 1982,
-        "y": 530,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "equipment.bloomseed.weapons.sword-stab-wood-up#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#0": {
       "frame": {
         "x": 2,
         "y": 596,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5592,19 +4812,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-up#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#1": {
       "frame": {
-        "x": 68,
+        "x": 84,
         "y": 596,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5612,19 +4832,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-up#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#2": {
       "frame": {
-        "x": 134,
+        "x": 166,
         "y": 596,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5632,19 +4852,19 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-up#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-down#3": {
       "frame": {
-        "x": 200,
+        "x": 248,
         "y": 596,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "rotated": false,
@@ -5652,112 +4872,172 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
+        "w": 80,
         "h": 64
       },
       "sourceSize": {
-        "w": 64,
+        "w": 80,
         "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side#0": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#0": {
       "frame": {
-        "x": 266,
+        "x": 330,
         "y": 596,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "sourceSize": {
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side#1": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#1": {
       "frame": {
-        "x": 332,
+        "x": 412,
         "y": 596,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "sourceSize": {
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side#2": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#2": {
       "frame": {
-        "x": 398,
+        "x": 494,
         "y": 596,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "sourceSize": {
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side#3": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-side#3": {
       "frame": {
-        "x": 464,
+        "x": 576,
         "y": 596,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "sourceSize": {
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       }
     },
-    "equipment.bloomseed.weapons.sword-stab-wood-side#4": {
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#0": {
       "frame": {
-        "x": 530,
+        "x": 658,
         "y": 596,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
       },
       "sourceSize": {
-        "w": 64,
-        "h": 48
+        "w": 80,
+        "h": 64
+      }
+    },
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#1": {
+      "frame": {
+        "x": 740,
+        "y": 596,
+        "w": 80,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 64
+      }
+    },
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#2": {
+      "frame": {
+        "x": 822,
+        "y": 596,
+        "w": 80,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 64
+      }
+    },
+    "equipment.bloomseed.weapons.sword.sword-stab.sword-stab-wood-up#3": {
+      "frame": {
+        "x": 904,
+        "y": 596,
+        "w": 80,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 64
       }
     }
   },
