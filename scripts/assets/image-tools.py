@@ -188,7 +188,7 @@ def parse_normalize_spec(normalize):
   }
 
 
-def column_has_alpha(image, x, max_y):
+def column_is_visible(image, x, max_y):
   if x < 0 or x >= image.width:
     return False
 
