@@ -18,6 +18,7 @@ export class PreloadScene extends Phaser.Scene {
   public create(): void {
     const animationKeys = registerBloomseedAnimations(this);
     this.registry.set(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY, animationKeys);
+    this.game.events.emit("bloomseedReady", animationKeys);
     this.scene.start(WORLD_SCENE_KEY);
   }
 }
