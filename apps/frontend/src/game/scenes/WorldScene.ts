@@ -3,18 +3,30 @@ import { BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY } from "./PreloadScene";
 import {
   type AnimationDirection,
   type AnimationGroups,
+  type SpriteDirection,
   parseAnimationGroups,
   resolveAnimation,
 } from "../assets/animationGroups";
+import {
+  type EquipmentId,
+  type Material,
+  getCompatibleEquipment,
+  resolveEquipmentKey,
+} from "../assets/equipmentGroups";
 
 export const WORLD_SCENE_KEY = "world";
 
+const EQUIPMENT_ATLAS = "bloomseed.equipment";
+
 export class WorldScene extends Phaser.Scene {
   private sprite: Phaser.GameObjects.Sprite | null = null;
+  private equipmentSprite: Phaser.GameObjects.Sprite | null = null;
   private animationLabel: Phaser.GameObjects.Text | null = null;
   private animationGroups: AnimationGroups = new Map();
   private currentBaseType = "";
   private currentDirection: AnimationDirection = "right";
+  private currentEquipmentId: EquipmentId | "" = "";
+  private currentMaterial: Material = "iron";
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
 
   constructor() {
@@ -65,7 +77,6 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    // Create sprite with a placeholder texture key; will be set when animation plays
     const result = resolveAnimation(this.animationGroups, this.currentBaseType, this.currentDirection);
     if (!result) {
       this.add
@@ -94,6 +105,11 @@ export class WorldScene extends Phaser.Scene {
     this.sprite = this.add.sprite(width / 2, height / 2, firstFrame.textureKey);
     this.sprite.setScale(4);
 
+    // Equipment sprite sits on top of the character sprite, same position/scale
+    this.equipmentSprite = this.add.sprite(width / 2, height / 2, EQUIPMENT_ATLAS);
+    this.equipmentSprite.setScale(4);
+    this.equipmentSprite.setVisible(false);
+
     this.animationLabel = this.add
       .text(width / 2, height - 24, "", {
         color: "#cbd5e1",
@@ -108,9 +124,13 @@ export class WorldScene extends Phaser.Scene {
     >;
 
     this.game.events.on("animationSelected", this.onAnimationSelected, this);
+    this.game.events.on("equipmentSelected", this.onEquipmentSelected, this);
     this.events.once(
       "shutdown",
-      () => this.game.events.off("animationSelected", this.onAnimationSelected, this),
+      () => {
+        this.game.events.off("animationSelected", this.onAnimationSelected, this);
+        this.game.events.off("equipmentSelected", this.onEquipmentSelected, this);
+      },
       this,
     );
 
@@ -134,16 +154,47 @@ export class WorldScene extends Phaser.Scene {
 
   private playCurrentAnimation(): void {
     if (!this.sprite) return;
+
     const result = resolveAnimation(this.animationGroups, this.currentBaseType, this.currentDirection);
     if (!result) return;
     const { key, flipX } = result;
+
     this.sprite.setFlipX(flipX);
-    this.sprite.play(key, true);
+    this.sprite.play(key, false);
+
+    // Equipment overlay
+    const spriteDir: SpriteDirection =
+      this.currentDirection === "left" || this.currentDirection === "right" ? "side" : this.currentDirection;
+    const compatible = getCompatibleEquipment(this.currentBaseType);
+
+    if (
+      this.equipmentSprite &&
+      this.currentEquipmentId &&
+      compatible.includes(this.currentEquipmentId)
+    ) {
+      const equipKey = resolveEquipmentKey(this.currentEquipmentId, this.currentMaterial, spriteDir);
+      if (this.anims.exists(equipKey)) {
+        this.equipmentSprite.setFlipX(flipX);
+        this.equipmentSprite.setVisible(true);
+        this.equipmentSprite.play(equipKey, false);
+      } else {
+        this.equipmentSprite.setVisible(false);
+      }
+    } else if (this.equipmentSprite) {
+      this.equipmentSprite.setVisible(false);
+    }
+
     this.animationLabel?.setText(`Playing: ${key}${flipX ? " (flipped)" : ""}`);
   }
 
   private onAnimationSelected(baseType: string): void {
     this.currentBaseType = baseType;
+    this.playCurrentAnimation();
+  }
+
+  private onEquipmentSelected(payload: { equipmentId: EquipmentId; material: Material }): void {
+    this.currentEquipmentId = payload.equipmentId;
+    this.currentMaterial = payload.material;
     this.playCurrentAnimation();
   }
 }
