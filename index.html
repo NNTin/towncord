@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Towncord</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #181213;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    #content {
+      width: 100vw;
+      height: 100vh;
+      border: none;
+      display: none;
+    }
+    .version-info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.7);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div>Loading Towncord...</div>
+    <div id="version-display"></div>
+  </div>
+  <div class="version-info" id="version-info" style="display: none;"></div>
+  <iframe id="content" src=""></iframe>
+
+  <script>
+    // latestVersion is populated at runtime from versions.json
+    var latestVersion = null;
+    // Prevents hashchange from firing a redundant loadVersion when we set
+    // the hash programmatically (e.g. during initial redirect to latest).
+    var skipNextHashChange = false;
+
+    function getCurrentVersion() {
+      var hash = window.location.hash.slice(1);
+      return hash || latestVersion || '';
+    }
+
+    function setVersion(version) {
+      if (window.location.hash.slice(1) !== version) {
+        skipNextHashChange = true;
+        window.location.hash = version;
+      }
+    }
+
+    function loadVersion(version) {
+      // Validate version to prevent open-redirect / path-traversal attacks.
+      // Only allow the same safe character set enforced server-side.
+      if (!version || !/^[a-zA-Z0-9._-]+$/.test(version)) {
+        var loading = document.getElementById('loading');
+        var content = document.getElementById('content');
+        var versionInfo = document.getElementById('version-info');
+        var existingErr = loading.querySelector('.error-content');
+        if (existingErr) existingErr.remove();
+        var invalidContent = document.createElement('div');
+        invalidContent.className = 'error-content';
+        var invalidMsg = document.createElement('p');
+        invalidMsg.style.cssText = 'color:#ff6b6b;margin-top:20px;';
+        invalidMsg.textContent = version ? 'Invalid version identifier.' : 'No version available.';
+        invalidContent.appendChild(invalidMsg);
+        loading.appendChild(invalidContent);
+        loading.style.display = 'block';
+        content.style.display = 'none';
+        versionInfo.style.display = 'none';
+        return;
+      }
+
+      var versionDisplay = document.getElementById('version-display');
+      var versionInfo = document.getElementById('version-info');
+      var content = document.getElementById('content');
+      var loading = document.getElementById('loading');
+
+      var existingError = loading.querySelector('.error-content');
+      if (existingError) existingError.remove();
+
+      versionDisplay.textContent = 'Version: ' + version;
+      versionInfo.textContent = 'v' + version;
+
+      loading.style.display = 'block';
+      content.style.display = 'none';
+      versionInfo.style.display = 'none';
+
+      fetch(version + '/')
+        .then(function(response) {
+          if (!response.ok) throw new Error('Version ' + version + ' not found (' + response.status + ')');
+
+          content.src = version + '/';
+          content.onload = function() {
+            loading.style.display = 'none';
+            content.style.display = 'block';
+            versionInfo.style.display = 'block';
+          };
+          setTimeout(function() {
+            if (loading.style.display !== 'none') {
+              var timeoutError = document.createElement('div');
+              timeoutError.className = 'error-content';
+              timeoutError.innerHTML =
+                '<div style="color:#ff6b6b;margin-top:20px;">' +
+                  '<h3>Loading Timeout</h3>' +
+                  '<p>The selected version is taking longer than expected to load. Please check your network connection or try reloading.</p>' +
+                '</div>';
+              loading.appendChild(timeoutError);
+            }
+          }, 5000);
+        })
+        .catch(function(error) {
+          console.error('Version load error:', error);
+          versionDisplay.textContent = 'Version: ' + version + ' (Not Found)';
+
+          var errorContent = document.createElement('div');
+          errorContent.className = 'error-content';
+
+          var messageContainer = document.createElement('div');
+          messageContainer.style.cssText = 'color:#ff6b6b;margin-top:20px;';
+
+          var heading = document.createElement('h3');
+          heading.textContent = 'Version Not Found';
+          messageContainer.appendChild(heading);
+
+          var versionParagraph = document.createElement('p');
+          versionParagraph.textContent = 'Version "' + version + '" does not exist.';
+          messageContainer.appendChild(versionParagraph);
+
+          var buttonsContainer = document.createElement('div');
+          buttonsContainer.style.cssText = 'margin-top:15px;';
+
+          var defaultButton = document.createElement('button');
+          defaultButton.textContent = 'Go to Default Version';
+          defaultButton.style.cssText = 'background:#4ECDC4;color:white;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
+          defaultButton.onclick = function() {
+            if (latestVersion) window.switchToVersion(latestVersion);
+          };
+          buttonsContainer.appendChild(defaultButton);
+
+          var backButton = document.createElement('button');
+          backButton.textContent = 'Go Back';
+          backButton.style.cssText = 'background:#95E1D3;color:#333;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
+          backButton.onclick = function() {
+            history.back();
+          };
+          buttonsContainer.appendChild(backButton);
+
+          var errorDetailsContainer = document.createElement('div');
+          errorDetailsContainer.style.cssText = 'margin-top:20px;font-size:12px;color:#888;';
+
+          var errorParagraph = document.createElement('p');
+          errorParagraph.textContent = 'Error: ' + error.message;
+          errorDetailsContainer.appendChild(errorParagraph);
+
+          errorContent.appendChild(messageContainer);
+          errorContent.appendChild(buttonsContainer);
+          errorContent.appendChild(errorDetailsContainer);
+          loading.appendChild(errorContent);
+          loading.style.display = 'block';
+          content.style.display = 'none';
+          versionInfo.style.display = 'none';
+        });
+    }
+
+    window.switchToVersion = function(version) {
+      setVersion(version);
+      loadVersion(version);
+    };
+
+    // Guard against double-invocation: when setVersion() changes the hash
+    // programmatically, skip the resulting hashchange to avoid calling
+    // loadVersion twice.
+    window.addEventListener('hashchange', function() {
+      if (skipNextHashChange) {
+        skipNextHashChange = false;
+        return;
+      }
+      loadVersion(getCurrentVersion());
+    });
+
+    // On first load, fetch versions.json to discover the latest version rather
+    // than relying on a version value baked into this file at deploy time.
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('versions.json')
+        .then(function(r) { return r.json(); })
+        .then(function(versions) {
+          if (Array.isArray(versions) && versions.length > 0) {
+            latestVersion = versions[versions.length - 1];
+          }
+        })
+        .catch(function(err) { console.error('Failed to load versions.json:', err); })
+        .finally(function() {
+          if (!window.location.hash && latestVersion) {
+            setVersion(latestVersion);
+          }
+          loadVersion(getCurrentVersion());
+        });
+    });
+  </script>
+</body>
+</html>
