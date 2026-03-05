@@ -1,11 +1,10 @@
 import Phaser from "phaser";
-import { buildEntityRegistryFromCatalog } from "../application/entityRegistryBuilder";
-import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import {
-  type AnimationCatalog,
-  buildAnimationCatalog,
-} from "../assets/animationCatalog";
-import type { EntityRegistry } from "../domain/entityRegistry";
+  BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY,
+  type BloomseedGameContext,
+} from "../application/gameComposition";
+import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
+import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLAYER_PLACED_EVENT,
@@ -14,7 +13,6 @@ import {
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
 } from "../events";
-import { BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY } from "./PreloadScene";
 import { playEntityAnimation } from "./world/animationSystem";
 import { createWorldEntity } from "./world/entityFactory";
 import { updateEntityMovement } from "./world/movementSystem";
@@ -29,7 +27,7 @@ const SELECTED_TINT = 0x88bbff;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
-  private entityRegistry: EntityRegistry | null = null;
+  private entityRegistry: BloomseedGameContext["entityRegistry"] | null = null;
 
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
@@ -49,14 +47,11 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const rawKeys = this.registry.get(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY) as unknown;
-    const animationKeys = Array.isArray(rawKeys)
-      ? rawKeys.filter((value): value is string => typeof value === "string")
-      : [];
-
-    if (animationKeys.length > 0) {
-      this.catalog = buildAnimationCatalog(animationKeys);
-      this.entityRegistry = buildEntityRegistryFromCatalog(this.catalog);
+    const rawContext = this.registry.get(BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY) as unknown;
+    if (rawContext && typeof rawContext === "object") {
+      const context = rawContext as BloomseedGameContext;
+      this.catalog = context.catalog;
+      this.entityRegistry = context.entityRegistry;
     }
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<

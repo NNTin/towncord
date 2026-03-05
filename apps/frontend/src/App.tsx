@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import type Phaser from "phaser";
 import { createGame } from "./game/phaser/createGame";
 import { SidebarAccordion } from "./components/SidebarAccordion";
-import { buildAnimationCatalog, type AnimationCatalog } from "./game/assets/animationCatalog";
+import type { AnimationCatalog } from "./game/assets/animationCatalog";
+import {
+  BLOOMSEED_READY_EVENT,
+  type BloomseedGameContext,
+} from "./game/application/gameComposition";
 import { PlaceableService } from "./game/application/placeableService";
 import {
   PLACE_DRAG_MIME,
@@ -24,10 +28,9 @@ function App(): JSX.Element {
     const game = createGame(container);
     gameRef.current = game;
 
-    game.events.once("bloomseedReady", (keys: string[]) => {
-      const nextCatalog = buildAnimationCatalog(keys);
-      setCatalog(nextCatalog);
-      setPlaceableService(PlaceableService.fromCatalog(nextCatalog));
+    game.events.once(BLOOMSEED_READY_EVENT, (payload: BloomseedGameContext) => {
+      setCatalog(payload.catalog);
+      setPlaceableService(payload.placeableService);
     });
 
     return () => {

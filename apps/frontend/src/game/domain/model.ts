@@ -15,11 +15,6 @@ export function readCatalogPath(ref: CatalogPathRef): string {
   return ref.value;
 }
 
-export type SpawnSpec = {
-  entityId: EntityId;
-  catalogPath: CatalogPathRef;
-};
-
 export type EntityDefinition = {
   id: EntityId;
   label: string;

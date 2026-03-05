@@ -1,7 +1,6 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   buildArchetypeRuntimes,
-  isNpcPlaceableId,
   type NpcArchetypeSeed,
   type PlayerArchetypeSeed,
 } from "../domain/archetypes";
@@ -21,7 +20,6 @@ function buildNpcSeeds(catalog: AnimationCatalog): NpcArchetypeSeed[] {
   for (const path of catalog.tracksByPath.keys()) {
     const [ns, family, mobId, extra] = path.split("/");
     if (ns !== "mobs" || !family || !mobId || extra) continue;
-    if (!isNpcPlaceableId(mobId)) continue;
 
     seeds.push({
       family,
