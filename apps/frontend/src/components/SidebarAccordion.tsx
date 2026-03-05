@@ -8,6 +8,7 @@ import {
   getPropGroups,
   getTracksForPath,
 } from "../game/assets/animationCatalog";
+import type { PlaceableObjectType } from "../game/events";
 import { type EquipmentId, type Material, MATERIALS } from "../game/assets/equipmentGroups";
 import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import { AnimationPreview, type PreviewInfo } from "./AnimationPreview";
@@ -53,6 +54,33 @@ const SECTION_LABEL_STYLE: React.CSSProperties = {
 
 function SectionLabel({ children }: { children: React.ReactNode }): JSX.Element {
   return <div style={SECTION_LABEL_STYLE}>{children}</div>;
+}
+
+function DraggableEntry({
+  label,
+  onDragStart,
+}: {
+  label: string;
+  onDragStart: (e: React.DragEvent) => void;
+}): JSX.Element {
+  return (
+    <div
+      draggable
+      onDragStart={onDragStart}
+      style={{
+        background: "rgba(255,255,255,0.05)",
+        border: "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 4,
+        color: "#cbd5e1",
+        cursor: "grab",
+        fontSize: 12,
+        padding: "5px 8px",
+        userSelect: "none",
+      }}
+    >
+      ⊕ {label}
+    </div>
+  );
 }
 
 function AccordionHeader({
@@ -175,6 +203,7 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
 
   // Accordion state
   const [playerOpen, setPlayerOpen] = useState(true);
+  const [mobsOpen, setMobsOpen] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(true);
   const [animOpen, setAnimOpen] = useState(true);
 
@@ -337,25 +366,46 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
       {playerOpen && (
         <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
           {catalog.playerModels.map((model) => (
-            <div
+            <DraggableEntry
               key={model}
-              draggable
-              onDragStart={(e) => handleDragStart(e, { type: "player", model })}
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 4,
-                color: "#cbd5e1",
-                cursor: "grab",
-                fontSize: 12,
-                padding: "5px 8px",
-                userSelect: "none",
-              }}
-            >
-              ⊕ {model}
-            </div>
+              label={model}
+              onDragStart={(e) =>
+                handleDragStart(e, { type: "player", model, catalogPath: `player/${model}` })
+              }
+            />
           ))}
         </div>
+      )}
+
+      {catalog.mobFamilies.flatMap((family) =>
+        getMobIds(catalog, family).filter(
+          (id): id is PlaceableObjectType => id === "chicken" || id === "cow",
+        ),
+      ).length > 0 && (
+        <>
+          <AccordionHeader label="Mobs" open={mobsOpen} onToggle={() => setMobsOpen((v) => !v)} />
+          {mobsOpen && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
+              {catalog.mobFamilies.flatMap((family) =>
+                getMobIds(catalog, family)
+                  .filter((id): id is PlaceableObjectType => id === "chicken" || id === "cow")
+                  .map((id) => (
+                    <DraggableEntry
+                      key={id}
+                      label={id}
+                      onDragStart={(e) =>
+                        handleDragStart(e, {
+                          type: id,
+                          model: id,
+                          catalogPath: `mobs/${family}/${id}`,
+                        })
+                      }
+                    />
+                  )),
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* ── Preview selector ───────────────────────────────────── */}
@@ -516,9 +566,9 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
           paddingTop: 8,
         }}
       >
-        Drag model to place player
+        Drag to place · Click to select
         <br />
-        WASD move · Shift run
+        WASD move · Shift run (player)
         <br />
         Mid-drag pan · Scroll zoom
       </div>

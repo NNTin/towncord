@@ -23,25 +23,33 @@ export const WORLD_SCENE_KEY = "world";
 // Types
 // ---------------------------------------------------------------------------
 
-type PlayerState = "idle" | "move" | "run";
+type EntityState = "idle" | "move" | "run";
 
-type PlayerRuntime = {
-  placed: boolean;
+type Entity = {
+  id: number;
+  catalogPath: string;
+  supportsRun: boolean;
   position: { x: number; y: number };
   velocity: { x: number; y: number };
   facing: InputDirection;
-  state: PlayerState;
-  model: string;
+  state: EntityState;
+  sprite: Phaser.GameObjects.Sprite;
 };
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const STATE_TO_TRACK_IDS: Record<PlayerState, string[]> = {
+const PLAYER_STATE_TO_TRACKS: Record<EntityState, string[]> = {
   idle: ["idle"],
   move: ["walk", "run", "idle"],
   run: ["run", "walk", "idle"],
+};
+
+const MOB_STATE_TO_TRACKS: Record<EntityState, string[]> = {
+  idle: ["idle"],
+  move: ["walk", "idle"],
+  run: ["walk", "idle"],
 };
 
 const WALK_SPEED = 100;
@@ -51,6 +59,7 @@ const STOP_DAMPING_60FPS = 0.75;
 const SPRITE_SCALE = 4;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
+const SELECTED_TINT = 0x88bbff;
 
 // ---------------------------------------------------------------------------
 // Scene
@@ -59,9 +68,9 @@ const MAX_ZOOM = 4;
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
 
-  // Placed player — drag-drop + WASD
-  private player: PlayerRuntime | null = null;
-  private playerSprite: Phaser.GameObjects.Sprite | null = null;
+  private entities: Entity[] = [];
+  private selectedEntity: Entity | null = null;
+  private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
@@ -111,75 +120,75 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
-    if (this.player?.placed) {
-      this.updatePlayer(delta / 1000);
+    if (this.selectedEntity) {
+      this.updateEntity(this.selectedEntity, delta / 1000);
     }
   }
 
   // ---------------------------------------------------------------------------
-  // Player update
+  // Entity update
   // ---------------------------------------------------------------------------
 
-  private updatePlayer(dt: number): void {
-    const p = this.player!;
+  private updateEntity(entity: Entity, dt: number): void {
     const wasd = this.wasd!;
     const shift = this.shiftKey!;
 
     const moveX = (wasd.D.isDown ? 1 : 0) - (wasd.A.isDown ? 1 : 0);
     const moveY = (wasd.S.isDown ? 1 : 0) - (wasd.W.isDown ? 1 : 0);
     const isMoving = moveX !== 0 || moveY !== 0;
-    const isRunModifier = shift.isDown;
+    const isRunModifier = shift.isDown && entity.supportsRun;
 
-    const prevState = p.state;
-    const prevFacing = p.facing;
+    const prevState = entity.state;
+    const prevFacing = entity.facing;
 
     if (isMoving) {
       const len = Math.sqrt(moveX * moveX + moveY * moveY);
       const speed = isRunModifier ? RUN_SPEED : WALK_SPEED;
-      p.velocity.x = (moveX / len) * speed;
-      p.velocity.y = (moveY / len) * speed;
+      entity.velocity.x = (moveX / len) * speed;
+      entity.velocity.y = (moveY / len) * speed;
 
       if (Math.abs(moveX) >= Math.abs(moveY)) {
-        p.facing = moveX > 0 ? "right" : "left";
+        entity.facing = moveX > 0 ? "right" : "left";
       } else {
-        p.facing = moveY > 0 ? "down" : "up";
+        entity.facing = moveY > 0 ? "down" : "up";
       }
 
-      p.state = isRunModifier ? "run" : "move";
+      entity.state = isRunModifier ? "run" : "move";
     } else {
       const dampFactor = Math.pow(STOP_DAMPING_60FPS, dt * 60);
-      p.velocity.x *= dampFactor;
-      p.velocity.y *= dampFactor;
+      entity.velocity.x *= dampFactor;
+      entity.velocity.y *= dampFactor;
 
-      const speed = Math.sqrt(p.velocity.x ** 2 + p.velocity.y ** 2);
+      const speed = Math.sqrt(entity.velocity.x ** 2 + entity.velocity.y ** 2);
       if (speed < 1) {
-        p.velocity.x = 0;
-        p.velocity.y = 0;
-        p.state = "idle";
+        entity.velocity.x = 0;
+        entity.velocity.y = 0;
+        entity.state = "idle";
       } else {
-        p.state = "move";
+        entity.state = "move";
       }
     }
 
-    p.position.x += p.velocity.x * dt;
-    p.position.y += p.velocity.y * dt;
-    this.playerSprite?.setPosition(p.position.x, p.position.y);
+    entity.position.x += entity.velocity.x * dt;
+    entity.position.y += entity.velocity.y * dt;
+    entity.sprite.setPosition(entity.position.x, entity.position.y);
 
-    const stateChanged = p.state !== prevState;
-    const dirChanged = p.state !== "idle" && p.facing !== prevFacing;
+    const stateChanged = entity.state !== prevState;
+    const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
     if (stateChanged || dirChanged) {
-      this.playPlayerAnimation();
-      if (stateChanged) {
-        const payload: PlayerStateChangedPayload = { state: p.state };
+      this.playEntityAnimation(entity);
+      if (stateChanged && entity.catalogPath.startsWith("player/")) {
+        const payload: PlayerStateChangedPayload = { state: entity.state };
         this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
       }
     }
   }
 
-  private resolvePlayerTrack(): AnimationTrack | null {
-    if (!this.player || !this.catalog) return null;
-    const tracks = getTracksForPath(this.catalog, `player/${this.player.model}`);
-    const candidates = STATE_TO_TRACK_IDS[this.player.state] ?? ["idle"];
+  private resolveEntityTrack(entity: Entity): AnimationTrack | null {
+    if (!this.catalog) return null;
+    const tracks = getTracksForPath(this.catalog, entity.catalogPath);
+    const map = entity.supportsRun ? PLAYER_STATE_TO_TRACKS : MOB_STATE_TO_TRACKS;
+    const candidates = map[entity.state] ?? ["idle"];
     for (const id of candidates) {
       const track = tracks.find((t) => t.id === id);
       if (track) return track;
@@ -187,16 +196,28 @@ export class WorldScene extends Phaser.Scene {
     return tracks[0] ?? null;
   }
 
-  private playPlayerAnimation(): void {
-    if (!this.playerSprite || !this.player) return;
-    const track = this.resolvePlayerTrack();
+  private playEntityAnimation(entity: Entity): void {
+    const track = this.resolveEntityTrack(entity);
     if (!track) return;
-
-    const result = resolveTrackForDirection(track, this.player.facing);
+    const result = resolveTrackForDirection(track, entity.facing);
     if (!result) return;
+    entity.sprite.setFlipX(result.flipX);
+    entity.sprite.play(result.key, true);
+  }
 
-    this.playerSprite.setFlipX(result.flipX);
-    this.playerSprite.play(result.key, true);
+  // ---------------------------------------------------------------------------
+  // Selection
+  // ---------------------------------------------------------------------------
+
+  private selectEntity(entity: Entity | null): void {
+    if (this.selectedEntity === entity) return;
+    if (this.selectedEntity) {
+      this.selectedEntity.sprite.clearTint();
+    }
+    this.selectedEntity = entity;
+    if (entity) {
+      entity.sprite.setTint(SELECTED_TINT);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -204,55 +225,51 @@ export class WorldScene extends Phaser.Scene {
   // ---------------------------------------------------------------------------
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (payload.type !== "player" || !this.catalog) return;
+    if (!this.catalog) return;
 
     const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
+    const tracks = getTracksForPath(this.catalog, payload.catalogPath);
+    const idleTrack = tracks.find((t) => t.id === "idle") ?? tracks[0];
+    if (!idleTrack) return;
 
-    if (this.player && this.playerSprite) {
-      this.player.model = payload.model;
-      this.player.position.x = worldPoint.x;
-      this.player.position.y = worldPoint.y;
-      this.player.velocity.x = 0;
-      this.player.velocity.y = 0;
-      this.player.state = "idle";
-      this.playerSprite.setPosition(worldPoint.x, worldPoint.y);
-      this.playPlayerAnimation();
-    } else {
-      const tracks = getTracksForPath(this.catalog, `player/${payload.model}`);
-      const idleTrack = tracks.find((t) => t.id === "idle") ?? tracks[0];
-      if (!idleTrack) return;
+    const resolved = resolveTrackForDirection(idleTrack, "down");
+    if (!resolved) return;
 
-      const resolved = resolveTrackForDirection(idleTrack, "down");
-      if (!resolved) return;
+    const firstFrame = this.anims.get(resolved.key)?.frames[0];
+    if (!firstFrame) return;
 
-      const firstFrame = this.anims.get(resolved.key)?.frames[0];
-      if (!firstFrame) return;
+    const sprite = this.add.sprite(
+      worldPoint.x,
+      worldPoint.y,
+      firstFrame.textureKey,
+      firstFrame.textureFrame,
+    );
+    sprite.setScale(SPRITE_SCALE);
+    sprite.setFlipX(resolved.flipX);
+    sprite.play(resolved.key, true);
 
-      this.player = {
-        placed: true,
-        position: { x: worldPoint.x, y: worldPoint.y },
-        velocity: { x: 0, y: 0 },
-        facing: "down",
-        state: "idle",
-        model: payload.model,
-      };
+    const entity: Entity = {
+      id: this.nextId++,
+      catalogPath: payload.catalogPath,
+      supportsRun: payload.type === "player",
+      position: { x: worldPoint.x, y: worldPoint.y },
+      velocity: { x: 0, y: 0 },
+      facing: "down",
+      state: "idle",
+      sprite,
+    };
 
-      this.playerSprite = this.add.sprite(
-        worldPoint.x,
-        worldPoint.y,
-        firstFrame.textureKey,
-        firstFrame.textureFrame,
-      );
-      this.playerSprite.setScale(SPRITE_SCALE);
-      this.playPlayerAnimation();
+    this.entities.push(entity);
+    this.selectEntity(entity);
+
+    if (payload.type === "player") {
+      const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
+      this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
     }
-
-    const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
-    this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
   }
 
   // ---------------------------------------------------------------------------
-  // Camera controls
+  // Camera controls + left-click selection
   // ---------------------------------------------------------------------------
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
@@ -262,6 +279,17 @@ export class WorldScene extends Phaser.Scene {
       this.panStartY = pointer.y;
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
+    } else if (pointer.button === 0) {
+      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+      let hit: Entity | null = null;
+      for (const entity of this.entities) {
+        const bounds = entity.sprite.getBounds();
+        if (bounds.contains(worldPoint.x, worldPoint.y)) {
+          hit = entity;
+          break;
+        }
+      }
+      this.selectEntity(hit);
     }
   }
 

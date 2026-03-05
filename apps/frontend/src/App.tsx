@@ -48,6 +48,7 @@ function App(): JSX.Element {
       const payload: PlaceObjectDropPayload = {
         type: data.type,
         model: data.model,
+        catalogPath: data.catalogPath,
         screenX: e.clientX - rect.left,
         screenY: e.clientY - rect.top,
       };
