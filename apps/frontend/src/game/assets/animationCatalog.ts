@@ -26,12 +26,23 @@ export type AnimationCatalog = {
 };
 
 const SPRITE_DIRECTIONS: SpriteDirection[] = ["up", "down", "side"];
+const MOBS_WITH_SIDE_NATURALLY_FACING_LEFT = new Set(["animals/cow"]);
+const MOB_ACTIONS_WITH_SIDE_NATURALLY_FACING_LEFT = new Map<string, Set<string>>([
+  ["animals/chicken", new Set(["sleep", "pet"])],
+]);
 
 function getSpriteDirection(segment: string): SpriteDirection | null {
   for (const dir of SPRITE_DIRECTIONS) {
     if (segment.endsWith(`-${dir}`)) return dir;
   }
   return null;
+}
+
+function mobSideNaturallyFacesLeft(family: string, mobId: string, actionId: string): boolean {
+  const mobKey = `${family}/${mobId}`;
+  if (MOBS_WITH_SIDE_NATURALLY_FACING_LEFT.has(mobKey)) return true;
+  const actions = MOB_ACTIONS_WITH_SIDE_NATURALLY_FACING_LEFT.get(mobKey);
+  return actions?.has(actionId) ?? false;
 }
 
 function getOrCreate(
@@ -105,7 +116,7 @@ function parseMobKeys(
     const track = getOrCreate(pathTracks.get(path)!, actionId, {
       label: actionId,
       entityType: "mobs",
-      sideNaturallyFacesLeft: false,
+      sideNaturallyFacesLeft: mobSideNaturallyFacesLeft(family, mobId, actionId),
       equipmentCompatible: [],
     });
 
