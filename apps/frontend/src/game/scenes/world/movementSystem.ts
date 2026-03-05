@@ -18,9 +18,9 @@ export function updateEntityMovement(
   dt: number,
   input: MovementInput,
 ): void {
-  const isMoving = input.moveX !== 0 || input.moveY !== 0;
+  const hasInputMovement = input.moveX !== 0 || input.moveY !== 0;
 
-  if (hasCapability(entity.definition, "walk") && isMoving) {
+  if (hasCapability(entity.definition, "walk") && hasInputMovement) {
     const len = Math.sqrt(input.moveX * input.moveX + input.moveY * input.moveY);
     const speed = input.isRunModifier && hasCapability(entity.definition, "run")
       ? RUN_SPEED
@@ -45,8 +45,13 @@ export function updateEntityMovement(
     }
   }
 
+  const speedAfterUpdate = Math.sqrt(entity.velocity.x ** 2 + entity.velocity.y ** 2);
+  const isMovingByVelocity = speedAfterUpdate >= 1;
+
   entity.state = resolveNextAction(entity.definition, {
-    isMoving,
-    isRunModifier: input.isRunModifier,
+    // Keep movement state active while inertia still moves the entity.
+    isMoving: isMovingByVelocity,
+    // Running only applies while input is actively held.
+    isRunModifier: hasInputMovement && input.isRunModifier,
   });
 }
