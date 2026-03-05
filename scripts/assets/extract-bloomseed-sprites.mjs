@@ -151,21 +151,33 @@ function buildLayout(rule, png) {
     return null;
   }
 
+  const normalize = buildNormalize(rule);
+
   if (rule.parser === "strip") {
     const frameWidth = rule.defaults?.frameWidth ?? png.height;
     const frameHeight = rule.defaults?.frameHeight ?? png.height;
-    const frameCount = Math.max(1, Math.floor(png.width / frameWidth));
-    const remainderX = png.width % frameWidth;
+    const offsetX = Math.max(0, rule.defaults?.offsetX ?? 0);
+    const availableWidth = Math.max(0, png.width - offsetX);
+    const frameCountMode = rule.defaults?.frameCountMode ?? "floor";
+    const rawFrameCount = availableWidth / frameWidth;
+    const frameCount = Math.max(
+      1,
+      frameCountMode === "round" ? Math.round(rawFrameCount) : Math.floor(rawFrameCount),
+    );
+    const remainderX = Math.max(0, availableWidth - frameCount * frameWidth);
 
     return {
       type: "strip",
       frameWidth,
       frameHeight,
       frameCount,
+      offsetX,
+      frameCountMode,
       columns: frameCount,
       rows: 1,
       remainderX,
-      exact: remainderX === 0,
+      exact: remainderX === 0 && offsetX === 0,
+      normalize,
     };
   }
 
@@ -186,6 +198,17 @@ function buildLayout(rule, png) {
       remainderX,
       remainderY,
       exact: remainderX === 0 && remainderY === 0,
+      normalize,
+    };
+  }
+
+  if (rule.parser === "components") {
+    const minArea = Math.max(1, Number(rule.defaults?.minArea ?? 1));
+    return {
+      type: "components",
+      minArea,
+      exact: true,
+      normalize,
     };
   }
 
@@ -195,6 +218,60 @@ function buildLayout(rule, png) {
     frameHeight: png.height,
     frameCount: 1,
     exact: true,
+    normalize,
+  };
+}
+
+function buildNormalize(rule) {
+  if (!rule.normalize) {
+    return null;
+  }
+
+  const frameWidth = Number(rule.normalize.frameWidth);
+  const frameHeight = Number(rule.normalize.frameHeight);
+  const anchor = rule.normalize.anchor ?? "center";
+  const trimAlpha = rule.normalize.trimAlpha ?? false;
+  const offsetX = Number(rule.normalize.offsetX ?? 0);
+  const offsetY = Number(rule.normalize.offsetY ?? 0);
+  const centerOddX = rule.normalize.centerOddX ?? false;
+
+  if (
+    !Number.isInteger(frameWidth) ||
+    !Number.isInteger(frameHeight) ||
+    frameWidth <= 0 ||
+    frameHeight <= 0
+  ) {
+    throw new Error(
+      `Invalid normalize dimensions for rule "${rule.source}". Expected positive integer frameWidth/frameHeight.`,
+    );
+  }
+
+  if (!["center", "bottom-center"].includes(anchor)) {
+    throw new Error(
+      `Invalid normalize anchor "${anchor}" for rule "${rule.source}".`,
+    );
+  }
+
+  if (!Number.isInteger(offsetX) || !Number.isInteger(offsetY)) {
+    throw new Error(
+      `Invalid normalize offsets for rule "${rule.source}". Expected integer offsetX/offsetY.`,
+    );
+  }
+
+  if (typeof centerOddX !== "boolean") {
+    throw new Error(
+      `Invalid normalize centerOddX for rule "${rule.source}". Expected a boolean.`,
+    );
+  }
+
+  return {
+    frameWidth,
+    frameHeight,
+    anchor,
+    trimAlpha,
+    offsetX,
+    offsetY,
+    centerOddX,
   };
 }
 
