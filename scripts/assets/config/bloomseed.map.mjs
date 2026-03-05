@@ -213,7 +213,7 @@ export const bloomseedConfig = {
       parser: "sheet",
       atlas: "props",
       tags: ["prop", "animated", "chest"],
-      defaults: { cellWidth: 16, cellHeight: 26 },
+      defaults: { cellWidth: 32, cellHeight: 26 },
     },
     {
       source: "Environment/Props/Animated/Water_Props",
