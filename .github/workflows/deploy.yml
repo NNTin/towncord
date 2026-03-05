@@ -1,10 +1,13 @@
 name: Versioned GitHub Pages Deployment
 
 on:
+  push:
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to deploy'
+        description: 'Version to deploy (e.g. v0.3.0)'
         required: true
 
 permissions:
@@ -29,10 +32,10 @@ jobs:
       - name: Build for production
         run: npm run build:frontend
         env:
-          BASE_PATH: /towncord/${{ github.event.inputs.version }}/
+          BASE_PATH: /towncord/${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}/
 
       - name: Prepare deployment
-        run: bash .github/scripts/deploy.sh "${{ github.event.inputs.version }}"
+        run: bash .github/scripts/deploy.sh "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
