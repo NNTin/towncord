@@ -4,257 +4,276 @@ import {
   type AnimationCatalog,
   type AnimationTrack,
   type InputDirection,
-  type SpriteDirection,
   buildAnimationCatalog,
   getTracksForPath,
   resolveTrackForDirection,
 } from "../assets/animationCatalog";
-import { type EquipmentId, type Material, resolveEquipmentKey } from "../assets/equipmentGroups";
 import {
-  ANIMATION_DISPLAY_INFO_EVENT,
-  ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
-  type AnimationDisplayInfo,
+  PLACE_OBJECT_DROP_EVENT,
+  PLAYER_PLACED_EVENT,
+  PLAYER_STATE_CHANGED_EVENT,
+  type PlaceObjectDropPayload,
+  type PlayerPlacedPayload,
+  type PlayerStateChangedPayload,
 } from "../events";
 
 export const WORLD_SCENE_KEY = "world";
 
-const EQUIPMENT_ATLAS = "bloomseed.equipment";
+type PlayerState = "idle" | "move" | "run";
+
+type PlayerRuntime = {
+  placed: boolean;
+  position: { x: number; y: number };
+  velocity: { x: number; y: number };
+  facing: InputDirection;
+  state: PlayerState;
+  model: string;
+};
+
+const STATE_TO_TRACK_IDS: Record<PlayerState, string[]> = {
+  idle: ["idle"],
+  move: ["walk", "run", "idle"],
+  run: ["run", "walk", "idle"],
+};
+
+const WALK_SPEED = 100;
+const RUN_SPEED = 220;
+/** Per-frame velocity retention factor at 60 fps when no keys pressed (fast ease-out). */
+const STOP_DAMPING_60FPS = 0.75;
+const SPRITE_SCALE = 4;
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 4;
 
 export class WorldScene extends Phaser.Scene {
-  private sprite: Phaser.GameObjects.Sprite | null = null;
-  private equipmentSprite: Phaser.GameObjects.Sprite | null = null;
-  private animationLabel: Phaser.GameObjects.Text | null = null;
   private catalog: AnimationCatalog | null = null;
-  private currentTrack: AnimationTrack | null = null;
-  private currentDirection: InputDirection = "right";
-  private currentEquipmentId: EquipmentId | "" = "";
-  private currentMaterial: Material = "iron";
+  private player: PlayerRuntime | null = null;
+  private playerSprite: Phaser.GameObjects.Sprite | null = null;
+
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
+  private shiftKey: Phaser.Input.Keyboard.Key | null = null;
+
+  private isPanning = false;
+  private panStartX = 0;
+  private panStartY = 0;
+  private camStartX = 0;
+  private camStartY = 0;
 
   constructor() {
     super(WORLD_SCENE_KEY);
   }
 
   public create(): void {
-    const width = this.scale.width;
-    const height = this.scale.height;
-
-    this.add
-      .text(width / 2, 24, "Towncord", {
-        color: "#e2e8f0",
-        fontFamily: "monospace",
-        fontSize: "22px",
-      })
-      .setOrigin(0.5, 0);
-
-    const rawAnimationKeys = this.registry.get(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY) as unknown;
-    const animationKeys = Array.isArray(rawAnimationKeys)
-      ? rawAnimationKeys.filter((value): value is string => typeof value === "string")
+    const rawKeys = this.registry.get(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY) as unknown;
+    const animationKeys = Array.isArray(rawKeys)
+      ? rawKeys.filter((v): v is string => typeof v === "string")
       : [];
-
-    if (animationKeys.length === 0) {
-      this.add
-        .text(width / 2, height / 2, "No animations were registered.", {
-          color: "#f8fafc",
-          fontFamily: "monospace",
-          fontSize: "16px",
-        })
-        .setOrigin(0.5);
-      return;
+    if (animationKeys.length > 0) {
+      this.catalog = buildAnimationCatalog(animationKeys);
     }
-
-    this.catalog = buildAnimationCatalog(animationKeys);
-
-    // Find initial default track: player/female/run, or first available
-    const playerModel = this.catalog.playerModels[0] ?? "female";
-    const playerTracks = getTracksForPath(this.catalog, `player/${playerModel}`);
-    this.currentTrack = playerTracks.find((t) => t.id === "run") ?? playerTracks[0] ?? null;
-
-    if (!this.currentTrack) {
-      this.add
-        .text(width / 2, height / 2, "No playable animation keys found.", {
-          color: "#f8fafc",
-          fontFamily: "monospace",
-          fontSize: "16px",
-        })
-        .setOrigin(0.5);
-      return;
-    }
-
-    const result = resolveTrackForDirection(this.currentTrack, this.currentDirection);
-    if (!result) {
-      this.add
-        .text(width / 2, height / 2, "Could not resolve animation frames.", {
-          color: "#f8fafc",
-          fontFamily: "monospace",
-          fontSize: "16px",
-        })
-        .setOrigin(0.5);
-      return;
-    }
-
-    const animation = this.anims.get(result.key);
-    const firstFrame = animation?.frames[0];
-    if (!firstFrame) {
-      this.add
-        .text(width / 2, height / 2, "Could not resolve animation frames.", {
-          color: "#f8fafc",
-          fontFamily: "monospace",
-          fontSize: "16px",
-        })
-        .setOrigin(0.5);
-      return;
-    }
-
-    this.sprite = this.add.sprite(width / 2, height / 2, firstFrame.textureKey);
-    this.sprite.setScale(4);
-
-    // Equipment sprite sits on top of the character sprite, same position/scale
-    this.equipmentSprite = this.add.sprite(width / 2, height / 2, EQUIPMENT_ATLAS);
-    this.equipmentSprite.setScale(4);
-    this.equipmentSprite.setVisible(false);
-
-    this.animationLabel = this.add
-      .text(width / 2, height - 24, "", {
-        color: "#cbd5e1",
-        fontFamily: "monospace",
-        fontSize: "12px",
-      })
-      .setOrigin(0.5, 1);
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<
       "W" | "A" | "S" | "D",
       Phaser.Input.Keyboard.Key
     >;
+    this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
-    this.game.events.on("animationSelected", this.onAnimationSelected, this);
-    this.game.events.on("equipmentSelected", this.onEquipmentSelected, this);
-    this.game.events.on(ANIMATION_DISPLAY_INFO_REQUEST_EVENT, this.onAnimationDisplayInfoRequest, this);
+    this.input.on("pointerdown", this.onPointerDown, this);
+    this.input.on("pointermove", this.onPointerMove, this);
+    this.input.on("pointerup", this.onPointerUp, this);
+    this.input.on("wheel", this.onWheel, this);
+
+    this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.events.once(
       "shutdown",
       () => {
-        this.game.events.off("animationSelected", this.onAnimationSelected, this);
-        this.game.events.off("equipmentSelected", this.onEquipmentSelected, this);
-        this.game.events.off(
-          ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
-          this.onAnimationDisplayInfoRequest,
-          this,
-        );
+        this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
       },
       this,
     );
-
-    this.playCurrentAnimation();
   }
 
-  public override update(): void {
-    if (!this.wasd) return;
-
-    let dir: InputDirection = this.currentDirection;
-    if (this.wasd.W.isDown) dir = "up";
-    else if (this.wasd.S.isDown) dir = "down";
-    else if (this.wasd.D.isDown) dir = "right";
-    else if (this.wasd.A.isDown) dir = "left";
-
-    if (dir !== this.currentDirection) {
-      this.currentDirection = dir;
-      this.playCurrentAnimation();
+  public override update(_time: number, delta: number): void {
+    if (this.player?.placed) {
+      this.updatePlayer(delta / 1000);
     }
   }
 
-  private playCurrentAnimation(): void {
-    if (!this.sprite || !this.currentTrack) return;
+  // ---------------------------------------------------------------------------
+  // Player update
+  // ---------------------------------------------------------------------------
 
-    const result = resolveTrackForDirection(this.currentTrack, this.currentDirection);
-    if (!result) return;
-    const { key, flipX } = result;
+  private updatePlayer(dt: number): void {
+    const p = this.player!;
+    const wasd = this.wasd!;
+    const shift = this.shiftKey!;
 
-    this.sprite.setFlipX(flipX);
-    this.sprite.play(key, false);
+    const moveX = (wasd.D.isDown ? 1 : 0) - (wasd.A.isDown ? 1 : 0);
+    const moveY = (wasd.S.isDown ? 1 : 0) - (wasd.W.isDown ? 1 : 0);
+    const isMoving = moveX !== 0 || moveY !== 0;
+    const isRunModifier = shift.isDown;
 
-    // Equipment overlay
-    const spriteDir: SpriteDirection =
-      this.currentDirection === "left" || this.currentDirection === "right"
-        ? "side"
-        : this.currentDirection;
-    const compatible = this.currentTrack.equipmentCompatible;
+    const prevState = p.state;
+    const prevFacing = p.facing;
 
-    if (
-      this.equipmentSprite &&
-      this.currentEquipmentId &&
-      compatible.includes(this.currentEquipmentId)
-    ) {
-      const equipKey = resolveEquipmentKey(this.currentEquipmentId, this.currentMaterial, spriteDir);
-      if (this.anims.exists(equipKey)) {
-        this.equipmentSprite.setFlipX(flipX);
-        this.equipmentSprite.setVisible(true);
-        this.equipmentSprite.play(equipKey, false);
+    if (isMoving) {
+      const len = Math.sqrt(moveX * moveX + moveY * moveY);
+      const speed = isRunModifier ? RUN_SPEED : WALK_SPEED;
+      p.velocity.x = (moveX / len) * speed;
+      p.velocity.y = (moveY / len) * speed;
+
+      if (Math.abs(moveX) >= Math.abs(moveY)) {
+        p.facing = moveX > 0 ? "right" : "left";
       } else {
-        this.equipmentSprite.setVisible(false);
+        p.facing = moveY > 0 ? "down" : "up";
       }
-    } else if (this.equipmentSprite) {
-      this.equipmentSprite.setVisible(false);
+
+      p.state = isRunModifier ? "run" : "move";
+    } else {
+      const dampFactor = Math.pow(STOP_DAMPING_60FPS, dt * 60);
+      p.velocity.x *= dampFactor;
+      p.velocity.y *= dampFactor;
+
+      const speed = Math.sqrt(p.velocity.x ** 2 + p.velocity.y ** 2);
+      if (speed < 1) {
+        p.velocity.x = 0;
+        p.velocity.y = 0;
+        p.state = "idle";
+      } else {
+        p.state = "move";
+      }
     }
 
-    this.animationLabel?.setText(`Playing: ${key}${flipX ? " (flipped)" : ""}`);
-    this.emitAnimationDisplayInfo(key, flipX);
+    p.position.x += p.velocity.x * dt;
+    p.position.y += p.velocity.y * dt;
+
+    if (this.playerSprite) {
+      this.playerSprite.setPosition(p.position.x, p.position.y);
+    }
+
+    const stateChanged = p.state !== prevState;
+    const dirChanged = p.state !== "idle" && p.facing !== prevFacing;
+    if (stateChanged || dirChanged) {
+      this.playPlayerAnimation();
+      if (stateChanged) {
+        const payload: PlayerStateChangedPayload = { state: p.state };
+        this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+      }
+    }
   }
 
-  private onAnimationSelected(track: AnimationTrack): void {
-    this.currentTrack = track;
-    this.playCurrentAnimation();
+  // ---------------------------------------------------------------------------
+  // Animation
+  // ---------------------------------------------------------------------------
+
+  private resolvePlayerTrack(): AnimationTrack | null {
+    if (!this.player || !this.catalog) return null;
+    const tracks = getTracksForPath(this.catalog, `player/${this.player.model}`);
+    const candidates = STATE_TO_TRACK_IDS[this.player.state] ?? ["idle"];
+    for (const id of candidates) {
+      const track = tracks.find((t) => t.id === id);
+      if (track) return track;
+    }
+    return tracks[0] ?? null;
   }
 
-  private onEquipmentSelected(payload: { equipmentId: EquipmentId; material: Material }): void {
-    this.currentEquipmentId = payload.equipmentId;
-    this.currentMaterial = payload.material;
-    this.playCurrentAnimation();
+  private playPlayerAnimation(): void {
+    if (!this.playerSprite || !this.player) return;
+    const track = this.resolvePlayerTrack();
+    if (!track) return;
+
+    const result = resolveTrackForDirection(track, this.player.facing);
+    if (!result) return;
+
+    const { key, flipX } = result;
+    this.playerSprite.setFlipX(flipX);
+    this.playerSprite.play(key, true);
   }
 
-  private onAnimationDisplayInfoRequest(): void {
-    if (!this.currentTrack) {
-      return;
+  // ---------------------------------------------------------------------------
+  // Drop handler
+  // ---------------------------------------------------------------------------
+
+  private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
+    if (payload.type !== "player" || !this.catalog) return;
+
+    const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
+
+    if (this.player && this.playerSprite) {
+      // Reposition existing player
+      this.player.model = payload.model;
+      this.player.position.x = worldPoint.x;
+      this.player.position.y = worldPoint.y;
+      this.player.velocity.x = 0;
+      this.player.velocity.y = 0;
+      this.player.state = "idle";
+      this.playerSprite.setPosition(worldPoint.x, worldPoint.y);
+      this.playPlayerAnimation();
+    } else {
+      // Create player sprite
+      const tracks = getTracksForPath(this.catalog, `player/${payload.model}`);
+      const idleTrack = tracks.find((t) => t.id === "idle") ?? tracks[0];
+      if (!idleTrack) return;
+
+      const resolved = resolveTrackForDirection(idleTrack, "down");
+      if (!resolved) return;
+
+      const firstFrame = this.anims.get(resolved.key)?.frames[0];
+      if (!firstFrame) return;
+
+      this.player = {
+        placed: true,
+        position: { x: worldPoint.x, y: worldPoint.y },
+        velocity: { x: 0, y: 0 },
+        facing: "down",
+        state: "idle",
+        model: payload.model,
+      };
+
+      this.playerSprite = this.add.sprite(worldPoint.x, worldPoint.y, firstFrame.textureKey);
+      this.playerSprite.setScale(SPRITE_SCALE);
+      this.playPlayerAnimation();
     }
 
-    const resolved = resolveTrackForDirection(this.currentTrack, this.currentDirection);
-    if (!resolved) {
-      return;
-    }
-
-    this.emitAnimationDisplayInfo(resolved.key, resolved.flipX);
+    const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
+    this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
   }
 
-  private emitAnimationDisplayInfo(animationKey: string, flipX: boolean): void {
-    if (!this.sprite) {
-      return;
+  // ---------------------------------------------------------------------------
+  // Camera controls
+  // ---------------------------------------------------------------------------
+
+  private onPointerDown(pointer: Phaser.Input.Pointer): void {
+    if (pointer.button === 1) {
+      this.isPanning = true;
+      this.panStartX = pointer.x;
+      this.panStartY = pointer.y;
+      this.camStartX = this.cameras.main.scrollX;
+      this.camStartY = this.cameras.main.scrollY;
     }
+  }
 
-    const animation = this.anims.get(animationKey);
-    const firstFrame = animation?.frames[0];
-    if (!animation || !firstFrame) {
-      return;
+  private onPointerMove(pointer: Phaser.Input.Pointer): void {
+    if (!this.isPanning) return;
+    const zoom = this.cameras.main.zoom;
+    const dx = (pointer.x - this.panStartX) / zoom;
+    const dy = (pointer.y - this.panStartY) / zoom;
+    this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+  }
+
+  private onPointerUp(pointer: Phaser.Input.Pointer): void {
+    if (pointer.button === 1) {
+      this.isPanning = false;
     }
+  }
 
-    const texture = this.textures.get(firstFrame.textureKey);
-    const frame = texture.get(firstFrame.textureFrame);
-    if (!frame) {
-      return;
-    }
-
-    const frameWidth = frame.width;
-    const frameHeight = frame.height;
-    const scale = this.sprite.scaleX;
-    const payload: AnimationDisplayInfo = {
-      animationKey,
-      frameWidth,
-      frameHeight,
-      frameCount: animation.frames.length,
-      flipX,
-      scale,
-      displayWidth: Math.round(Math.abs(this.sprite.scaleX) * frameWidth),
-      displayHeight: Math.round(Math.abs(this.sprite.scaleY) * frameHeight),
-    };
-
-    this.game.events.emit(ANIMATION_DISPLAY_INFO_EVENT, payload);
+  private onWheel(
+    _pointer: Phaser.Input.Pointer,
+    _gameObjects: unknown,
+    _dx: number,
+    dy: number,
+  ): void {
+    const cam = this.cameras.main;
+    const factor = dy > 0 ? 0.9 : 1.1;
+    cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
   }
 }
