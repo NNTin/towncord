@@ -17,7 +17,7 @@ type Props = {
   catalog: AnimationCatalog;
 };
 
-const PLACEABLE_MOB_IDS: Exclude<PlaceableObjectType, "player">[] = ["chicken", "cow", "bat"];
+const PLACEABLE_MOB_IDS: Exclude<PlaceableObjectType, "player">[] = ["chicken", "cow", "bat", "slime"];
 const PLACEABLE_MOB_ID_SET: ReadonlySet<string> = new Set(PLACEABLE_MOB_IDS);
 
 function isPlaceableMobId(id: string): id is Exclude<PlaceableObjectType, "player"> {
