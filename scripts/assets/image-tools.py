@@ -505,6 +505,7 @@ def pack_frames(frames, max_width, padding):
         "name": frame["name"],
         "source": frame["source"],
         "rect": frame["rect"],
+        "flipX": frame.get("flipX", False),
         "x": x,
         "y": y,
         "w": frame["w"],
@@ -547,6 +548,8 @@ def pack_command(args):
     sw = int(rect["w"])
     sh = int(rect["h"])
     cropped = source.crop((sx, sy, sx + sw, sy + sh))
+    if placement.get("flipX", False):
+      cropped = cropped.transpose(Image.FLIP_LEFT_RIGHT)
     atlas_image.paste(cropped, (placement["x"], placement["y"]))
 
     atlas_frames[placement["name"]] = {

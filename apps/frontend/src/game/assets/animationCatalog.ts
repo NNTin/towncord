@@ -11,8 +11,6 @@ export type AnimationTrack = {
   directional: boolean;
   keyByDirection: Partial<Record<SpriteDirection, string>>;
   undirectedKey: string | null;
-  /** true when the sprite sheet's "side" frame faces left (flip logic is inverted) */
-  sideNaturallyFacesLeft: boolean;
   equipmentCompatible: EquipmentId[];
 };
 
@@ -26,23 +24,12 @@ export type AnimationCatalog = {
 };
 
 const SPRITE_DIRECTIONS: SpriteDirection[] = ["up", "down", "side"];
-const MOBS_WITH_SIDE_NATURALLY_FACING_LEFT = new Set(["animals/cow"]);
-const MOB_ACTIONS_WITH_SIDE_NATURALLY_FACING_LEFT = new Map<string, Set<string>>([
-  ["animals/chicken", new Set(["sleep", "pet"])],
-]);
 
 function getSpriteDirection(segment: string): SpriteDirection | null {
   for (const dir of SPRITE_DIRECTIONS) {
     if (segment.endsWith(`-${dir}`)) return dir;
   }
   return null;
-}
-
-function mobSideNaturallyFacesLeft(family: string, mobId: string, actionId: string): boolean {
-  const mobKey = `${family}/${mobId}`;
-  if (MOBS_WITH_SIDE_NATURALLY_FACING_LEFT.has(mobKey)) return true;
-  const actions = MOB_ACTIONS_WITH_SIDE_NATURALLY_FACING_LEFT.get(mobKey);
-  return actions?.has(actionId) ?? false;
 }
 
 function getOrCreate(
@@ -76,7 +63,6 @@ function parsePlayerKeys(
     const track = getOrCreate(pathTracks.get(path)!, baseType, {
       label: baseType,
       entityType: "player",
-      sideNaturallyFacesLeft: baseType.startsWith("tool-"),
       equipmentCompatible: TOOL_EQUIPMENT_MAP[baseType] ?? [],
     });
 
@@ -116,7 +102,6 @@ function parseMobKeys(
     const track = getOrCreate(pathTracks.get(path)!, actionId, {
       label: actionId,
       entityType: "mobs",
-      sideNaturallyFacesLeft: mobSideNaturallyFacesLeft(family, mobId, actionId),
       equipmentCompatible: [],
     });
 
@@ -166,7 +151,6 @@ function parsePropKeys(
     const track = getOrCreate(pathTracks.get(path)!, variantId, {
       label: variantId,
       entityType: "props",
-      sideNaturallyFacesLeft: false,
       equipmentCompatible: [],
     });
     track.undirectedKey = key;
@@ -219,7 +203,7 @@ export function resolveTrackForDirection(
   dir: InputDirection,
 ): { key: string; flipX: boolean } | null {
   const isHorizontal = dir === "left" || dir === "right";
-  const flipX = track.sideNaturallyFacesLeft ? dir === "right" : dir === "left";
+  const flipX = dir === "left";
   const spriteDir: SpriteDirection = isHorizontal ? "side" : dir;
 
   if (track.directional) {

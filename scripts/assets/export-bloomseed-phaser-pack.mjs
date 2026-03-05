@@ -15,6 +15,37 @@ const imageToolsPath = path.resolve(rootDir, "scripts/assets/image-tools.py");
 const dryRun = process.argv.slice(2).includes("--dry-run");
 const execFileAsync = promisify(execFile);
 
+/**
+ * Mob asset IDs whose source sprites naturally face left and must be flipped
+ * during atlas packing so all exported side-facing frames face right by
+ * convention, letting the runtime use a single uniform flip rule.
+ */
+const FLIP_X_MOB_ASSET_IDS = new Set([
+  "mobs.bloomseed.animals.cow.cow-idle-side",
+  "mobs.bloomseed.animals.cow.cow-walk-side",
+  "mobs.bloomseed.animals.chicken.chicken-sleep-side",
+  "mobs.bloomseed.animals.chicken.chicken-pet",
+]);
+
+/**
+ * Returns true when a frame from this asset must be horizontally flipped
+ * before being written into the atlas.  After packing, every side-facing
+ * sprite faces right, so the runtime only needs to flip for leftward movement.
+ */
+function needsFlipX(asset) {
+  const { id } = asset;
+  // Player character tool-side animations face left in the source sheets.
+  if (id.startsWith("characters.bloomseed.player.") && id.includes(".tool.") && id.endsWith("-side")) {
+    return true;
+  }
+  // Equipment side frames overlay character tool-side sprites and share the same orientation.
+  if (id.startsWith("equipment.bloomseed.") && id.endsWith("-side")) {
+    return true;
+  }
+  // Mob-specific cases enumerated explicitly above.
+  return FLIP_X_MOB_ASSET_IDS.has(id);
+}
+
 async function main() {
   const sourceManifest = await readJson(path.join(sourceRoot, "manifest.json"));
   const categoryManifests = await Promise.all(
@@ -87,6 +118,8 @@ function buildFrameList(assets) {
   for (const asset of assets) {
     const sourceFile = path.join(sourceRoot, asset.outputPath);
 
+    const flipX = needsFlipX(asset);
+
     if (asset.layout?.type === "strip") {
       for (let index = 0; index < asset.layout.frameCount; index += 1) {
         frames.push({
@@ -100,6 +133,7 @@ function buildFrameList(assets) {
           },
           w: asset.layout.frameWidth,
           h: asset.layout.frameHeight,
+          flipX,
         });
       }
       continue;
@@ -120,6 +154,7 @@ function buildFrameList(assets) {
             },
             w: asset.layout.cellWidth,
             h: asset.layout.cellHeight,
+            flipX,
           });
           index += 1;
         }
@@ -138,6 +173,7 @@ function buildFrameList(assets) {
       },
       w: asset.image.width,
       h: asset.image.height,
+      flipX,
     });
   }
 
