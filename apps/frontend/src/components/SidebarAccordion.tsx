@@ -171,7 +171,6 @@ function useWASDDirection(): InputDirection {
 }
 
 export function SidebarAccordion({ catalog }: Props): JSX.Element {
-  const init = () => getInitialState(catalog);
   const previewDirection = useWASDDirection();
 
   // Accordion state
@@ -179,15 +178,16 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
   const [previewOpen, setPreviewOpen] = useState(true);
   const [animOpen, setAnimOpen] = useState(true);
 
-  // Entity selector state
-  const [entityType, setEntityType] = useState<EntityType>(init().entityType);
-  const [playerFamily, setPlayerFamily] = useState(init().playerFamily);
-  const [mobFamily, setMobFamily] = useState(init().mobFamily);
-  const [mobId, setMobId] = useState(init().mobId);
-  const [propFamily, setPropFamily] = useState(init().propFamily);
-  const [propGroup, setPropGroup] = useState(init().propGroup);
-  const [selectedTrackId, setSelectedTrackId] = useState(init().trackId);
-  const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(init().equipmentId);
+  // Entity selector state — initial values computed once via lazy initializer
+  const [initState] = useState<SelectorState>(() => getInitialState(catalog));
+  const [entityType, setEntityType] = useState<EntityType>(initState.entityType);
+  const [playerFamily, setPlayerFamily] = useState(initState.playerFamily);
+  const [mobFamily, setMobFamily] = useState(initState.mobFamily);
+  const [mobId, setMobId] = useState(initState.mobId);
+  const [propFamily, setPropFamily] = useState(initState.propFamily);
+  const [propGroup, setPropGroup] = useState(initState.propGroup);
+  const [selectedTrackId, setSelectedTrackId] = useState(initState.trackId);
+  const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(initState.equipmentId);
   const [material, setMaterial] = useState<Material>("iron");
 
   // Animation info fed back from the preview renderer
