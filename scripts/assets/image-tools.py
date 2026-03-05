@@ -642,16 +642,20 @@ def gif_command(args):
 
   combined_width = sum(c.width for c in crops)
   combined_height = max(c.height for c in crops)
-  combined = Image.new("RGBA", (combined_width, combined_height), (0, 0, 0, 0))
+  combined = Image.new("RGB", (combined_width, combined_height), (255, 255, 255))
   offset = 0
   for crop in crops:
-    combined.paste(crop, (offset, 0))
+    rgb_crop = Image.new("RGB", crop.size, (255, 255, 255))
+    rgb_crop.paste(crop, mask=crop.split()[3] if crop.mode == "RGBA" else None)
+    combined.paste(rgb_crop, (offset, 0))
     offset += crop.width
   palette_source = combined.convert("P", palette=Image.ADAPTIVE)
 
   gif_frames = []
   for crop in crops:
-    gif_frames.append(crop.quantize(palette=palette_source))
+    rgb_crop = Image.new("RGB", crop.size, (255, 255, 255))
+    rgb_crop.paste(crop, mask=crop.split()[3] if crop.mode == "RGBA" else None)
+    gif_frames.append(rgb_crop.quantize(palette=palette_source))
 
   if not args.dry_run:
     if not args.dest:

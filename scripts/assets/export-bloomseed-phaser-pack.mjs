@@ -17,14 +17,28 @@ const execFileAsync = promisify(execFile);
 
 /**
  * Mob asset IDs whose source sprites naturally face left and must be flipped
- * during atlas packing so all exported side-facing frames face right by
- * convention, letting the runtime use a single uniform flip rule.
+ * during atlas packing so all exported frames face right by convention,
+ * letting the runtime use a single uniform flip rule.
  */
 const FLIP_X_MOB_ASSET_IDS = new Set([
-  "mobs.bloomseed.animals.cow.cow-idle-side",
-  "mobs.bloomseed.animals.cow.cow-walk-side",
+  // chicken
   "mobs.bloomseed.animals.chicken.chicken-sleep-side",
   "mobs.bloomseed.animals.chicken.chicken-pet",
+  // cow
+  "mobs.bloomseed.animals.cow.cow-eat",
+  "mobs.bloomseed.animals.cow.cow-pet",
+  "mobs.bloomseed.animals.cow.cow-sleep",
+  "mobs.bloomseed.animals.cow.cow-idle-side",
+  "mobs.bloomseed.animals.cow.cow-walk-side",
+  // bat
+  "mobs.bloomseed.enemies.bat.bat-alert",
+  "mobs.bloomseed.enemies.bat.bat-attack-1",
+  "mobs.bloomseed.enemies.bat.bat-walk",
+  // slime
+  "mobs.bloomseed.enemies.slime.slime-alert",
+  "mobs.bloomseed.enemies.slime.slime-attack-1",
+  "mobs.bloomseed.enemies.slime.slime-idle",
+  "mobs.bloomseed.enemies.slime.slime-leap",
 ]);
 
 /**
