@@ -165,15 +165,17 @@ export class WorldScene extends Phaser.Scene {
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
     } else if (pointer.button === 0) {
-      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
       let hit: WorldEntity | null = null;
-      for (const entity of this.entities) {
-        const bounds = entity.sprite.getBounds();
-        if (bounds.contains(worldPoint.x, worldPoint.y)) {
+      const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
+
+      for (const target of hits) {
+        const entity = this.entities.find((candidate) => candidate.sprite === target);
+        if (entity) {
           hit = entity;
           break;
         }
       }
+
       this.selectEntity(hit);
     }
   }

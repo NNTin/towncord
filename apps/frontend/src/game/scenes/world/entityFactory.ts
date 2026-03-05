@@ -24,6 +24,7 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
   const sprite = scene.add.sprite(worldX, worldY, spawn.textureKey, spawn.textureFrame);
   sprite.setScale(spriteScale);
   sprite.setFlipX(spawn.flipX);
+  sprite.setInteractive({ pixelPerfect: true });
   sprite.play(spawn.animationKey, true);
 
   return {
