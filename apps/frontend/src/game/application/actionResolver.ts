@@ -7,12 +7,6 @@ export type ActionResolverInput = {
   deltaSeconds: number;
 };
 
-const TRACK_CANDIDATES: Record<EntityAction, string[]> = {
-  idle: ["idle"],
-  walk: ["walk", "run", "idle"],
-  run: ["run", "walk", "idle"],
-};
-
 export function resolveNextAction(
   behavior: EntityBehavior,
   input: ActionResolverInput,
@@ -28,8 +22,4 @@ export function resolveNextAction(
   }
 
   return behavior.idle(context);
-}
-
-export function getTrackCandidatesForAction(action: EntityAction): string[] {
-  return TRACK_CANDIDATES[action];
 }

@@ -3,10 +3,33 @@ import type { PlaceableViewModel } from "../../game/application/placeableService
 import { AccordionHeader } from "./common";
 
 type Props = {
-  playerPlaceables: PlaceableViewModel[];
-  npcPlaceables: PlaceableViewModel[];
+  placeables: PlaceableViewModel[];
   onDragStart: (e: React.DragEvent, placeable: PlaceableViewModel) => void;
 };
+
+type PlaceableGroup = {
+  kind: PlaceableViewModel["kind"];
+  label: string;
+  placeables: PlaceableViewModel[];
+};
+
+function groupPlaceablesByKind(placeables: PlaceableViewModel[]): PlaceableGroup[] {
+  const byKind = new Map<PlaceableViewModel["kind"], PlaceableGroup>();
+
+  for (const placeable of placeables) {
+    if (!byKind.has(placeable.kind)) {
+      byKind.set(placeable.kind, {
+        kind: placeable.kind,
+        label: placeable.groupLabel,
+        placeables: [],
+      });
+    }
+
+    byKind.get(placeable.kind)!.placeables.push(placeable);
+  }
+
+  return [...byKind.values()];
+}
 
 function DraggableEntry({
   label,
@@ -36,12 +59,11 @@ function DraggableEntry({
 }
 
 export function PlaceablesPanel({
-  playerPlaceables,
-  npcPlaceables,
+  placeables,
   onDragStart,
 }: Props): JSX.Element {
-  const [playerOpen, setPlayerOpen] = useState(true);
-  const [mobsOpen, setMobsOpen] = useState(true);
+  const [openByKind, setOpenByKind] = useState<Record<string, boolean>>({});
+  const groups = groupPlaceablesByKind(placeables);
 
   return (
     <>
@@ -49,35 +71,34 @@ export function PlaceablesPanel({
         Placeables
       </div>
 
-      <AccordionHeader label="Player" open={playerOpen} onToggle={() => setPlayerOpen((v) => !v)} />
-      {playerOpen && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
-          {playerPlaceables.map((placeable) => (
-            <DraggableEntry
-              key={placeable.entityId}
-              label={placeable.label}
-              onDragStart={(e) => onDragStart(e, placeable)}
+      {groups.map((group) => {
+        const open = openByKind[group.kind] ?? true;
+        return (
+          <div key={group.kind}>
+            <AccordionHeader
+              label={group.label}
+              open={open}
+              onToggle={() =>
+                setOpenByKind((current) => ({
+                  ...current,
+                  [group.kind]: !(current[group.kind] ?? true),
+                }))
+              }
             />
-          ))}
-        </div>
-      )}
-
-      {npcPlaceables.length > 0 && (
-        <>
-          <AccordionHeader label="Mobs" open={mobsOpen} onToggle={() => setMobsOpen((v) => !v)} />
-          {mobsOpen && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
-              {npcPlaceables.map((placeable) => (
-                <DraggableEntry
-                  key={placeable.entityId}
-                  label={placeable.label}
-                  onDragStart={(e) => onDragStart(e, placeable)}
-                />
-              ))}
-            </div>
-          )}
-        </>
-      )}
+            {open && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
+                {group.placeables.map((placeable) => (
+                  <DraggableEntry
+                    key={placeable.entityId}
+                    label={placeable.label}
+                    onDragStart={(e) => onDragStart(e, placeable)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 }

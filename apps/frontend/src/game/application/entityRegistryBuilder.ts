@@ -1,34 +1,25 @@
-import type { AnimationCatalog } from "../assets/animationCatalog";
+import { listMobDescriptors, type AnimationCatalog } from "../assets/animationCatalog";
 import {
   buildArchetypeRuntimes,
   type NpcArchetypeSeed,
   type PlayerArchetypeSeed,
 } from "../domain/archetypes";
 import { RuntimeEntityRegistry } from "../domain/entityRegistry";
-import { createCatalogPathRef } from "../domain/model";
+import { createEntityVisualRef } from "../domain/model";
 
 function buildPlayerSeeds(catalog: AnimationCatalog): PlayerArchetypeSeed[] {
   return catalog.playerModels.map((model) => ({
     model,
-    catalogPath: createCatalogPathRef(`player/${model}`),
+    visualRef: createEntityVisualRef(`player/${model}`),
   }));
 }
 
 function buildNpcSeeds(catalog: AnimationCatalog): NpcArchetypeSeed[] {
-  const seeds: NpcArchetypeSeed[] = [];
-
-  for (const path of catalog.tracksByPath.keys()) {
-    const [ns, family, mobId, extra] = path.split("/");
-    if (ns !== "mobs" || !family || !mobId || extra) continue;
-
-    seeds.push({
-      family,
-      mobId,
-      catalogPath: createCatalogPathRef(path),
-    });
-  }
-
-  return seeds;
+  return listMobDescriptors(catalog).map(({ family, mobId, visualPath }) => ({
+    family,
+    mobId,
+    visualRef: createEntityVisualRef(visualPath),
+  }));
 }
 
 export function buildEntityRegistryFromCatalog(catalog: AnimationCatalog): RuntimeEntityRegistry {

@@ -9,7 +9,7 @@ export interface EntityRegistry {
 
 export type RegisteredEntity = {
   definition: EntityDefinition;
-  behavior: EntityBehavior;
+  createBehavior: () => EntityBehavior;
 };
 
 export class RuntimeEntityRegistry implements EntityRegistry {

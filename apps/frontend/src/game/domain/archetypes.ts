@@ -1,15 +1,15 @@
 import { deriveCapabilitiesFromBehavior, type ActionContext, type EntityBehavior } from "./capabilities";
-import type { CatalogPathRef, EntityAction, EntityDefinition } from "./model";
+import type { EntityAction, EntityDefinition, EntityVisualRef } from "./model";
 
 export type PlayerArchetypeSeed = {
   model: string;
-  catalogPath: CatalogPathRef;
+  visualRef: EntityVisualRef;
 };
 
 export type NpcArchetypeSeed = {
   family: string;
   mobId: string;
-  catalogPath: CatalogPathRef;
+  visualRef: EntityVisualRef;
 };
 
 export type BuildArchetypeRuntimesInput = {
@@ -19,29 +19,30 @@ export type BuildArchetypeRuntimesInput = {
 
 export type ArchetypeRuntime = {
   definition: EntityDefinition;
-  behavior: EntityBehavior;
+  createBehavior: () => EntityBehavior;
 };
 
 type BuildRuntimeInput = {
   id: string;
   label: string;
   kind: "player" | "npc";
-  catalogPath: CatalogPathRef;
-  behavior: EntityBehavior;
+  visualRef: EntityVisualRef;
+  createBehavior: () => EntityBehavior;
 };
 
 function buildRuntime(input: BuildRuntimeInput): ArchetypeRuntime {
-  const { id, label, kind, catalogPath, behavior } = input;
+  const { id, label, kind, visualRef, createBehavior } = input;
+  const behavior = createBehavior();
   return {
     definition: {
       id,
       label,
       kind,
-      catalogPath,
+      visualRef,
       capabilities: deriveCapabilitiesFromBehavior(behavior),
       placeable: true,
     },
-    behavior,
+    createBehavior,
   };
 }
 
@@ -75,8 +76,8 @@ function buildPlayerRuntime(seed: PlayerArchetypeSeed): ArchetypeRuntime {
     id: `player.${seed.model}`,
     label: seed.model,
     kind: "player",
-    catalogPath: seed.catalogPath,
-    behavior: createPlayerBehavior(),
+    visualRef: seed.visualRef,
+    createBehavior: createPlayerBehavior,
   });
 }
 
@@ -85,8 +86,8 @@ function buildNpcRuntime(seed: NpcArchetypeSeed): ArchetypeRuntime {
     id: `npc.${seed.family}.${seed.mobId}`,
     label: seed.mobId,
     kind: "npc",
-    catalogPath: seed.catalogPath,
-    behavior: createNpcBehavior(),
+    visualRef: seed.visualRef,
+    createBehavior: createNpcBehavior,
   });
 }
 

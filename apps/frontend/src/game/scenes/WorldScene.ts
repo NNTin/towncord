@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import {
-  BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY,
-  type BloomseedGameContext,
+  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
+  getBloomseedWorldBootstrap,
+  type BloomseedWorldBootstrap,
 } from "../application/gameComposition";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import type { AnimationCatalog } from "../assets/animationCatalog";
@@ -29,7 +30,7 @@ const SELECTED_BADGE_VERTICAL_OFFSET = 12;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
-  private entityRegistry: BloomseedGameContext["entityRegistry"] | null = null;
+  private entityRegistry: BloomseedWorldBootstrap["entityRegistry"] | null = null;
 
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
@@ -50,11 +51,12 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const rawContext = this.registry.get(BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY) as unknown;
-    if (rawContext && typeof rawContext === "object") {
-      const context = rawContext as BloomseedGameContext;
-      this.catalog = context.catalog;
-      this.entityRegistry = context.entityRegistry;
+    const bootstrap = getBloomseedWorldBootstrap(
+      this.registry.get(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY),
+    );
+    if (bootstrap) {
+      this.catalog = bootstrap.catalog;
+      this.entityRegistry = bootstrap.entityRegistry;
     }
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<

@@ -1,11 +1,28 @@
 import { type EntityRegistry } from "../domain/entityRegistry";
-import type { EntityDefinition, EntityId } from "../domain/model";
-import type { PlaceDragPayload } from "../events";
+import type { EntityDefinition, EntityId, EntityKind } from "../domain/model";
+
+const KIND_LABEL_OVERRIDES: Record<string, string> = {
+  npc: "Mobs",
+  player: "Player",
+};
+
+function formatKindLabel(kind: string): string {
+  return kind
+    .split(/[-_.\s]+/)
+    .filter(Boolean)
+    .map((segment) => segment[0]!.toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+export function resolvePlaceableGroupLabel(kind: EntityKind): string {
+  return KIND_LABEL_OVERRIDES[kind] ?? formatKindLabel(kind);
+}
 
 export type PlaceableViewModel = {
   entityId: EntityId;
   label: string;
   kind: EntityDefinition["kind"];
+  groupLabel: string;
 };
 
 export class PlaceableService {
@@ -24,14 +41,7 @@ export class PlaceableService {
         entityId: definition.id,
         label: definition.label,
         kind: definition.kind,
+        groupLabel: resolvePlaceableGroupLabel(definition.kind),
       }));
-  }
-
-  public toDragPayload(entityId: EntityId): PlaceDragPayload | null {
-    const definition = this.registry.getById(entityId);
-    if (!definition || !definition.placeable) return null;
-    return {
-      entityId: definition.id,
-    };
   }
 }

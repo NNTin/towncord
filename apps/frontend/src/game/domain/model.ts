@@ -1,17 +1,19 @@
 export type EntityId = string;
-export type EntityKind = "player" | "npc";
+export const KNOWN_ENTITY_KINDS = ["player", "npc"] as const;
+export type KnownEntityKind = (typeof KNOWN_ENTITY_KINDS)[number];
+export type EntityKind = KnownEntityKind | (string & {});
 export type EntityCapability = "idle" | "walk" | "run";
 export type EntityAction = EntityCapability;
 
-export type CatalogPathRef = {
+export type EntityVisualRef = {
   value: string;
 };
 
-export function createCatalogPathRef(value: string): CatalogPathRef {
+export function createEntityVisualRef(value: string): EntityVisualRef {
   return { value };
 }
 
-export function readCatalogPath(ref: CatalogPathRef): string {
+export function readEntityVisualRef(ref: EntityVisualRef): string {
   return ref.value;
 }
 
@@ -19,7 +21,7 @@ export type EntityDefinition = {
   id: EntityId;
   label: string;
   kind: EntityKind;
-  catalogPath: CatalogPathRef;
+  visualRef: EntityVisualRef;
   capabilities: readonly EntityCapability[];
   placeable: boolean;
 };

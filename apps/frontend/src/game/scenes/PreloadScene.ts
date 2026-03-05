@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 import {
-  BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY,
+  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
   BLOOMSEED_READY_EVENT,
-  composeBloomseedGameContext,
+  composeBloomseedBootstrap,
 } from "../application/gameComposition";
 import { registerBloomseedAnimations } from "../assets/animation";
 import { preloadBloomseedPack } from "../assets/preload";
@@ -20,9 +20,9 @@ export class PreloadScene extends Phaser.Scene {
 
   public create(): void {
     const animationKeys = registerBloomseedAnimations(this);
-    const gameContext = composeBloomseedGameContext(animationKeys);
-    this.registry.set(BLOOMSEED_GAME_CONTEXT_REGISTRY_KEY, gameContext);
-    this.game.events.emit(BLOOMSEED_READY_EVENT, gameContext);
+    const bootstrap = composeBloomseedBootstrap(animationKeys);
+    this.registry.set(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
+    this.game.events.emit(BLOOMSEED_READY_EVENT, bootstrap.ui);
     this.scene.start(WORLD_SCENE_KEY);
   }
 }

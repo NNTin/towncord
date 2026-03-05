@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
-import { type PlaceableViewModel, type PlaceableService } from "../game/application/placeableService";
+import type { PlaceableViewModel } from "../game/application/placeableService";
 import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
@@ -9,19 +9,14 @@ import { PreviewPanel } from "./sidebar/PreviewPanel";
 
 type Props = {
   catalog: AnimationCatalog;
-  placeableService: PlaceableService;
+  placeables: PlaceableViewModel[];
 };
 
-export function SidebarAccordion({ catalog, placeableService }: Props): JSX.Element {
+export function SidebarAccordion({ catalog, placeables }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
 
-  const placeables = placeableService.listPlaceables();
-  const playerPlaceables = placeables.filter((item) => item.kind === "player");
-  const npcPlaceables = placeables.filter((item) => item.kind === "npc");
-
   function handleDragStart(e: React.DragEvent, placeable: PlaceableViewModel): void {
-    const payload: PlaceDragPayload | null = placeableService.toDragPayload(placeable.entityId);
-    if (!payload) return;
+    const payload: PlaceDragPayload = { entityId: placeable.entityId };
     e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
   }
@@ -45,8 +40,7 @@ export function SidebarAccordion({ catalog, placeableService }: Props): JSX.Elem
       }}
     >
       <PlaceablesPanel
-        playerPlaceables={playerPlaceables}
-        npcPlaceables={npcPlaceables}
+        placeables={placeables}
         onDragStart={handleDragStart}
       />
 
