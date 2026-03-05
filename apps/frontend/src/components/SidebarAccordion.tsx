@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   type AnimationCatalog,
   type AnimationTrack,
   type EntityType,
+  type InputDirection,
   getMobIds,
   getPropGroups,
   getTracksForPath,
@@ -123,11 +124,55 @@ function getInitialState(catalog: AnimationCatalog): SelectorState {
 // Component
 // ---------------------------------------------------------------------------
 
-// Preview always faces down; direction control can be added in a future iteration.
-const PREVIEW_DIRECTION = "down" as const;
+// ---------------------------------------------------------------------------
+// Shared WASD keyboard state → preview direction
+// ---------------------------------------------------------------------------
+
+function useWASDDirection(): InputDirection {
+  const [direction, setDirection] = useState<InputDirection>("down");
+  const heldKeys = useRef(new Set<string>());
+
+  useEffect(() => {
+    function derive(): InputDirection | null {
+      const k = heldKeys.current;
+      if (k.has("d")) return "right";
+      if (k.has("a")) return "left";
+      if (k.has("s")) return "down";
+      if (k.has("w")) return "up";
+      return null; // no key held — caller keeps previous
+    }
+
+    function onKeyDown(e: KeyboardEvent): void {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+      heldKeys.current.add(key);
+      const dir = derive();
+      if (dir) setDirection(dir);
+    }
+
+    function onKeyUp(e: KeyboardEvent): void {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+      heldKeys.current.delete(key);
+      const dir = derive();
+      if (dir) setDirection(dir);
+      // If no WASD key is held, keep the last direction shown
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, []);
+
+  return direction;
+}
 
 export function SidebarAccordion({ catalog }: Props): JSX.Element {
   const init = () => getInitialState(catalog);
+  const previewDirection = useWASDDirection();
 
   // Accordion state
   const [playerOpen, setPlayerOpen] = useState(true);
@@ -421,7 +466,7 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
           <SectionLabel>Preview</SectionLabel>
           <AnimationPreview
             track={currentTrack}
-            direction={PREVIEW_DIRECTION}
+            direction={previewDirection}
             equipmentId={equipmentId}
             material={material}
             onInfo={setAnimInfo}

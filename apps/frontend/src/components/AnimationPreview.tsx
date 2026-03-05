@@ -60,6 +60,12 @@ export function AnimationPreview({
       audio: { noAudio: true },
       scale: { mode: Phaser.Scale.NONE },
       disableContextMenu: true,
+      render: {
+        pixelArt: true,
+        antialias: false,
+        roundPixels: true,
+        antialiasGL: false,
+      },
     });
     gameRef.current = game;
 
@@ -122,6 +128,7 @@ export function AnimationPreview({
         border: "1px solid rgba(255,255,255,0.08)",
         borderRadius: 4,
         height: PREVIEW_HEIGHT,
+        imageRendering: "pixelated",
         overflow: "hidden",
         width: PREVIEW_WIDTH,
       }}
