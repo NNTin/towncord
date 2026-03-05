@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type Phaser from "phaser";
 import { createGame } from "./game/phaser/createGame";
 import { SidebarAccordion } from "./components/SidebarAccordion";
-import { buildAnimationCatalog, type AnimationCatalog } from "./game/assets/animationCatalog";
+import type { AnimationCatalog } from "./game/assets/animationCatalog";
+import {
+  BLOOMSEED_READY_EVENT,
+  type BloomseedUiBootstrap,
+} from "./game/application/gameComposition";
+import type { PlaceableViewModel } from "./game/application/placeableService";
 import {
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
@@ -14,6 +19,7 @@ function App(): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
+  const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -22,13 +28,15 @@ function App(): JSX.Element {
     const game = createGame(container);
     gameRef.current = game;
 
-    game.events.once("bloomseedReady", (keys: string[]) => {
-      setCatalog(buildAnimationCatalog(keys));
+    game.events.once(BLOOMSEED_READY_EVENT, (payload: BloomseedUiBootstrap) => {
+      setCatalog(payload.catalog);
+      setPlaceables(payload.placeables);
     });
 
     return () => {
       game.destroy(true);
       gameRef.current = null;
+      setPlaceables(null);
     };
   }, []);
 
@@ -46,9 +54,7 @@ function App(): JSX.Element {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       const payload: PlaceObjectDropPayload = {
-        type: data.type,
-        model: data.model,
-        catalogPath: data.catalogPath,
+        entityId: data.entityId,
         screenX: e.clientX - rect.left,
         screenY: e.clientY - rect.top,
       };
@@ -60,7 +66,12 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {catalog && <SidebarAccordion catalog={catalog} />}
+      {catalog && placeables && (
+        <SidebarAccordion
+          catalog={catalog}
+          placeables={placeables}
+        />
+      )}
       <div
         ref={containerRef}
         className="game-root"

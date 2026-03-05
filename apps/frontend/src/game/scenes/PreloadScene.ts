@@ -1,10 +1,13 @@
 import Phaser from "phaser";
+import {
+  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
+  BLOOMSEED_READY_EVENT,
+  composeBloomseedBootstrap,
+} from "../application/gameComposition";
 import { registerBloomseedAnimations } from "../assets/animation";
 import { preloadBloomseedPack } from "../assets/preload";
 import { PRELOAD_SCENE_KEY } from "./BootScene";
 import { WORLD_SCENE_KEY } from "./WorldScene";
-
-export const BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY = "bloomseed.animationKeys";
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -17,8 +20,9 @@ export class PreloadScene extends Phaser.Scene {
 
   public create(): void {
     const animationKeys = registerBloomseedAnimations(this);
-    this.registry.set(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY, animationKeys);
-    this.game.events.emit("bloomseedReady", animationKeys);
+    const bootstrap = composeBloomseedBootstrap(animationKeys);
+    this.registry.set(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
+    this.game.events.emit(BLOOMSEED_READY_EVENT, bootstrap.ui);
     this.scene.start(WORLD_SCENE_KEY);
   }
 }

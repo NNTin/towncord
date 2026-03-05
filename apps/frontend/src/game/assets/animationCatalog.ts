@@ -23,6 +23,12 @@ export type AnimationCatalog = {
   tracksByPath: Map<string, AnimationTrack[]>;
 };
 
+export type MobCatalogDescriptor = {
+  family: string;
+  mobId: string;
+  visualPath: string;
+};
+
 const SPRITE_DIRECTIONS: SpriteDirection[] = ["up", "down", "side"];
 
 function getSpriteDirection(segment: string): SpriteDirection | null {
@@ -226,6 +232,23 @@ export function getMobIds(catalog: AnimationCatalog, family: string): string[] {
     .filter((p) => p.startsWith(prefix))
     .map((p) => p.slice(prefix.length))
     .sort();
+}
+
+function parseMobVisualPath(path: string): MobCatalogDescriptor | null {
+  const [ns, family, mobId, extra] = path.split("/");
+  if (ns !== "mobs" || !family || !mobId || extra) return null;
+  return { family, mobId, visualPath: path };
+}
+
+export function listMobDescriptors(catalog: AnimationCatalog): MobCatalogDescriptor[] {
+  const descriptors: MobCatalogDescriptor[] = [];
+
+  for (const path of catalog.tracksByPath.keys()) {
+    const descriptor = parseMobVisualPath(path);
+    if (descriptor) descriptors.push(descriptor);
+  }
+
+  return descriptors;
 }
 
 /** Returns prop groups under a prop family (e.g. "chest", "water", "barrels"). */
