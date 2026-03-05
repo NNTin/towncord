@@ -18,6 +18,11 @@ set -euo pipefail
 
 VERSION="${1:?Usage: deploy.sh <version>}"
 
+# Validate VERSION to prevent path traversal and shell metacharacters
+if [[ ! "$VERSION" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+  echo "ERROR: Invalid version '$VERSION'. Allowed characters: a-z, A-Z, 0-9, '.', '_', '-'." >&2
+  exit 1
+fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BUILD_DIR="$REPO_ROOT/build"
@@ -143,7 +148,16 @@ cat > "$INDEX_HTML" << HTMLEOF
             versionInfo.style.display = 'block';
           };
           setTimeout(() => {
-            if (loading.style.display !== 'none') content.onload();
+            if (loading.style.display !== 'none') {
+              const timeoutError = document.createElement('div');
+              timeoutError.className = 'error-content';
+              timeoutError.innerHTML =
+                '<div style="color:#ff6b6b;margin-top:20px;">' +
+                  '<h3>Loading Timeout</h3>' +
+                  '<p>The selected version is taking longer than expected to load. Please check your network connection or try reloading.</p>' +
+                '</div>';
+              loading.appendChild(timeoutError);
+            }
           }, 5000);
         })
         .catch(error => {
@@ -152,17 +166,47 @@ cat > "$INDEX_HTML" << HTMLEOF
 
           const errorContent = document.createElement('div');
           errorContent.className = 'error-content';
-          errorContent.innerHTML =
-            '<div style="color:#ff6b6b;margin-top:20px;">' +
-              '<h3>Version Not Found</h3>' +
-              '<p>Version "' + version + '" does not exist.</p>' +
-            '</div>' +
-            '<div style="margin-top:15px;">' +
-              '<button onclick="window.switchToVersion(\'' + DEFAULT_VERSION + '\')" style="background:#4ECDC4;color:white;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;">Go to Default Version</button>' +
-              '<button onclick="history.back()" style="background:#95E1D3;color:#333;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;">Go Back</button>' +
-            '</div>' +
-            '<div style="margin-top:20px;font-size:12px;color:#888;"><p>Error: ' + error.message + '</p></div>';
 
+          const messageContainer = document.createElement('div');
+          messageContainer.style.cssText = 'color:#ff6b6b;margin-top:20px;';
+
+          const heading = document.createElement('h3');
+          heading.textContent = 'Version Not Found';
+          messageContainer.appendChild(heading);
+
+          const versionParagraph = document.createElement('p');
+          versionParagraph.textContent = 'Version "' + version + '" does not exist.';
+          messageContainer.appendChild(versionParagraph);
+
+          const buttonsContainer = document.createElement('div');
+          buttonsContainer.style.cssText = 'margin-top:15px;';
+
+          const defaultButton = document.createElement('button');
+          defaultButton.textContent = 'Go to Default Version';
+          defaultButton.style.cssText = 'background:#4ECDC4;color:white;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
+          defaultButton.onclick = function() {
+            window.switchToVersion(DEFAULT_VERSION);
+          };
+          buttonsContainer.appendChild(defaultButton);
+
+          const backButton = document.createElement('button');
+          backButton.textContent = 'Go Back';
+          backButton.style.cssText = 'background:#95E1D3;color:#333;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
+          backButton.onclick = function() {
+            history.back();
+          };
+          buttonsContainer.appendChild(backButton);
+
+          const errorDetailsContainer = document.createElement('div');
+          errorDetailsContainer.style.cssText = 'margin-top:20px;font-size:12px;color:#888;';
+
+          const errorParagraph = document.createElement('p');
+          errorParagraph.textContent = 'Error: ' + error.message;
+          errorDetailsContainer.appendChild(errorParagraph);
+
+          errorContent.appendChild(messageContainer);
+          errorContent.appendChild(buttonsContainer);
+          errorContent.appendChild(errorDetailsContainer);
           loading.appendChild(errorContent);
           loading.style.display = 'block';
           content.style.display = 'none';
@@ -205,7 +249,7 @@ else
 fi
 
 # Append version if not already present, then write
-node - << JSEOF
+node --input-type=commonjs - << JSEOF
 const fs = require('fs');
 const versions = JSON.parse('$EXISTING_VERSIONS');
 if (!versions.includes('$VERSION')) versions.push('$VERSION');
