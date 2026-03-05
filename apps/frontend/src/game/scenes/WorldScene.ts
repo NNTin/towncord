@@ -1,10 +1,11 @@
 import Phaser from "phaser";
+import { buildEntityRegistryFromCatalog } from "../application/entityRegistryBuilder";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import {
   type AnimationCatalog,
   buildAnimationCatalog,
 } from "../assets/animationCatalog";
-import { CatalogEntityRegistry } from "../domain/entityRegistry";
+import type { EntityRegistry } from "../domain/entityRegistry";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLAYER_PLACED_EVENT,
@@ -28,7 +29,7 @@ const SELECTED_TINT = 0x88bbff;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
-  private entityRegistry: CatalogEntityRegistry | null = null;
+  private entityRegistry: EntityRegistry | null = null;
 
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
@@ -55,7 +56,7 @@ export class WorldScene extends Phaser.Scene {
 
     if (animationKeys.length > 0) {
       this.catalog = buildAnimationCatalog(animationKeys);
-      this.entityRegistry = CatalogEntityRegistry.fromCatalog(this.catalog);
+      this.entityRegistry = buildEntityRegistryFromCatalog(this.catalog);
     }
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<

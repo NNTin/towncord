@@ -6,7 +6,7 @@ import {
   resolveTrackForDirection,
 } from "../../assets/animationCatalog";
 import { getTrackCandidatesForAction } from "../../application/actionResolver";
-import type { EntityAction, EntityDefinition } from "../../domain/model";
+import { readCatalogPath, type EntityAction, type EntityDefinition } from "../../domain/model";
 import type { WorldEntity } from "./types";
 
 export type SpawnVisual = {
@@ -21,7 +21,7 @@ export function resolveEntityTrack(
   definition: EntityDefinition,
   action: EntityAction,
 ): AnimationTrack | null {
-  const tracks = getTracksForPath(catalog, definition.catalogPath);
+  const tracks = getTracksForPath(catalog, readCatalogPath(definition.catalogPath));
   const candidates = getTrackCandidatesForAction(action);
 
   for (const id of candidates) {

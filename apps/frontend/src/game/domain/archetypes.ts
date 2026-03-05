@@ -1,4 +1,3 @@
-import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   deriveCapabilitiesFromBehavior,
   type ActionContext,
@@ -8,15 +7,36 @@ import {
   type CanWalk,
   type EntityBehavior,
 } from "./capabilities";
-import type { EntityAction, EntityDefinition, SpawnSpec } from "./model";
+import type { CatalogPathRef, EntityAction, EntityDefinition, SpawnSpec } from "./model";
 
-const NPC_PLACEABLE_IDS = new Set(["chicken", "cow", "bat"]);
+export const NPC_PLACEABLE_IDS = ["chicken", "cow", "bat"] as const;
+export type NpcPlaceableId = (typeof NPC_PLACEABLE_IDS)[number];
+
+export function isNpcPlaceableId(value: string): value is NpcPlaceableId {
+  return (NPC_PLACEABLE_IDS as readonly string[]).includes(value);
+}
+
+export type PlayerArchetypeSeed = {
+  model: string;
+  catalogPath: CatalogPathRef;
+};
+
+export type NpcArchetypeSeed = {
+  family: string;
+  mobId: NpcPlaceableId;
+  catalogPath: CatalogPathRef;
+};
+
+export type BuildArchetypeRuntimesInput = {
+  players: readonly PlayerArchetypeSeed[];
+  npcs: readonly NpcArchetypeSeed[];
+};
 
 abstract class BaseArchetype implements CanBePlaced {
   protected abstract readonly id: string;
   protected abstract readonly label: string;
   protected abstract readonly kind: "player" | "npc";
-  protected abstract readonly catalogPath: string;
+  protected abstract readonly catalogPath: CatalogPathRef;
 
   public createSpawnSpec(): SpawnSpec {
     return { entityId: this.id, catalogPath: this.catalogPath };
@@ -42,13 +62,13 @@ export class PlayerArchetype extends BaseArchetype implements CanIdle, CanWalk, 
   protected readonly id: string;
   protected readonly label: string;
   protected readonly kind = "player" as const;
-  protected readonly catalogPath: string;
+  protected readonly catalogPath: CatalogPathRef;
 
-  public constructor(model: string) {
+  public constructor(model: string, catalogPath: CatalogPathRef) {
     super();
     this.id = `player.${model}`;
     this.label = model;
-    this.catalogPath = `player/${model}`;
+    this.catalogPath = catalogPath;
   }
 
   public idle(_ctx: ActionContext): EntityAction {
@@ -84,9 +104,9 @@ export type ArchetypeRuntime = {
 export class CowArchetype extends BaseNpcArchetype {
   protected readonly id: string;
   protected readonly label = "cow";
-  protected readonly catalogPath: string;
+  protected readonly catalogPath: CatalogPathRef;
 
-  public constructor(family: string, catalogPath: string) {
+  public constructor(family: string, catalogPath: CatalogPathRef) {
     super();
     this.id = `npc.${family}.cow`;
     this.catalogPath = catalogPath;
@@ -96,9 +116,9 @@ export class CowArchetype extends BaseNpcArchetype {
 export class ChickenArchetype extends BaseNpcArchetype {
   protected readonly id: string;
   protected readonly label = "chicken";
-  protected readonly catalogPath: string;
+  protected readonly catalogPath: CatalogPathRef;
 
-  public constructor(family: string, catalogPath: string) {
+  public constructor(family: string, catalogPath: CatalogPathRef) {
     super();
     this.id = `npc.${family}.chicken`;
     this.catalogPath = catalogPath;
@@ -108,9 +128,9 @@ export class ChickenArchetype extends BaseNpcArchetype {
 export class BatArchetype extends BaseNpcArchetype {
   protected readonly id: string;
   protected readonly label = "bat";
-  protected readonly catalogPath: string;
+  protected readonly catalogPath: CatalogPathRef;
 
-  public constructor(family: string, catalogPath: string) {
+  public constructor(family: string, catalogPath: CatalogPathRef) {
     super();
     this.id = `npc.${family}.bat`;
     this.catalogPath = catalogPath;
@@ -118,36 +138,32 @@ export class BatArchetype extends BaseNpcArchetype {
 }
 
 function npcArchetypeFromMobId(
-  mobId: string,
+  mobId: NpcPlaceableId,
   family: string,
-  catalogPath: string,
-): BaseNpcArchetype | null {
+  catalogPath: CatalogPathRef,
+): BaseNpcArchetype {
   switch (mobId) {
     case "cow": return new CowArchetype(family, catalogPath);
     case "chicken": return new ChickenArchetype(family, catalogPath);
     case "bat": return new BatArchetype(family, catalogPath);
-    default: return null;
   }
 }
 
-export function buildArchetypeRuntimes(catalog: AnimationCatalog): ArchetypeRuntime[] {
+export function buildArchetypeRuntimes(input: BuildArchetypeRuntimesInput): ArchetypeRuntime[] {
   const runtimes: ArchetypeRuntime[] = [];
+  const seenNpcCatalogPaths = new Set<string>();
 
-  for (const model of catalog.playerModels) {
-    runtimes.push(new PlayerArchetype(model).toRuntime());
+  for (const player of input.players) {
+    runtimes.push(new PlayerArchetype(player.model, player.catalogPath).toRuntime());
   }
 
   // Scope intentionally limited in this refactor:
   // only known NPC mobs are placeable. Tiles/props are planned later.
-  for (const path of catalog.tracksByPath.keys()) {
-    if (!path.startsWith("mobs/")) continue;
-    const [, family, mobId] = path.split("/");
-    if (!family || !mobId || !NPC_PLACEABLE_IDS.has(mobId)) continue;
-    if (runtimes.some((runtime) => runtime.definition.catalogPath === path)) continue;
-    const archetype = npcArchetypeFromMobId(mobId, family, path);
-    if (archetype) {
-      runtimes.push(archetype.toRuntime());
-    }
+  for (const npc of input.npcs) {
+    const pathKey = npc.catalogPath.value;
+    if (seenNpcCatalogPaths.has(pathKey)) continue;
+    seenNpcCatalogPaths.add(pathKey);
+    runtimes.push(npcArchetypeFromMobId(npc.mobId, npc.family, npc.catalogPath).toRuntime());
   }
 
   return runtimes;

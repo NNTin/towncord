@@ -1,5 +1,3 @@
-import type { AnimationCatalog } from "../assets/animationCatalog";
-import { buildArchetypeRuntimes } from "./archetypes";
 import type { EntityBehavior } from "./capabilities";
 import type { EntityDefinition, EntityId } from "./model";
 
@@ -14,15 +12,15 @@ export type RegisteredEntity = {
   behavior: EntityBehavior;
 };
 
-export class CatalogEntityRegistry implements EntityRegistry {
+export class RuntimeEntityRegistry implements EntityRegistry {
   private readonly byId: Map<EntityId, RegisteredEntity>;
 
   private constructor(entities: RegisteredEntity[]) {
     this.byId = new Map(entities.map((entity) => [entity.definition.id, entity]));
   }
 
-  public static fromCatalog(catalog: AnimationCatalog): CatalogEntityRegistry {
-    return new CatalogEntityRegistry(buildArchetypeRuntimes(catalog));
+  public static fromRuntimes(runtimes: RegisteredEntity[]): RuntimeEntityRegistry {
+    return new RuntimeEntityRegistry(runtimes);
   }
 
   public getById(entityId: EntityId): EntityDefinition | null {

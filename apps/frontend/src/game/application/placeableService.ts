@@ -1,7 +1,8 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
-import { CatalogEntityRegistry, type EntityRegistry } from "../domain/entityRegistry";
+import { type EntityRegistry } from "../domain/entityRegistry";
 import type { EntityDefinition, EntityId } from "../domain/model";
 import type { PlaceDragPayload } from "../events";
+import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
 
 export type PlaceableViewModel = {
   entityId: EntityId;
@@ -13,7 +14,7 @@ export class PlaceableService {
   private constructor(private readonly registry: EntityRegistry) {}
 
   public static fromCatalog(catalog: AnimationCatalog): PlaceableService {
-    return new PlaceableService(CatalogEntityRegistry.fromCatalog(catalog));
+    return new PlaceableService(buildEntityRegistryFromCatalog(catalog));
   }
 
   public getRegistry(): EntityRegistry {
