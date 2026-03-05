@@ -65,7 +65,7 @@ export class PreviewScene extends Phaser.Scene {
     const cy = Math.round(this.scale.height / 2);
 
     if (!this.sprite) {
-      this.sprite = this.add.sprite(cx, cy, firstFrame.textureKey);
+      this.sprite = this.add.sprite(cx, cy, firstFrame.textureKey, firstFrame.textureFrame);
       this.sprite.setScale(PREVIEW_SCALE);
     }
 

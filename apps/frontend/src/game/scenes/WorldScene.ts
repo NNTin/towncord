@@ -99,7 +99,13 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.events.once(
       "shutdown",
-      () => { this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this); },
+      () => {
+        this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+        this.input.off("pointerdown", this.onPointerDown, this);
+        this.input.off("pointermove", this.onPointerMove, this);
+        this.input.off("pointerup", this.onPointerUp, this);
+        this.input.off("wheel", this.onWheel, this);
+      },
       this,
     );
   }
@@ -231,7 +237,12 @@ export class WorldScene extends Phaser.Scene {
         model: payload.model,
       };
 
-      this.playerSprite = this.add.sprite(worldPoint.x, worldPoint.y, firstFrame.textureKey);
+      this.playerSprite = this.add.sprite(
+        worldPoint.x,
+        worldPoint.y,
+        firstFrame.textureKey,
+        firstFrame.textureFrame,
+      );
       this.playerSprite.setScale(SPRITE_SCALE);
       this.playPlayerAnimation();
     }
