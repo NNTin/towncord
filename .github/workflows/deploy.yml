@@ -29,7 +29,7 @@ jobs:
       - name: Build for production
         run: npm run build:frontend
         env:
-          BASE_PATH: /${{ github.event.inputs.version }}/
+          BASE_PATH: /towncord/${{ github.event.inputs.version }}/
 
       - name: Prepare deployment
         run: bash .github/scripts/deploy.sh "${{ github.event.inputs.version }}"
