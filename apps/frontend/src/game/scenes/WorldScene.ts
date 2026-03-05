@@ -23,7 +23,9 @@ export const WORLD_SCENE_KEY = "world";
 const SPRITE_SCALE = 4;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
-const SELECTED_TINT = 0x88bbff;
+const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
+const SELECTED_BADGE_SCALE = 2;
+const SELECTED_BADGE_VERTICAL_OFFSET = 12;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
@@ -31,6 +33,7 @@ export class WorldScene extends Phaser.Scene {
 
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
+  private selectionBadge: Phaser.GameObjects.Sprite | null = null;
   private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
@@ -69,6 +72,8 @@ export class WorldScene extends Phaser.Scene {
     this.events.once(
       "shutdown",
       () => {
+        this.selectionBadge?.destroy();
+        this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
@@ -77,6 +82,8 @@ export class WorldScene extends Phaser.Scene {
       },
       this,
     );
+
+    this.createSelectionBadge();
   }
 
   public override update(_time: number, delta: number): void {
@@ -109,17 +116,39 @@ export class WorldScene extends Phaser.Scene {
         this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
       }
     }
+
+    this.syncSelectionBadgePosition(entity);
   }
 
   private selectEntity(entity: WorldEntity | null): void {
     if (this.selectedEntity === entity) return;
-    if (this.selectedEntity) {
-      this.selectedEntity.sprite.clearTint();
-    }
     this.selectedEntity = entity;
-    if (entity) {
-      entity.sprite.setTint(SELECTED_TINT);
-    }
+    this.setSelectionBadgeVisible(Boolean(entity));
+    if (entity) this.syncSelectionBadgePosition(entity);
+  }
+
+  private createSelectionBadge(): void {
+    const firstFrame = this.anims.get(SELECTED_BADGE_ANIMATION_KEY)?.frames[0];
+    if (!firstFrame) return;
+
+    const badge = this.add.sprite(0, 0, firstFrame.textureKey, firstFrame.textureFrame);
+    badge.setScale(SELECTED_BADGE_SCALE);
+    badge.setDepth(10_000);
+    badge.setVisible(false);
+    this.selectionBadge = badge;
+  }
+
+  private setSelectionBadgeVisible(visible: boolean): void {
+    if (!this.selectionBadge) return;
+    this.selectionBadge.setVisible(visible);
+  }
+
+  private syncSelectionBadgePosition(entity: WorldEntity): void {
+    if (!this.selectionBadge) return;
+    this.selectionBadge.setPosition(
+      entity.position.x,
+      entity.position.y - entity.sprite.displayHeight * 0.5 - SELECTED_BADGE_VERTICAL_OFFSET,
+    );
   }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
