@@ -153,10 +153,14 @@ def pack_components_as_strip(image, components, align):
     return (
       image.copy(),
       {
-        "type": "single",
+        "type": "strip",
         "frameWidth": image.width,
         "frameHeight": image.height,
         "frameCount": 1,
+        "offsetX": 0,
+        "columns": 1,
+        "rows": 1,
+        "remainderX": 0,
         "exact": True,
       },
     )
@@ -344,16 +348,6 @@ def parse_normalize_spec(normalize):
     "offsetY": offset_y,
     "centerOddX": center_odd_x,
   }
-
-
-def column_has_alpha(image, x, max_y):
-  if x < 0 or x >= image.width:
-    return False
-
-  for y in range(max_y):
-    if image.getpixel((x, y))[3] != 0:
-      return True
-  return False
 
 
 def align_strip_crop_x(image, initial_x, crop_width, crop_height):
@@ -604,11 +598,13 @@ def layout_frames(layout, image_width, image_height):
   if layout["type"] == "strip":
     frame_width = int(layout["frameWidth"])
     frame_height = int(layout.get("frameHeight", image_height))
-    frame_count = int(layout.get("frameCount", max(1, image_width // frame_width)))
+    offset_x = int(layout.get("offsetX", 0))
+    available_width = max(0, image_width - offset_x)
+    frame_count = int(layout.get("frameCount", max(1, available_width // frame_width)))
 
     frames = []
     for index in range(frame_count):
-      frames.append((index * frame_width, 0, frame_width, frame_height))
+      frames.append((offset_x + index * frame_width, 0, frame_width, frame_height))
     return frames
 
   if layout["type"] == "sheet":
@@ -636,11 +632,23 @@ def gif_command(args):
     raise RuntimeError("No frames resolved for GIF render.")
 
   duration_ms = max(1, int(round(1000 / max(1, args.fps))))
-  gif_frames = []
 
+  crops = []
   for x, y, w, h in frames:
-    crop = image.crop((x, y, x + w, y + h))
-    gif_frames.append(crop.convert("P", palette=Image.ADAPTIVE))
+    crops.append(image.crop((x, y, x + w, y + h)))
+
+  combined_width = sum(c.width for c in crops)
+  combined_height = max(c.height for c in crops)
+  combined = Image.new("RGBA", (combined_width, combined_height), (0, 0, 0, 0))
+  offset = 0
+  for crop in crops:
+    combined.paste(crop, (offset, 0))
+    offset += crop.width
+  palette_source = combined.convert("P", palette=Image.ADAPTIVE)
+
+  gif_frames = []
+  for crop in crops:
+    gif_frames.append(crop.quantize(palette=palette_source))
 
   if not args.dry_run:
     if not args.dest:
