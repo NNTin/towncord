@@ -182,7 +182,7 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
       : (track.equipmentCompatible[0] ?? "");
     if (newEquip !== resolvedEquip) setEquipmentId(newEquip);
     activateTrack(track, newEquip, resolvedMat);
-    setSelectedTrackId(track.id);
+
   }
 
   function handleEntityType(et: EntityType): void {
