@@ -108,26 +108,52 @@ cat > "$INDEX_HTML" << HTMLEOF
   <iframe id="content" src=""></iframe>
 
   <script>
-    const DEFAULT_VERSION = '$VERSION';
+    // latestVersion is populated at runtime from versions.json
+    var latestVersion = null;
+    // Prevents hashchange from firing a redundant loadVersion when we set
+    // the hash programmatically (e.g. during initial redirect to latest).
+    var skipNextHashChange = false;
 
     function getCurrentVersion() {
-      const hash = window.location.hash.slice(1);
-      return hash || DEFAULT_VERSION;
+      var hash = window.location.hash.slice(1);
+      return hash || latestVersion || '';
     }
 
     function setVersion(version) {
       if (window.location.hash.slice(1) !== version) {
+        skipNextHashChange = true;
         window.location.hash = version;
       }
     }
 
     function loadVersion(version) {
-      const versionDisplay = document.getElementById('version-display');
-      const versionInfo = document.getElementById('version-info');
-      const content = document.getElementById('content');
-      const loading = document.getElementById('loading');
+      // Validate version to prevent open-redirect / path-traversal attacks.
+      // Only allow the same safe character set enforced server-side.
+      if (!version || !/^[a-zA-Z0-9._-]+$/.test(version)) {
+        var loading = document.getElementById('loading');
+        var content = document.getElementById('content');
+        var versionInfo = document.getElementById('version-info');
+        var existingErr = loading.querySelector('.error-content');
+        if (existingErr) existingErr.remove();
+        var invalidContent = document.createElement('div');
+        invalidContent.className = 'error-content';
+        var invalidMsg = document.createElement('p');
+        invalidMsg.style.cssText = 'color:#ff6b6b;margin-top:20px;';
+        invalidMsg.textContent = version ? 'Invalid version identifier.' : 'No version available.';
+        invalidContent.appendChild(invalidMsg);
+        loading.appendChild(invalidContent);
+        loading.style.display = 'block';
+        content.style.display = 'none';
+        versionInfo.style.display = 'none';
+        return;
+      }
 
-      const existingError = loading.querySelector('.error-content');
+      var versionDisplay = document.getElementById('version-display');
+      var versionInfo = document.getElementById('version-info');
+      var content = document.getElementById('content');
+      var loading = document.getElementById('loading');
+
+      var existingError = loading.querySelector('.error-content');
       if (existingError) existingError.remove();
 
       versionDisplay.textContent = 'Version: ' + version;
@@ -138,7 +164,7 @@ cat > "$INDEX_HTML" << HTMLEOF
       versionInfo.style.display = 'none';
 
       fetch(version + '/')
-        .then(response => {
+        .then(function(response) {
           if (!response.ok) throw new Error('Version ' + version + ' not found (' + response.status + ')');
 
           content.src = version + '/';
@@ -147,9 +173,9 @@ cat > "$INDEX_HTML" << HTMLEOF
             content.style.display = 'block';
             versionInfo.style.display = 'block';
           };
-          setTimeout(() => {
+          setTimeout(function() {
             if (loading.style.display !== 'none') {
-              const timeoutError = document.createElement('div');
+              var timeoutError = document.createElement('div');
               timeoutError.className = 'error-content';
               timeoutError.innerHTML =
                 '<div style="color:#ff6b6b;margin-top:20px;">' +
@@ -160,36 +186,36 @@ cat > "$INDEX_HTML" << HTMLEOF
             }
           }, 5000);
         })
-        .catch(error => {
+        .catch(function(error) {
           console.error('Version load error:', error);
           versionDisplay.textContent = 'Version: ' + version + ' (Not Found)';
 
-          const errorContent = document.createElement('div');
+          var errorContent = document.createElement('div');
           errorContent.className = 'error-content';
 
-          const messageContainer = document.createElement('div');
+          var messageContainer = document.createElement('div');
           messageContainer.style.cssText = 'color:#ff6b6b;margin-top:20px;';
 
-          const heading = document.createElement('h3');
+          var heading = document.createElement('h3');
           heading.textContent = 'Version Not Found';
           messageContainer.appendChild(heading);
 
-          const versionParagraph = document.createElement('p');
+          var versionParagraph = document.createElement('p');
           versionParagraph.textContent = 'Version "' + version + '" does not exist.';
           messageContainer.appendChild(versionParagraph);
 
-          const buttonsContainer = document.createElement('div');
+          var buttonsContainer = document.createElement('div');
           buttonsContainer.style.cssText = 'margin-top:15px;';
 
-          const defaultButton = document.createElement('button');
+          var defaultButton = document.createElement('button');
           defaultButton.textContent = 'Go to Default Version';
           defaultButton.style.cssText = 'background:#4ECDC4;color:white;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
           defaultButton.onclick = function() {
-            window.switchToVersion(DEFAULT_VERSION);
+            if (latestVersion) window.switchToVersion(latestVersion);
           };
           buttonsContainer.appendChild(defaultButton);
 
-          const backButton = document.createElement('button');
+          var backButton = document.createElement('button');
           backButton.textContent = 'Go Back';
           backButton.style.cssText = 'background:#95E1D3;color:#333;border:none;padding:10px 20px;margin:5px;border-radius:5px;cursor:pointer;font-size:14px;';
           backButton.onclick = function() {
@@ -197,10 +223,10 @@ cat > "$INDEX_HTML" << HTMLEOF
           };
           buttonsContainer.appendChild(backButton);
 
-          const errorDetailsContainer = document.createElement('div');
+          var errorDetailsContainer = document.createElement('div');
           errorDetailsContainer.style.cssText = 'margin-top:20px;font-size:12px;color:#888;';
 
-          const errorParagraph = document.createElement('p');
+          var errorParagraph = document.createElement('p');
           errorParagraph.textContent = 'Error: ' + error.message;
           errorDetailsContainer.appendChild(errorParagraph);
 
@@ -219,13 +245,34 @@ cat > "$INDEX_HTML" << HTMLEOF
       loadVersion(version);
     };
 
+    // Guard against double-invocation: when setVersion() changes the hash
+    // programmatically, skip the resulting hashchange to avoid calling
+    // loadVersion twice.
     window.addEventListener('hashchange', function() {
+      if (skipNextHashChange) {
+        skipNextHashChange = false;
+        return;
+      }
       loadVersion(getCurrentVersion());
     });
 
+    // On first load, fetch versions.json to discover the latest version rather
+    // than relying on a version value baked into this file at deploy time.
     document.addEventListener('DOMContentLoaded', function() {
-      if (!window.location.hash) setVersion(DEFAULT_VERSION);
-      loadVersion(getCurrentVersion());
+      fetch('versions.json')
+        .then(function(r) { return r.json(); })
+        .then(function(versions) {
+          if (Array.isArray(versions) && versions.length > 0) {
+            latestVersion = versions[versions.length - 1];
+          }
+        })
+        .catch(function(err) { console.error('Failed to load versions.json:', err); })
+        .finally(function() {
+          if (!window.location.hash && latestVersion) {
+            setVersion(latestVersion);
+          }
+          loadVersion(getCurrentVersion());
+        });
     });
   </script>
 </body>
@@ -249,11 +296,28 @@ else
 fi
 
 # Append version if not already present, then write
-node --input-type=commonjs - << JSEOF
+EXISTING_VERSIONS="$EXISTING_VERSIONS" VERSION="$VERSION" VERSIONS_JSON="$VERSIONS_JSON" node --input-type=commonjs - << 'JSEOF'
+'use strict';
 const fs = require('fs');
-const versions = JSON.parse('$EXISTING_VERSIONS');
-if (!versions.includes('$VERSION')) versions.push('$VERSION');
-fs.writeFileSync('$VERSIONS_JSON', JSON.stringify(versions));
+
+const existingVersionsRaw = process.env.EXISTING_VERSIONS || '[]';
+let versions;
+try {
+  versions = JSON.parse(existingVersionsRaw);
+  if (!Array.isArray(versions)) {
+    versions = [];
+  }
+} catch (e) {
+  versions = [];
+}
+
+const version = process.env.VERSION;
+if (version && !versions.includes(version)) {
+  versions.push(version);
+}
+
+const versionsJsonPath = process.env.VERSIONS_JSON;
+fs.writeFileSync(versionsJsonPath, JSON.stringify(versions));
 console.log('Written versions.json:', JSON.stringify(versions));
 JSEOF
 
