@@ -169,6 +169,7 @@ export const bloomseedConfig = {
       atlas: "mobs",
       tags: ["mob", "animal", "cow"],
       defaults: { frameWidth: 64, frameHeight: 48, frameCountMode: "round" },
+      normalize: { frameWidth: 64, frameHeight: 48, anchor: "center", trimAlpha: true },
     },
     {
       source: "Mobs/Enemies/Bat",
