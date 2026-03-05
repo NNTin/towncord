@@ -59,7 +59,7 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {catalog && <SidebarAccordion catalog={catalog} gameRef={gameRef} />}
+      {catalog && <SidebarAccordion catalog={catalog} />}
       <div
         ref={containerRef}
         className="game-root"

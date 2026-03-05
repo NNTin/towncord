@@ -4,29 +4,20 @@ import {
   type AnimationCatalog,
   type AnimationTrack,
   type InputDirection,
-  type SpriteDirection,
   buildAnimationCatalog,
   getTracksForPath,
   resolveTrackForDirection,
 } from "../assets/animationCatalog";
-import { type EquipmentId, type Material, resolveEquipmentKey } from "../assets/equipmentGroups";
 import {
-  ANIMATION_DISPLAY_INFO_EVENT,
-  ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
-  ANIMATION_SELECTED_EVENT,
-  EQUIPMENT_SELECTED_EVENT,
   PLACE_OBJECT_DROP_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
-  type AnimationDisplayInfo,
   type PlaceObjectDropPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
 } from "../events";
 
 export const WORLD_SCENE_KEY = "world";
-
-const EQUIPMENT_ATLAS = "bloomseed.equipment";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,19 +57,11 @@ const MAX_ZOOM = 4;
 // ---------------------------------------------------------------------------
 
 export class WorldScene extends Phaser.Scene {
-  // Preview sprite — driven by entity/track selector
-  private previewSprite: Phaser.GameObjects.Sprite | null = null;
-  private equipmentSprite: Phaser.GameObjects.Sprite | null = null;
-  private previewTrack: AnimationTrack | null = null;
-  private previewDirection: InputDirection = "down";
-  private previewEquipmentId: EquipmentId | "" = "";
-  private previewMaterial: Material = "iron";
+  private catalog: AnimationCatalog | null = null;
 
-  // Placed player — driven by drag-drop + WASD
+  // Placed player — drag-drop + WASD
   private player: PlayerRuntime | null = null;
   private playerSprite: Phaser.GameObjects.Sprite | null = null;
-
-  private catalog: AnimationCatalog | null = null;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
@@ -98,10 +81,8 @@ export class WorldScene extends Phaser.Scene {
     const animationKeys = Array.isArray(rawKeys)
       ? rawKeys.filter((v): v is string => typeof v === "string")
       : [];
-
     if (animationKeys.length > 0) {
       this.catalog = buildAnimationCatalog(animationKeys);
-      this.initPreviewSprite();
     }
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<
@@ -115,19 +96,10 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerup", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
 
-    this.game.events.on(ANIMATION_SELECTED_EVENT, this.onAnimationSelected, this);
-    this.game.events.on(EQUIPMENT_SELECTED_EVENT, this.onEquipmentSelected, this);
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-    this.game.events.on(ANIMATION_DISPLAY_INFO_REQUEST_EVENT, this.onAnimationDisplayInfoRequest, this);
-
     this.events.once(
       "shutdown",
-      () => {
-        this.game.events.off(ANIMATION_SELECTED_EVENT, this.onAnimationSelected, this);
-        this.game.events.off(EQUIPMENT_SELECTED_EVENT, this.onEquipmentSelected, this);
-        this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-        this.game.events.off(ANIMATION_DISPLAY_INFO_REQUEST_EVENT, this.onAnimationDisplayInfoRequest, this);
-      },
+      () => { this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this); },
       this,
     );
   }
@@ -139,115 +111,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   // ---------------------------------------------------------------------------
-  // Preview sprite — initialised at create(), updated by selector events
-  // ---------------------------------------------------------------------------
-
-  private initPreviewSprite(): void {
-    if (!this.catalog) return;
-
-    const playerModel = this.catalog.playerModels[0] ?? "female";
-    const tracks = getTracksForPath(this.catalog, `player/${playerModel}`);
-    const defaultTrack = tracks.find((t) => t.id === "run") ?? tracks[0] ?? null;
-    if (!defaultTrack) return;
-
-    const resolved = resolveTrackForDirection(defaultTrack, this.previewDirection);
-    if (!resolved) return;
-
-    const firstFrame = this.anims.get(resolved.key)?.frames[0];
-    if (!firstFrame) return;
-
-    const cx = this.scale.width / 2;
-    const cy = this.scale.height / 2;
-
-    this.previewSprite = this.add.sprite(cx, cy, firstFrame.textureKey);
-    this.previewSprite.setScale(SPRITE_SCALE);
-
-    this.equipmentSprite = this.add.sprite(cx, cy, EQUIPMENT_ATLAS);
-    this.equipmentSprite.setScale(SPRITE_SCALE);
-    this.equipmentSprite.setVisible(false);
-
-    this.previewTrack = defaultTrack;
-    this.previewEquipmentId = defaultTrack.equipmentCompatible[0] ?? "";
-    this.playCurrentAnimation();
-  }
-
-  private playCurrentAnimation(): void {
-    if (!this.previewSprite || !this.previewTrack) return;
-
-    const result = resolveTrackForDirection(this.previewTrack, this.previewDirection);
-    if (!result) return;
-
-    const { key, flipX } = result;
-    this.previewSprite.setFlipX(flipX);
-    this.previewSprite.play(key, false);
-
-    const spriteDir: SpriteDirection =
-      this.previewDirection === "left" || this.previewDirection === "right"
-        ? "side"
-        : this.previewDirection;
-
-    const compatible = this.previewTrack.equipmentCompatible;
-    if (this.equipmentSprite && this.previewEquipmentId && compatible.includes(this.previewEquipmentId)) {
-      const equipKey = resolveEquipmentKey(this.previewEquipmentId, this.previewMaterial, spriteDir);
-      if (this.anims.exists(equipKey)) {
-        this.equipmentSprite.setFlipX(flipX);
-        this.equipmentSprite.setVisible(true);
-        this.equipmentSprite.play(equipKey, false);
-      } else {
-        this.equipmentSprite.setVisible(false);
-      }
-    } else if (this.equipmentSprite) {
-      this.equipmentSprite.setVisible(false);
-    }
-
-    this.emitAnimationDisplayInfo(key, flipX);
-  }
-
-  private emitAnimationDisplayInfo(animationKey: string, flipX: boolean): void {
-    if (!this.previewSprite) return;
-
-    const animation = this.anims.get(animationKey);
-    const firstFrame = animation?.frames[0];
-    if (!animation || !firstFrame) return;
-
-    const texture = this.textures.get(firstFrame.textureKey);
-    const frame = texture.get(firstFrame.textureFrame);
-    if (!frame) return;
-
-    const payload: AnimationDisplayInfo = {
-      animationKey,
-      frameWidth: frame.width,
-      frameHeight: frame.height,
-      frameCount: animation.frames.length,
-      flipX,
-      scale: this.previewSprite.scaleX,
-      displayWidth: Math.round(Math.abs(this.previewSprite.scaleX) * frame.width),
-      displayHeight: Math.round(Math.abs(this.previewSprite.scaleY) * frame.height),
-    };
-    this.game.events.emit(ANIMATION_DISPLAY_INFO_EVENT, payload);
-  }
-
-  private onAnimationSelected(track: AnimationTrack): void {
-    this.previewTrack = track;
-    this.previewEquipmentId = track.equipmentCompatible[0] ?? "";
-    this.playCurrentAnimation();
-  }
-
-  private onEquipmentSelected(payload: { equipmentId: EquipmentId; material: Material }): void {
-    this.previewEquipmentId = payload.equipmentId;
-    this.previewMaterial = payload.material;
-    this.playCurrentAnimation();
-  }
-
-  private onAnimationDisplayInfoRequest(): void {
-    if (!this.previewTrack) return;
-    const result = resolveTrackForDirection(this.previewTrack, this.previewDirection);
-    if (!result) return;
-    this.emitAnimationDisplayInfo(result.key, result.flipX);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Placed player — drag-drop placement + WASD movement
+  // Player update
   // ---------------------------------------------------------------------------
 
   private updatePlayer(dt: number): void {
@@ -327,8 +191,11 @@ export class WorldScene extends Phaser.Scene {
 
     this.playerSprite.setFlipX(result.flipX);
     this.playerSprite.play(result.key, true);
-    // Player movement animation is silent — display info comes from the preview sprite only
   }
+
+  // ---------------------------------------------------------------------------
+  // Drop handler
+  // ---------------------------------------------------------------------------
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
     if (payload.type !== "player" || !this.catalog) return;

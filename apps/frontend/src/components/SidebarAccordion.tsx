@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import type Phaser from "phaser";
+import { useState } from "react";
 import {
   type AnimationCatalog,
   type AnimationTrack,
@@ -9,19 +8,11 @@ import {
   getTracksForPath,
 } from "../game/assets/animationCatalog";
 import { type EquipmentId, type Material, MATERIALS } from "../game/assets/equipmentGroups";
-import {
-  ANIMATION_DISPLAY_INFO_EVENT,
-  ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
-  ANIMATION_SELECTED_EVENT,
-  EQUIPMENT_SELECTED_EVENT,
-  PLACE_DRAG_MIME,
-  type AnimationDisplayInfo,
-  type PlaceDragPayload,
-} from "../game/events";
+import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
+import { AnimationPreview, type PreviewInfo } from "./AnimationPreview";
 
 type Props = {
   catalog: AnimationCatalog;
-  gameRef: React.RefObject<Phaser.Game | null>;
 };
 
 // ---------------------------------------------------------------------------
@@ -75,11 +66,7 @@ function AccordionHeader({
   return (
     <button
       onClick={onToggle}
-      style={{
-        ...BUTTON_BASE,
-        background: "rgba(255,255,255,0.05)",
-        color: "#e2e8f0",
-      }}
+      style={{ ...BUTTON_BASE, background: "rgba(255,255,255,0.05)", color: "#e2e8f0" }}
     >
       {open ? "▾" : "▸"} {label}
     </button>
@@ -96,7 +83,7 @@ function InfoRow({ label, value }: { label: string; value: string }): JSX.Elemen
 }
 
 // ---------------------------------------------------------------------------
-// Selector initial state helpers (ported from old AnimationSelector)
+// Selector initial state
 // ---------------------------------------------------------------------------
 
 type SelectorState = {
@@ -110,7 +97,7 @@ type SelectorState = {
   equipmentId: EquipmentId | "";
 };
 
-function getInitialSelectorState(catalog: AnimationCatalog): SelectorState {
+function getInitialState(catalog: AnimationCatalog): SelectorState {
   const playerModel = catalog.playerModels[0] ?? "female";
   const playerTracks = getTracksForPath(catalog, `player/${playerModel}`);
   const defaultTrack = playerTracks.find((t) => t.id === "run") ?? playerTracks[0];
@@ -136,15 +123,18 @@ function getInitialSelectorState(catalog: AnimationCatalog): SelectorState {
 // Component
 // ---------------------------------------------------------------------------
 
-export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
-  const init = () => getInitialSelectorState(catalog);
+// Preview always faces down; direction control can be added in a future iteration.
+const PREVIEW_DIRECTION = "down" as const;
 
-  // Accordion open state
+export function SidebarAccordion({ catalog }: Props): JSX.Element {
+  const init = () => getInitialState(catalog);
+
+  // Accordion state
   const [playerOpen, setPlayerOpen] = useState(true);
   const [previewOpen, setPreviewOpen] = useState(true);
   const [animOpen, setAnimOpen] = useState(true);
 
-  // Entity selector state (ported from AnimationSelector)
+  // Entity selector state
   const [entityType, setEntityType] = useState<EntityType>(init().entityType);
   const [playerFamily, setPlayerFamily] = useState(init().playerFamily);
   const [mobFamily, setMobFamily] = useState(init().mobFamily);
@@ -155,11 +145,11 @@ export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
   const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(init().equipmentId);
   const [material, setMaterial] = useState<Material>("iron");
 
-  // Animation display state
-  const [animInfo, setAnimInfo] = useState<AnimationDisplayInfo | null>(null);
+  // Animation info fed back from the preview renderer
+  const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
 
   // ---------------------------------------------------------------------------
-  // Path + track resolution
+  // Path helpers
   // ---------------------------------------------------------------------------
 
   function resolvePropPath(family: string, group: string): string {
@@ -183,82 +173,34 @@ export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
     }
   }
 
-  const currentPath = getCurrentPath(entityType, playerFamily, mobFamily, mobId, propFamily, propGroup);
+  const currentPath = getCurrentPath(
+    entityType, playerFamily, mobFamily, mobId, propFamily, propGroup,
+  );
   const currentTracks = getTracksForPath(catalog, currentPath);
   const currentTrack = currentTracks.find((t) => t.id === selectedTrackId) ?? currentTracks[0] ?? null;
   const propGroups = getPropGroups(catalog, propFamily);
   const compatible = currentTrack?.equipmentCompatible ?? [];
 
   // ---------------------------------------------------------------------------
-  // Phaser event emitters
+  // Selector state transitions
+  // (No Phaser event emissions needed — AnimationPreview reacts to props.)
   // ---------------------------------------------------------------------------
 
-  function emitTrack(track: AnimationTrack): void {
-    gameRef.current?.events.emit(ANIMATION_SELECTED_EVENT, track);
-  }
-
-  function emitEquipment(equip: EquipmentId | "", mat: Material): void {
-    if (equip) {
-      gameRef.current?.events.emit(EQUIPMENT_SELECTED_EVENT, { equipmentId: equip, material: mat });
-    }
-  }
-
-  function activateTrack(track: AnimationTrack, equip: EquipmentId | "", mat: Material): void {
+  function activateTrack(track: AnimationTrack, equip: EquipmentId | ""): void {
     setSelectedTrackId(track.id);
-    emitTrack(track);
-    if (track.equipmentCompatible.length > 0 && equip) {
-      emitEquipment(equip, mat);
-    }
+    setEquipmentId(equip);
   }
 
-  function switchToPath(
-    newPath: string,
-    overrideTrackId?: string,
-    equip?: EquipmentId | "",
-    mat?: Material,
-  ): void {
+  function switchToPath(newPath: string, overrideTrackId?: string, overrideEquip?: EquipmentId | ""): void {
     const tracks = getTracksForPath(catalog, newPath);
     const track = tracks.find((t) => t.id === (overrideTrackId ?? selectedTrackId)) ?? tracks[0] ?? null;
     if (!track) return;
-    const resolvedEquip = equip ?? equipmentId;
-    const resolvedMat = mat ?? material;
-    const newEquip = track.equipmentCompatible.includes(resolvedEquip as EquipmentId)
-      ? resolvedEquip
+    const currentEquip = overrideEquip ?? equipmentId;
+    const newEquip = track.equipmentCompatible.includes(currentEquip as EquipmentId)
+      ? currentEquip
       : (track.equipmentCompatible[0] ?? "");
-    if (newEquip !== resolvedEquip) setEquipmentId(newEquip);
-    activateTrack(track, newEquip, resolvedMat);
+    activateTrack(track, newEquip);
   }
-
-  // ---------------------------------------------------------------------------
-  // Effects
-  // ---------------------------------------------------------------------------
-
-  // Emit initial track on mount
-  useEffect(() => {
-    if (currentTrack) {
-      emitTrack(currentTrack);
-      if (currentTrack.equipmentCompatible.length > 0 && equipmentId) {
-        emitEquipment(equipmentId, material);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Subscribe to animation display info
-  useEffect(() => {
-    const game = gameRef.current;
-    if (!game) return;
-
-    const handleInfo = (payload: AnimationDisplayInfo): void => { setAnimInfo(payload); };
-    game.events.on(ANIMATION_DISPLAY_INFO_EVENT, handleInfo);
-    game.events.emit(ANIMATION_DISPLAY_INFO_REQUEST_EVENT);
-
-    return () => { game.events.off(ANIMATION_DISPLAY_INFO_EVENT, handleInfo); };
-  }, [gameRef]);
-
-  // ---------------------------------------------------------------------------
-  // Selector handlers (ported from AnimationSelector)
-  // ---------------------------------------------------------------------------
 
   function handleEntityType(et: EntityType): void {
     setEntityType(et);
@@ -299,32 +241,23 @@ export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
   function handleSelectTrack(track: AnimationTrack): void {
     const compat = track.equipmentCompatible;
     const newEquip = compat.includes(equipmentId as EquipmentId) ? equipmentId : (compat[0] ?? "");
-    if (newEquip !== equipmentId) setEquipmentId(newEquip);
-    activateTrack(track, newEquip, material);
+    activateTrack(track, newEquip);
   }
 
   function handleSelectEquipment(equip: EquipmentId): void {
     setEquipmentId(equip);
-    emitEquipment(equip, material);
   }
 
   function handleSelectMaterial(mat: Material): void {
     setMaterial(mat);
-    emitEquipment(equipmentId, mat);
-  }
-
-  function handleAnimToggle(): void {
-    const next = !animOpen;
-    setAnimOpen(next);
-    if (next) gameRef.current?.events.emit(ANIMATION_DISPLAY_INFO_REQUEST_EVENT);
   }
 
   // ---------------------------------------------------------------------------
   // Drag payload for placeables
   // ---------------------------------------------------------------------------
 
-  function handleDragStart(e: React.DragEvent, dragPayload: PlaceDragPayload): void {
-    e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(dragPayload));
+  function handleDragStart(e: React.DragEvent, payload: PlaceDragPayload): void {
+    e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
   }
 
@@ -483,12 +416,22 @@ export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
               </div>
             </>
           )}
+
+          {/* Animated preview canvas */}
+          <SectionLabel>Preview</SectionLabel>
+          <AnimationPreview
+            track={currentTrack}
+            direction={PREVIEW_DIRECTION}
+            equipmentId={equipmentId}
+            material={material}
+            onInfo={setAnimInfo}
+          />
         </div>
       )}
 
-      {/* ── Animation display ──────────────────────────────────── */}
+      {/* ── Animation info ─────────────────────────────────────── */}
       <SectionLabel>Info</SectionLabel>
-      <AccordionHeader label="Animation" open={animOpen} onToggle={handleAnimToggle} />
+      <AccordionHeader label="Animation" open={animOpen} onToggle={() => setAnimOpen((v) => !v)} />
       {animOpen && (
         <div
           style={{
@@ -512,7 +455,7 @@ export function SidebarAccordion({ catalog, gameRef }: Props): JSX.Element {
               <InfoRow label="flipX" value={animInfo.flipX ? "yes" : "no"} />
             </>
           ) : (
-            <span style={{ color: "#475569" }}>No animation playing</span>
+            <span style={{ color: "#475569" }}>Loading preview…</span>
           )}
         </div>
       )}
