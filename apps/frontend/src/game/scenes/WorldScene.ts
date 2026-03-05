@@ -47,7 +47,7 @@ const PLAYER_STATE_TO_TRACKS: Record<EntityState, string[]> = {
 };
 
 const MOB_STATE_TO_TRACKS: Record<EntityState, string[]> = {
-  idle: ["idle"],
+  idle: ["idle", "walk"],
   move: ["walk", "idle"],
   run: ["walk", "idle"],
 };
@@ -184,11 +184,15 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  private resolveEntityTrack(entity: Entity): AnimationTrack | null {
+  private resolveEntityTrack(
+    catalogPath: string,
+    state: EntityState,
+    supportsRun: boolean,
+  ): AnimationTrack | null {
     if (!this.catalog) return null;
-    const tracks = getTracksForPath(this.catalog, entity.catalogPath);
-    const map = entity.supportsRun ? PLAYER_STATE_TO_TRACKS : MOB_STATE_TO_TRACKS;
-    const candidates = map[entity.state] ?? ["idle"];
+    const tracks = getTracksForPath(this.catalog, catalogPath);
+    const map = supportsRun ? PLAYER_STATE_TO_TRACKS : MOB_STATE_TO_TRACKS;
+    const candidates = map[state] ?? ["idle"];
     for (const id of candidates) {
       const track = tracks.find((t) => t.id === id);
       if (track) return track;
@@ -197,11 +201,24 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private playEntityAnimation(entity: Entity): void {
-    const track = this.resolveEntityTrack(entity);
+    const track = this.resolveEntityTrack(entity.catalogPath, entity.state, entity.supportsRun);
     if (!track) return;
     const result = resolveTrackForDirection(track, entity.facing);
     if (!result) return;
-    entity.sprite.setFlipX(result.flipX);
+
+    let flipX = result.flipX;
+    // Undirected mob tracks (e.g. bat-walk) should keep last horizontal facing on up/down.
+    if (!entity.supportsRun && !track.directional) {
+      if (entity.facing === "left") {
+        flipX = true;
+      } else if (entity.facing === "right") {
+        flipX = false;
+      } else {
+        flipX = entity.sprite.flipX;
+      }
+    }
+
+    entity.sprite.setFlipX(flipX);
     entity.sprite.play(result.key, true);
   }
 
@@ -228,8 +245,8 @@ export class WorldScene extends Phaser.Scene {
     if (!this.catalog) return;
 
     const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
-    const tracks = getTracksForPath(this.catalog, payload.catalogPath);
-    const idleTrack = tracks.find((t) => t.id === "idle") ?? tracks[0];
+    const supportsRun = payload.type === "player";
+    const idleTrack = this.resolveEntityTrack(payload.catalogPath, "idle", supportsRun);
     if (!idleTrack) return;
 
     const resolved = resolveTrackForDirection(idleTrack, "down");
@@ -251,7 +268,7 @@ export class WorldScene extends Phaser.Scene {
     const entity: Entity = {
       id: this.nextId++,
       catalogPath: payload.catalogPath,
-      supportsRun: payload.type === "player",
+      supportsRun,
       position: { x: worldPoint.x, y: worldPoint.y },
       velocity: { x: 0, y: 0 },
       facing: "down",

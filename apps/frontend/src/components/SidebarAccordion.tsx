@@ -17,6 +17,13 @@ type Props = {
   catalog: AnimationCatalog;
 };
 
+const PLACEABLE_MOB_IDS: Exclude<PlaceableObjectType, "player">[] = ["chicken", "cow", "bat"];
+const PLACEABLE_MOB_ID_SET: ReadonlySet<string> = new Set(PLACEABLE_MOB_IDS);
+
+function isPlaceableMobId(id: string): id is Exclude<PlaceableObjectType, "player"> {
+  return PLACEABLE_MOB_ID_SET.has(id);
+}
+
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
@@ -254,6 +261,11 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
   const currentTrack = currentTracks.find((t) => t.id === selectedTrackId) ?? currentTracks[0] ?? null;
   const propGroups = getPropGroups(catalog, propFamily);
   const compatible = currentTrack?.equipmentCompatible ?? [];
+  const placeableMobs = catalog.mobFamilies.flatMap((family) =>
+    getMobIds(catalog, family)
+      .filter(isPlaceableMobId)
+      .map((id) => ({ family, id })),
+  );
 
   // ---------------------------------------------------------------------------
   // Selector state transitions
@@ -377,32 +389,24 @@ export function SidebarAccordion({ catalog }: Props): JSX.Element {
         </div>
       )}
 
-      {catalog.mobFamilies.flatMap((family) =>
-        getMobIds(catalog, family).filter(
-          (id): id is PlaceableObjectType => id === "chicken" || id === "cow",
-        ),
-      ).length > 0 && (
+      {placeableMobs.length > 0 && (
         <>
           <AccordionHeader label="Mobs" open={mobsOpen} onToggle={() => setMobsOpen((v) => !v)} />
           {mobsOpen && (
             <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
-              {catalog.mobFamilies.flatMap((family) =>
-                getMobIds(catalog, family)
-                  .filter((id): id is PlaceableObjectType => id === "chicken" || id === "cow")
-                  .map((id) => (
-                    <DraggableEntry
-                      key={id}
-                      label={id}
-                      onDragStart={(e) =>
-                        handleDragStart(e, {
-                          type: id,
-                          model: id,
-                          catalogPath: `mobs/${family}/${id}`,
-                        })
-                      }
-                    />
-                  )),
-              )}
+              {placeableMobs.map(({ family, id }) => (
+                <DraggableEntry
+                  key={`${family}:${id}`}
+                  label={id}
+                  onDragStart={(e) =>
+                    handleDragStart(e, {
+                      type: id,
+                      model: id,
+                      catalogPath: `mobs/${family}/${id}`,
+                    })
+                  }
+                />
+              ))}
             </div>
           )}
         </>

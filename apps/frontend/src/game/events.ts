@@ -4,7 +4,7 @@ export const PLACE_OBJECT_DROP_EVENT = "placeObjectDrop";
 export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
 
-export type PlaceableObjectType = "player" | "chicken" | "cow";
+export type PlaceableObjectType = "player" | "chicken" | "cow" | "bat";
 
 export type PlaceDragPayload = {
   type: PlaceableObjectType;
