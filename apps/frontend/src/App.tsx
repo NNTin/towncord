@@ -3,6 +3,7 @@ import type Phaser from "phaser";
 import { createGame } from "./game/phaser/createGame";
 import { SidebarAccordion } from "./components/SidebarAccordion";
 import { buildAnimationCatalog, type AnimationCatalog } from "./game/assets/animationCatalog";
+import { PlaceableService } from "./game/application/placeableService";
 import {
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
@@ -14,6 +15,7 @@ function App(): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
+  const [placeableService, setPlaceableService] = useState<PlaceableService | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -23,12 +25,15 @@ function App(): JSX.Element {
     gameRef.current = game;
 
     game.events.once("bloomseedReady", (keys: string[]) => {
-      setCatalog(buildAnimationCatalog(keys));
+      const nextCatalog = buildAnimationCatalog(keys);
+      setCatalog(nextCatalog);
+      setPlaceableService(PlaceableService.fromCatalog(nextCatalog));
     });
 
     return () => {
       game.destroy(true);
       gameRef.current = null;
+      setPlaceableService(null);
     };
   }, []);
 
@@ -46,9 +51,7 @@ function App(): JSX.Element {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
       const payload: PlaceObjectDropPayload = {
-        type: data.type,
-        model: data.model,
-        catalogPath: data.catalogPath,
+        entityId: data.entityId,
         screenX: e.clientX - rect.left,
         screenY: e.clientY - rect.top,
       };
@@ -60,7 +63,12 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {catalog && <SidebarAccordion catalog={catalog} />}
+      {catalog && placeableService && (
+        <SidebarAccordion
+          catalog={catalog}
+          placeableService={placeableService}
+        />
+      )}
       <div
         ref={containerRef}
         className="game-root"
