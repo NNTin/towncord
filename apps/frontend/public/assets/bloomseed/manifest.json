@@ -33,9 +33,9 @@
       "atlasKey": "bloomseed.props",
       "textureURL": "assets/bloomseed/atlases/props.png",
       "atlasURL": "assets/bloomseed/atlases/props.json",
-      "frameCount": 1113,
+      "frameCount": 315,
       "width": 1022,
-      "height": 730
+      "height": 624
     },
     {
       "category": "tilesets",
@@ -56,5 +56,5 @@
       "height": 128
     }
   ],
-  "animationCount": 170
+  "animationCount": 239
 }
