@@ -1,13 +1,11 @@
 import Phaser from "phaser";
-import { BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY } from "./PreloadScene";
 import {
-  type AnimationCatalog,
-  type AnimationTrack,
-  type InputDirection,
-  buildAnimationCatalog,
-  getTracksForPath,
-  resolveTrackForDirection,
-} from "../assets/animationCatalog";
+  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
+  getBloomseedWorldBootstrap,
+  type BloomseedWorldBootstrap,
+} from "../application/gameComposition";
+import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
+import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLAYER_PLACED_EVENT,
@@ -16,52 +14,28 @@ import {
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
 } from "../events";
+import { playEntityAnimation } from "./world/animationSystem";
+import { createWorldEntity } from "./world/entityFactory";
+import { updateEntityMovement } from "./world/movementSystem";
+import type { WorldEntity } from "./world/types";
 
 export const WORLD_SCENE_KEY = "world";
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-type PlayerState = "idle" | "move" | "run";
-
-type PlayerRuntime = {
-  placed: boolean;
-  position: { x: number; y: number };
-  velocity: { x: number; y: number };
-  facing: InputDirection;
-  state: PlayerState;
-  model: string;
-};
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const STATE_TO_TRACK_IDS: Record<PlayerState, string[]> = {
-  idle: ["idle"],
-  move: ["walk", "run", "idle"],
-  run: ["run", "walk", "idle"],
-};
-
-const WALK_SPEED = 100;
-const RUN_SPEED = 220;
-/** Per-frame velocity retention at 60 fps when keys released (fast ease-out). */
-const STOP_DAMPING_60FPS = 0.75;
 const SPRITE_SCALE = 4;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
-
-// ---------------------------------------------------------------------------
-// Scene
-// ---------------------------------------------------------------------------
+const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
+const SELECTED_BADGE_SCALE = 2;
+const SELECTED_BADGE_VERTICAL_OFFSET = 12;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
+  private entityRegistry: BloomseedWorldBootstrap["entityRegistry"] | null = null;
 
-  // Placed player — drag-drop + WASD
-  private player: PlayerRuntime | null = null;
-  private playerSprite: Phaser.GameObjects.Sprite | null = null;
+  private entities: WorldEntity[] = [];
+  private selectedEntity: WorldEntity | null = null;
+  private selectionBadge: Phaser.GameObjects.Sprite | null = null;
+  private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
@@ -77,12 +51,12 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const rawKeys = this.registry.get(BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY) as unknown;
-    const animationKeys = Array.isArray(rawKeys)
-      ? rawKeys.filter((v): v is string => typeof v === "string")
-      : [];
-    if (animationKeys.length > 0) {
-      this.catalog = buildAnimationCatalog(animationKeys);
+    const bootstrap = getBloomseedWorldBootstrap(
+      this.registry.get(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY),
+    );
+    if (bootstrap) {
+      this.catalog = bootstrap.catalog;
+      this.entityRegistry = bootstrap.entityRegistry;
     }
 
     this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<
@@ -100,6 +74,8 @@ export class WorldScene extends Phaser.Scene {
     this.events.once(
       "shutdown",
       () => {
+        this.selectionBadge?.destroy();
+        this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
@@ -108,152 +84,104 @@ export class WorldScene extends Phaser.Scene {
       },
       this,
     );
+
+    this.createSelectionBadge();
   }
 
   public override update(_time: number, delta: number): void {
-    if (this.player?.placed) {
-      this.updatePlayer(delta / 1000);
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Player update
-  // ---------------------------------------------------------------------------
-
-  private updatePlayer(dt: number): void {
-    const p = this.player!;
-    const wasd = this.wasd!;
-    const shift = this.shiftKey!;
-
-    const moveX = (wasd.D.isDown ? 1 : 0) - (wasd.A.isDown ? 1 : 0);
-    const moveY = (wasd.S.isDown ? 1 : 0) - (wasd.W.isDown ? 1 : 0);
-    const isMoving = moveX !== 0 || moveY !== 0;
-    const isRunModifier = shift.isDown;
-
-    const prevState = p.state;
-    const prevFacing = p.facing;
-
-    if (isMoving) {
-      const len = Math.sqrt(moveX * moveX + moveY * moveY);
-      const speed = isRunModifier ? RUN_SPEED : WALK_SPEED;
-      p.velocity.x = (moveX / len) * speed;
-      p.velocity.y = (moveY / len) * speed;
-
-      if (Math.abs(moveX) >= Math.abs(moveY)) {
-        p.facing = moveX > 0 ? "right" : "left";
-      } else {
-        p.facing = moveY > 0 ? "down" : "up";
-      }
-
-      p.state = isRunModifier ? "run" : "move";
-    } else {
-      const dampFactor = Math.pow(STOP_DAMPING_60FPS, dt * 60);
-      p.velocity.x *= dampFactor;
-      p.velocity.y *= dampFactor;
-
-      const speed = Math.sqrt(p.velocity.x ** 2 + p.velocity.y ** 2);
-      if (speed < 1) {
-        p.velocity.x = 0;
-        p.velocity.y = 0;
-        p.state = "idle";
-      } else {
-        p.state = "move";
-      }
+    if (!this.selectedEntity || !this.wasd || !this.shiftKey || !this.catalog) {
+      return;
     }
 
-    p.position.x += p.velocity.x * dt;
-    p.position.y += p.velocity.y * dt;
-    this.playerSprite?.setPosition(p.position.x, p.position.y);
+    const entity = this.selectedEntity;
+    const dt = delta / 1000;
 
-    const stateChanged = p.state !== prevState;
-    const dirChanged = p.state !== "idle" && p.facing !== prevFacing;
+    const prevState = entity.state;
+    const prevFacing = entity.facing;
+
+    updateEntityMovement(entity, dt, {
+      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
+      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
+      isRunModifier: this.shiftKey.isDown,
+    });
+
+    entity.position.x += entity.velocity.x * dt;
+    entity.position.y += entity.velocity.y * dt;
+    entity.sprite.setPosition(entity.position.x, entity.position.y);
+
+    const stateChanged = entity.state !== prevState;
+    const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
     if (stateChanged || dirChanged) {
-      this.playPlayerAnimation();
-      if (stateChanged) {
-        const payload: PlayerStateChangedPayload = { state: p.state };
+      playEntityAnimation(entity, this.catalog);
+      if (stateChanged && entity.definition.kind === "player") {
+        const payload: PlayerStateChangedPayload = { state: entity.state };
         this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
       }
     }
+
+    this.syncSelectionBadgePosition(entity);
   }
 
-  private resolvePlayerTrack(): AnimationTrack | null {
-    if (!this.player || !this.catalog) return null;
-    const tracks = getTracksForPath(this.catalog, `player/${this.player.model}`);
-    const candidates = STATE_TO_TRACK_IDS[this.player.state] ?? ["idle"];
-    for (const id of candidates) {
-      const track = tracks.find((t) => t.id === id);
-      if (track) return track;
-    }
-    return tracks[0] ?? null;
+  private selectEntity(entity: WorldEntity | null): void {
+    if (this.selectedEntity === entity) return;
+    this.selectedEntity = entity;
+    this.setSelectionBadgeVisible(Boolean(entity));
+    if (entity) this.syncSelectionBadgePosition(entity);
   }
 
-  private playPlayerAnimation(): void {
-    if (!this.playerSprite || !this.player) return;
-    const track = this.resolvePlayerTrack();
-    if (!track) return;
+  private createSelectionBadge(): void {
+    const firstFrame = this.anims.get(SELECTED_BADGE_ANIMATION_KEY)?.frames[0];
+    if (!firstFrame) return;
 
-    const result = resolveTrackForDirection(track, this.player.facing);
-    if (!result) return;
-
-    this.playerSprite.setFlipX(result.flipX);
-    this.playerSprite.play(result.key, true);
+    const badge = this.add.sprite(0, 0, firstFrame.textureKey, firstFrame.textureFrame);
+    badge.setScale(SELECTED_BADGE_SCALE);
+    badge.setDepth(10_000);
+    badge.setVisible(false);
+    this.selectionBadge = badge;
   }
 
-  // ---------------------------------------------------------------------------
-  // Drop handler
-  // ---------------------------------------------------------------------------
+  private setSelectionBadgeVisible(visible: boolean): void {
+    if (!this.selectionBadge) return;
+    this.selectionBadge.setVisible(visible);
+  }
+
+  private syncSelectionBadgePosition(entity: WorldEntity): void {
+    if (!this.selectionBadge) return;
+    this.selectionBadge.setPosition(
+      entity.position.x,
+      entity.position.y - entity.sprite.displayHeight * 0.5 - SELECTED_BADGE_VERTICAL_OFFSET,
+    );
+  }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (payload.type !== "player" || !this.catalog) return;
+    if (!this.catalog || !this.entityRegistry) return;
 
-    const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
+    const spawnRequest = mapDropPayloadToSpawnRequest(payload);
+    const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
+    if (!runtime || !runtime.definition.placeable) return;
+    const { definition } = runtime;
 
-    if (this.player && this.playerSprite) {
-      this.player.model = payload.model;
-      this.player.position.x = worldPoint.x;
-      this.player.position.y = worldPoint.y;
-      this.player.velocity.x = 0;
-      this.player.velocity.y = 0;
-      this.player.state = "idle";
-      this.playerSprite.setPosition(worldPoint.x, worldPoint.y);
-      this.playPlayerAnimation();
-    } else {
-      const tracks = getTracksForPath(this.catalog, `player/${payload.model}`);
-      const idleTrack = tracks.find((t) => t.id === "idle") ?? tracks[0];
-      if (!idleTrack) return;
+    const worldPoint = this.cameras.main.getWorldPoint(spawnRequest.screenX, spawnRequest.screenY);
+    const entity = createWorldEntity({
+      scene: this,
+      catalog: this.catalog,
+      runtime,
+      nextId: this.nextId,
+      worldX: worldPoint.x,
+      worldY: worldPoint.y,
+      spriteScale: SPRITE_SCALE,
+    });
+    if (!entity) return;
 
-      const resolved = resolveTrackForDirection(idleTrack, "down");
-      if (!resolved) return;
+    this.nextId += 1;
+    this.entities.push(entity);
+    this.selectEntity(entity);
 
-      const firstFrame = this.anims.get(resolved.key)?.frames[0];
-      if (!firstFrame) return;
-
-      this.player = {
-        placed: true,
-        position: { x: worldPoint.x, y: worldPoint.y },
-        velocity: { x: 0, y: 0 },
-        facing: "down",
-        state: "idle",
-        model: payload.model,
-      };
-
-      this.playerSprite = this.add.sprite(
-        worldPoint.x,
-        worldPoint.y,
-        firstFrame.textureKey,
-        firstFrame.textureFrame,
-      );
-      this.playerSprite.setScale(SPRITE_SCALE);
-      this.playPlayerAnimation();
+    if (definition.kind === "player") {
+      const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
+      this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
     }
-
-    const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
-    this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
   }
-
-  // ---------------------------------------------------------------------------
-  // Camera controls
-  // ---------------------------------------------------------------------------
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
@@ -262,6 +190,19 @@ export class WorldScene extends Phaser.Scene {
       this.panStartY = pointer.y;
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
+    } else if (pointer.button === 0) {
+      let hit: WorldEntity | null = null;
+      const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
+
+      for (const target of hits) {
+        const entity = this.entities.find((candidate) => candidate.sprite === target);
+        if (entity) {
+          hit = entity;
+          break;
+        }
+      }
+
+      this.selectEntity(hit);
     }
   }
 
