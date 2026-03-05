@@ -1,6 +1,14 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
-import type { CanBePlaced, CanIdle, CanRun, CanWalk, ActionContext } from "./capabilities";
-import type { EntityAction, EntityCapability, EntityDefinition, SpawnSpec } from "./model";
+import {
+  deriveCapabilitiesFromBehavior,
+  type ActionContext,
+  type CanBePlaced,
+  type CanIdle,
+  type CanRun,
+  type CanWalk,
+  type EntityBehavior,
+} from "./capabilities";
+import type { EntityAction, EntityDefinition, SpawnSpec } from "./model";
 
 const NPC_PLACEABLE_IDS = new Set(["chicken", "cow", "bat"]);
 
@@ -9,21 +17,24 @@ abstract class BaseArchetype implements CanBePlaced {
   protected abstract readonly label: string;
   protected abstract readonly kind: "player" | "npc";
   protected abstract readonly catalogPath: string;
-  protected abstract readonly capabilities: readonly EntityCapability[];
-
-  public toDefinition(): EntityDefinition {
-    return {
-      id: this.id,
-      label: this.label,
-      kind: this.kind,
-      catalogPath: this.catalogPath,
-      capabilities: this.capabilities,
-      placeable: true,
-    };
-  }
 
   public createSpawnSpec(): SpawnSpec {
     return { entityId: this.id, catalogPath: this.catalogPath };
+  }
+
+  public toRuntime(): ArchetypeRuntime {
+    const behavior = this as unknown as EntityBehavior;
+    return {
+      definition: {
+        id: this.id,
+        label: this.label,
+        kind: this.kind,
+        catalogPath: this.catalogPath,
+        capabilities: deriveCapabilitiesFromBehavior(behavior),
+        placeable: true,
+      },
+      behavior,
+    };
   }
 }
 
@@ -32,7 +43,6 @@ export class PlayerArchetype extends BaseArchetype implements CanIdle, CanWalk, 
   protected readonly label: string;
   protected readonly kind = "player" as const;
   protected readonly catalogPath: string;
-  protected readonly capabilities: readonly EntityCapability[] = ["idle", "walk", "run"];
 
   public constructor(model: string) {
     super();
@@ -56,7 +66,6 @@ export class PlayerArchetype extends BaseArchetype implements CanIdle, CanWalk, 
 
 abstract class BaseNpcArchetype extends BaseArchetype implements CanIdle, CanWalk {
   protected readonly kind = "npc" as const;
-  protected readonly capabilities: readonly EntityCapability[] = ["idle", "walk"];
 
   public idle(_ctx: ActionContext): EntityAction {
     return "idle";
@@ -66,6 +75,11 @@ abstract class BaseNpcArchetype extends BaseArchetype implements CanIdle, CanWal
     return "walk";
   }
 }
+
+export type ArchetypeRuntime = {
+  definition: EntityDefinition;
+  behavior: EntityBehavior;
+};
 
 export class CowArchetype extends BaseNpcArchetype {
   protected readonly id: string;
@@ -116,11 +130,11 @@ function npcArchetypeFromMobId(
   }
 }
 
-export function buildArchetypeDefinitions(catalog: AnimationCatalog): EntityDefinition[] {
-  const definitions: EntityDefinition[] = [];
+export function buildArchetypeRuntimes(catalog: AnimationCatalog): ArchetypeRuntime[] {
+  const runtimes: ArchetypeRuntime[] = [];
 
   for (const model of catalog.playerModels) {
-    definitions.push(new PlayerArchetype(model).toDefinition());
+    runtimes.push(new PlayerArchetype(model).toRuntime());
   }
 
   // Scope intentionally limited in this refactor:
@@ -129,12 +143,12 @@ export function buildArchetypeDefinitions(catalog: AnimationCatalog): EntityDefi
     if (!path.startsWith("mobs/")) continue;
     const [, family, mobId] = path.split("/");
     if (!family || !mobId || !NPC_PLACEABLE_IDS.has(mobId)) continue;
-    if (definitions.some((definition) => definition.catalogPath === path)) continue;
+    if (runtimes.some((runtime) => runtime.definition.catalogPath === path)) continue;
     const archetype = npcArchetypeFromMobId(mobId, family, path);
     if (archetype) {
-      definitions.push(archetype.toDefinition());
+      runtimes.push(archetype.toRuntime());
     }
   }
 
-  return definitions;
+  return runtimes;
 }

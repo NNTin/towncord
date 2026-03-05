@@ -1,8 +1,10 @@
-import { hasCapability, type EntityAction, type EntityDefinition } from "../domain/model";
+import { supportsRun, supportsWalk, type ActionContext, type EntityBehavior } from "../domain/capabilities";
+import type { EntityAction } from "../domain/model";
 
 export type ActionResolverInput = {
   isMoving: boolean;
   isRunModifier: boolean;
+  deltaSeconds: number;
 };
 
 const TRACK_CANDIDATES: Record<EntityAction, string[]> = {
@@ -12,18 +14,20 @@ const TRACK_CANDIDATES: Record<EntityAction, string[]> = {
 };
 
 export function resolveNextAction(
-  definition: EntityDefinition,
+  behavior: EntityBehavior,
   input: ActionResolverInput,
 ): EntityAction {
-  if (input.isMoving && input.isRunModifier && hasCapability(definition, "run")) {
-    return "run";
+  const context: ActionContext = { deltaSeconds: input.deltaSeconds };
+
+  if (input.isMoving && input.isRunModifier && supportsRun(behavior)) {
+    return behavior.run(context);
   }
 
-  if (input.isMoving && hasCapability(definition, "walk")) {
-    return "walk";
+  if (input.isMoving && supportsWalk(behavior)) {
+    return behavior.walk(context);
   }
 
-  return "idle";
+  return behavior.idle(context);
 }
 
 export function getTrackCandidatesForAction(action: EntityAction): string[] {

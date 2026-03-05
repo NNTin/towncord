@@ -16,10 +16,3 @@ export type EntityDefinition = {
   capabilities: readonly EntityCapability[];
   placeable: boolean;
 };
-
-export function hasCapability(
-  definition: EntityDefinition,
-  capability: EntityCapability,
-): boolean {
-  return definition.capabilities.includes(capability);
-}

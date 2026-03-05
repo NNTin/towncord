@@ -1,5 +1,5 @@
 import { resolveNextAction } from "../../application/actionResolver";
-import { hasCapability } from "../../domain/model";
+import { supportsRun, supportsWalk } from "../../domain/capabilities";
 import type { WorldEntity } from "./types";
 
 const WALK_SPEED = 100;
@@ -20,9 +20,9 @@ export function updateEntityMovement(
 ): void {
   const hasInputMovement = input.moveX !== 0 || input.moveY !== 0;
 
-  if (hasCapability(entity.definition, "walk") && hasInputMovement) {
+  if (supportsWalk(entity.behavior) && hasInputMovement) {
     const len = Math.sqrt(input.moveX * input.moveX + input.moveY * input.moveY);
-    const speed = input.isRunModifier && hasCapability(entity.definition, "run")
+    const speed = input.isRunModifier && supportsRun(entity.behavior)
       ? RUN_SPEED
       : WALK_SPEED;
     entity.velocity.x = (input.moveX / len) * speed;
@@ -39,7 +39,7 @@ export function updateEntityMovement(
     entity.velocity.y *= dampFactor;
 
     const speed = Math.sqrt(entity.velocity.x ** 2 + entity.velocity.y ** 2);
-    if (speed < 1 || !hasCapability(entity.definition, "walk")) {
+    if (speed < 1 || !supportsWalk(entity.behavior)) {
       entity.velocity.x = 0;
       entity.velocity.y = 0;
     }
@@ -48,10 +48,11 @@ export function updateEntityMovement(
   const speedAfterUpdate = Math.sqrt(entity.velocity.x ** 2 + entity.velocity.y ** 2);
   const isMovingByVelocity = speedAfterUpdate >= 1;
 
-  entity.state = resolveNextAction(entity.definition, {
+  entity.state = resolveNextAction(entity.behavior, {
     // Keep movement state active while inertia still moves the entity.
     isMoving: isMovingByVelocity,
     // Running only applies while input is actively held.
     isRunModifier: hasInputMovement && input.isRunModifier,
+    deltaSeconds: dt,
   });
 }

@@ -130,14 +130,15 @@ export class WorldScene extends Phaser.Scene {
     if (!this.catalog || !this.entityRegistry) return;
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
-    const definition = this.entityRegistry.getById(spawnRequest.entityId);
-    if (!definition || !definition.placeable) return;
+    const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
+    if (!runtime || !runtime.definition.placeable) return;
+    const { definition } = runtime;
 
     const worldPoint = this.cameras.main.getWorldPoint(spawnRequest.screenX, spawnRequest.screenY);
     const entity = createWorldEntity({
       scene: this,
       catalog: this.catalog,
-      definition,
+      runtime,
       nextId: this.nextId,
       worldX: worldPoint.x,
       worldY: worldPoint.y,

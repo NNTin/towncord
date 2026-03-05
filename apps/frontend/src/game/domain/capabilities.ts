@@ -1,4 +1,4 @@
-import type { EntityAction, SpawnSpec } from "./model";
+import type { EntityAction, EntityCapability, SpawnSpec } from "./model";
 
 export type ActionContext = {
   deltaSeconds: number;
@@ -18,4 +18,21 @@ export interface CanRun {
 
 export interface CanBePlaced {
   createSpawnSpec(): SpawnSpec;
+}
+
+export type EntityBehavior = CanIdle & CanBePlaced & Partial<CanWalk & CanRun>;
+
+export function supportsWalk(behavior: EntityBehavior): behavior is EntityBehavior & CanWalk {
+  return typeof (behavior as { walk?: unknown }).walk === "function";
+}
+
+export function supportsRun(behavior: EntityBehavior): behavior is EntityBehavior & CanRun {
+  return typeof (behavior as { run?: unknown }).run === "function";
+}
+
+export function deriveCapabilitiesFromBehavior(behavior: EntityBehavior): EntityCapability[] {
+  const capabilities: EntityCapability[] = ["idle"];
+  if (supportsWalk(behavior)) capabilities.push("walk");
+  if (supportsRun(behavior)) capabilities.push("run");
+  return capabilities;
 }

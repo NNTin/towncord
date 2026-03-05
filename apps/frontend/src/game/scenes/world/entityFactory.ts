@@ -1,13 +1,13 @@
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../../assets/animationCatalog";
-import type { EntityDefinition } from "../../domain/model";
+import type { RegisteredEntity } from "../../domain/entityRegistry";
 import { resolveSpawnVisual } from "./animationSystem";
 import type { WorldEntity } from "./types";
 
 export type CreateWorldEntityParams = {
   scene: Phaser.Scene;
   catalog: AnimationCatalog;
-  definition: EntityDefinition;
+  runtime: RegisteredEntity;
   nextId: number;
   worldX: number;
   worldY: number;
@@ -15,7 +15,8 @@ export type CreateWorldEntityParams = {
 };
 
 export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity | null {
-  const { scene, catalog, definition, nextId, worldX, worldY, spriteScale } = params;
+  const { scene, catalog, runtime, nextId, worldX, worldY, spriteScale } = params;
+  const { definition, behavior } = runtime;
 
   const spawn = resolveSpawnVisual(catalog, scene.anims, definition);
   if (!spawn) return null;
@@ -29,6 +30,7 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
     id: nextId,
     entityId: definition.id,
     definition,
+    behavior,
     position: { x: worldX, y: worldY },
     velocity: { x: 0, y: 0 },
     facing: "down",
