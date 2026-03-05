@@ -55,6 +55,155 @@ def alpha_trim_box(image):
   return (left, top, right - left, bottom - top)
 
 
+def alpha_components(image, min_area):
+  alpha = image.getchannel("A")
+  pixels = alpha.load()
+  width = image.width
+  height = image.height
+  visited = bytearray(width * height)
+  components = []
+
+  def idx(x, y):
+    return y * width + x
+
+  for y in range(height):
+    for x in range(width):
+      if pixels[x, y] == 0:
+        continue
+
+      start = idx(x, y)
+      if visited[start] != 0:
+        continue
+
+      queue = [(x, y)]
+      visited[start] = 1
+      q_index = 0
+
+      min_x = x
+      max_x = x
+      min_y = y
+      max_y = y
+      area = 0
+
+      while q_index < len(queue):
+        cx, cy = queue[q_index]
+        q_index += 1
+        area += 1
+
+        if cx < min_x:
+          min_x = cx
+        if cx > max_x:
+          max_x = cx
+        if cy < min_y:
+          min_y = cy
+        if cy > max_y:
+          max_y = cy
+
+        if cx > 0:
+          nx = cx - 1
+          ny = cy
+          ni = idx(nx, ny)
+          if visited[ni] == 0 and pixels[nx, ny] != 0:
+            visited[ni] = 1
+            queue.append((nx, ny))
+
+        if cx + 1 < width:
+          nx = cx + 1
+          ny = cy
+          ni = idx(nx, ny)
+          if visited[ni] == 0 and pixels[nx, ny] != 0:
+            visited[ni] = 1
+            queue.append((nx, ny))
+
+        if cy > 0:
+          nx = cx
+          ny = cy - 1
+          ni = idx(nx, ny)
+          if visited[ni] == 0 and pixels[nx, ny] != 0:
+            visited[ni] = 1
+            queue.append((nx, ny))
+
+        if cy + 1 < height:
+          nx = cx
+          ny = cy + 1
+          ni = idx(nx, ny)
+          if visited[ni] == 0 and pixels[nx, ny] != 0:
+            visited[ni] = 1
+            queue.append((nx, ny))
+
+      if area < min_area:
+        continue
+
+      components.append(
+        {
+          "x": min_x,
+          "y": min_y,
+          "w": (max_x - min_x) + 1,
+          "h": (max_y - min_y) + 1,
+          "area": area,
+        }
+      )
+
+  components.sort(key=lambda item: (item["y"], item["x"]))
+  return components
+
+
+def pack_components_as_strip(image, components, align):
+  if len(components) == 0:
+    return (
+      image.copy(),
+      {
+        "type": "single",
+        "frameWidth": image.width,
+        "frameHeight": image.height,
+        "frameCount": 1,
+        "exact": True,
+      },
+    )
+
+  frame_width = max(component["w"] for component in components)
+  frame_height = max(component["h"] for component in components)
+  frame_count = len(components)
+
+  packed = Image.new(
+    "RGBA",
+    (frame_width * frame_count, frame_height),
+    (0, 0, 0, 0),
+  )
+
+  for index, component in enumerate(components):
+    crop = image.crop(
+      (
+        component["x"],
+        component["y"],
+        component["x"] + component["w"],
+        component["y"] + component["h"],
+      )
+    )
+    frame_x = index * frame_width
+    target_x = frame_x + ((frame_width - crop.width) // 2)
+    if align == "bottom-center":
+      target_y = frame_height - crop.height
+    else:
+      target_y = (frame_height - crop.height) // 2
+
+    packed.paste(crop, (target_x, target_y))
+
+  packed_layout = {
+    "type": "strip",
+    "frameWidth": frame_width,
+    "frameHeight": frame_height,
+    "frameCount": frame_count,
+    "offsetX": 0,
+    "columns": frame_count,
+    "rows": 1,
+    "remainderX": 0,
+    "exact": True,
+  }
+
+  return packed, packed_layout
+
+
 def trim_command(args):
   source = Path(args.src)
   layout = json.loads(args.layout_json)
@@ -109,6 +258,15 @@ def trim_command(args):
       "remainderY": crop[3] % cell_height,
       "exact": (crop[2] % cell_width) == 0 and (crop[3] % cell_height) == 0,
     }
+  elif layout["type"] == "components":
+    min_area = int(layout.get("minArea", 1))
+    align = layout.get("align", "bottom-center")
+    if align not in ("center", "bottom-center"):
+      raise RuntimeError("Component layout align must be 'center' or 'bottom-center'.")
+    components = alpha_components(image, max(1, min_area))
+    trim_mode = "components"
+    crop = (0, 0, image.width, image.height)
+    trimmed, trimmed_layout = pack_components_as_strip(image, components, align)
   else:
     crop = alpha_trim_box(image)
     trim_mode = "alpha"
@@ -121,7 +279,7 @@ def trim_command(args):
     }
 
   x, y, w, h = crop
-  if layout["type"] != "strip":
+  if layout["type"] not in ("strip", "components"):
     trimmed = image.crop((x, y, x + w, y + h))
   normalize = parse_normalize_spec(layout.get("normalize"))
 

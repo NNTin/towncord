@@ -136,7 +136,7 @@ export class WorldScene extends Phaser.Scene {
     this.playCurrentAnimation();
   }
 
-  public update(): void {
+  public override update(): void {
     if (!this.wasd) return;
 
     let dir: InputDirection = this.currentDirection;

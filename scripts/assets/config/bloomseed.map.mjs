@@ -16,7 +16,7 @@
  * @property {string} parser
  * @property {string} atlas
  * @property {string[]} [tags]
- * @property {{ frameWidth?: number, frameHeight?: number, cellWidth?: number, cellHeight?: number, offsetX?: number, frameCountMode?: "floor" | "round" }} [defaults]
+ * @property {{ frameWidth?: number, frameHeight?: number, cellWidth?: number, cellHeight?: number, offsetX?: number, frameCountMode?: "floor" | "round", minArea?: number }} [defaults]
  * @property {{ frameWidth: number, frameHeight: number, anchor?: "center" | "bottom-center", trimAlpha?: boolean, offsetX?: number, offsetY?: number, centerOddX?: boolean }} [normalize]
  */
 
@@ -210,9 +210,10 @@ export const bloomseedConfig = {
       source: "Environment/Props/Animated/Chest",
       target: "props/bloomseed/animated/chest",
       kind: "prop",
-      parser: "single",
+      parser: "sheet",
       atlas: "props",
       tags: ["prop", "animated", "chest"],
+      defaults: { cellWidth: 16, cellHeight: 26 },
     },
     {
       source: "Environment/Props/Animated/Water_Props",
@@ -227,10 +228,10 @@ export const bloomseedConfig = {
       source: "Environment/Props/Static",
       target: "props/bloomseed/static",
       kind: "prop",
-      parser: "sheet",
+      parser: "components",
       atlas: "props",
       tags: ["prop", "static"],
-      defaults: { cellWidth: 16, cellHeight: 16 },
+      defaults: { minArea: 16 },
     },
     {
       source: "Equipment/Tools/Watering_Can",

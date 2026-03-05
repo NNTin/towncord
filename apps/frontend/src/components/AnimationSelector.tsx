@@ -55,6 +55,7 @@ function SectionLabel({ children }: { children: React.ReactNode }): JSX.Element 
 
 function getInitialState(catalog: AnimationCatalog): {
   entityType: EntityType;
+  playerFamily: string;
   mobFamily: string;
   mobId: string;
   propFamily: string;
@@ -74,6 +75,7 @@ function getInitialState(catalog: AnimationCatalog): {
 
   return {
     entityType: "player",
+    playerFamily: playerModel,
     mobFamily,
     mobId,
     propFamily,
@@ -84,10 +86,10 @@ function getInitialState(catalog: AnimationCatalog): {
 }
 
 export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
-  const playerModel = catalog.playerModels[0] ?? "female";
   const init = () => getInitialState(catalog);
 
   const [entityType, setEntityType] = useState<EntityType>(init().entityType);
+  const [playerFamily, setPlayerFamily] = useState(init().playerFamily);
   const [mobFamily, setMobFamily] = useState(init().mobFamily);
   const [mobId, setMobId] = useState(init().mobId);
   const [propFamily, setPropFamily] = useState(init().propFamily);
@@ -96,20 +98,45 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
   const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(init().equipmentId);
   const [material, setMaterial] = useState<Material>("iron");
 
-  function getCurrentPath(et: EntityType, mf: string, mi: string, pf: string, pg: string): string {
+  function resolvePropPath(family: string, group: string): string {
+    if (group) {
+      return `props/${family}/${group}`;
+    }
+    if (family === "static") {
+      return "props/static";
+    }
+    return `props/${family}`;
+  }
+
+  function getCurrentPath(
+    et: EntityType,
+    player: string,
+    mf: string,
+    mi: string,
+    pf: string,
+    pg: string,
+  ): string {
     switch (et) {
       case "player":
-        return `player/${playerModel}`;
+        return `player/${player}`;
       case "mobs":
         return `mobs/${mf}/${mi}`;
       case "props":
-        return pf === "static" ? "props/static" : `props/${pf}/${pg}`;
+        return resolvePropPath(pf, pg);
     }
   }
 
-  const currentPath = getCurrentPath(entityType, mobFamily, mobId, propFamily, propGroup);
+  const currentPath = getCurrentPath(
+    entityType,
+    playerFamily,
+    mobFamily,
+    mobId,
+    propFamily,
+    propGroup,
+  );
   const currentTracks = getTracksForPath(catalog, currentPath);
   const currentTrack = currentTracks.find((t) => t.id === selectedTrackId) ?? currentTracks[0] ?? null;
+  const propGroups = getPropGroups(catalog, propFamily);
 
   function emitTrack(track: AnimationTrack): void {
     gameRef.current?.events.emit("animationSelected", track);
@@ -160,8 +187,13 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
 
   function handleEntityType(et: EntityType): void {
     setEntityType(et);
-    const newPath = getCurrentPath(et, mobFamily, mobId, propFamily, propGroup);
+    const newPath = getCurrentPath(et, playerFamily, mobFamily, mobId, propFamily, propGroup);
     switchToPath(newPath);
+  }
+
+  function handlePlayerFamily(family: string): void {
+    setPlayerFamily(family);
+    switchToPath(`player/${family}`);
   }
 
   function handleMobFamily(family: string): void {
@@ -182,13 +214,13 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
     const newGroup = groups[0] ?? "";
     setPropFamily(family);
     setPropGroup(newGroup);
-    const newPath = family === "static" ? "props/static" : `props/${family}/${newGroup}`;
+    const newPath = resolvePropPath(family, newGroup);
     switchToPath(newPath);
   }
 
   function handlePropGroup(group: string): void {
     setPropGroup(group);
-    switchToPath(`props/${propFamily}/${group}`);
+    switchToPath(resolvePropPath(propFamily, group));
   }
 
   function handleSelectTrack(track: AnimationTrack): void {
@@ -254,6 +286,21 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
         </>
       )}
 
+      {entityType === "player" && (
+        <>
+          <SectionLabel>Family</SectionLabel>
+          {catalog.playerModels.map((family) => (
+            <button
+              key={family}
+              onClick={() => handlePlayerFamily(family)}
+              style={activeBtn(playerFamily === family)}
+            >
+              {family}
+            </button>
+          ))}
+        </>
+      )}
+
       {entityType === "props" && (
         <>
           <SectionLabel>Family</SectionLabel>
@@ -262,10 +309,10 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
               {f}
             </button>
           ))}
-          {propFamily !== "static" && getPropGroups(catalog, propFamily).length > 0 && (
+          {propGroups.length > 0 && (
             <>
               <SectionLabel>Group</SectionLabel>
-              {getPropGroups(catalog, propFamily).map((g) => (
+              {propGroups.map((g) => (
                 <button key={g} onClick={() => handlePropGroup(g)} style={activeBtn(propGroup === g)}>
                   {g}
                 </button>

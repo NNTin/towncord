@@ -202,6 +202,16 @@ function buildLayout(rule, png) {
     };
   }
 
+  if (rule.parser === "components") {
+    const minArea = Math.max(1, Number(rule.defaults?.minArea ?? 1));
+    return {
+      type: "components",
+      minArea,
+      exact: true,
+      normalize,
+    };
+  }
+
   return {
     type: "single",
     frameWidth: png.width,

@@ -21,7 +21,7 @@ export type AnimationCatalog = {
   playerModels: string[];
   mobFamilies: string[];
   propFamilies: string[];
-  /** key: path like "player/female", "mobs/animals/chicken", "props/animated/chest", "props/static" */
+  /** key: path like "player/female", "mobs/animals/chicken", "props/animated/chest", "props/static/barrels" */
   tracksByPath: Map<string, AnimationTrack[]>;
 };
 
@@ -133,10 +133,17 @@ function parsePropKeys(
     let variantId: string;
 
     if (family === "static") {
-      // props.bloomseed.static.<variant>
-      if (parts.length !== 4) continue;
-      path = "props/static";
-      variantId = parts[3]!;
+      // New shape: props.bloomseed.static.<group>.<variant>
+      // Legacy shape: props.bloomseed.static.<variant>
+      if (parts.length === 5) {
+        path = `props/static/${parts[3]!}`;
+        variantId = parts[4]!;
+      } else if (parts.length === 4) {
+        path = "props/static";
+        variantId = parts[3]!;
+      } else {
+        continue;
+      }
     } else {
       // props.bloomseed.<family>.<group>.<variant>
       if (parts.length !== 5) continue;
@@ -226,9 +233,8 @@ export function getMobIds(catalog: AnimationCatalog, family: string): string[] {
     .sort();
 }
 
-/** Returns prop groups under an animated family (empty array for "static"). */
+/** Returns prop groups under a prop family (e.g. "chest", "water", "barrels"). */
 export function getPropGroups(catalog: AnimationCatalog, family: string): string[] {
-  if (family === "static") return [];
   const prefix = `props/${family}/`;
   return [...catalog.tracksByPath.keys()]
     .filter((p) => p.startsWith(prefix))

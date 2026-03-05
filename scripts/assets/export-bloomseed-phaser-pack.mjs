@@ -190,19 +190,32 @@ function buildAnimationIndex(categoryManifests) {
     const atlasKey = `bloomseed.${manifest.category}`;
 
     for (const asset of manifest.assets) {
-      let frames = [];
+      if (isAggregatePropSheet(asset.id)) {
+        continue;
+      }
 
-      if (asset.layout?.type === "strip") {
-        frames = Array.from({ length: asset.layout.frameCount }, (_, index) => (
-          `${asset.id}#${index}`
-        ));
-      } else if (asset.layout?.type === "sheet") {
-        const frameCount = asset.layout.columns * asset.layout.rows;
-        frames = Array.from({ length: frameCount }, (_, index) => (
-          `${asset.id}#${index}`
-        ));
-      } else {
-        frames = [asset.id];
+      const frames = resolveAnimationFrames(asset);
+      if (frames.length === 0) {
+        continue;
+      }
+
+      if (asset.id.startsWith("props.bloomseed.static.")) {
+        const segments = asset.id.split(".");
+        const groupId = segments[3];
+        if (!groupId) {
+          continue;
+        }
+
+        const digits = Math.max(2, String(frames.length).length);
+        for (let index = 0; index < frames.length; index += 1) {
+          const variantId = `variant-${String(index + 1).padStart(digits, "0")}`;
+          const animationId = `props.bloomseed.static.${groupId}.${variantId}`;
+          animations[animationId] = {
+            atlasKey,
+            frames: [frames[index]],
+          };
+        }
+        continue;
       }
 
       animations[asset.id] = {
@@ -217,6 +230,32 @@ function buildAnimationIndex(categoryManifests) {
     namespace: "bloomseed",
     animations,
   };
+}
+
+function resolveAnimationFrames(asset) {
+  if (asset.layout?.type === "strip") {
+    return Array.from({ length: asset.layout.frameCount }, (_, index) => (
+      `${asset.id}#${index}`
+    ));
+  }
+
+  if (asset.layout?.type === "sheet") {
+    const frameCount = asset.layout.columns * asset.layout.rows;
+    return Array.from({ length: frameCount }, (_, index) => (
+      `${asset.id}#${index}`
+    ));
+  }
+
+  return [asset.id];
+}
+
+function isAggregatePropSheet(assetId) {
+  if (!assetId.startsWith("props.bloomseed.")) {
+    return false;
+  }
+
+  const lastSegment = assetId.split(".").pop() ?? "";
+  return lastSegment.startsWith("all-");
 }
 
 function buildPack(sourceManifest, atlasOutputs) {
