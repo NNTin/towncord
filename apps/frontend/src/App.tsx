@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type Phaser from "phaser";
 import { createGame } from "./game/phaser/createGame";
 import { AnimationSelector } from "./components/AnimationSelector";
-import { parseAnimationGroups, type AnimationGroups } from "./game/assets/animationGroups";
+import { buildAnimationCatalog, type AnimationCatalog } from "./game/assets/animationCatalog";
 
 function App(): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
-  const [animationGroups, setAnimationGroups] = useState<AnimationGroups>(new Map());
+  const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -17,7 +17,7 @@ function App(): JSX.Element {
     gameRef.current = game;
 
     game.events.once("bloomseedReady", (keys: string[]) => {
-      setAnimationGroups(parseAnimationGroups(keys));
+      setCatalog(buildAnimationCatalog(keys));
     });
 
     return () => {
@@ -29,9 +29,7 @@ function App(): JSX.Element {
   return (
     <main className="app">
       <div ref={containerRef} className="game-root" />
-      {animationGroups.size > 0 && (
-        <AnimationSelector gameRef={gameRef} animationGroups={animationGroups} />
-      )}
+      {catalog && <AnimationSelector gameRef={gameRef} catalog={catalog} />}
     </main>
   );
 }

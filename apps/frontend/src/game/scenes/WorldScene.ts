@@ -1,18 +1,15 @@
 import Phaser from "phaser";
 import { BLOOMSEED_ANIMATION_KEYS_REGISTRY_KEY } from "./PreloadScene";
 import {
-  type AnimationDirection,
-  type AnimationGroups,
+  type AnimationCatalog,
+  type AnimationTrack,
+  type InputDirection,
   type SpriteDirection,
-  parseAnimationGroups,
-  resolveAnimation,
-} from "../assets/animationGroups";
-import {
-  type EquipmentId,
-  type Material,
-  getCompatibleEquipment,
-  resolveEquipmentKey,
-} from "../assets/equipmentGroups";
+  buildAnimationCatalog,
+  getTracksForPath,
+  resolveTrackForDirection,
+} from "../assets/animationCatalog";
+import { type EquipmentId, type Material, resolveEquipmentKey } from "../assets/equipmentGroups";
 
 export const WORLD_SCENE_KEY = "world";
 
@@ -22,9 +19,9 @@ export class WorldScene extends Phaser.Scene {
   private sprite: Phaser.GameObjects.Sprite | null = null;
   private equipmentSprite: Phaser.GameObjects.Sprite | null = null;
   private animationLabel: Phaser.GameObjects.Text | null = null;
-  private animationGroups: AnimationGroups = new Map();
-  private currentBaseType = "";
-  private currentDirection: AnimationDirection = "right";
+  private catalog: AnimationCatalog | null = null;
+  private currentTrack: AnimationTrack | null = null;
+  private currentDirection: InputDirection = "right";
   private currentEquipmentId: EquipmentId | "" = "";
   private currentMaterial: Material = "iron";
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
@@ -61,12 +58,14 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    this.animationGroups = parseAnimationGroups(animationKeys);
+    this.catalog = buildAnimationCatalog(animationKeys);
 
-    const sortedBaseTypes = [...this.animationGroups.keys()].sort();
-    this.currentBaseType = sortedBaseTypes.includes("run") ? "run" : (sortedBaseTypes[0] ?? "");
+    // Find initial default track: player/female/run, or first available
+    const playerModel = this.catalog.playerModels[0] ?? "female";
+    const playerTracks = getTracksForPath(this.catalog, `player/${playerModel}`);
+    this.currentTrack = playerTracks.find((t) => t.id === "run") ?? playerTracks[0] ?? null;
 
-    if (!this.currentBaseType) {
+    if (!this.currentTrack) {
       this.add
         .text(width / 2, height / 2, "No playable animation keys found.", {
           color: "#f8fafc",
@@ -77,7 +76,7 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    const result = resolveAnimation(this.animationGroups, this.currentBaseType, this.currentDirection);
+    const result = resolveTrackForDirection(this.currentTrack, this.currentDirection);
     if (!result) {
       this.add
         .text(width / 2, height / 2, "Could not resolve animation frames.", {
@@ -140,7 +139,7 @@ export class WorldScene extends Phaser.Scene {
   public update(): void {
     if (!this.wasd) return;
 
-    let dir: AnimationDirection = this.currentDirection;
+    let dir: InputDirection = this.currentDirection;
     if (this.wasd.W.isDown) dir = "up";
     else if (this.wasd.S.isDown) dir = "down";
     else if (this.wasd.D.isDown) dir = "right";
@@ -153,9 +152,9 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private playCurrentAnimation(): void {
-    if (!this.sprite) return;
+    if (!this.sprite || !this.currentTrack) return;
 
-    const result = resolveAnimation(this.animationGroups, this.currentBaseType, this.currentDirection);
+    const result = resolveTrackForDirection(this.currentTrack, this.currentDirection);
     if (!result) return;
     const { key, flipX } = result;
 
@@ -164,8 +163,10 @@ export class WorldScene extends Phaser.Scene {
 
     // Equipment overlay
     const spriteDir: SpriteDirection =
-      this.currentDirection === "left" || this.currentDirection === "right" ? "side" : this.currentDirection;
-    const compatible = getCompatibleEquipment(this.currentBaseType);
+      this.currentDirection === "left" || this.currentDirection === "right"
+        ? "side"
+        : this.currentDirection;
+    const compatible = this.currentTrack.equipmentCompatible;
 
     if (
       this.equipmentSprite &&
@@ -187,8 +188,8 @@ export class WorldScene extends Phaser.Scene {
     this.animationLabel?.setText(`Playing: ${key}${flipX ? " (flipped)" : ""}`);
   }
 
-  private onAnimationSelected(baseType: string): void {
-    this.currentBaseType = baseType;
+  private onAnimationSelected(track: AnimationTrack): void {
+    this.currentTrack = track;
     this.playCurrentAnimation();
   }
 

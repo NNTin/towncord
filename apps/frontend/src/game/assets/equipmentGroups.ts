@@ -1,4 +1,4 @@
-import type { SpriteDirection } from "./animationGroups";
+import type { SpriteDirection } from "./animationCatalog";
 
 export type EquipmentId =
   | "axe"
