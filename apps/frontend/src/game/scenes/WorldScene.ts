@@ -10,6 +10,11 @@ import {
   resolveTrackForDirection,
 } from "../assets/animationCatalog";
 import { type EquipmentId, type Material, resolveEquipmentKey } from "../assets/equipmentGroups";
+import {
+  ANIMATION_DISPLAY_INFO_EVENT,
+  ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
+  type AnimationDisplayInfo,
+} from "../events";
 
 export const WORLD_SCENE_KEY = "world";
 
@@ -124,11 +129,17 @@ export class WorldScene extends Phaser.Scene {
 
     this.game.events.on("animationSelected", this.onAnimationSelected, this);
     this.game.events.on("equipmentSelected", this.onEquipmentSelected, this);
+    this.game.events.on(ANIMATION_DISPLAY_INFO_REQUEST_EVENT, this.onAnimationDisplayInfoRequest, this);
     this.events.once(
       "shutdown",
       () => {
         this.game.events.off("animationSelected", this.onAnimationSelected, this);
         this.game.events.off("equipmentSelected", this.onEquipmentSelected, this);
+        this.game.events.off(
+          ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
+          this.onAnimationDisplayInfoRequest,
+          this,
+        );
       },
       this,
     );
@@ -186,6 +197,7 @@ export class WorldScene extends Phaser.Scene {
     }
 
     this.animationLabel?.setText(`Playing: ${key}${flipX ? " (flipped)" : ""}`);
+    this.emitAnimationDisplayInfo(key, flipX);
   }
 
   private onAnimationSelected(track: AnimationTrack): void {
@@ -197,5 +209,52 @@ export class WorldScene extends Phaser.Scene {
     this.currentEquipmentId = payload.equipmentId;
     this.currentMaterial = payload.material;
     this.playCurrentAnimation();
+  }
+
+  private onAnimationDisplayInfoRequest(): void {
+    if (!this.currentTrack) {
+      return;
+    }
+
+    const resolved = resolveTrackForDirection(this.currentTrack, this.currentDirection);
+    if (!resolved) {
+      return;
+    }
+
+    this.emitAnimationDisplayInfo(resolved.key, resolved.flipX);
+  }
+
+  private emitAnimationDisplayInfo(animationKey: string, flipX: boolean): void {
+    if (!this.sprite) {
+      return;
+    }
+
+    const animation = this.anims.get(animationKey);
+    const firstFrame = animation?.frames[0];
+    if (!animation || !firstFrame) {
+      return;
+    }
+
+    const texture = this.textures.get(firstFrame.textureKey);
+    const frame = texture.get(firstFrame.textureFrame);
+    if (!frame) {
+      return;
+    }
+
+    const frameWidth = frame.width;
+    const frameHeight = frame.height;
+    const scale = this.sprite.scaleX;
+    const payload: AnimationDisplayInfo = {
+      animationKey,
+      frameWidth,
+      frameHeight,
+      frameCount: animation.frames.length,
+      flipX,
+      scale,
+      displayWidth: Math.round(Math.abs(this.sprite.scaleX) * frameWidth),
+      displayHeight: Math.round(Math.abs(this.sprite.scaleY) * frameHeight),
+    };
+
+    this.game.events.emit(ANIMATION_DISPLAY_INFO_EVENT, payload);
   }
 }

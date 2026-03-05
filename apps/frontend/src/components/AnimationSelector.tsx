@@ -9,6 +9,11 @@ import {
   getTracksForPath,
 } from "../game/assets/animationCatalog";
 import { type EquipmentId, type Material, MATERIALS } from "../game/assets/equipmentGroups";
+import {
+  ANIMATION_DISPLAY_INFO_EVENT,
+  ANIMATION_DISPLAY_INFO_REQUEST_EVENT,
+  type AnimationDisplayInfo,
+} from "../game/events";
 
 type Props = {
   gameRef: React.RefObject<Phaser.Game | null>;
@@ -97,6 +102,7 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
   const [selectedTrackId, setSelectedTrackId] = useState(init().trackId);
   const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(init().equipmentId);
   const [material, setMaterial] = useState<Material>("iron");
+  const [displayedAnimation, setDisplayedAnimation] = useState<AnimationDisplayInfo | null>(null);
 
   function resolvePropPath(family: string, group: string): string {
     if (group) {
@@ -165,6 +171,24 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const game = gameRef.current;
+    if (!game) {
+      return;
+    }
+
+    const handleDisplayInfo = (payload: AnimationDisplayInfo): void => {
+      setDisplayedAnimation(payload);
+    };
+
+    game.events.on(ANIMATION_DISPLAY_INFO_EVENT, handleDisplayInfo);
+    game.events.emit(ANIMATION_DISPLAY_INFO_REQUEST_EVENT);
+
+    return () => {
+      game.events.off(ANIMATION_DISPLAY_INFO_EVENT, handleDisplayInfo);
+    };
+  }, [gameRef]);
 
   function switchToPath(
     newPath: string,
@@ -332,6 +356,30 @@ export function AnimationSelector({ gameRef, catalog }: Props): JSX.Element {
           {track.label}
         </button>
       ))}
+
+      <SectionLabel>Displayed</SectionLabel>
+      <div
+        style={{
+          color: "#cbd5e1",
+          fontSize: 11,
+          lineHeight: 1.5,
+          wordBreak: "break-word",
+          background: "rgba(15, 23, 42, 0.5)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 4,
+          padding: "6px 7px",
+        }}
+      >
+        <div>Key: {displayedAnimation?.animationKey ?? "-"}</div>
+        <div>
+          Frame: {displayedAnimation ? `${displayedAnimation.frameWidth} x ${displayedAnimation.frameHeight}` : "-"}
+        </div>
+        <div>Frames: {displayedAnimation?.frameCount ?? "-"}</div>
+        <div>
+          Display:{" "}
+          {displayedAnimation ? `${displayedAnimation.displayWidth} x ${displayedAnimation.displayHeight}` : "-"}
+        </div>
+      </div>
 
       {compatible.length > 0 && (
         <>
