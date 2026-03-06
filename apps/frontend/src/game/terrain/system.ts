@@ -47,18 +47,21 @@ export class TerrainSystem {
 
   public update(): void {
     if (this.pendingDrops.length > 0) {
-      for (const pending of this.pendingDrops) {
-        const op = this.router.toEditOp(pending.payload, pending.worldX, pending.worldY);
-        try {
-          this.store.applyEditOp(op);
-        } catch (error) {
-          if (import.meta.env.DEV) {
-            throw error;
+      try {
+        for (const pending of this.pendingDrops) {
+          const op = this.router.toEditOp(pending.payload, pending.worldX, pending.worldY);
+          try {
+            this.store.applyEditOp(op);
+          } catch (error) {
+            if (import.meta.env.DEV) {
+              throw error;
+            }
+            console.error(error);
           }
-          console.error(error);
         }
+      } finally {
+        this.pendingDrops.length = 0;
       }
-      this.pendingDrops.length = 0;
     }
 
     if (!this.store.hasDirtyChunks()) return;

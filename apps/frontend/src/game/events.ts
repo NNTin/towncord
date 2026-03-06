@@ -22,12 +22,9 @@ export type PlaceTerrainDragPayload = {
 
 export type PlaceDragPayload = PlaceEntityDragPayload | PlaceTerrainDragPayload;
 
-export type LegacyPlaceDragPayload = {
-  entityId: EntityId;
-};
 
 export type PlaceEntityDropPayload = PlaceEntityDragPayload & {
-  entityId: EntityId;
+
   screenX: number;
   screenY: number;
 };
