@@ -16,7 +16,17 @@ export function SidebarAccordion({ catalog, placeables }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
 
   function handleDragStart(e: React.DragEvent, placeable: PlaceableViewModel): void {
-    const payload: PlaceDragPayload = { entityId: placeable.entityId };
+    const payload: PlaceDragPayload =
+      placeable.type === "entity"
+        ? {
+            type: "entity",
+            entityId: placeable.entityId,
+          }
+        : {
+            type: "terrain",
+            materialId: placeable.materialId,
+            brushId: placeable.brushId,
+          };
     e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
   }

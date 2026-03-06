@@ -1,0 +1,75 @@
+{
+  "transitions": [
+    {
+      "id": "phase1-water-over-ground",
+      "insideMaterial": "water",
+      "outsideMaterial": "ground",
+      "rules": [
+        {
+          "caseId": 0,
+          "frame": "tilesets.bloomseed.environment.all-tileset#0"
+        },
+        {
+          "caseId": 1,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 2,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 3,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 4,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 5,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 6,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 7,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 8,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 9,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 10,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 11,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 12,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 13,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 14,
+          "frame": "tilesets.bloomseed.environment.all-tileset#2"
+        },
+        {
+          "caseId": 15,
+          "frame": "tilesets.bloomseed.environment.all-tileset#1"
+        }
+      ]
+    }
+  ]
+}

@@ -8,24 +8,24 @@ type Props = {
 };
 
 type PlaceableGroup = {
-  kind: PlaceableViewModel["kind"];
+  key: string;
   label: string;
   placeables: PlaceableViewModel[];
 };
 
 function groupPlaceablesByKind(placeables: PlaceableViewModel[]): PlaceableGroup[] {
-  const byKind = new Map<PlaceableViewModel["kind"], PlaceableGroup>();
+  const byKind = new Map<string, PlaceableGroup>();
 
   for (const placeable of placeables) {
-    if (!byKind.has(placeable.kind)) {
-      byKind.set(placeable.kind, {
-        kind: placeable.kind,
+    if (!byKind.has(placeable.groupKey)) {
+      byKind.set(placeable.groupKey, {
+        key: placeable.groupKey,
         label: placeable.groupLabel,
         placeables: [],
       });
     }
 
-    byKind.get(placeable.kind)!.placeables.push(placeable);
+    byKind.get(placeable.groupKey)!.placeables.push(placeable);
   }
 
   return [...byKind.values()];
@@ -72,16 +72,16 @@ export function PlaceablesPanel({
       </div>
 
       {groups.map((group) => {
-        const open = openByKind[group.kind] ?? true;
+        const open = openByKind[group.key] ?? true;
         return (
-          <div key={group.kind}>
+          <div key={group.key}>
             <AccordionHeader
               label={group.label}
               open={open}
               onToggle={() =>
                 setOpenByKind((current) => ({
                   ...current,
-                  [group.kind]: !(current[group.kind] ?? true),
+                  [group.key]: !(current[group.key] ?? true),
                 }))
               }
             />
@@ -89,7 +89,7 @@ export function PlaceablesPanel({
               <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
                 {group.placeables.map((placeable) => (
                   <DraggableEntry
-                    key={placeable.entityId}
+                    key={placeable.id}
                     label={placeable.label}
                     onDragStart={(e) => onDragStart(e, placeable)}
                   />

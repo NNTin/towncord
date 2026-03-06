@@ -8,12 +8,15 @@ import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper"
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
+  PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
   type PlaceObjectDropPayload,
+  type PlaceTerrainDropPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
 } from "../events";
+import { TerrainSystem } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import { createWorldEntity } from "./world/entityFactory";
 import { updateEntityMovement } from "./world/movementSystem";
@@ -35,6 +38,7 @@ export class WorldScene extends Phaser.Scene {
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
+  private terrainSystem: TerrainSystem | null = null;
   private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
@@ -70,13 +74,18 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerup", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
 
+    this.terrainSystem = new TerrainSystem(this);
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+    this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.events.once(
       "shutdown",
       () => {
+        this.terrainSystem?.destroy();
+        this.terrainSystem = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+        this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
         this.input.off("pointerup", this.onPointerUp, this);
@@ -89,6 +98,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
+    this.terrainSystem?.update();
+
     if (!this.selectedEntity || !this.wasd || !this.shiftKey || !this.catalog) {
       return;
     }
@@ -181,6 +192,12 @@ export class WorldScene extends Phaser.Scene {
       const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
       this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
     }
+  }
+
+  private onPlaceTerrainDrop(payload: PlaceTerrainDropPayload): void {
+    if (!this.terrainSystem) return;
+    const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
+    this.terrainSystem.queueDrop(payload, worldPoint.x, worldPoint.y);
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
