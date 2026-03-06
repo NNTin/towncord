@@ -1,9 +1,9 @@
 {
   "meta": {
-    "generatedAt": "2026-03-05T16:27:14.232Z",
-    "generator": "scripts/assets/export-bloomseed-phaser-pack.mjs",
+    "generatedAt": "2026-03-06T21:22:44.394900+00:00",
+    "generator": "packages/bloomseed-assets/pipeline/export_from_aseprite.py",
     "namespace": "bloomseed",
-    "sourceManifest": "assets/sprites/manifest.json",
+    "sourceRoot": "packages/bloomseed-assets/aseprite",
     "publicRoot": "apps/frontend/public/assets/bloomseed",
     "format": "phaser-asset-pack"
   },

@@ -7,16 +7,12 @@
     "packages/*"
   ],
   "scripts": {
-    "assets:bloomseed:extract": "node scripts/assets/extract-bloomseed-sprites.mjs",
-    "assets:bloomseed:extract:dry": "node scripts/assets/extract-bloomseed-sprites.mjs --dry-run",
-    "assets:bloomseed:phaser": "node scripts/assets/export-bloomseed-phaser-pack.mjs",
-    "assets:bloomseed:phaser:dry": "node scripts/assets/export-bloomseed-phaser-pack.mjs --dry-run",
-    "assets:bloomseed:debug": "node scripts/assets/generate-bloomseed-debug-gifs.mjs",
-    "assets:bloomseed:debug:dry": "node scripts/assets/generate-bloomseed-debug-gifs.mjs --dry-run",
-    "assets:bloomseed": "npm run assets:bloomseed:extract && npm run assets:bloomseed:phaser && npm run assets:bloomseed:debug",
     "dev:frontend": "npm run -w @towncord/frontend dev",
     "build:frontend": "npm run -w @towncord/frontend build",
     "typecheck:frontend": "npm run -w @towncord/frontend typecheck",
+    "assets:bloomseed:dry": "npm run -w @towncord/bloomseed-assets export:dry",
+    "assets:bloomseed:public": "npm run -w @towncord/bloomseed-assets export:public",
+    "assets:bloomseed:all": "npm run -w @towncord/bloomseed-assets export:all",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
     "test": "echo \"Define workspace tests\""

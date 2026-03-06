@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-05T16:27:14.231Z",
+  "generatedAt": "2026-03-06T21:22:44.395262+00:00",
   "namespace": "bloomseed",
   "animations": {
     "characters.bloomseed.player.female.carry.carry-idle-down": {
@@ -1278,6 +1278,76 @@
         "mobs.bloomseed.enemies.slime.slime-leap#9"
       ]
     },
+    "props.bloomseed.animated.chest.all-chest": {
+      "atlasKey": "bloomseed.props",
+      "frames": [
+        "props.bloomseed.animated.chest.all-chest#0",
+        "props.bloomseed.animated.chest.all-chest#1",
+        "props.bloomseed.animated.chest.all-chest#2",
+        "props.bloomseed.animated.chest.all-chest#3",
+        "props.bloomseed.animated.chest.all-chest#4",
+        "props.bloomseed.animated.chest.all-chest#5",
+        "props.bloomseed.animated.chest.all-chest#6",
+        "props.bloomseed.animated.chest.all-chest#7",
+        "props.bloomseed.animated.chest.all-chest#8",
+        "props.bloomseed.animated.chest.all-chest#9",
+        "props.bloomseed.animated.chest.all-chest#10",
+        "props.bloomseed.animated.chest.all-chest#11",
+        "props.bloomseed.animated.chest.all-chest#12",
+        "props.bloomseed.animated.chest.all-chest#13",
+        "props.bloomseed.animated.chest.all-chest#14",
+        "props.bloomseed.animated.chest.all-chest#15",
+        "props.bloomseed.animated.chest.all-chest#16",
+        "props.bloomseed.animated.chest.all-chest#17",
+        "props.bloomseed.animated.chest.all-chest#18",
+        "props.bloomseed.animated.chest.all-chest#19",
+        "props.bloomseed.animated.chest.all-chest#20",
+        "props.bloomseed.animated.chest.all-chest#21",
+        "props.bloomseed.animated.chest.all-chest#22",
+        "props.bloomseed.animated.chest.all-chest#23",
+        "props.bloomseed.animated.chest.all-chest#24",
+        "props.bloomseed.animated.chest.all-chest#25",
+        "props.bloomseed.animated.chest.all-chest#26",
+        "props.bloomseed.animated.chest.all-chest#27",
+        "props.bloomseed.animated.chest.all-chest#28",
+        "props.bloomseed.animated.chest.all-chest#29",
+        "props.bloomseed.animated.chest.all-chest#30",
+        "props.bloomseed.animated.chest.all-chest#31",
+        "props.bloomseed.animated.chest.all-chest#32",
+        "props.bloomseed.animated.chest.all-chest#33",
+        "props.bloomseed.animated.chest.all-chest#34",
+        "props.bloomseed.animated.chest.all-chest#35",
+        "props.bloomseed.animated.chest.all-chest#36",
+        "props.bloomseed.animated.chest.all-chest#37",
+        "props.bloomseed.animated.chest.all-chest#38",
+        "props.bloomseed.animated.chest.all-chest#39",
+        "props.bloomseed.animated.chest.all-chest#40",
+        "props.bloomseed.animated.chest.all-chest#41",
+        "props.bloomseed.animated.chest.all-chest#42",
+        "props.bloomseed.animated.chest.all-chest#43",
+        "props.bloomseed.animated.chest.all-chest#44",
+        "props.bloomseed.animated.chest.all-chest#45",
+        "props.bloomseed.animated.chest.all-chest#46",
+        "props.bloomseed.animated.chest.all-chest#47",
+        "props.bloomseed.animated.chest.all-chest#48",
+        "props.bloomseed.animated.chest.all-chest#49",
+        "props.bloomseed.animated.chest.all-chest#50",
+        "props.bloomseed.animated.chest.all-chest#51",
+        "props.bloomseed.animated.chest.all-chest#52",
+        "props.bloomseed.animated.chest.all-chest#53",
+        "props.bloomseed.animated.chest.all-chest#54",
+        "props.bloomseed.animated.chest.all-chest#55",
+        "props.bloomseed.animated.chest.all-chest#56",
+        "props.bloomseed.animated.chest.all-chest#57",
+        "props.bloomseed.animated.chest.all-chest#58",
+        "props.bloomseed.animated.chest.all-chest#59",
+        "props.bloomseed.animated.chest.all-chest#60",
+        "props.bloomseed.animated.chest.all-chest#61",
+        "props.bloomseed.animated.chest.all-chest#62",
+        "props.bloomseed.animated.chest.all-chest#63",
+        "props.bloomseed.animated.chest.all-chest#64"
+      ]
+    },
     "props.bloomseed.animated.chest.black-chest": {
       "atlasKey": "bloomseed.props",
       "frames": [
@@ -1398,6 +1468,23 @@
         "props.bloomseed.animated.chest.wood-chest#4"
       ]
     },
+    "props.bloomseed.animated.water.all-water-props": {
+      "atlasKey": "bloomseed.props",
+      "frames": [
+        "props.bloomseed.animated.water.all-water-props#0",
+        "props.bloomseed.animated.water.all-water-props#1",
+        "props.bloomseed.animated.water.all-water-props#2",
+        "props.bloomseed.animated.water.all-water-props#3",
+        "props.bloomseed.animated.water.all-water-props#4",
+        "props.bloomseed.animated.water.all-water-props#5",
+        "props.bloomseed.animated.water.all-water-props#6",
+        "props.bloomseed.animated.water.all-water-props#7",
+        "props.bloomseed.animated.water.all-water-props#8",
+        "props.bloomseed.animated.water.all-water-props#9",
+        "props.bloomseed.animated.water.all-water-props#10",
+        "props.bloomseed.animated.water.all-water-props#11"
+      ]
+    },
     "props.bloomseed.animated.water.lily-pad": {
       "atlasKey": "bloomseed.props",
       "frames": [
@@ -1430,501 +1517,229 @@
         "props.bloomseed.animated.water.water-rocks#5"
       ]
     },
-    "props.bloomseed.static.barrels.variant-01": {
+    "props.bloomseed.static.all-props": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.barrels#0"
+        "props.bloomseed.static.all-props#0",
+        "props.bloomseed.static.all-props#1",
+        "props.bloomseed.static.all-props#2",
+        "props.bloomseed.static.all-props#3",
+        "props.bloomseed.static.all-props#4",
+        "props.bloomseed.static.all-props#5",
+        "props.bloomseed.static.all-props#6",
+        "props.bloomseed.static.all-props#7",
+        "props.bloomseed.static.all-props#8",
+        "props.bloomseed.static.all-props#9",
+        "props.bloomseed.static.all-props#10",
+        "props.bloomseed.static.all-props#11",
+        "props.bloomseed.static.all-props#12",
+        "props.bloomseed.static.all-props#13",
+        "props.bloomseed.static.all-props#14",
+        "props.bloomseed.static.all-props#15",
+        "props.bloomseed.static.all-props#16",
+        "props.bloomseed.static.all-props#17",
+        "props.bloomseed.static.all-props#18",
+        "props.bloomseed.static.all-props#19",
+        "props.bloomseed.static.all-props#20",
+        "props.bloomseed.static.all-props#21",
+        "props.bloomseed.static.all-props#22",
+        "props.bloomseed.static.all-props#23",
+        "props.bloomseed.static.all-props#24",
+        "props.bloomseed.static.all-props#25",
+        "props.bloomseed.static.all-props#26",
+        "props.bloomseed.static.all-props#27",
+        "props.bloomseed.static.all-props#28",
+        "props.bloomseed.static.all-props#29",
+        "props.bloomseed.static.all-props#30",
+        "props.bloomseed.static.all-props#31",
+        "props.bloomseed.static.all-props#32",
+        "props.bloomseed.static.all-props#33",
+        "props.bloomseed.static.all-props#34",
+        "props.bloomseed.static.all-props#35",
+        "props.bloomseed.static.all-props#36",
+        "props.bloomseed.static.all-props#37",
+        "props.bloomseed.static.all-props#38",
+        "props.bloomseed.static.all-props#39",
+        "props.bloomseed.static.all-props#40",
+        "props.bloomseed.static.all-props#41",
+        "props.bloomseed.static.all-props#42",
+        "props.bloomseed.static.all-props#43",
+        "props.bloomseed.static.all-props#44",
+        "props.bloomseed.static.all-props#45",
+        "props.bloomseed.static.all-props#46",
+        "props.bloomseed.static.all-props#47",
+        "props.bloomseed.static.all-props#48",
+        "props.bloomseed.static.all-props#49",
+        "props.bloomseed.static.all-props#50",
+        "props.bloomseed.static.all-props#51",
+        "props.bloomseed.static.all-props#52",
+        "props.bloomseed.static.all-props#53",
+        "props.bloomseed.static.all-props#54",
+        "props.bloomseed.static.all-props#55",
+        "props.bloomseed.static.all-props#56",
+        "props.bloomseed.static.all-props#57",
+        "props.bloomseed.static.all-props#58",
+        "props.bloomseed.static.all-props#59",
+        "props.bloomseed.static.all-props#60",
+        "props.bloomseed.static.all-props#61",
+        "props.bloomseed.static.all-props#62",
+        "props.bloomseed.static.all-props#63",
+        "props.bloomseed.static.all-props#64",
+        "props.bloomseed.static.all-props#65",
+        "props.bloomseed.static.all-props#66",
+        "props.bloomseed.static.all-props#67",
+        "props.bloomseed.static.all-props#68",
+        "props.bloomseed.static.all-props#69",
+        "props.bloomseed.static.all-props#70",
+        "props.bloomseed.static.all-props#71",
+        "props.bloomseed.static.all-props#72",
+        "props.bloomseed.static.all-props#73",
+        "props.bloomseed.static.all-props#74",
+        "props.bloomseed.static.all-props#75",
+        "props.bloomseed.static.all-props#76",
+        "props.bloomseed.static.all-props#77",
+        "props.bloomseed.static.all-props#78",
+        "props.bloomseed.static.all-props#79",
+        "props.bloomseed.static.all-props#80",
+        "props.bloomseed.static.all-props#81",
+        "props.bloomseed.static.all-props#82"
       ]
     },
-    "props.bloomseed.static.barrels.variant-02": {
+    "props.bloomseed.static.barrels": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.barrels#1"
-      ]
-    },
-    "props.bloomseed.static.barrels.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.barrels#2"
-      ]
-    },
-    "props.bloomseed.static.barrels.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.barrels#3"
-      ]
-    },
-    "props.bloomseed.static.barrels.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.barrels#0",
+        "props.bloomseed.static.barrels#1",
+        "props.bloomseed.static.barrels#2",
+        "props.bloomseed.static.barrels#3",
         "props.bloomseed.static.barrels#4"
       ]
     },
-    "props.bloomseed.static.beds.variant-01": {
+    "props.bloomseed.static.beds": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.beds#0"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#1"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#2"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#3"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#4"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#5"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-07": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#6"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-08": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#7"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-09": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.beds#8"
-      ]
-    },
-    "props.bloomseed.static.beds.variant-10": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.beds#0",
+        "props.bloomseed.static.beds#1",
+        "props.bloomseed.static.beds#2",
+        "props.bloomseed.static.beds#3",
+        "props.bloomseed.static.beds#4",
+        "props.bloomseed.static.beds#5",
+        "props.bloomseed.static.beds#6",
+        "props.bloomseed.static.beds#7",
+        "props.bloomseed.static.beds#8",
         "props.bloomseed.static.beds#9"
       ]
     },
-    "props.bloomseed.static.bushes.variant-01": {
+    "props.bloomseed.static.bushes": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.bushes#0"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#1"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#2"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#3"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#4"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#5"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-07": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#6"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-08": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.bushes#7"
-      ]
-    },
-    "props.bloomseed.static.bushes.variant-09": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.bushes#0",
+        "props.bloomseed.static.bushes#1",
+        "props.bloomseed.static.bushes#2",
+        "props.bloomseed.static.bushes#3",
+        "props.bloomseed.static.bushes#4",
+        "props.bloomseed.static.bushes#5",
+        "props.bloomseed.static.bushes#6",
+        "props.bloomseed.static.bushes#7",
         "props.bloomseed.static.bushes#8"
       ]
     },
-    "props.bloomseed.static.chairs.variant-01": {
+    "props.bloomseed.static.chairs": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.chairs#0"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#1"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#2"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#3"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#4"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#5"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-07": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#6"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-08": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#7"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-09": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#8"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-10": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#9"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-11": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.chairs#10"
-      ]
-    },
-    "props.bloomseed.static.chairs.variant-12": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.chairs#0",
+        "props.bloomseed.static.chairs#1",
+        "props.bloomseed.static.chairs#2",
+        "props.bloomseed.static.chairs#3",
+        "props.bloomseed.static.chairs#4",
+        "props.bloomseed.static.chairs#5",
+        "props.bloomseed.static.chairs#6",
+        "props.bloomseed.static.chairs#7",
+        "props.bloomseed.static.chairs#8",
+        "props.bloomseed.static.chairs#9",
+        "props.bloomseed.static.chairs#10",
         "props.bloomseed.static.chairs#11"
       ]
     },
-    "props.bloomseed.static.crates.variant-01": {
+    "props.bloomseed.static.crates": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.crates#0"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#1"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#2"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#3"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#4"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#5"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-07": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#6"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-08": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#7"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-09": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#8"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-10": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#9"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-11": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#10"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-12": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#11"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-13": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#12"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-14": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#13"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-15": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#14"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-16": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#15"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-17": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#16"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-18": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#17"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-19": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#18"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-20": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#19"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-21": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#20"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-22": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#21"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-23": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.crates#22"
-      ]
-    },
-    "props.bloomseed.static.crates.variant-24": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.crates#0",
+        "props.bloomseed.static.crates#1",
+        "props.bloomseed.static.crates#2",
+        "props.bloomseed.static.crates#3",
+        "props.bloomseed.static.crates#4",
+        "props.bloomseed.static.crates#5",
+        "props.bloomseed.static.crates#6",
+        "props.bloomseed.static.crates#7",
+        "props.bloomseed.static.crates#8",
+        "props.bloomseed.static.crates#9",
+        "props.bloomseed.static.crates#10",
+        "props.bloomseed.static.crates#11",
+        "props.bloomseed.static.crates#12",
+        "props.bloomseed.static.crates#13",
+        "props.bloomseed.static.crates#14",
+        "props.bloomseed.static.crates#15",
+        "props.bloomseed.static.crates#16",
+        "props.bloomseed.static.crates#17",
+        "props.bloomseed.static.crates#18",
+        "props.bloomseed.static.crates#19",
+        "props.bloomseed.static.crates#20",
+        "props.bloomseed.static.crates#21",
+        "props.bloomseed.static.crates#22",
         "props.bloomseed.static.crates#23"
       ]
     },
-    "props.bloomseed.static.fences.variant-01": {
+    "props.bloomseed.static.fences": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.fences#0"
-      ]
-    },
-    "props.bloomseed.static.fences.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.fences#1"
-      ]
-    },
-    "props.bloomseed.static.fences.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.fences#0",
+        "props.bloomseed.static.fences#1",
         "props.bloomseed.static.fences#2"
       ]
     },
-    "props.bloomseed.static.rocks.variant-01": {
+    "props.bloomseed.static.rocks": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.rocks#0"
-      ]
-    },
-    "props.bloomseed.static.rocks.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.rocks#1"
-      ]
-    },
-    "props.bloomseed.static.rocks.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.rocks#2"
-      ]
-    },
-    "props.bloomseed.static.rocks.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.rocks#3"
-      ]
-    },
-    "props.bloomseed.static.rocks.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.rocks#4"
-      ]
-    },
-    "props.bloomseed.static.rocks.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.rocks#0",
+        "props.bloomseed.static.rocks#1",
+        "props.bloomseed.static.rocks#2",
+        "props.bloomseed.static.rocks#3",
+        "props.bloomseed.static.rocks#4",
         "props.bloomseed.static.rocks#5"
       ]
     },
-    "props.bloomseed.static.stumps.variant-01": {
+    "props.bloomseed.static.stumps": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.stumps#0"
-      ]
-    },
-    "props.bloomseed.static.stumps.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.stumps#0",
         "props.bloomseed.static.stumps#1"
       ]
     },
-    "props.bloomseed.static.tables.variant-01": {
+    "props.bloomseed.static.tables": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.tables#0"
-      ]
-    },
-    "props.bloomseed.static.tables.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.tables#1"
-      ]
-    },
-    "props.bloomseed.static.tables.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.tables#2"
-      ]
-    },
-    "props.bloomseed.static.tables.variant-04": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.tables#3"
-      ]
-    },
-    "props.bloomseed.static.tables.variant-05": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.tables#4"
-      ]
-    },
-    "props.bloomseed.static.tables.variant-06": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.tables#0",
+        "props.bloomseed.static.tables#1",
+        "props.bloomseed.static.tables#2",
+        "props.bloomseed.static.tables#3",
+        "props.bloomseed.static.tables#4",
         "props.bloomseed.static.tables#5"
       ]
     },
-    "props.bloomseed.static.trees.variant-01": {
+    "props.bloomseed.static.trees": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.trees#0"
-      ]
-    },
-    "props.bloomseed.static.trees.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.trees#1"
-      ]
-    },
-    "props.bloomseed.static.trees.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.trees#0",
+        "props.bloomseed.static.trees#1",
         "props.bloomseed.static.trees#2"
       ]
     },
-    "props.bloomseed.static.wood.variant-01": {
+    "props.bloomseed.static.wood": {
       "atlasKey": "bloomseed.props",
       "frames": [
-        "props.bloomseed.static.wood#0"
-      ]
-    },
-    "props.bloomseed.static.wood.variant-02": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
-        "props.bloomseed.static.wood#1"
-      ]
-    },
-    "props.bloomseed.static.wood.variant-03": {
-      "atlasKey": "bloomseed.props",
-      "frames": [
+        "props.bloomseed.static.wood#0",
+        "props.bloomseed.static.wood#1",
         "props.bloomseed.static.wood#2"
       ]
     },

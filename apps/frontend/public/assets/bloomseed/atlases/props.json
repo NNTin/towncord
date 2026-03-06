@@ -1,9 +1,2989 @@
 {
   "frames": {
-    "props.bloomseed.static.all-props#0": {
+    "props.bloomseed.animated.chest.all-chest#0": {
       "frame": {
         "x": 2,
         "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#1": {
+      "frame": {
+        "x": 36,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#2": {
+      "frame": {
+        "x": 70,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#3": {
+      "frame": {
+        "x": 104,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#4": {
+      "frame": {
+        "x": 138,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#5": {
+      "frame": {
+        "x": 172,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#6": {
+      "frame": {
+        "x": 206,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#7": {
+      "frame": {
+        "x": 240,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#8": {
+      "frame": {
+        "x": 274,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#9": {
+      "frame": {
+        "x": 308,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#10": {
+      "frame": {
+        "x": 342,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#11": {
+      "frame": {
+        "x": 376,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#12": {
+      "frame": {
+        "x": 410,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#13": {
+      "frame": {
+        "x": 444,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#14": {
+      "frame": {
+        "x": 478,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#15": {
+      "frame": {
+        "x": 512,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#16": {
+      "frame": {
+        "x": 546,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#17": {
+      "frame": {
+        "x": 580,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#18": {
+      "frame": {
+        "x": 614,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#19": {
+      "frame": {
+        "x": 648,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#20": {
+      "frame": {
+        "x": 682,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#21": {
+      "frame": {
+        "x": 716,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#22": {
+      "frame": {
+        "x": 750,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#23": {
+      "frame": {
+        "x": 784,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#24": {
+      "frame": {
+        "x": 818,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#25": {
+      "frame": {
+        "x": 852,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#26": {
+      "frame": {
+        "x": 886,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#27": {
+      "frame": {
+        "x": 920,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#28": {
+      "frame": {
+        "x": 954,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#29": {
+      "frame": {
+        "x": 988,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#30": {
+      "frame": {
+        "x": 1022,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#31": {
+      "frame": {
+        "x": 1056,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#32": {
+      "frame": {
+        "x": 1090,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#33": {
+      "frame": {
+        "x": 1124,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#34": {
+      "frame": {
+        "x": 1158,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#35": {
+      "frame": {
+        "x": 1192,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#36": {
+      "frame": {
+        "x": 1226,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#37": {
+      "frame": {
+        "x": 1260,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#38": {
+      "frame": {
+        "x": 1294,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#39": {
+      "frame": {
+        "x": 1328,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#40": {
+      "frame": {
+        "x": 1362,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#41": {
+      "frame": {
+        "x": 1396,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#42": {
+      "frame": {
+        "x": 1430,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#43": {
+      "frame": {
+        "x": 1464,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#44": {
+      "frame": {
+        "x": 1498,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#45": {
+      "frame": {
+        "x": 1532,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#46": {
+      "frame": {
+        "x": 1566,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#47": {
+      "frame": {
+        "x": 1600,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#48": {
+      "frame": {
+        "x": 1634,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#49": {
+      "frame": {
+        "x": 1668,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#50": {
+      "frame": {
+        "x": 1702,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#51": {
+      "frame": {
+        "x": 1736,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#52": {
+      "frame": {
+        "x": 1770,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#53": {
+      "frame": {
+        "x": 1804,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#54": {
+      "frame": {
+        "x": 1838,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#55": {
+      "frame": {
+        "x": 1872,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#56": {
+      "frame": {
+        "x": 1906,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#57": {
+      "frame": {
+        "x": 1940,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#58": {
+      "frame": {
+        "x": 1974,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#59": {
+      "frame": {
+        "x": 2008,
+        "y": 2,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#60": {
+      "frame": {
+        "x": 2,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#61": {
+      "frame": {
+        "x": 36,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#62": {
+      "frame": {
+        "x": 70,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#63": {
+      "frame": {
+        "x": 104,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.all-chest#64": {
+      "frame": {
+        "x": 138,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.black-chest#0": {
+      "frame": {
+        "x": 172,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.black-chest#1": {
+      "frame": {
+        "x": 206,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.black-chest#2": {
+      "frame": {
+        "x": 240,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.black-chest#3": {
+      "frame": {
+        "x": 274,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.black-chest#4": {
+      "frame": {
+        "x": 308,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.blue-chest#0": {
+      "frame": {
+        "x": 342,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.blue-chest#1": {
+      "frame": {
+        "x": 376,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.blue-chest#2": {
+      "frame": {
+        "x": 410,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.blue-chest#3": {
+      "frame": {
+        "x": 444,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.blue-chest#4": {
+      "frame": {
+        "x": 478,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-green-chest#0": {
+      "frame": {
+        "x": 512,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-green-chest#1": {
+      "frame": {
+        "x": 546,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-green-chest#2": {
+      "frame": {
+        "x": 580,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-green-chest#3": {
+      "frame": {
+        "x": 614,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-green-chest#4": {
+      "frame": {
+        "x": 648,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest#0": {
+      "frame": {
+        "x": 682,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest#1": {
+      "frame": {
+        "x": 716,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest#2": {
+      "frame": {
+        "x": 750,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest#3": {
+      "frame": {
+        "x": 784,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest#4": {
+      "frame": {
+        "x": 818,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest-2#0": {
+      "frame": {
+        "x": 852,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest-2#1": {
+      "frame": {
+        "x": 886,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest-2#2": {
+      "frame": {
+        "x": 920,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest-2#3": {
+      "frame": {
+        "x": 954,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.dark-wood-chest-2#4": {
+      "frame": {
+        "x": 988,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.gold-chest#0": {
+      "frame": {
+        "x": 1022,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.gold-chest#1": {
+      "frame": {
+        "x": 1056,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.gold-chest#2": {
+      "frame": {
+        "x": 1090,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.gold-chest#3": {
+      "frame": {
+        "x": 1124,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.gold-chest#4": {
+      "frame": {
+        "x": 1158,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.light-wood-chest#0": {
+      "frame": {
+        "x": 1192,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.light-wood-chest#1": {
+      "frame": {
+        "x": 1226,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.light-wood-chest#2": {
+      "frame": {
+        "x": 1260,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.light-wood-chest#3": {
+      "frame": {
+        "x": 1294,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.light-wood-chest#4": {
+      "frame": {
+        "x": 1328,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.pink-chest#0": {
+      "frame": {
+        "x": 1362,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.pink-chest#1": {
+      "frame": {
+        "x": 1396,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.pink-chest#2": {
+      "frame": {
+        "x": 1430,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.pink-chest#3": {
+      "frame": {
+        "x": 1464,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.pink-chest#4": {
+      "frame": {
+        "x": 1498,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.purple-chest#0": {
+      "frame": {
+        "x": 1532,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.purple-chest#1": {
+      "frame": {
+        "x": 1566,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.purple-chest#2": {
+      "frame": {
+        "x": 1600,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.purple-chest#3": {
+      "frame": {
+        "x": 1634,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.purple-chest#4": {
+      "frame": {
+        "x": 1668,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.red-chest#0": {
+      "frame": {
+        "x": 1702,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.red-chest#1": {
+      "frame": {
+        "x": 1736,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.red-chest#2": {
+      "frame": {
+        "x": 1770,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.red-chest#3": {
+      "frame": {
+        "x": 1804,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.red-chest#4": {
+      "frame": {
+        "x": 1838,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.silver-chest#0": {
+      "frame": {
+        "x": 1872,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.silver-chest#1": {
+      "frame": {
+        "x": 1906,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.silver-chest#2": {
+      "frame": {
+        "x": 1940,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.silver-chest#3": {
+      "frame": {
+        "x": 1974,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.silver-chest#4": {
+      "frame": {
+        "x": 2008,
+        "y": 30,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.wood-chest#0": {
+      "frame": {
+        "x": 2,
+        "y": 58,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.wood-chest#1": {
+      "frame": {
+        "x": 36,
+        "y": 58,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.wood-chest#2": {
+      "frame": {
+        "x": 70,
+        "y": 58,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.wood-chest#3": {
+      "frame": {
+        "x": 104,
+        "y": 58,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.chest.wood-chest#4": {
+      "frame": {
+        "x": 138,
+        "y": 58,
+        "w": 32,
+        "h": 26
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 26
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 26
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#0": {
+      "frame": {
+        "x": 172,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#1": {
+      "frame": {
+        "x": 190,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#2": {
+      "frame": {
+        "x": 208,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#3": {
+      "frame": {
+        "x": 226,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#4": {
+      "frame": {
+        "x": 244,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#5": {
+      "frame": {
+        "x": 262,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#6": {
+      "frame": {
+        "x": 280,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#7": {
+      "frame": {
+        "x": 298,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#8": {
+      "frame": {
+        "x": 316,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#9": {
+      "frame": {
+        "x": 334,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#10": {
+      "frame": {
+        "x": 352,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.all-water-props#11": {
+      "frame": {
+        "x": 370,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-pad#0": {
+      "frame": {
+        "x": 388,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-pad#1": {
+      "frame": {
+        "x": 406,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-pink#0": {
+      "frame": {
+        "x": 424,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-pink#1": {
+      "frame": {
+        "x": 442,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-white#0": {
+      "frame": {
+        "x": 460,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.lily-white#1": {
+      "frame": {
+        "x": 478,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#0": {
+      "frame": {
+        "x": 496,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#1": {
+      "frame": {
+        "x": 514,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#2": {
+      "frame": {
+        "x": 532,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#3": {
+      "frame": {
+        "x": 550,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#4": {
+      "frame": {
+        "x": 568,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.animated.water.water-rocks#5": {
+      "frame": {
+        "x": 586,
+        "y": 58,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      }
+    },
+    "props.bloomseed.static.all-props#0": {
+      "frame": {
+        "x": 604,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -22,208 +3002,8 @@
     },
     "props.bloomseed.static.all-props#1": {
       "frame": {
-        "x": 63,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#10": {
-      "frame": {
-        "x": 124,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#11": {
-      "frame": {
-        "x": 185,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#12": {
-      "frame": {
-        "x": 246,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#13": {
-      "frame": {
-        "x": 307,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#14": {
-      "frame": {
-        "x": 368,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#15": {
-      "frame": {
-        "x": 429,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#16": {
-      "frame": {
-        "x": 490,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#17": {
-      "frame": {
-        "x": 551,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#18": {
-      "frame": {
-        "x": 612,
-        "y": 2,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#19": {
-      "frame": {
-        "x": 673,
-        "y": 2,
+        "x": 665,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -242,8 +3022,348 @@
     },
     "props.bloomseed.static.all-props#2": {
       "frame": {
-        "x": 734,
-        "y": 2,
+        "x": 726,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#3": {
+      "frame": {
+        "x": 787,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#4": {
+      "frame": {
+        "x": 848,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#5": {
+      "frame": {
+        "x": 909,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#6": {
+      "frame": {
+        "x": 970,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#7": {
+      "frame": {
+        "x": 1031,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#8": {
+      "frame": {
+        "x": 1092,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#9": {
+      "frame": {
+        "x": 1153,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#10": {
+      "frame": {
+        "x": 1214,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#11": {
+      "frame": {
+        "x": 1275,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#12": {
+      "frame": {
+        "x": 1336,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#13": {
+      "frame": {
+        "x": 1397,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#14": {
+      "frame": {
+        "x": 1458,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#15": {
+      "frame": {
+        "x": 1519,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#16": {
+      "frame": {
+        "x": 1580,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#17": {
+      "frame": {
+        "x": 1641,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#18": {
+      "frame": {
+        "x": 1702,
+        "y": 58,
+        "w": 59,
+        "h": 70
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 59,
+        "h": 70
+      },
+      "sourceSize": {
+        "w": 59,
+        "h": 70
+      }
+    },
+    "props.bloomseed.static.all-props#19": {
+      "frame": {
+        "x": 1763,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -262,8 +3382,8 @@
     },
     "props.bloomseed.static.all-props#20": {
       "frame": {
-        "x": 795,
-        "y": 2,
+        "x": 1824,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -282,8 +3402,8 @@
     },
     "props.bloomseed.static.all-props#21": {
       "frame": {
-        "x": 856,
-        "y": 2,
+        "x": 1885,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -302,8 +3422,8 @@
     },
     "props.bloomseed.static.all-props#22": {
       "frame": {
-        "x": 917,
-        "y": 2,
+        "x": 1946,
+        "y": 58,
         "w": 59,
         "h": 70
       },
@@ -323,7 +3443,7 @@
     "props.bloomseed.static.all-props#23": {
       "frame": {
         "x": 2,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -343,7 +3463,7 @@
     "props.bloomseed.static.all-props#24": {
       "frame": {
         "x": 63,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -363,7 +3483,7 @@
     "props.bloomseed.static.all-props#25": {
       "frame": {
         "x": 124,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -383,7 +3503,7 @@
     "props.bloomseed.static.all-props#26": {
       "frame": {
         "x": 185,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -403,7 +3523,7 @@
     "props.bloomseed.static.all-props#27": {
       "frame": {
         "x": 246,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -423,7 +3543,7 @@
     "props.bloomseed.static.all-props#28": {
       "frame": {
         "x": 307,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -443,27 +3563,7 @@
     "props.bloomseed.static.all-props#29": {
       "frame": {
         "x": 368,
-        "y": 74,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#3": {
-      "frame": {
-        "x": 429,
-        "y": 74,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -482,8 +3582,8 @@
     },
     "props.bloomseed.static.all-props#30": {
       "frame": {
-        "x": 490,
-        "y": 74,
+        "x": 429,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -502,8 +3602,8 @@
     },
     "props.bloomseed.static.all-props#31": {
       "frame": {
-        "x": 551,
-        "y": 74,
+        "x": 490,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -522,8 +3622,8 @@
     },
     "props.bloomseed.static.all-props#32": {
       "frame": {
-        "x": 612,
-        "y": 74,
+        "x": 551,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -542,8 +3642,8 @@
     },
     "props.bloomseed.static.all-props#33": {
       "frame": {
-        "x": 673,
-        "y": 74,
+        "x": 612,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -562,8 +3662,8 @@
     },
     "props.bloomseed.static.all-props#34": {
       "frame": {
-        "x": 734,
-        "y": 74,
+        "x": 673,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -582,8 +3682,8 @@
     },
     "props.bloomseed.static.all-props#35": {
       "frame": {
-        "x": 795,
-        "y": 74,
+        "x": 734,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -602,8 +3702,8 @@
     },
     "props.bloomseed.static.all-props#36": {
       "frame": {
-        "x": 856,
-        "y": 74,
+        "x": 795,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -622,8 +3722,8 @@
     },
     "props.bloomseed.static.all-props#37": {
       "frame": {
-        "x": 917,
-        "y": 74,
+        "x": 856,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -642,8 +3742,8 @@
     },
     "props.bloomseed.static.all-props#38": {
       "frame": {
-        "x": 2,
-        "y": 146,
+        "x": 917,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -662,28 +3762,8 @@
     },
     "props.bloomseed.static.all-props#39": {
       "frame": {
-        "x": 63,
-        "y": 146,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#4": {
-      "frame": {
-        "x": 124,
-        "y": 146,
+        "x": 978,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -702,8 +3782,8 @@
     },
     "props.bloomseed.static.all-props#40": {
       "frame": {
-        "x": 185,
-        "y": 146,
+        "x": 1039,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -722,8 +3802,8 @@
     },
     "props.bloomseed.static.all-props#41": {
       "frame": {
-        "x": 246,
-        "y": 146,
+        "x": 1100,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -742,8 +3822,8 @@
     },
     "props.bloomseed.static.all-props#42": {
       "frame": {
-        "x": 307,
-        "y": 146,
+        "x": 1161,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -762,8 +3842,8 @@
     },
     "props.bloomseed.static.all-props#43": {
       "frame": {
-        "x": 368,
-        "y": 146,
+        "x": 1222,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -782,8 +3862,8 @@
     },
     "props.bloomseed.static.all-props#44": {
       "frame": {
-        "x": 429,
-        "y": 146,
+        "x": 1283,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -802,8 +3882,8 @@
     },
     "props.bloomseed.static.all-props#45": {
       "frame": {
-        "x": 490,
-        "y": 146,
+        "x": 1344,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -822,8 +3902,8 @@
     },
     "props.bloomseed.static.all-props#46": {
       "frame": {
-        "x": 551,
-        "y": 146,
+        "x": 1405,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -842,8 +3922,8 @@
     },
     "props.bloomseed.static.all-props#47": {
       "frame": {
-        "x": 612,
-        "y": 146,
+        "x": 1466,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -862,8 +3942,8 @@
     },
     "props.bloomseed.static.all-props#48": {
       "frame": {
-        "x": 673,
-        "y": 146,
+        "x": 1527,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -882,28 +3962,8 @@
     },
     "props.bloomseed.static.all-props#49": {
       "frame": {
-        "x": 734,
-        "y": 146,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#5": {
-      "frame": {
-        "x": 795,
-        "y": 146,
+        "x": 1588,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -922,8 +3982,8 @@
     },
     "props.bloomseed.static.all-props#50": {
       "frame": {
-        "x": 856,
-        "y": 146,
+        "x": 1649,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -942,8 +4002,8 @@
     },
     "props.bloomseed.static.all-props#51": {
       "frame": {
-        "x": 917,
-        "y": 146,
+        "x": 1710,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -962,8 +4022,8 @@
     },
     "props.bloomseed.static.all-props#52": {
       "frame": {
-        "x": 2,
-        "y": 218,
+        "x": 1771,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -982,8 +4042,8 @@
     },
     "props.bloomseed.static.all-props#53": {
       "frame": {
-        "x": 63,
-        "y": 218,
+        "x": 1832,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -1002,8 +4062,8 @@
     },
     "props.bloomseed.static.all-props#54": {
       "frame": {
-        "x": 124,
-        "y": 218,
+        "x": 1893,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -1022,8 +4082,8 @@
     },
     "props.bloomseed.static.all-props#55": {
       "frame": {
-        "x": 185,
-        "y": 218,
+        "x": 1954,
+        "y": 130,
         "w": 59,
         "h": 70
       },
@@ -1042,8 +4102,8 @@
     },
     "props.bloomseed.static.all-props#56": {
       "frame": {
-        "x": 246,
-        "y": 218,
+        "x": 2,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1062,8 +4122,8 @@
     },
     "props.bloomseed.static.all-props#57": {
       "frame": {
-        "x": 307,
-        "y": 218,
+        "x": 63,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1082,8 +4142,8 @@
     },
     "props.bloomseed.static.all-props#58": {
       "frame": {
-        "x": 368,
-        "y": 218,
+        "x": 124,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1102,28 +4162,8 @@
     },
     "props.bloomseed.static.all-props#59": {
       "frame": {
-        "x": 429,
-        "y": 218,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#6": {
-      "frame": {
-        "x": 490,
-        "y": 218,
+        "x": 185,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1142,8 +4182,8 @@
     },
     "props.bloomseed.static.all-props#60": {
       "frame": {
-        "x": 551,
-        "y": 218,
+        "x": 246,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1162,8 +4202,8 @@
     },
     "props.bloomseed.static.all-props#61": {
       "frame": {
-        "x": 612,
-        "y": 218,
+        "x": 307,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1182,8 +4222,8 @@
     },
     "props.bloomseed.static.all-props#62": {
       "frame": {
-        "x": 673,
-        "y": 218,
+        "x": 368,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1202,8 +4242,8 @@
     },
     "props.bloomseed.static.all-props#63": {
       "frame": {
-        "x": 734,
-        "y": 218,
+        "x": 429,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1222,8 +4262,8 @@
     },
     "props.bloomseed.static.all-props#64": {
       "frame": {
-        "x": 795,
-        "y": 218,
+        "x": 490,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1242,8 +4282,8 @@
     },
     "props.bloomseed.static.all-props#65": {
       "frame": {
-        "x": 856,
-        "y": 218,
+        "x": 551,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1262,8 +4302,8 @@
     },
     "props.bloomseed.static.all-props#66": {
       "frame": {
-        "x": 917,
-        "y": 218,
+        "x": 612,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1282,8 +4322,8 @@
     },
     "props.bloomseed.static.all-props#67": {
       "frame": {
-        "x": 2,
-        "y": 290,
+        "x": 673,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1302,8 +4342,8 @@
     },
     "props.bloomseed.static.all-props#68": {
       "frame": {
-        "x": 63,
-        "y": 290,
+        "x": 734,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1322,28 +4362,8 @@
     },
     "props.bloomseed.static.all-props#69": {
       "frame": {
-        "x": 124,
-        "y": 290,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#7": {
-      "frame": {
-        "x": 185,
-        "y": 290,
+        "x": 795,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1362,8 +4382,8 @@
     },
     "props.bloomseed.static.all-props#70": {
       "frame": {
-        "x": 246,
-        "y": 290,
+        "x": 856,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1382,8 +4402,8 @@
     },
     "props.bloomseed.static.all-props#71": {
       "frame": {
-        "x": 307,
-        "y": 290,
+        "x": 917,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1402,8 +4422,8 @@
     },
     "props.bloomseed.static.all-props#72": {
       "frame": {
-        "x": 368,
-        "y": 290,
+        "x": 978,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1422,8 +4442,8 @@
     },
     "props.bloomseed.static.all-props#73": {
       "frame": {
-        "x": 429,
-        "y": 290,
+        "x": 1039,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1442,8 +4462,8 @@
     },
     "props.bloomseed.static.all-props#74": {
       "frame": {
-        "x": 490,
-        "y": 290,
+        "x": 1100,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1462,8 +4482,8 @@
     },
     "props.bloomseed.static.all-props#75": {
       "frame": {
-        "x": 551,
-        "y": 290,
+        "x": 1161,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1482,8 +4502,8 @@
     },
     "props.bloomseed.static.all-props#76": {
       "frame": {
-        "x": 612,
-        "y": 290,
+        "x": 1222,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1502,8 +4522,8 @@
     },
     "props.bloomseed.static.all-props#77": {
       "frame": {
-        "x": 673,
-        "y": 290,
+        "x": 1283,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1522,8 +4542,8 @@
     },
     "props.bloomseed.static.all-props#78": {
       "frame": {
-        "x": 734,
-        "y": 290,
+        "x": 1344,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1542,28 +4562,8 @@
     },
     "props.bloomseed.static.all-props#79": {
       "frame": {
-        "x": 795,
-        "y": 290,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#8": {
-      "frame": {
-        "x": 856,
-        "y": 290,
+        "x": 1405,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1582,8 +4582,8 @@
     },
     "props.bloomseed.static.all-props#80": {
       "frame": {
-        "x": 917,
-        "y": 290,
+        "x": 1466,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1602,8 +4602,8 @@
     },
     "props.bloomseed.static.all-props#81": {
       "frame": {
-        "x": 2,
-        "y": 362,
+        "x": 1527,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1622,8 +4622,8 @@
     },
     "props.bloomseed.static.all-props#82": {
       "frame": {
-        "x": 63,
-        "y": 362,
+        "x": 1588,
+        "y": 202,
         "w": 59,
         "h": 70
       },
@@ -1638,472 +4638,12 @@
       "sourceSize": {
         "w": 59,
         "h": 70
-      }
-    },
-    "props.bloomseed.static.all-props#9": {
-      "frame": {
-        "x": 124,
-        "y": 362,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.fences#0": {
-      "frame": {
-        "x": 185,
-        "y": 362,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.fences#1": {
-      "frame": {
-        "x": 246,
-        "y": 362,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.fences#2": {
-      "frame": {
-        "x": 307,
-        "y": 362,
-        "w": 59,
-        "h": 70
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 59,
-        "h": 70
-      },
-      "sourceSize": {
-        "w": 59,
-        "h": 70
-      }
-    },
-    "props.bloomseed.static.trees#0": {
-      "frame": {
-        "x": 368,
-        "y": 362,
-        "w": 56,
-        "h": 58
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 56,
-        "h": 58
-      },
-      "sourceSize": {
-        "w": 56,
-        "h": 58
-      }
-    },
-    "props.bloomseed.static.trees#1": {
-      "frame": {
-        "x": 426,
-        "y": 362,
-        "w": 56,
-        "h": 58
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 56,
-        "h": 58
-      },
-      "sourceSize": {
-        "w": 56,
-        "h": 58
-      }
-    },
-    "props.bloomseed.static.trees#2": {
-      "frame": {
-        "x": 484,
-        "y": 362,
-        "w": 56,
-        "h": 58
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 56,
-        "h": 58
-      },
-      "sourceSize": {
-        "w": 56,
-        "h": 58
-      }
-    },
-    "props.bloomseed.static.beds#0": {
-      "frame": {
-        "x": 542,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#1": {
-      "frame": {
-        "x": 582,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#2": {
-      "frame": {
-        "x": 622,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#3": {
-      "frame": {
-        "x": 662,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#4": {
-      "frame": {
-        "x": 702,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#5": {
-      "frame": {
-        "x": 742,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#6": {
-      "frame": {
-        "x": 782,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#7": {
-      "frame": {
-        "x": 822,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#8": {
-      "frame": {
-        "x": 862,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.beds#9": {
-      "frame": {
-        "x": 902,
-        "y": 362,
-        "w": 38,
-        "h": 45
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 38,
-        "h": 45
-      },
-      "sourceSize": {
-        "w": 38,
-        "h": 45
-      }
-    },
-    "props.bloomseed.static.tables#0": {
-      "frame": {
-        "x": 942,
-        "y": 362,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
-      }
-    },
-    "props.bloomseed.static.tables#1": {
-      "frame": {
-        "x": 972,
-        "y": 362,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
-      }
-    },
-    "props.bloomseed.static.tables#2": {
-      "frame": {
-        "x": 2,
-        "y": 434,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
-      }
-    },
-    "props.bloomseed.static.tables#3": {
-      "frame": {
-        "x": 32,
-        "y": 434,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
-      }
-    },
-    "props.bloomseed.static.tables#4": {
-      "frame": {
-        "x": 62,
-        "y": 434,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
-      }
-    },
-    "props.bloomseed.static.tables#5": {
-      "frame": {
-        "x": 92,
-        "y": 434,
-        "w": 28,
-        "h": 31
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 28,
-        "h": 31
-      },
-      "sourceSize": {
-        "w": 28,
-        "h": 31
       }
     },
     "props.bloomseed.static.barrels#0": {
       "frame": {
-        "x": 122,
-        "y": 434,
+        "x": 1649,
+        "y": 202,
         "w": 35,
         "h": 27
       },
@@ -2122,8 +4662,8 @@
     },
     "props.bloomseed.static.barrels#1": {
       "frame": {
-        "x": 159,
-        "y": 434,
+        "x": 1686,
+        "y": 202,
         "w": 35,
         "h": 27
       },
@@ -2142,8 +4682,8 @@
     },
     "props.bloomseed.static.barrels#2": {
       "frame": {
-        "x": 196,
-        "y": 434,
+        "x": 1723,
+        "y": 202,
         "w": 35,
         "h": 27
       },
@@ -2162,8 +4702,8 @@
     },
     "props.bloomseed.static.barrels#3": {
       "frame": {
-        "x": 233,
-        "y": 434,
+        "x": 1760,
+        "y": 202,
         "w": 35,
         "h": 27
       },
@@ -2182,8 +4722,8 @@
     },
     "props.bloomseed.static.barrels#4": {
       "frame": {
-        "x": 270,
-        "y": 434,
+        "x": 1797,
+        "y": 202,
         "w": 35,
         "h": 27
       },
@@ -2200,2550 +4740,210 @@
         "h": 27
       }
     },
-    "props.bloomseed.static.stumps#0": {
+    "props.bloomseed.static.beds#0": {
       "frame": {
-        "x": 307,
-        "y": 434,
-        "w": 32,
-        "h": 27
+        "x": 1834,
+        "y": 202,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 27
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 27
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.static.stumps#1": {
+    "props.bloomseed.static.beds#1": {
       "frame": {
-        "x": 341,
-        "y": 434,
-        "w": 32,
-        "h": 27
+        "x": 1874,
+        "y": 202,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 27
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 27
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#0": {
+    "props.bloomseed.static.beds#2": {
       "frame": {
-        "x": 375,
-        "y": 434,
-        "w": 32,
-        "h": 26
+        "x": 1914,
+        "y": 202,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#1": {
+    "props.bloomseed.static.beds#3": {
       "frame": {
-        "x": 409,
-        "y": 434,
-        "w": 32,
-        "h": 26
+        "x": 1954,
+        "y": 202,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#10": {
+    "props.bloomseed.static.beds#4": {
       "frame": {
-        "x": 443,
-        "y": 434,
-        "w": 32,
-        "h": 26
+        "x": 1994,
+        "y": 202,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#11": {
-      "frame": {
-        "x": 477,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#12": {
-      "frame": {
-        "x": 511,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#13": {
-      "frame": {
-        "x": 545,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#14": {
-      "frame": {
-        "x": 579,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#15": {
-      "frame": {
-        "x": 613,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#16": {
-      "frame": {
-        "x": 647,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#17": {
-      "frame": {
-        "x": 681,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#18": {
-      "frame": {
-        "x": 715,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#19": {
-      "frame": {
-        "x": 749,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#2": {
-      "frame": {
-        "x": 783,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#20": {
-      "frame": {
-        "x": 817,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#21": {
-      "frame": {
-        "x": 851,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#22": {
-      "frame": {
-        "x": 885,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#23": {
-      "frame": {
-        "x": 919,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#24": {
-      "frame": {
-        "x": 953,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#25": {
-      "frame": {
-        "x": 987,
-        "y": 434,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#26": {
+    "props.bloomseed.static.beds#5": {
       "frame": {
         "x": 2,
-        "y": 467,
-        "w": 32,
-        "h": 26
+        "y": 274,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#27": {
+    "props.bloomseed.static.beds#6": {
       "frame": {
-        "x": 36,
-        "y": 467,
-        "w": 32,
-        "h": 26
+        "x": 42,
+        "y": 274,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#28": {
+    "props.bloomseed.static.beds#7": {
       "frame": {
-        "x": 70,
-        "y": 467,
-        "w": 32,
-        "h": 26
+        "x": 82,
+        "y": 274,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#29": {
+    "props.bloomseed.static.beds#8": {
       "frame": {
-        "x": 104,
-        "y": 467,
-        "w": 32,
-        "h": 26
+        "x": 122,
+        "y": 274,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
-    "props.bloomseed.animated.chest.all-chest#3": {
+    "props.bloomseed.static.beds#9": {
       "frame": {
-        "x": 138,
-        "y": 467,
-        "w": 32,
-        "h": 26
+        "x": 162,
+        "y": 274,
+        "w": 38,
+        "h": 45
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       },
       "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#30": {
-      "frame": {
-        "x": 172,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#31": {
-      "frame": {
-        "x": 206,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#32": {
-      "frame": {
-        "x": 240,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#33": {
-      "frame": {
-        "x": 274,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#34": {
-      "frame": {
-        "x": 308,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#35": {
-      "frame": {
-        "x": 342,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#36": {
-      "frame": {
-        "x": 376,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#37": {
-      "frame": {
-        "x": 410,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#38": {
-      "frame": {
-        "x": 444,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#39": {
-      "frame": {
-        "x": 478,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#4": {
-      "frame": {
-        "x": 512,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#40": {
-      "frame": {
-        "x": 546,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#41": {
-      "frame": {
-        "x": 580,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#42": {
-      "frame": {
-        "x": 614,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#43": {
-      "frame": {
-        "x": 648,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#44": {
-      "frame": {
-        "x": 682,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#45": {
-      "frame": {
-        "x": 716,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#46": {
-      "frame": {
-        "x": 750,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#47": {
-      "frame": {
-        "x": 784,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#48": {
-      "frame": {
-        "x": 818,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#49": {
-      "frame": {
-        "x": 852,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#5": {
-      "frame": {
-        "x": 886,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#50": {
-      "frame": {
-        "x": 920,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#51": {
-      "frame": {
-        "x": 954,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#52": {
-      "frame": {
-        "x": 988,
-        "y": 467,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#53": {
-      "frame": {
-        "x": 2,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#54": {
-      "frame": {
-        "x": 36,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#55": {
-      "frame": {
-        "x": 70,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#56": {
-      "frame": {
-        "x": 104,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#57": {
-      "frame": {
-        "x": 138,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#58": {
-      "frame": {
-        "x": 172,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#59": {
-      "frame": {
-        "x": 206,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#6": {
-      "frame": {
-        "x": 240,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#60": {
-      "frame": {
-        "x": 274,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#61": {
-      "frame": {
-        "x": 308,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#62": {
-      "frame": {
-        "x": 342,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#63": {
-      "frame": {
-        "x": 376,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#64": {
-      "frame": {
-        "x": 410,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#7": {
-      "frame": {
-        "x": 444,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#8": {
-      "frame": {
-        "x": 478,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.all-chest#9": {
-      "frame": {
-        "x": 512,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.black-chest#0": {
-      "frame": {
-        "x": 546,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.black-chest#1": {
-      "frame": {
-        "x": 580,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.black-chest#2": {
-      "frame": {
-        "x": 614,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.black-chest#3": {
-      "frame": {
-        "x": 648,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.black-chest#4": {
-      "frame": {
-        "x": 682,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.blue-chest#0": {
-      "frame": {
-        "x": 716,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.blue-chest#1": {
-      "frame": {
-        "x": 750,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.blue-chest#2": {
-      "frame": {
-        "x": 784,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.blue-chest#3": {
-      "frame": {
-        "x": 818,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.blue-chest#4": {
-      "frame": {
-        "x": 852,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-green-chest#0": {
-      "frame": {
-        "x": 886,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-green-chest#1": {
-      "frame": {
-        "x": 920,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-green-chest#2": {
-      "frame": {
-        "x": 954,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-green-chest#3": {
-      "frame": {
-        "x": 988,
-        "y": 495,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-green-chest#4": {
-      "frame": {
-        "x": 2,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest#0": {
-      "frame": {
-        "x": 36,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest#1": {
-      "frame": {
-        "x": 70,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest#2": {
-      "frame": {
-        "x": 104,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest#3": {
-      "frame": {
-        "x": 138,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest#4": {
-      "frame": {
-        "x": 172,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest-2#0": {
-      "frame": {
-        "x": 206,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest-2#1": {
-      "frame": {
-        "x": 240,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest-2#2": {
-      "frame": {
-        "x": 274,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest-2#3": {
-      "frame": {
-        "x": 308,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.dark-wood-chest-2#4": {
-      "frame": {
-        "x": 342,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.gold-chest#0": {
-      "frame": {
-        "x": 376,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.gold-chest#1": {
-      "frame": {
-        "x": 410,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.gold-chest#2": {
-      "frame": {
-        "x": 444,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.gold-chest#3": {
-      "frame": {
-        "x": 478,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.gold-chest#4": {
-      "frame": {
-        "x": 512,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.light-wood-chest#0": {
-      "frame": {
-        "x": 546,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.light-wood-chest#1": {
-      "frame": {
-        "x": 580,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.light-wood-chest#2": {
-      "frame": {
-        "x": 614,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.light-wood-chest#3": {
-      "frame": {
-        "x": 648,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.light-wood-chest#4": {
-      "frame": {
-        "x": 682,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.pink-chest#0": {
-      "frame": {
-        "x": 716,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.pink-chest#1": {
-      "frame": {
-        "x": 750,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.pink-chest#2": {
-      "frame": {
-        "x": 784,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.pink-chest#3": {
-      "frame": {
-        "x": 818,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.pink-chest#4": {
-      "frame": {
-        "x": 852,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.purple-chest#0": {
-      "frame": {
-        "x": 886,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.purple-chest#1": {
-      "frame": {
-        "x": 920,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.purple-chest#2": {
-      "frame": {
-        "x": 954,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.purple-chest#3": {
-      "frame": {
-        "x": 988,
-        "y": 523,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.purple-chest#4": {
-      "frame": {
-        "x": 2,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.red-chest#0": {
-      "frame": {
-        "x": 36,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.red-chest#1": {
-      "frame": {
-        "x": 70,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.red-chest#2": {
-      "frame": {
-        "x": 104,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.red-chest#3": {
-      "frame": {
-        "x": 138,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.red-chest#4": {
-      "frame": {
-        "x": 172,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.silver-chest#0": {
-      "frame": {
-        "x": 206,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.silver-chest#1": {
-      "frame": {
-        "x": 240,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.silver-chest#2": {
-      "frame": {
-        "x": 274,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.silver-chest#3": {
-      "frame": {
-        "x": 308,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.silver-chest#4": {
-      "frame": {
-        "x": 342,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.wood-chest#0": {
-      "frame": {
-        "x": 376,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.wood-chest#1": {
-      "frame": {
-        "x": 410,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.wood-chest#2": {
-      "frame": {
-        "x": 444,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.wood-chest#3": {
-      "frame": {
-        "x": 478,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
-      }
-    },
-    "props.bloomseed.animated.chest.wood-chest#4": {
-      "frame": {
-        "x": 512,
-        "y": 551,
-        "w": 32,
-        "h": 26
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 26
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 26
+        "w": 38,
+        "h": 45
       }
     },
     "props.bloomseed.static.bushes#0": {
       "frame": {
-        "x": 546,
-        "y": 551,
+        "x": 202,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4762,8 +4962,8 @@
     },
     "props.bloomseed.static.bushes#1": {
       "frame": {
-        "x": 578,
-        "y": 551,
+        "x": 234,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4782,8 +4982,8 @@
     },
     "props.bloomseed.static.bushes#2": {
       "frame": {
-        "x": 610,
-        "y": 551,
+        "x": 266,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4802,8 +5002,8 @@
     },
     "props.bloomseed.static.bushes#3": {
       "frame": {
-        "x": 642,
-        "y": 551,
+        "x": 298,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4822,8 +5022,8 @@
     },
     "props.bloomseed.static.bushes#4": {
       "frame": {
-        "x": 674,
-        "y": 551,
+        "x": 330,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4842,8 +5042,8 @@
     },
     "props.bloomseed.static.bushes#5": {
       "frame": {
-        "x": 706,
-        "y": 551,
+        "x": 362,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4862,8 +5062,8 @@
     },
     "props.bloomseed.static.bushes#6": {
       "frame": {
-        "x": 738,
-        "y": 551,
+        "x": 394,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4882,8 +5082,8 @@
     },
     "props.bloomseed.static.bushes#7": {
       "frame": {
-        "x": 770,
-        "y": 551,
+        "x": 426,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4902,8 +5102,8 @@
     },
     "props.bloomseed.static.bushes#8": {
       "frame": {
-        "x": 802,
-        "y": 551,
+        "x": 458,
+        "y": 274,
         "w": 30,
         "h": 26
       },
@@ -4920,10 +5120,250 @@
         "h": 26
       }
     },
+    "props.bloomseed.static.chairs#0": {
+      "frame": {
+        "x": 490,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#1": {
+      "frame": {
+        "x": 504,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#2": {
+      "frame": {
+        "x": 518,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#3": {
+      "frame": {
+        "x": 532,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#4": {
+      "frame": {
+        "x": 546,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#5": {
+      "frame": {
+        "x": 560,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#6": {
+      "frame": {
+        "x": 574,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#7": {
+      "frame": {
+        "x": 588,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#8": {
+      "frame": {
+        "x": 602,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#9": {
+      "frame": {
+        "x": 616,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#10": {
+      "frame": {
+        "x": 630,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
+    "props.bloomseed.static.chairs#11": {
+      "frame": {
+        "x": 644,
+        "y": 274,
+        "w": 12,
+        "h": 22
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 22
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 22
+      }
+    },
     "props.bloomseed.static.crates#0": {
       "frame": {
-        "x": 834,
-        "y": 551,
+        "x": 658,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -4942,8 +5382,168 @@
     },
     "props.bloomseed.static.crates#1": {
       "frame": {
+        "x": 680,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#2": {
+      "frame": {
+        "x": 702,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#3": {
+      "frame": {
+        "x": 724,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#4": {
+      "frame": {
+        "x": 746,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#5": {
+      "frame": {
+        "x": 768,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#6": {
+      "frame": {
+        "x": 790,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#7": {
+      "frame": {
+        "x": 812,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#8": {
+      "frame": {
+        "x": 834,
+        "y": 274,
+        "w": 20,
+        "h": 25
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 25
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 25
+      }
+    },
+    "props.bloomseed.static.crates#9": {
+      "frame": {
         "x": 856,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -4963,7 +5563,7 @@
     "props.bloomseed.static.crates#10": {
       "frame": {
         "x": 878,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -4983,7 +5583,7 @@
     "props.bloomseed.static.crates#11": {
       "frame": {
         "x": 900,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5003,7 +5603,7 @@
     "props.bloomseed.static.crates#12": {
       "frame": {
         "x": 922,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5023,7 +5623,7 @@
     "props.bloomseed.static.crates#13": {
       "frame": {
         "x": 944,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5043,7 +5643,7 @@
     "props.bloomseed.static.crates#14": {
       "frame": {
         "x": 966,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5063,7 +5663,7 @@
     "props.bloomseed.static.crates#15": {
       "frame": {
         "x": 988,
-        "y": 551,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5082,8 +5682,8 @@
     },
     "props.bloomseed.static.crates#16": {
       "frame": {
-        "x": 2,
-        "y": 579,
+        "x": 1010,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5102,8 +5702,8 @@
     },
     "props.bloomseed.static.crates#17": {
       "frame": {
-        "x": 24,
-        "y": 579,
+        "x": 1032,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5122,8 +5722,8 @@
     },
     "props.bloomseed.static.crates#18": {
       "frame": {
-        "x": 46,
-        "y": 579,
+        "x": 1054,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5142,28 +5742,8 @@
     },
     "props.bloomseed.static.crates#19": {
       "frame": {
-        "x": 68,
-        "y": 579,
-        "w": 20,
-        "h": 25
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 20,
-        "h": 25
-      },
-      "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.crates#2": {
-      "frame": {
-        "x": 90,
-        "y": 579,
+        "x": 1076,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5182,8 +5762,8 @@
     },
     "props.bloomseed.static.crates#20": {
       "frame": {
-        "x": 112,
-        "y": 579,
+        "x": 1098,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5202,8 +5782,8 @@
     },
     "props.bloomseed.static.crates#21": {
       "frame": {
-        "x": 134,
-        "y": 579,
+        "x": 1120,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5222,8 +5802,8 @@
     },
     "props.bloomseed.static.crates#22": {
       "frame": {
-        "x": 156,
-        "y": 579,
+        "x": 1142,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5242,8 +5822,8 @@
     },
     "props.bloomseed.static.crates#23": {
       "frame": {
-        "x": 178,
-        "y": 579,
+        "x": 1164,
+        "y": 274,
         "w": 20,
         "h": 25
       },
@@ -5260,390 +5840,70 @@
         "h": 25
       }
     },
-    "props.bloomseed.static.crates#3": {
+    "props.bloomseed.static.fences#0": {
       "frame": {
-        "x": 200,
-        "y": 579,
-        "w": 20,
-        "h": 25
+        "x": 1186,
+        "y": 274,
+        "w": 59,
+        "h": 70
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 20,
-        "h": 25
+        "w": 59,
+        "h": 70
       },
       "sourceSize": {
-        "w": 20,
-        "h": 25
+        "w": 59,
+        "h": 70
       }
     },
-    "props.bloomseed.static.crates#4": {
+    "props.bloomseed.static.fences#1": {
       "frame": {
-        "x": 222,
-        "y": 579,
-        "w": 20,
-        "h": 25
+        "x": 1247,
+        "y": 274,
+        "w": 59,
+        "h": 70
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 20,
-        "h": 25
+        "w": 59,
+        "h": 70
       },
       "sourceSize": {
-        "w": 20,
-        "h": 25
+        "w": 59,
+        "h": 70
       }
     },
-    "props.bloomseed.static.crates#5": {
+    "props.bloomseed.static.fences#2": {
       "frame": {
-        "x": 244,
-        "y": 579,
-        "w": 20,
-        "h": 25
+        "x": 1308,
+        "y": 274,
+        "w": 59,
+        "h": 70
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 20,
-        "h": 25
+        "w": 59,
+        "h": 70
       },
       "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.crates#6": {
-      "frame": {
-        "x": 266,
-        "y": 579,
-        "w": 20,
-        "h": 25
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 20,
-        "h": 25
-      },
-      "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.crates#7": {
-      "frame": {
-        "x": 288,
-        "y": 579,
-        "w": 20,
-        "h": 25
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 20,
-        "h": 25
-      },
-      "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.crates#8": {
-      "frame": {
-        "x": 310,
-        "y": 579,
-        "w": 20,
-        "h": 25
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 20,
-        "h": 25
-      },
-      "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.crates#9": {
-      "frame": {
-        "x": 332,
-        "y": 579,
-        "w": 20,
-        "h": 25
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 20,
-        "h": 25
-      },
-      "sourceSize": {
-        "w": 20,
-        "h": 25
-      }
-    },
-    "props.bloomseed.static.chairs#0": {
-      "frame": {
-        "x": 354,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#1": {
-      "frame": {
-        "x": 368,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#10": {
-      "frame": {
-        "x": 382,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#11": {
-      "frame": {
-        "x": 396,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#2": {
-      "frame": {
-        "x": 410,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#3": {
-      "frame": {
-        "x": 424,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#4": {
-      "frame": {
-        "x": 438,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#5": {
-      "frame": {
-        "x": 452,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#6": {
-      "frame": {
-        "x": 466,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#7": {
-      "frame": {
-        "x": 480,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#8": {
-      "frame": {
-        "x": 494,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
-      }
-    },
-    "props.bloomseed.static.chairs#9": {
-      "frame": {
-        "x": 508,
-        "y": 579,
-        "w": 12,
-        "h": 22
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 22
-      },
-      "sourceSize": {
-        "w": 12,
-        "h": 22
+        "w": 59,
+        "h": 70
       }
     },
     "props.bloomseed.static.rocks#0": {
       "frame": {
-        "x": 522,
-        "y": 579,
+        "x": 1369,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5662,8 +5922,8 @@
     },
     "props.bloomseed.static.rocks#1": {
       "frame": {
-        "x": 552,
-        "y": 579,
+        "x": 1399,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5682,8 +5942,8 @@
     },
     "props.bloomseed.static.rocks#2": {
       "frame": {
-        "x": 582,
-        "y": 579,
+        "x": 1429,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5702,8 +5962,8 @@
     },
     "props.bloomseed.static.rocks#3": {
       "frame": {
-        "x": 612,
-        "y": 579,
+        "x": 1459,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5722,8 +5982,8 @@
     },
     "props.bloomseed.static.rocks#4": {
       "frame": {
-        "x": 642,
-        "y": 579,
+        "x": 1489,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5742,8 +6002,8 @@
     },
     "props.bloomseed.static.rocks#5": {
       "frame": {
-        "x": 672,
-        "y": 579,
+        "x": 1519,
+        "y": 274,
         "w": 28,
         "h": 20
       },
@@ -5760,490 +6020,230 @@
         "h": 20
       }
     },
-    "props.bloomseed.animated.water.all-water-props#0": {
+    "props.bloomseed.static.stumps#0": {
       "frame": {
-        "x": 702,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1549,
+        "y": 274,
+        "w": 32,
+        "h": 27
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 32,
+        "h": 27
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 32,
+        "h": 27
       }
     },
-    "props.bloomseed.animated.water.all-water-props#1": {
+    "props.bloomseed.static.stumps#1": {
       "frame": {
-        "x": 720,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1583,
+        "y": 274,
+        "w": 32,
+        "h": 27
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 32,
+        "h": 27
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 32,
+        "h": 27
       }
     },
-    "props.bloomseed.animated.water.all-water-props#10": {
+    "props.bloomseed.static.tables#0": {
       "frame": {
-        "x": 738,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1617,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#11": {
+    "props.bloomseed.static.tables#1": {
       "frame": {
-        "x": 756,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1647,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#2": {
+    "props.bloomseed.static.tables#2": {
       "frame": {
-        "x": 774,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1677,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#3": {
+    "props.bloomseed.static.tables#3": {
       "frame": {
-        "x": 792,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1707,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#4": {
+    "props.bloomseed.static.tables#4": {
       "frame": {
-        "x": 810,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1737,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#5": {
+    "props.bloomseed.static.tables#5": {
       "frame": {
-        "x": 828,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1767,
+        "y": 274,
+        "w": 28,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 28,
+        "h": 31
       }
     },
-    "props.bloomseed.animated.water.all-water-props#6": {
+    "props.bloomseed.static.trees#0": {
       "frame": {
-        "x": 846,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1797,
+        "y": 274,
+        "w": 56,
+        "h": 58
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       }
     },
-    "props.bloomseed.animated.water.all-water-props#7": {
+    "props.bloomseed.static.trees#1": {
       "frame": {
-        "x": 864,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1855,
+        "y": 274,
+        "w": 56,
+        "h": 58
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       }
     },
-    "props.bloomseed.animated.water.all-water-props#8": {
+    "props.bloomseed.static.trees#2": {
       "frame": {
-        "x": 882,
-        "y": 579,
-        "w": 16,
-        "h": 16
+        "x": 1913,
+        "y": 274,
+        "w": 56,
+        "h": 58
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       },
       "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.all-water-props#9": {
-      "frame": {
-        "x": 900,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-pad#0": {
-      "frame": {
-        "x": 918,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-pad#1": {
-      "frame": {
-        "x": 936,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-pink#0": {
-      "frame": {
-        "x": 954,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-pink#1": {
-      "frame": {
-        "x": 972,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-white#0": {
-      "frame": {
-        "x": 990,
-        "y": 579,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.lily-white#1": {
-      "frame": {
-        "x": 2,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#0": {
-      "frame": {
-        "x": 20,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#1": {
-      "frame": {
-        "x": 38,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#2": {
-      "frame": {
-        "x": 56,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#3": {
-      "frame": {
-        "x": 74,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#4": {
-      "frame": {
-        "x": 92,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
-      }
-    },
-    "props.bloomseed.animated.water.water-rocks#5": {
-      "frame": {
-        "x": 110,
-        "y": 606,
-        "w": 16,
-        "h": 16
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 16,
-        "h": 16
-      },
-      "sourceSize": {
-        "w": 16,
-        "h": 16
+        "w": 56,
+        "h": 58
       }
     },
     "props.bloomseed.static.wood#0": {
       "frame": {
-        "x": 128,
-        "y": 606,
+        "x": 1971,
+        "y": 274,
         "w": 16,
         "h": 13
       },
@@ -6262,8 +6262,8 @@
     },
     "props.bloomseed.static.wood#1": {
       "frame": {
-        "x": 146,
-        "y": 606,
+        "x": 1989,
+        "y": 274,
         "w": 16,
         "h": 13
       },
@@ -6282,8 +6282,8 @@
     },
     "props.bloomseed.static.wood#2": {
       "frame": {
-        "x": 164,
-        "y": 606,
+        "x": 2007,
+        "y": 274,
         "w": 16,
         "h": 13
       },
@@ -6302,13 +6302,13 @@
     }
   },
   "meta": {
-    "app": "towncord-bloomseed-pipeline",
+    "app": "towncord-aseprite-pipeline",
     "version": "1.0",
     "image": "props.png",
     "format": "RGBA8888",
     "size": {
-      "w": 1022,
-      "h": 624
+      "w": 2042,
+      "h": 346
     },
     "scale": "1"
   }

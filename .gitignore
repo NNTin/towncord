@@ -5,3 +5,4 @@ TODO.md
 __pycache__/
 *.pyc
 specs/
+packages/bloomseed-assets/

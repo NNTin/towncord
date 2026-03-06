@@ -57,7 +57,7 @@ apps/frontend/
 
 - React manages UI shell, menus, overlays, and app composition.
 - Phaser manages rendering, world state, scene lifecycle, and input.
-- Asset generation stays outside the app runtime (`scripts/assets/*`).
+- Asset generation stays outside the app runtime (`packages/bloomseed-assets/pipeline/*`).
 - Runtime loads generated files from `public/assets/bloomseed/*`.
 
 ## TypeScript Strictness

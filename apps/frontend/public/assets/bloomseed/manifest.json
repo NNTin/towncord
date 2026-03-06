@@ -7,8 +7,8 @@
       "textureURL": "assets/bloomseed/atlases/characters.png",
       "atlasURL": "assets/bloomseed/atlases/characters.json",
       "frameCount": 166,
-      "width": 992,
-      "height": 794
+      "width": 2048,
+      "height": 398
     },
     {
       "category": "equipment",
@@ -25,8 +25,8 @@
       "textureURL": "assets/bloomseed/atlases/mobs.png",
       "atlasURL": "assets/bloomseed/atlases/mobs.json",
       "frameCount": 203,
-      "width": 2048,
-      "height": 660
+      "width": 2040,
+      "height": 724
     },
     {
       "category": "props",
@@ -34,8 +34,8 @@
       "textureURL": "assets/bloomseed/atlases/props.png",
       "atlasURL": "assets/bloomseed/atlases/props.json",
       "frameCount": 315,
-      "width": 1022,
-      "height": 624
+      "width": 2042,
+      "height": 346
     },
     {
       "category": "tilesets",
@@ -43,8 +43,8 @@
       "textureURL": "assets/bloomseed/atlases/tilesets.png",
       "atlasURL": "assets/bloomseed/atlases/tilesets.json",
       "frameCount": 2764,
-      "width": 1010,
-      "height": 902
+      "width": 2036,
+      "height": 452
     },
     {
       "category": "ui",
@@ -52,9 +52,9 @@
       "textureURL": "assets/bloomseed/atlases/ui.png",
       "atlasURL": "assets/bloomseed/atlases/ui.json",
       "frameCount": 97,
-      "width": 254,
-      "height": 128
+      "width": 1748,
+      "height": 20
     }
   ],
-  "animationCount": 239
+  "animationCount": 170
 }

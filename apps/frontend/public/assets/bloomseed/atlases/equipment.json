@@ -5042,7 +5042,7 @@
     }
   },
   "meta": {
-    "app": "towncord-bloomseed-pipeline",
+    "app": "towncord-aseprite-pipeline",
     "version": "1.0",
     "image": "equipment.png",
     "format": "RGBA8888",
