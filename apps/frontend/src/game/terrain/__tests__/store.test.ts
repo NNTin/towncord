@@ -72,4 +72,26 @@ describe("TerrainMapStore dirty chunk invalidation", () => {
       toTerrainChunkId(1, 1),
     ]);
   });
+
+  test("eraser brush restores the default material", () => {
+    const store = new TerrainMapStore(createGridSpec());
+    store.consumeDirtyChunks();
+
+    store.applyEditOp({
+      materialId: CHANGED_MATERIAL,
+      brushId: "tile",
+      center: { cellX: 10, cellY: 10 },
+    });
+    store.consumeDirtyChunks();
+
+    const changed = store.applyEditOp({
+      materialId: CHANGED_MATERIAL,
+      brushId: "eraser",
+      center: { cellX: 10, cellY: 10 },
+    });
+
+    expect(changed).toBe(true);
+    expect(store.getCellMaterial(10, 10)).toBe(DEFAULT_MATERIAL);
+    expect(consumeDirtyChunkIds(store)).toEqual([toTerrainChunkId(0, 0)]);
+  });
 });

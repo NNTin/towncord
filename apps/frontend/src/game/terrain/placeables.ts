@@ -9,9 +9,21 @@ export type TerrainPlaceableDefinition = {
 
 export const TERRAIN_PLACEABLES: TerrainPlaceableDefinition[] = [
   {
-    id: "terrain.water.single",
-    label: "Water Brush",
+    id: "terrain.water.tile",
+    label: "Water Tile Brush",
     materialId: "water",
-    brushId: "single",
+    brushId: "tile",
+  },
+  {
+    id: "terrain.grass.tile",
+    label: "Grass Tile Brush",
+    materialId: "ground",
+    brushId: "tile",
+  },
+  {
+    id: "terrain.eraser",
+    label: "Eraser",
+    materialId: "ground",
+    brushId: "eraser",
   },
 ];

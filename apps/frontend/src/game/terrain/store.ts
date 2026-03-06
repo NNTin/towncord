@@ -82,15 +82,17 @@ export class TerrainMapStore {
     const { cellX, cellY } = op.center;
     if (!this.isInBounds(cellX, cellY)) return false;
 
-    if (!this.materials.has(op.materialId)) {
-      throw new Error(`TerrainMapStore: unknown material \"${op.materialId}\".`);
+    const materialId = op.brushId === "eraser" ? this.defaultMaterial : op.materialId;
+
+    if (!this.materials.has(materialId)) {
+      throw new Error(`TerrainMapStore: unknown material \"${materialId}\".`);
     }
 
     const index = this.toCellIndex(cellX, cellY);
     const current = this.cells[index];
-    if (current === op.materialId) return false;
+    if (current === materialId) return false;
 
-    this.cells[index] = op.materialId;
+    this.cells[index] = materialId;
     this.markChunksDirtyForCellChange(cellX, cellY);
     return true;
   }
