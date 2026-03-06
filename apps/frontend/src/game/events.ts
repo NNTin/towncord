@@ -5,6 +5,7 @@ import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 export const PLACE_DRAG_MIME = "application/json";
 export const PLACE_OBJECT_DROP_EVENT = "placeObjectDrop";
 export const PLACE_TERRAIN_DROP_EVENT = "placeTerrainDrop";
+export const TERRAIN_TILE_INSPECTED_EVENT = "terrainTileInspected";
 export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
 
@@ -40,6 +41,17 @@ export type PlaceDropPayload = PlaceEntityDropPayload | PlaceTerrainDropPayload;
 
 // Kept for entity placement compatibility while terrain drops use PLACE_TERRAIN_DROP_EVENT.
 export type PlaceObjectDropPayload = PlaceEntityDropPayload;
+export type TerrainTileInspectedPayload = {
+  textureKey: string;
+  frame: string;
+  cellX: number;
+  cellY: number;
+  materialId: TerrainMaterialId;
+  caseId: number;
+  rotate90: 0 | 1 | 2 | 3;
+  flipX: boolean;
+  flipY: boolean;
+};
 
 export type PlayerPlacedPayload = { worldX: number; worldY: number };
 

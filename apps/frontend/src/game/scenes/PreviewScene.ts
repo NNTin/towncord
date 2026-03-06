@@ -7,6 +7,7 @@ export const PREVIEW_SCENE_KEY = "preview";
 // Internal events for the preview game instance (not shared with main game)
 export const PREVIEW_READY_EVENT = "preview:ready";
 export const PREVIEW_PLAY_EVENT = "preview:play";
+export const PREVIEW_SHOW_TILE_EVENT = "preview:showTile";
 export const PREVIEW_INFO_EVENT = "preview:info";
 
 const EQUIPMENT_ATLAS = "bloomseed.equipment";
@@ -20,15 +21,34 @@ export type PreviewPlayPayload = {
   equipFlipX: boolean;
 };
 
+export type PreviewShowTilePayload = {
+  textureKey: string;
+  frame: string;
+  caseId: number;
+  materialId: string;
+  cellX: number;
+  cellY: number;
+  rotate90: 0 | 1 | 2 | 3;
+  flipX: boolean;
+  flipY: boolean;
+};
+
 export type PreviewInfo = {
+  sourceType: "animation" | "terrain-tile";
   animationKey: string;
   frameWidth: number;
   frameHeight: number;
   frameCount: number;
   flipX: boolean;
+  flipY: boolean;
   scale: number;
   displayWidth: number;
   displayHeight: number;
+  caseId?: number;
+  materialId?: string;
+  cellX?: number;
+  cellY?: number;
+  rotate90?: 0 | 1 | 2 | 3;
 };
 
 export class PreviewScene extends Phaser.Scene {
@@ -47,8 +67,10 @@ export class PreviewScene extends Phaser.Scene {
     registerBloomseedAnimations(this);
 
     this.game.events.on(PREVIEW_PLAY_EVENT, this.onPlay, this);
+    this.game.events.on(PREVIEW_SHOW_TILE_EVENT, this.onShowTile, this);
     this.events.once("shutdown", () => {
       this.game.events.off(PREVIEW_PLAY_EVENT, this.onPlay, this);
+      this.game.events.off(PREVIEW_SHOW_TILE_EVENT, this.onShowTile, this);
     });
 
     this.game.events.emit(PREVIEW_READY_EVENT);
@@ -69,7 +91,8 @@ export class PreviewScene extends Phaser.Scene {
       this.sprite.setScale(PREVIEW_SCALE);
     }
 
-    this.sprite.setFlipX(flipX);
+    this.sprite.setFlip(flipX, false);
+    this.sprite.setRotation(0);
     this.sprite.play(key, false);
 
     if (equipKey && this.anims.exists(equipKey)) {
@@ -89,14 +112,64 @@ export class PreviewScene extends Phaser.Scene {
     if (!frame) return;
 
     const info: PreviewInfo = {
+      sourceType: "animation",
       animationKey: key,
       frameWidth: frame.width,
       frameHeight: frame.height,
       frameCount: animation.frames.length,
       flipX,
+      flipY: false,
       scale: PREVIEW_SCALE,
       displayWidth: Math.round(PREVIEW_SCALE * frame.width),
       displayHeight: Math.round(PREVIEW_SCALE * frame.height),
+    };
+    this.game.events.emit(PREVIEW_INFO_EVENT, info);
+  }
+
+  private onShowTile(payload: PreviewShowTilePayload): void {
+    const { textureKey, frame, caseId, materialId, cellX, cellY, rotate90, flipX, flipY } = payload;
+    if (!this.textures.exists(textureKey)) return;
+
+    const texture = this.textures.get(textureKey);
+    const resolvedFrame = texture.get(frame);
+    if (!resolvedFrame) return;
+
+    const cx = Math.round(this.scale.width / 2);
+    const cy = Math.round(this.scale.height / 2);
+
+    if (!this.sprite) {
+      this.sprite = this.add.sprite(cx, cy, textureKey, frame);
+      this.sprite.setScale(PREVIEW_SCALE);
+    } else {
+      this.sprite.setTexture(textureKey, frame);
+      this.sprite.setPosition(cx, cy);
+    }
+
+    this.sprite.setFlip(flipX, flipY);
+    this.sprite.setRotation(rotate90 * (Math.PI / 2));
+    this.sprite.setScale(PREVIEW_SCALE);
+    this.sprite.stop();
+
+    if (this.equipSprite) {
+      this.equipSprite.setVisible(false);
+    }
+
+    const info: PreviewInfo = {
+      sourceType: "terrain-tile",
+      animationKey: frame,
+      frameWidth: resolvedFrame.width,
+      frameHeight: resolvedFrame.height,
+      frameCount: 1,
+      flipX,
+      flipY,
+      scale: PREVIEW_SCALE,
+      displayWidth: Math.round(PREVIEW_SCALE * resolvedFrame.width),
+      displayHeight: Math.round(PREVIEW_SCALE * resolvedFrame.height),
+      caseId,
+      materialId,
+      cellX,
+      cellY,
+      rotate90,
     };
     this.game.events.emit(PREVIEW_INFO_EVENT, info);
   }

@@ -9,11 +9,14 @@ import {
   getTracksForPath,
 } from "../../game/assets/animationCatalog";
 import { type EquipmentId, type Material, MATERIALS } from "../../game/assets/equipmentGroups";
+import type { TerrainTileInspectedPayload } from "../../game/events";
 import { AnimationPreview, type PreviewInfo } from "../AnimationPreview";
 import { AccordionHeader, SectionLabel, activeBtn } from "./common";
 
 type Props = {
   catalog: AnimationCatalog;
+  inspectedTile: TerrainTileInspectedPayload | null;
+  onClearInspectedTile: () => void;
   onInfo: (info: PreviewInfo | null) => void;
 };
 
@@ -112,7 +115,12 @@ function getCurrentPath(
   }
 }
 
-export function PreviewPanel({ catalog, onInfo }: Props): JSX.Element {
+export function PreviewPanel({
+  catalog,
+  inspectedTile,
+  onClearInspectedTile,
+  onInfo,
+}: Props): JSX.Element {
   const previewDirection = useWASDDirection();
 
   const [previewOpen, setPreviewOpen] = useState(true);
@@ -301,11 +309,22 @@ export function PreviewPanel({ catalog, onInfo }: Props): JSX.Element {
           )}
 
           <SectionLabel>Preview</SectionLabel>
+          {inspectedTile && (
+            <>
+              <div style={{ color: "#94a3b8", fontSize: 10 }}>
+                Inspecting tile {inspectedTile.cellX},{inspectedTile.cellY}
+              </div>
+              <button onClick={onClearInspectedTile} style={activeBtn(false)}>
+                Back to animation
+              </button>
+            </>
+          )}
           <AnimationPreview
             track={currentTrack}
             direction={previewDirection}
             equipmentId={equipmentId}
             material={material}
+            inspectedTile={inspectedTile}
             onInfo={onInfo}
           />
         </div>

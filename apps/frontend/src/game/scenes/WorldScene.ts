@@ -9,10 +9,12 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
+  type TerrainTileInspectedPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
 } from "../events";
@@ -220,6 +222,15 @@ export class WorldScene extends Phaser.Scene {
       }
 
       this.selectEntity(hit);
+
+      if (this.terrainSystem) {
+        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+        const inspected = this.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
+        if (inspected) {
+          const payload: TerrainTileInspectedPayload = inspected;
+          this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
+        }
+      }
     }
   }
 

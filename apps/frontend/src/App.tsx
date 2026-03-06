@@ -12,8 +12,10 @@ import {
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
+  type TerrainTileInspectedPayload,
   parsePlaceDragPayload,
   toPlaceDropPayload,
 } from "./game/events";
@@ -23,6 +25,7 @@ function App(): JSX.Element {
   const gameRef = useRef<Phaser.Game | null>(null);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
+  const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -36,10 +39,17 @@ function App(): JSX.Element {
       setPlaceables(payload.placeables);
     });
 
+    function handleTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
+      setInspectedTile(payload);
+    }
+    game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
+
     return () => {
+      game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
       game.destroy(true);
       gameRef.current = null;
       setPlaceables(null);
+      setInspectedTile(null);
     };
   }, []);
 
@@ -85,6 +95,8 @@ function App(): JSX.Element {
         <SidebarAccordion
           catalog={catalog}
           placeables={placeables}
+          inspectedTile={inspectedTile}
+          onClearInspectedTile={() => setInspectedTile(null)}
         />
       )}
       <div
