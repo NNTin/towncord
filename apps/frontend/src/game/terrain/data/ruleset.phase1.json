@@ -1,0 +1,90 @@
+{
+  "transitions": [
+    {
+      "id": "phase1-water-over-ground",
+      "insideMaterial": "water",
+      "outsideMaterial": "ground",
+      "rules": [
+        {
+          "caseId": 0,
+          "frame": "tilesets.bloomseed.environment.all-tileset#1"
+        },
+        {
+          "caseId": 1,
+          "frame": "tilesets.bloomseed.environment.water-tileset#1",
+          "rotate90": 2
+        },
+        {
+          "caseId": 2,
+          "frame": "tilesets.bloomseed.environment.water-tileset#1",
+          "rotate90": 0,
+          "flipY": true
+        },
+        {
+          "caseId": 3,
+          "frame": "tilesets.bloomseed.environment.water-tileset#2",
+          "rotate90": 2
+        },
+        {
+          "caseId": 4,
+          "frame": "tilesets.bloomseed.environment.water-tileset#1"
+        },
+        {
+          "caseId": 5,
+          "frame": "tilesets.bloomseed.environment.water-tileset#2",
+          "rotate90": 2
+        },
+        {
+          "caseId": 6,
+          "frame": "tilesets.bloomseed.environment.water-tileset#47",
+          "rotate90": 0
+        },
+        {
+          "caseId": 7,
+          "frame": "tilesets.bloomseed.environment.water-tileset#21",
+          "rotate90": 2,
+          "flipX": true
+        },
+        {
+          "caseId": 8,
+          "frame": "tilesets.bloomseed.environment.water-tileset#1",
+          "rotate90": 2,
+          "flipY": true
+        },
+        {
+          "caseId": 9,
+          "frame": "tilesets.bloomseed.environment.water-tileset#47",
+          "rotate90": 2
+        },
+        {
+          "caseId": 10,
+          "frame": "tilesets.bloomseed.environment.water-tileset#2",
+          "rotate90": 3
+        },
+        {
+          "caseId": 11,
+          "frame": "tilesets.bloomseed.environment.water-tileset#21",
+          "rotate90": 2
+        },
+        {
+          "caseId": 12,
+          "frame": "tilesets.bloomseed.environment.water-tileset#2"
+        },
+        {
+          "caseId": 13,
+          "frame": "tilesets.bloomseed.environment.water-tileset#21",
+          "rotate90": 0,
+          "flipX": true
+        },
+        {
+          "caseId": 14,
+          "frame": "tilesets.bloomseed.environment.water-tileset#21"
+        },
+        {
+          "caseId": 15,
+          "frame": "tilesets.bloomseed.environment.water-tileset#24"
+        }
+      ]
+    }
+  ]
+}
