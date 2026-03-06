@@ -14,7 +14,7 @@ towncord/
 │       └── realtime-server/       # WebSocket server (if separate)
 │
 ├── packages/
-│   └── bloomseed-assets/          # bloomseed art asset (.git ignored)
+│   └── bloomseed-assets/          # bloomseed art source repo (git submodule)
 │
 ├── assets/
 │   ├── sprites/
@@ -40,11 +40,24 @@ This project uses art assets from [**Bloomseed** by Cocophany](https://cocophany
 
 ## Asset Import
 
-Bloomseed grouped source files live in:
+Bloomseed source files live in:
 
 - `packages/bloomseed-assets/aseprite/**/*.aseprite`
 
+Initialize submodules after cloning:
+
+```bash
+git submodule update --init --recursive
+```
+
 The export pipeline reads those `.aseprite` files directly and generates the Phaser runtime contract in `apps/frontend/public/assets/bloomseed/*`.
+
+CI note:
+- `deploy.yml` expects `secrets.BLOOMSEED_ASSETS_REPO_TOKEN` to read the private `packages/bloomseed-assets` submodule.
+
+Local prerequisites:
+- `aseprite` CLI available on `PATH`
+- Python package `Pillow` installed (`python -m pip install pillow`)
 
 ```bash
 npm run assets:bloomseed:dry

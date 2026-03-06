@@ -1,0 +1,3 @@
+[submodule "packages/bloomseed-assets"]
+	path = packages/bloomseed-assets
+	url = https://github.com/NNTin/bloomseed-assets.git

@@ -1,8 +1,8 @@
 /assets/
 /assets/debug/
+apps/frontend/public/assets/bloomseed/
 node_modules/
 TODO.md
 __pycache__/
 *.pyc
 specs/
-packages/bloomseed-assets/

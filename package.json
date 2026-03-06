@@ -7,8 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:frontend": "npm run -w @towncord/frontend dev",
-    "build:frontend": "npm run -w @towncord/frontend build",
+    "dev:frontend": "npm run assets:bloomseed:public && npm run -w @towncord/frontend dev",
+    "build:frontend": "npm run assets:bloomseed:public && npm run -w @towncord/frontend build",
     "typecheck:frontend": "npm run -w @towncord/frontend typecheck",
     "assets:bloomseed:dry": "npm run -w @towncord/bloomseed-assets export:dry",
     "assets:bloomseed:public": "npm run -w @towncord/bloomseed-assets export:public",
