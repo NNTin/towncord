@@ -13,22 +13,22 @@ type PlaceableGroup = {
   placeables: PlaceableViewModel[];
 };
 
-function groupPlaceablesByKind(placeables: PlaceableViewModel[]): PlaceableGroup[] {
-  const byKind = new Map<string, PlaceableGroup>();
+function groupPlaceablesByGroup(placeables: PlaceableViewModel[]): PlaceableGroup[] {
+  const byGroup = new Map<string, PlaceableGroup>();
 
   for (const placeable of placeables) {
-    if (!byKind.has(placeable.groupKey)) {
-      byKind.set(placeable.groupKey, {
+    if (!byGroup.has(placeable.groupKey)) {
+      byGroup.set(placeable.groupKey, {
         key: placeable.groupKey,
         label: placeable.groupLabel,
         placeables: [],
       });
     }
 
-    byKind.get(placeable.groupKey)!.placeables.push(placeable);
+    byGroup.get(placeable.groupKey)!.placeables.push(placeable);
   }
 
-  return [...byKind.values()];
+  return [...byGroup.values()];
 }
 
 function DraggableEntry({
@@ -62,8 +62,8 @@ export function PlaceablesPanel({
   placeables,
   onDragStart,
 }: Props): JSX.Element {
-  const [openByKind, setOpenByKind] = useState<Record<string, boolean>>({});
-  const groups = groupPlaceablesByKind(placeables);
+  const [openByGroup, setOpenByGroup] = useState<Record<string, boolean>>({});
+  const groups = groupPlaceablesByGroup(placeables);
 
   return (
     <>
@@ -72,14 +72,14 @@ export function PlaceablesPanel({
       </div>
 
       {groups.map((group) => {
-        const open = openByKind[group.key] ?? true;
+        const open = openByGroup[group.key] ?? true;
         return (
           <div key={group.key}>
             <AccordionHeader
               label={group.label}
               open={open}
               onToggle={() =>
-                setOpenByKind((current) => ({
+                setOpenByGroup((current) => ({
                   ...current,
                   [group.key]: !(current[group.key] ?? true),
                 }))
