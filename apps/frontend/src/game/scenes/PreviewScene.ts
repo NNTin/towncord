@@ -19,6 +19,7 @@ export type PreviewPlayPayload = {
   flipX: boolean;
   equipKey: string | null;
   equipFlipX: boolean;
+  frameIndex?: number | null;
 };
 
 export type PreviewShowTilePayload = {
@@ -77,7 +78,7 @@ export class PreviewScene extends Phaser.Scene {
   }
 
   private onPlay(payload: PreviewPlayPayload): void {
-    const { key, flipX, equipKey, equipFlipX } = payload;
+    const { key, flipX, equipKey, equipFlipX, frameIndex } = payload;
 
     const animation = this.anims.get(key);
     const firstFrame = animation?.frames[0];
@@ -91,11 +92,25 @@ export class PreviewScene extends Phaser.Scene {
       this.sprite.setScale(PREVIEW_SCALE);
     }
 
+    const resolvedFrameIndex =
+      typeof frameIndex === "number" && Number.isFinite(frameIndex)
+        ? Phaser.Math.Clamp(Math.floor(frameIndex), 0, animation.frames.length - 1)
+        : null;
+    const selectedAnimationFrame =
+      resolvedFrameIndex === null ? firstFrame : animation.frames[resolvedFrameIndex];
+    if (!selectedAnimationFrame) return;
+
     this.sprite.setFlip(flipX, false);
     this.sprite.setRotation(0);
-    this.sprite.play(key, false);
+    if (resolvedFrameIndex === null) {
+      this.sprite.play(key, false);
+    } else {
+      this.sprite.setTexture(selectedAnimationFrame.textureKey, selectedAnimationFrame.textureFrame);
+      this.sprite.setPosition(cx, cy);
+      this.sprite.stop();
+    }
 
-    if (equipKey && this.anims.exists(equipKey)) {
+    if (resolvedFrameIndex === null && equipKey && this.anims.exists(equipKey)) {
       if (!this.equipSprite) {
         this.equipSprite = this.add.sprite(cx, cy, EQUIPMENT_ATLAS);
         this.equipSprite.setScale(PREVIEW_SCALE);
@@ -107,8 +122,8 @@ export class PreviewScene extends Phaser.Scene {
       this.equipSprite.setVisible(false);
     }
 
-    const texture = this.textures.get(firstFrame.textureKey);
-    const frame = texture.get(firstFrame.textureFrame);
+    const texture = this.textures.get(selectedAnimationFrame.textureKey);
+    const frame = texture.get(selectedAnimationFrame.textureFrame);
     if (!frame) return;
 
     const info: PreviewInfo = {

@@ -29,6 +29,7 @@ type Props = {
   direction: InputDirection;
   equipmentId: EquipmentId | "";
   material: Material;
+  frameIndex: number | null;
   inspectedTile: TerrainTileInspectedPayload | null;
   onInfo: (info: PreviewInfo | null) => void;
 };
@@ -38,6 +39,7 @@ export function AnimationPreview({
   direction,
   equipmentId,
   material,
+  frameIndex,
   inspectedTile,
   onInfo,
 }: Props): JSX.Element {
@@ -148,6 +150,7 @@ export function AnimationPreview({
       flipX: result.flipX,
       equipKey,
       equipFlipX: result.flipX,
+      frameIndex,
     };
 
     if (readyRef.current && gameRef.current) {
@@ -155,7 +158,7 @@ export function AnimationPreview({
     } else {
       pendingPlayRef.current = payload;
     }
-  }, [track, direction, equipmentId, material, inspectedTile]);
+  }, [track, direction, equipmentId, material, frameIndex, inspectedTile]);
 
   return (
     <div

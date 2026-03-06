@@ -4,8 +4,11 @@ import {
   type AnimationTrack,
   type EntityType,
   type InputDirection,
+  type TilesetFamily,
   getMobIds,
   getPropGroups,
+  resolveTrackForDirection,
+  getTilesetGroups,
   getTracksForPath,
 } from "../../game/assets/animationCatalog";
 import { type EquipmentId, type Material, MATERIALS } from "../../game/assets/equipmentGroups";
@@ -27,6 +30,8 @@ type SelectorState = {
   mobId: string;
   propFamily: string;
   propGroup: string;
+  tilesetFamily: TilesetFamily;
+  tilesetGroup: string;
   trackId: string;
   equipmentId: EquipmentId | "";
 };
@@ -40,6 +45,8 @@ function getInitialState(catalog: AnimationCatalog): SelectorState {
   const mobId = getMobIds(catalog, mobFamily)[0] ?? "";
   const propFamily = catalog.propFamilies[0] ?? "";
   const propGroup = getPropGroups(catalog, propFamily)[0] ?? "";
+  const tilesetFamily = catalog.tilesetFamilies.includes("static") ? "static" : catalog.tilesetFamilies[0]!;
+  const tilesetGroup = getTilesetGroups(catalog, tilesetFamily)[0] ?? "";
 
   return {
     entityType: "player",
@@ -48,6 +55,8 @@ function getInitialState(catalog: AnimationCatalog): SelectorState {
     mobId,
     propFamily,
     propGroup,
+    tilesetFamily,
+    tilesetGroup,
     trackId: defaultTrack?.id ?? "",
     equipmentId: defaultTrack?.equipmentCompatible[0] ?? "",
   };
@@ -100,6 +109,11 @@ function resolvePropPath(family: string, group: string): string {
   return `props/${family}`;
 }
 
+function resolveTilesetPath(family: TilesetFamily, group: string): string {
+  if (group) return `tilesets/${family}/${group}`;
+  return `tilesets/${family}`;
+}
+
 function getCurrentPath(
   et: EntityType,
   pf: string,
@@ -107,11 +121,14 @@ function getCurrentPath(
   mi: string,
   prpF: string,
   prpG: string,
+  tsF: TilesetFamily,
+  tsG: string,
 ): string {
   switch (et) {
     case "player": return `player/${pf}`;
     case "mobs": return `mobs/${mf}/${mi}`;
     case "props": return resolvePropPath(prpF, prpG);
+    case "tilesets": return resolveTilesetPath(tsF, tsG);
   }
 }
 
@@ -132,9 +149,13 @@ export function PreviewPanel({
   const [mobId, setMobId] = useState(initState.mobId);
   const [propFamily, setPropFamily] = useState(initState.propFamily);
   const [propGroup, setPropGroup] = useState(initState.propGroup);
+  const [tilesetFamily, setTilesetFamily] = useState(initState.tilesetFamily);
+  const [tilesetGroup, setTilesetGroup] = useState(initState.tilesetGroup);
+  const [tilesetFrameIndex, setTilesetFrameIndex] = useState(0);
   const [selectedTrackId, setSelectedTrackId] = useState(initState.trackId);
   const [equipmentId, setEquipmentId] = useState<EquipmentId | "">(initState.equipmentId);
   const [material, setMaterial] = useState<Material>("iron");
+  const [previewInfo, setPreviewInfo] = useState<PreviewInfo | null>(null);
 
   const currentPath = getCurrentPath(
     entityType,
@@ -143,11 +164,35 @@ export function PreviewPanel({
     mobId,
     propFamily,
     propGroup,
+    tilesetFamily,
+    tilesetGroup,
   );
   const currentTracks = getTracksForPath(catalog, currentPath);
   const currentTrack = currentTracks.find((track) => track.id === selectedTrackId) ?? currentTracks[0] ?? null;
   const propGroups = getPropGroups(catalog, propFamily);
+  const tilesetGroups = getTilesetGroups(catalog, tilesetFamily);
+  const isTilesetStatic = entityType === "tilesets" && tilesetFamily === "static";
+  const expectedPreviewKey = currentTrack
+    ? resolveTrackForDirection(currentTrack, previewDirection)?.key ?? null
+    : null;
   const compatible = currentTrack?.equipmentCompatible ?? [];
+  const maxTilesetFrameIndex =
+    isTilesetStatic &&
+    previewInfo?.sourceType === "animation" &&
+    expectedPreviewKey !== null &&
+    previewInfo.animationKey === expectedPreviewKey
+      ? Math.max(0, previewInfo.frameCount - 1)
+      : null;
+  const resolvedTilesetFrameIndex =
+    maxTilesetFrameIndex === null
+      ? Math.max(0, tilesetFrameIndex)
+      : Math.min(Math.max(0, tilesetFrameIndex), maxTilesetFrameIndex);
+
+  useEffect(() => {
+    if (!isTilesetStatic) {
+      setTilesetFrameIndex(0);
+    }
+  }, [isTilesetStatic]);
 
   function activateTrack(track: AnimationTrack, equip: EquipmentId | ""): void {
     setSelectedTrackId(track.id);
@@ -167,7 +212,18 @@ export function PreviewPanel({
 
   function handleEntityType(nextEntityType: EntityType): void {
     setEntityType(nextEntityType);
-    switchToPath(getCurrentPath(nextEntityType, playerFamily, mobFamily, mobId, propFamily, propGroup));
+    switchToPath(
+      getCurrentPath(
+        nextEntityType,
+        playerFamily,
+        mobFamily,
+        mobId,
+        propFamily,
+        propGroup,
+        tilesetFamily,
+        tilesetGroup,
+      ),
+    );
   }
 
   function handlePlayerFamily(family: string): void {
@@ -201,12 +257,35 @@ export function PreviewPanel({
     switchToPath(resolvePropPath(propFamily, group));
   }
 
+  function handleTilesetFamily(family: TilesetFamily): void {
+    const groups = getTilesetGroups(catalog, family);
+    const nextGroup = groups[0] ?? "";
+    setTilesetFamily(family);
+    setTilesetGroup(nextGroup);
+    setTilesetFrameIndex(0);
+    switchToPath(resolveTilesetPath(family, nextGroup));
+  }
+
+  function handleTilesetGroup(group: string): void {
+    setTilesetGroup(group);
+    setTilesetFrameIndex(0);
+    switchToPath(resolveTilesetPath(tilesetFamily, group));
+  }
+
   function handleSelectTrack(track: AnimationTrack): void {
     const compatibleEquipment = track.equipmentCompatible;
     const nextEquip = compatibleEquipment.includes(equipmentId as EquipmentId)
       ? equipmentId
       : (compatibleEquipment[0] ?? "");
+    if (entityType === "tilesets") {
+      setTilesetFrameIndex(0);
+    }
     activateTrack(track, nextEquip);
+  }
+
+  function handlePreviewInfo(info: PreviewInfo | null): void {
+    setPreviewInfo(info);
+    onInfo(info);
   }
 
   return (
@@ -270,6 +349,32 @@ export function PreviewPanel({
             </>
           )}
 
+          {entityType === "tilesets" && (
+            <>
+              <SectionLabel>Family</SectionLabel>
+              {catalog.tilesetFamilies.map((family) => (
+                <button key={family} onClick={() => handleTilesetFamily(family)} style={activeBtn(tilesetFamily === family)}>
+                  {family}
+                </button>
+              ))}
+              {tilesetGroups.length > 0 && (
+                <>
+                  <SectionLabel>Group</SectionLabel>
+                  {tilesetGroups.map((group) => (
+                    <button key={group} onClick={() => handleTilesetGroup(group)} style={activeBtn(tilesetGroup === group)}>
+                      {group}
+                    </button>
+                  ))}
+                </>
+              )}
+              {tilesetGroups.length === 0 && (
+                <div style={{ color: "#94a3b8", fontSize: 11 }}>
+                  No tilesets in this family yet
+                </div>
+              )}
+            </>
+          )}
+
           <SectionLabel>Animation</SectionLabel>
           {currentTracks.map((track) => (
             <button
@@ -280,6 +385,54 @@ export function PreviewPanel({
               {track.label}
             </button>
           ))}
+          {isTilesetStatic && currentTrack && (
+            <>
+              <SectionLabel>Tile</SectionLabel>
+              <div style={{ alignItems: "center", display: "flex", gap: 4 }}>
+                <button
+                  onClick={() => setTilesetFrameIndex((value) => Math.max(0, value - 1))}
+                  style={{ ...activeBtn(false), minWidth: 30, padding: "4px 0" }}
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  min={0}
+                  max={maxTilesetFrameIndex ?? undefined}
+                  value={resolvedTilesetFrameIndex}
+                  onChange={(event) => {
+                    const parsed = Number.parseInt(event.target.value, 10);
+                    setTilesetFrameIndex(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+                  }}
+                  style={{
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    borderRadius: 4,
+                    color: "#cbd5e1",
+                    flex: 1,
+                    fontFamily: "inherit",
+                    fontSize: 12,
+                    padding: "4px 6px",
+                  }}
+                />
+                <button
+                  onClick={() =>
+                    setTilesetFrameIndex((value) =>
+                      maxTilesetFrameIndex === null ? value + 1 : Math.min(maxTilesetFrameIndex, value + 1),
+                    )
+                  }
+                  style={{ ...activeBtn(false), minWidth: 30, padding: "4px 0" }}
+                >
+                  +
+                </button>
+              </div>
+              {maxTilesetFrameIndex !== null && (
+                <div style={{ color: "#94a3b8", fontSize: 10 }}>
+                  Tile {resolvedTilesetFrameIndex + 1} / {maxTilesetFrameIndex + 1}
+                </div>
+              )}
+            </>
+          )}
 
           {compatible.length > 0 && (
             <>
@@ -324,8 +477,9 @@ export function PreviewPanel({
             direction={previewDirection}
             equipmentId={equipmentId}
             material={material}
+            frameIndex={isTilesetStatic ? resolvedTilesetFrameIndex : null}
             inspectedTile={inspectedTile}
-            onInfo={onInfo}
+            onInfo={handlePreviewInfo}
           />
         </div>
       )}
