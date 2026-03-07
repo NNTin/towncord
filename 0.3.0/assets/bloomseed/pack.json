@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-03-07T19:04:36.568408+00:00",
+    "generatedAt": "2026-03-07T19:06:47.856943+00:00",
     "generator": "packages/bloomseed-assets/pipeline/export_from_aseprite.py",
     "namespace": "bloomseed",
     "sourceRoot": "packages/bloomseed-assets/aseprite",
