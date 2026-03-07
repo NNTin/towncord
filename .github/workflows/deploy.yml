@@ -57,7 +57,7 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Aseprite CLI
-        uses: neomura/setup-aseprite-cli-action@1fb5457640e86f885546a55870f55f0d62dce630
+        uses: neomura/setup-aseprite-cli-action@b6dc81c257c2b2d35690ebefed72546b46660007
 
       - name: Install Python dependencies
         run: |
