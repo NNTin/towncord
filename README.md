@@ -14,9 +14,7 @@ towncord/
 │       └── realtime-server/       # WebSocket server (if separate)
 │
 ├── packages/
-│   ├── shared-types/          # Shared TS types/interfaces
-│   ├── shared-utils/          # Shared utilities
-│   └── config/                # Shared config constants
+│   └── bloomseed-assets/          # bloomseed art source repo (git submodule)
 │
 ├── assets/
 │   ├── sprites/
@@ -42,18 +40,34 @@ This project uses art assets from [**Bloomseed** by Cocophany](https://cocophany
 
 ## Asset Import
 
-Bloomseed source files live in `assets/.raw/bloomseed`.
+Bloomseed source files live in:
 
-Stage 1 (`assets:bloomseed:extract`) extracts and normalizes the raw pack into `assets/sprites`, and trims unused transparent/padding space from source images.
-Stage 2 (`assets:bloomseed:phaser`) packs those extracted frames into grouped Phaser atlases in `apps/frontend/public/assets/bloomseed/atlases` and writes a Phaser Asset Pack file at `apps/frontend/public/assets/bloomseed/pack.json`.
+- `packages/bloomseed-assets/aseprite/**/*.aseprite`
+
+Initialize submodules after cloning:
 
 ```bash
-npm run assets:bloomseed:extract:dry
-npm run assets:bloomseed:extract
-npm run assets:bloomseed:phaser:dry
-npm run assets:bloomseed:phaser
-npm run assets:bloomseed
+git submodule update --init --recursive
 ```
+
+The export pipeline reads those `.aseprite` files directly and generates the Phaser runtime contract in `apps/frontend/public/assets/bloomseed/*`.
+
+CI note:
+- `deploy.yml` expects `secrets.BLOOMSEED_ASSETS_REPO_TOKEN` to read the private `packages/bloomseed-assets` submodule.
+
+Local prerequisites:
+- `aseprite` CLI available on `PATH`
+- Python package `Pillow` installed (`python -m pip install pillow`)
+
+```bash
+npm run assets:bloomseed:dry
+npm run assets:bloomseed:public
+npm run assets:bloomseed:all
+```
+
+- `assets:bloomseed:dry`: validate extraction and packing only
+- `assets:bloomseed:public`: write runtime atlas/manifest files for frontend
+- `assets:bloomseed:all`: write runtime files + GIF previews + frame PNG sequences
 
 Phaser preload example:
 
