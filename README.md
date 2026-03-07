@@ -53,7 +53,7 @@ git submodule update --init --recursive
 The export pipeline reads those `.aseprite` files directly and generates the Phaser runtime contract in `apps/frontend/public/assets/bloomseed/*`.
 
 CI note:
-- `deploy.yml` expects `secrets.BLOOMSEED_ASSETS_REPO_TOKEN` to read the private `packages/bloomseed-assets` submodule.
+- `deploy.yml` expects `secrets.REPO_TOKEN` to read the private `packages/bloomseed-assets` submodule.
 
 Local prerequisites:
 - `aseprite` CLI available on `PATH`

@@ -31,12 +31,12 @@ jobs:
     needs: resolve-version
 
     steps:
-      - name: Validate Bloomseed assets repo token
+      - name: Validate repo token
         env:
-          BLOOMSEED_ASSETS_REPO_TOKEN: ${{ secrets.BLOOMSEED_ASSETS_REPO_TOKEN }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
-          if [ -z "$BLOOMSEED_ASSETS_REPO_TOKEN" ]; then
-            echo "Error: BLOOMSEED_ASSETS_REPO_TOKEN is not set. This workflow requires this secret to checkout the Bloomseed assets submodule." >&2
+          if [ -z "$REPO_TOKEN" ]; then
+            echo "Error: REPO_TOKEN is not set. This workflow requires this secret to access private repositories." >&2
             exit 1
           fi
 
@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          token: ${{ secrets.BLOOMSEED_ASSETS_REPO_TOKEN }}
+          token: ${{ secrets.REPO_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -57,7 +57,43 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Aseprite CLI
-        uses: neomura/setup-aseprite-cli-action@b6dc81c257c2b2d35690ebefed72546b46660007
+        env:
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          set -euo pipefail
+          RELEASE_TAG="v1.3.17"
+          ASSET_NAME="Aseprite-v1.3.17-Linux.zip"
+          EXPECTED_SHA256="6cf84e38dfc74bc0f20346d57f7158689823044759de620abe24321d2d7870e9"
+          RELEASE_API_URL="https://api.github.com/repos/NNTin/aseprite-builder/releases/tags/${RELEASE_TAG}"
+          ZIP_PATH="${RUNNER_TEMP}/aseprite.zip"
+          INSTALL_DIR="${RUNNER_TEMP}/aseprite"
+
+          ASSET_API_URL="$(
+            curl -fsSL \
+              -H "Authorization: Bearer ${REPO_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "$RELEASE_API_URL" | \
+            python -c "import json,sys; asset='${ASSET_NAME}'; release=json.load(sys.stdin); print(next((a.get('url','') for a in release.get('assets',[]) if a.get('name')==asset), ''))"
+          )"
+
+          if [ -z "$ASSET_API_URL" ]; then
+            echo "Error: Could not find asset '${ASSET_NAME}' in release '${RELEASE_TAG}'." >&2
+            exit 1
+          fi
+
+          curl -fsSL \
+            -H "Authorization: Bearer ${REPO_TOKEN}" \
+            -H "Accept: application/octet-stream" \
+            "$ASSET_API_URL" \
+            -o "$ZIP_PATH"
+
+          echo "${EXPECTED_SHA256}  ${ZIP_PATH}" | sha256sum -c -
+
+          mkdir -p "$INSTALL_DIR"
+          unzip -q "$ZIP_PATH" -d "$INSTALL_DIR"
+          chmod +x "$INSTALL_DIR/aseprite"
+          echo "$INSTALL_DIR" >> "$GITHUB_PATH"
+          "$INSTALL_DIR/aseprite" --version
 
       - name: Install Python dependencies
         run: |
