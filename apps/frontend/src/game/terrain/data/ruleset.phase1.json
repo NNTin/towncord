@@ -7,82 +7,67 @@
       "rules": [
         {
           "caseId": 0,
-          "frame": "tilesets.bloomseed.environment.all-tileset#1"
+          "frame": "tilesets.debug.environment.ground-base#0"
         },
         {
           "caseId": 1,
-          "frame": "tilesets.bloomseed.environment.water-tileset#1",
-          "rotate90": 2
+          "frame": "tilesets.debug.environment.water-15#0"
         },
         {
           "caseId": 2,
-          "frame": "tilesets.bloomseed.environment.water-tileset#1",
-          "rotate90": 0,
-          "flipY": true
+          "frame": "tilesets.debug.environment.water-15#1"
         },
         {
           "caseId": 3,
-          "frame": "tilesets.bloomseed.environment.water-tileset#2",
-          "rotate90": 2
+          "frame": "tilesets.debug.environment.water-15#2"
         },
         {
           "caseId": 4,
-          "frame": "tilesets.bloomseed.environment.water-tileset#1"
+          "frame": "tilesets.debug.environment.water-15#3"
         },
         {
           "caseId": 5,
-          "frame": "tilesets.bloomseed.environment.water-tileset#2",
-          "rotate90": 2
+          "frame": "tilesets.debug.environment.water-15#4"
         },
         {
           "caseId": 6,
-          "frame": "tilesets.bloomseed.environment.water-tileset#47",
-          "rotate90": 0
+          "frame": "tilesets.debug.environment.water-15#5"
         },
         {
           "caseId": 7,
-          "frame": "tilesets.bloomseed.environment.water-tileset#21",
-          "rotate90": 2,
-          "flipX": true
+          "frame": "tilesets.debug.environment.water-15#6"
         },
         {
           "caseId": 8,
-          "frame": "tilesets.bloomseed.environment.water-tileset#1",
-          "rotate90": 2,
-          "flipY": true
+          "frame": "tilesets.debug.environment.water-15#7"
         },
         {
           "caseId": 9,
-          "frame": "tilesets.bloomseed.environment.water-tileset#47",
-          "rotate90": 2
+          "frame": "tilesets.debug.environment.water-15#8"
         },
         {
           "caseId": 10,
-          "frame": "tilesets.bloomseed.environment.water-tileset#2",
-          "rotate90": 3
+          "frame": "tilesets.debug.environment.water-15#9"
         },
         {
           "caseId": 11,
-          "frame": "tilesets.bloomseed.environment.water-tileset#21",
-          "rotate90": 2
+          "frame": "tilesets.debug.environment.water-15#10"
         },
         {
           "caseId": 12,
-          "frame": "tilesets.bloomseed.environment.water-tileset#2"
+          "frame": "tilesets.debug.environment.water-15#11"
         },
         {
           "caseId": 13,
-          "frame": "tilesets.bloomseed.environment.water-tileset#21",
-          "rotate90": 0,
-          "flipX": true
+          "frame": "tilesets.debug.environment.water-15#12"
         },
         {
           "caseId": 14,
-          "frame": "tilesets.bloomseed.environment.water-tileset#21"
+          "frame": "tilesets.debug.environment.water-15#13"
         },
         {
           "caseId": 15,
-          "frame": "tilesets.bloomseed.environment.water-tileset#24"
+          "frame": "tilesets.debug.environment.water-15#14"
         }
       ]
     }
