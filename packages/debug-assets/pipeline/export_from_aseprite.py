@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
-"""Export debug runtime assets directly from grouped .aseprite sources."""
+"""Export debug runtime assets from grouped .aseprite sources.
+
+Debug tilesets are authored as animated 4x4 sheet frames where each sheet frame
+contains marching-square cases in row-major order:
+0..3 / 4..7 / 8..11 / 12..15.
+
+The exporter slices each sheet frame into 16 tiles and writes atlas frames as:
+- <animation_id>#<tile_index>@<phase_index> (animated frames)
+- <animation_id>#<tile_index>            (phase-0 alias for compatibility)
+"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import subprocess
 import tempfile
@@ -30,21 +40,21 @@ SOURCE_CATEGORY_MAP = {
     "tilesets": "tilesets",
 }
 
+TILE_COLUMNS = 4
+TILE_ROWS = 4
+TILE_COUNT = TILE_COLUMNS * TILE_ROWS
+
 
 @dataclass(frozen=True)
 class ExtractedFrame:
     animation_id: str
     atlas_category: str
     atlas_key: str
-    frame_index: int
-    duration_ms: int
+    frame_name: str
     width: int
     height: int
+    duration_ms: int
     source_png: Path
-
-    @property
-    def frame_name(self) -> str:
-        return f"{self.animation_id}#{self.frame_index}"
 
 
 @dataclass
@@ -58,6 +68,11 @@ class AtlasPlacement:
 class AnimationBuild:
     atlas_key: str
     frame_names: list[str]
+
+
+@dataclass
+class PreviewBuild:
+    animation_id: str
     frame_paths: list[Path]
     durations_ms: list[int]
 
@@ -70,7 +85,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
             "Export Phaser atlas/runtime manifests from packages/debug-assets/aseprite "
-            "and optionally write GIF previews and per-frame PNG sequences."
+            "and optionally write GIF previews and sliced tile frame sequences."
         ),
     )
     parser.add_argument(
@@ -86,12 +101,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--frames-root",
         default=package_relative("./frames"),
-        help="Output root for per-animation frame sequences (when --write-frames).",
+        help="Output root for sliced case frame sequences (when --write-frames).",
     )
     parser.add_argument(
         "--previews-root",
         default=package_relative("./previews"),
-        help="Output root for GIF previews (when --write-previews).",
+        help="Output root for full-sheet GIF previews (when --write-previews).",
     )
     parser.add_argument(
         "--aseprite-bin",
@@ -124,12 +139,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--write-frames",
         action="store_true",
-        help="Write per-animation frame PNG sequences.",
+        help="Write sliced case frame PNG sequences.",
     )
     parser.add_argument(
         "--write-previews",
         action="store_true",
-        help="Write per-animation GIF previews.",
+        help="Write full-sheet animated GIF previews.",
     )
     parser.add_argument(
         "--dry-run",
@@ -223,17 +238,74 @@ def run_group_extraction(
     return read_json(manifest_path)
 
 
+def safe_name(value: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9_.-]+", "_", value)
+
+
+def slice_sheet_frame(
+    source_png: Path,
+    destination_dir: Path,
+    animation_id: str,
+    phase_index: int,
+) -> tuple[int, int, list[Path]]:
+    with Image.open(source_png) as raw:
+        sheet = raw.convert("RGBA")
+
+        if sheet.width % TILE_COLUMNS != 0 or sheet.height % TILE_ROWS != 0:
+            raise RuntimeError(
+                f"Sheet frame for {animation_id} has invalid size {sheet.width}x{sheet.height}; "
+                f"expected width/height divisible by {TILE_COLUMNS}x{TILE_ROWS}."
+            )
+
+        tile_width = sheet.width // TILE_COLUMNS
+        tile_height = sheet.height // TILE_ROWS
+
+        if tile_width < 1 or tile_height < 1:
+            raise RuntimeError(
+                f"Sheet frame for {animation_id} produced invalid tile size {tile_width}x{tile_height}."
+            )
+
+        destination_dir.mkdir(parents=True, exist_ok=True)
+        outputs: list[Path] = []
+        safe_animation = safe_name(animation_id)
+
+        for tile_index in range(TILE_COUNT):
+            col = tile_index % TILE_COLUMNS
+            row = tile_index // TILE_COLUMNS
+            left = col * tile_width
+            top = row * tile_height
+            right = left + tile_width
+            bottom = top + tile_height
+
+            tile = sheet.crop((left, top, right, bottom))
+            output_path = (
+                destination_dir
+                / f"{safe_animation}__tile-{tile_index:02d}__phase-{phase_index:03d}.png"
+            )
+            tile.save(output_path)
+            outputs.append(output_path)
+
+    return tile_width, tile_height, outputs
+
+
 def build_extracted_frames(
     aseprite_root: Path,
     grouped_sources: list[Path],
     aseprite_bin: str,
     extract_script: Path,
     temp_root: Path,
-) -> tuple[dict[str, list[ExtractedFrame]], dict[str, AnimationBuild]]:
+) -> tuple[
+    dict[str, list[ExtractedFrame]],
+    dict[str, AnimationBuild],
+    dict[str, PreviewBuild],
+    dict[str, dict[int, list[Path]]],
+]:
     frames_by_category: dict[str, list[ExtractedFrame]] = {
         category: [] for category in CATEGORY_ORDER
     }
     animations: dict[str, AnimationBuild] = {}
+    previews: dict[str, PreviewBuild] = {}
+    case_phase_frames: dict[str, dict[int, list[Path]]] = {}
 
     for source_file in grouped_sources:
         relative_source = source_file.relative_to(aseprite_root)
@@ -267,30 +339,19 @@ def build_extracted_frames(
             if animation_id in animations:
                 raise RuntimeError(f"Duplicate animation id across grouped sources: {animation_id}")
 
-            animation_build = AnimationBuild(
-                atlas_key=atlas_key,
-                frame_names=[],
-                frame_paths=[],
-                durations_ms=[],
-            )
+            animation_build = AnimationBuild(atlas_key=atlas_key, frame_names=[])
+            preview_build = PreviewBuild(animation_id=animation_id, frame_paths=[], durations_ms=[])
+            by_case: dict[int, list[Path]] = {index: [] for index in range(TILE_COUNT)}
 
-            for frame_index, frame in enumerate(tag_frames):
+            expected_tile_size: tuple[int, int] | None = None
+
+            for phase_index, frame in enumerate(tag_frames):
                 frame_file = frame.get("file")
-                width = frame.get("width")
-                height = frame.get("height")
                 duration = frame.get("duration", 100)
 
                 if not isinstance(frame_file, str):
                     raise RuntimeError(
                         f"Invalid frame file for animation {animation_id} in {source_file}"
-                    )
-                if not isinstance(width, int) or width < 1:
-                    raise RuntimeError(
-                        f"Invalid frame width for animation {animation_id} in {source_file}"
-                    )
-                if not isinstance(height, int) or height < 1:
-                    raise RuntimeError(
-                        f"Invalid frame height for animation {animation_id} in {source_file}"
                     )
                 if not isinstance(duration, int) or duration < 1:
                     duration = 100
@@ -301,25 +362,73 @@ def build_extracted_frames(
                         f"Missing extracted frame for animation {animation_id}: {source_png}"
                     )
 
-                extracted = ExtractedFrame(
-                    animation_id=animation_id,
-                    atlas_category=atlas_category,
-                    atlas_key=atlas_key,
-                    frame_index=frame_index,
-                    duration_ms=duration,
-                    width=width,
-                    height=height,
+                tile_dir = extract_dir / "sliced"
+                tile_width, tile_height, tile_paths = slice_sheet_frame(
                     source_png=source_png,
+                    destination_dir=tile_dir,
+                    animation_id=animation_id,
+                    phase_index=phase_index,
                 )
 
-                frames_by_category[atlas_category].append(extracted)
-                animation_build.frame_names.append(extracted.frame_name)
-                animation_build.frame_paths.append(source_png)
-                animation_build.durations_ms.append(duration)
+                size_tuple = (tile_width, tile_height)
+                if expected_tile_size is None:
+                    expected_tile_size = size_tuple
+                elif expected_tile_size != size_tuple:
+                    raise RuntimeError(
+                        f"Inconsistent tile size across phases for {animation_id}: "
+                        f"expected {expected_tile_size[0]}x{expected_tile_size[1]}, "
+                        f"got {tile_width}x{tile_height}"
+                    )
+
+                preview_build.frame_paths.append(source_png)
+                preview_build.durations_ms.append(duration)
+
+                for tile_index, tile_path in enumerate(tile_paths):
+                    by_case[tile_index].append(tile_path)
+
+                    base_name = f"{animation_id}#{tile_index}"
+                    phase_name = f"{base_name}@{phase_index}"
+
+                    frames_by_category[atlas_category].append(
+                        ExtractedFrame(
+                            animation_id=animation_id,
+                            atlas_category=atlas_category,
+                            atlas_key=atlas_key,
+                            frame_name=phase_name,
+                            width=tile_width,
+                            height=tile_height,
+                            duration_ms=duration,
+                            source_png=tile_path,
+                        )
+                    )
+
+                    if phase_index == 0:
+                        # Alias preserves existing case mapping contract without phase suffix.
+                        frames_by_category[atlas_category].append(
+                            ExtractedFrame(
+                                animation_id=animation_id,
+                                atlas_category=atlas_category,
+                                atlas_key=atlas_key,
+                                frame_name=base_name,
+                                width=tile_width,
+                                height=tile_height,
+                                duration_ms=duration,
+                                source_png=tile_path,
+                            )
+                        )
+                        animation_build.frame_names.append(base_name)
+
+            if len(animation_build.frame_names) != TILE_COUNT:
+                raise RuntimeError(
+                    f"Animation {animation_id} did not produce exactly {TILE_COUNT} base tiles. "
+                    f"Got {len(animation_build.frame_names)}"
+                )
 
             animations[animation_id] = animation_build
+            previews[animation_id] = preview_build
+            case_phase_frames[animation_id] = by_case
 
-    return frames_by_category, animations
+    return frames_by_category, animations, previews, case_phase_frames
 
 
 def pack_category_frames(
@@ -406,7 +515,7 @@ def write_atlas_png_and_json(
         {
             "frames": frames_json,
             "meta": {
-                "app": "towncord-aseprite-pipeline",
+                "app": "towncord-debug-aseprite-pipeline",
                 "version": "1.0",
                 "image": atlas_image_path.name,
                 "format": "RGBA8888",
@@ -491,41 +600,47 @@ def write_manifest_json(
 
 def write_frames(
     frames_root: Path,
-    animations: dict[str, AnimationBuild],
+    case_phase_frames: dict[str, dict[int, list[Path]]],
 ) -> int:
     shutil.rmtree(frames_root, ignore_errors=True)
     written = 0
 
-    for animation_id in sorted(animations.keys()):
-        animation = animations[animation_id]
-        rel_dir = Path(*animation_id.split("."))
-        output_dir = frames_root / rel_dir
-        output_dir.mkdir(parents=True, exist_ok=True)
+    for animation_id in sorted(case_phase_frames.keys()):
+        by_case = case_phase_frames[animation_id]
+        output_root = frames_root / Path(*animation_id.split("."))
+        output_root.mkdir(parents=True, exist_ok=True)
 
-        for index, source_png in enumerate(animation.frame_paths):
-            output_file = output_dir / f"frame-{index:04d}.png"
-            shutil.copy2(source_png, output_file)
-            written += 1
+        for case_index in range(TILE_COUNT):
+            case_dir = output_root / f"case-{case_index:02d}"
+            case_dir.mkdir(parents=True, exist_ok=True)
+            phase_paths = by_case.get(case_index, [])
 
+            for phase_index, source_png in enumerate(phase_paths):
+                output_file = case_dir / f"phase-{phase_index:03d}.png"
+                shutil.copy2(source_png, output_file)
+                written += 1
+
+    frames_root.mkdir(parents=True, exist_ok=True)
+    (frames_root / ".gitkeep").touch()
     return written
 
 
 def write_previews(
     previews_root: Path,
-    animations: dict[str, AnimationBuild],
+    previews: dict[str, PreviewBuild],
 ) -> int:
     shutil.rmtree(previews_root, ignore_errors=True)
     written = 0
 
-    for animation_id in sorted(animations.keys()):
-        animation = animations[animation_id]
+    for animation_id in sorted(previews.keys()):
+        preview = previews[animation_id]
         rel_file = Path(*animation_id.split("."))
         output_file = previews_root / rel_file.parent / f"{rel_file.name}.gif"
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
         frames: list[Image.Image] = []
         try:
-            for frame_path in animation.frame_paths:
+            for frame_path in preview.frame_paths:
                 with Image.open(frame_path) as frame_raw:
                     frames.append(frame_raw.convert("RGBA"))
 
@@ -539,7 +654,7 @@ def write_previews(
                 save_all=True,
                 append_images=rest,
                 optimize=False,
-                duration=animation.durations_ms,
+                duration=preview.durations_ms,
                 loop=0,
                 disposal=2,
             )
@@ -548,6 +663,8 @@ def write_previews(
             for frame in frames:
                 frame.close()
 
+    previews_root.mkdir(parents=True, exist_ok=True)
+    (previews_root / ".gitkeep").touch()
     return written
 
 
@@ -584,7 +701,7 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="debug-aseprite-export-") as temp_dir:
         temp_root = Path(temp_dir)
-        frames_by_category, animations = build_extracted_frames(
+        frames_by_category, animations, previews, case_phase_frames = build_extracted_frames(
             aseprite_root=aseprite_root,
             grouped_sources=grouped_sources,
             aseprite_bin=aseprite_bin,
@@ -639,13 +756,16 @@ def main() -> int:
 
             frames_written = 0
             if args.write_frames:
-                frames_written = write_frames(frames_root=frames_root, animations=animations)
+                frames_written = write_frames(
+                    frames_root=frames_root,
+                    case_phase_frames=case_phase_frames,
+                )
 
             previews_written = 0
             if args.write_previews:
                 previews_written = write_previews(
                     previews_root=previews_root,
-                    animations=animations,
+                    previews=previews,
                 )
         else:
             frames_written = 0

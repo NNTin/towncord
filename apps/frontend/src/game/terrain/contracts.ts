@@ -2,6 +2,7 @@ export const TERRAIN_CHUNK_SIZE = 32 as const;
 export const TERRAIN_TEXTURE_KEY = "debug.tilesets";
 export const TERRAIN_TILE_FRAME_SIZE = 16;
 export const TERRAIN_TILE_SCALE = 4;
+export const TERRAIN_ANIMATION_FRAME_MS = 120;
 export const TERRAIN_CELL_WORLD_SIZE = TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
 export const TERRAIN_RENDER_DEPTH = -1_000;
 

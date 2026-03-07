@@ -64,13 +64,18 @@ export class TerrainSystem {
       }
     }
 
-    if (!this.store.hasDirtyChunks()) return;
+    if (!this.store.hasDirtyChunks()) {
+      this.renderer.updateAnimation();
+      return;
+    }
 
     const dirtyChunks = this.store.consumeDirtyChunks();
     for (const chunk of dirtyChunks) {
       const payload = this.chunkBuilder.buildChunkPayload(chunk);
       this.renderer.applyChunkPayload(payload);
     }
+
+    this.renderer.updateAnimation();
   }
 
   public inspectAtWorld(worldX: number, worldY: number): TerrainTileInspectedPayload | null {

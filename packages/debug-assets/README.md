@@ -10,22 +10,27 @@ Placeholder asset package for early frontend integration and terrain iteration.
 
 ## Marching Squares Placeholder
 
-The debug environment source contains:
+The debug environment source uses an animated sprite-sheet tag:
 
-- `tilesets.debug.environment.ground-base` (outside/base tile, 1 frame)
-- `tilesets.debug.environment.water-15` (15 transition frames for case IDs 1..15)
+- `tilesets.debug.environment.autotile-15`
+- Each timeline frame is a full 4x4 tileset sheet (8 phases)
+- Tiles are row-major case IDs:
+  - row 1: `0 1 2 3`
+  - row 2: `4 5 6 7`
+  - row 3: `8 9 10 11`
+  - row 4: `12 13 14 15`
 
 Expected mapping strategy:
 
-- case `0` -> `tilesets.debug.environment.ground-base#0`
-- case `1..15` -> `tilesets.debug.environment.water-15#(caseId - 1)`
+- case `N` -> `tilesets.debug.environment.autotile-15#N`
+- animated variants are exported as `tilesets.debug.environment.autotile-15#N@phase`
 - canonical ruleset example: `aseprite/environment/tileset.marching-squares-15.json`
 
 ## Outputs
 
 - Phaser runtime files in `apps/frontend/public/assets/debug`
-- GIF previews in `previews/` (via `export:all`)
-- Frame PNG sequences in `frames/` (via `export:all`)
+- GIF previews in `previews/` (via `export:all`) showing full sheet animation
+- Sliced case frame sequences in `frames/` (via `export:all`)
 
 ## Commands
 
