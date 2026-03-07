@@ -32,10 +32,13 @@ jobs:
 
     steps:
       - name: Validate Bloomseed assets repo token
-        if: ${{ !secrets.BLOOMSEED_ASSETS_REPO_TOKEN }}
+        env:
+          BLOOMSEED_ASSETS_REPO_TOKEN: ${{ secrets.BLOOMSEED_ASSETS_REPO_TOKEN }}
         run: |
-          echo "Error: BLOOMSEED_ASSETS_REPO_TOKEN is not set. This workflow requires this secret to checkout the Bloomseed assets submodule." >&2
-          exit 1
+          if [ -z "$BLOOMSEED_ASSETS_REPO_TOKEN" ]; then
+            echo "Error: BLOOMSEED_ASSETS_REPO_TOKEN is not set. This workflow requires this secret to checkout the Bloomseed assets submodule." >&2
+            exit 1
+          fi
 
       - name: Checkout code
         uses: actions/checkout@v4
