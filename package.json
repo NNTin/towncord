@@ -13,6 +13,9 @@
     "assets:bloomseed:dry": "npm run -w @towncord/bloomseed-assets export:dry",
     "assets:bloomseed:public": "npm run -w @towncord/bloomseed-assets export:public",
     "assets:bloomseed:all": "npm run -w @towncord/bloomseed-assets export:all",
+    "assets:debug:dry": "npm run -w @towncord/debug-assets export:dry",
+    "assets:debug:public": "npm run -w @towncord/debug-assets export:public",
+    "assets:debug:all": "npm run -w @towncord/debug-assets export:all",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
     "test": "echo \"Define workspace tests\""

@@ -1,6 +1,7 @@
 /assets/
 /assets/debug/
 apps/frontend/public/assets/bloomseed/
+apps/frontend/public/assets/debug/
 node_modules/
 TODO.md
 __pycache__/
