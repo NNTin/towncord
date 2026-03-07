@@ -182,10 +182,6 @@ def resolve_aseprite_binary(preferred: str) -> str:
     if candidate.exists() and candidate.is_file():
         return str(candidate)
 
-    fallback = Path("/home/nntin/git/aseprite/build/bin/aseprite")
-    if fallback.exists() and fallback.is_file():
-        return str(fallback)
-
     raise RuntimeError(f'Could not resolve Aseprite binary from "{preferred}"')
 
 
@@ -312,7 +308,7 @@ def build_extracted_frames(
         atlas_category = map_source_category(relative_source)
         atlas_key = CATEGORY_ATLAS_KEY[atlas_category]
 
-        source_stem = str(relative_source.with_suffix(""))
+        source_stem = relative_source.with_suffix("").as_posix()
         safe_stem = source_stem.replace("/", "__")
         extract_dir = temp_root / safe_stem
         manifest_path = extract_dir / "manifest.json"
@@ -441,7 +437,12 @@ def pack_category_frames(
         return border_padding * 2, border_padding * 2, []
 
     max_frame_width = max(frame.width for frame in frames)
-    effective_max_width = max(max_width, max_frame_width + (border_padding * 2))
+    if max_frame_width + (border_padding * 2) > max_width:
+        raise ValueError(
+            f"Frame width {max_frame_width}px plus border padding ({border_padding * 2}px) "
+            f"exceeds --max-atlas-width {max_width}px"
+        )
+    effective_max_width = max_width
 
     x = border_padding
     y = border_padding
