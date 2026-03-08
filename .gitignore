@@ -7,3 +7,5 @@ TODO.md
 __pycache__/
 *.pyc
 specs/
+.chunkhound/
+.chunkhound.json
