@@ -11,8 +11,15 @@ import type { PlaceableViewModel } from "./game/application/placeableService";
 import {
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
-  type PlaceDragPayload,
+  PLACE_TERRAIN_DROP_EVENT,
+  RUNTIME_PERF_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
+  type PlaceTerrainDropPayload,
+  type RuntimePerfPayload,
+  type TerrainTileInspectedPayload,
+  parsePlaceDragPayload,
+  toPlaceDropPayload,
 } from "./game/events";
 
 function App(): JSX.Element {
@@ -20,6 +27,8 @@ function App(): JSX.Element {
   const gameRef = useRef<Phaser.Game | null>(null);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
+  const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
+  const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -33,10 +42,23 @@ function App(): JSX.Element {
       setPlaceables(payload.placeables);
     });
 
+    function handleTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
+      setInspectedTile(payload);
+    }
+    function handleRuntimePerf(payload: RuntimePerfPayload): void {
+      setRuntimePerf(payload);
+    }
+    game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
+    game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
+
     return () => {
+      game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
+      game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
       game.destroy(true);
       gameRef.current = null;
       setPlaceables(null);
+      setInspectedTile(null);
+      setRuntimePerf(null);
     };
   }, []);
 
@@ -49,16 +71,28 @@ function App(): JSX.Element {
     e.preventDefault();
     const raw = e.dataTransfer.getData(PLACE_DRAG_MIME);
     if (!raw) return;
+
     try {
-      const data = JSON.parse(raw) as PlaceDragPayload;
+      const dragPayload = parsePlaceDragPayload(JSON.parse(raw));
+      if (!dragPayload) return;
+
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      const payload: PlaceObjectDropPayload = {
-        entityId: data.entityId,
-        screenX: e.clientX - rect.left,
-        screenY: e.clientY - rect.top,
-      };
-      gameRef.current?.events.emit(PLACE_OBJECT_DROP_EVENT, payload);
+
+      const dropPayload = toPlaceDropPayload(
+        dragPayload,
+        e.clientX - rect.left,
+        e.clientY - rect.top,
+      );
+
+      if (dropPayload.type === "entity") {
+        const payload: PlaceObjectDropPayload = dropPayload;
+        gameRef.current?.events.emit(PLACE_OBJECT_DROP_EVENT, payload);
+        return;
+      }
+
+      const terrainPayload: PlaceTerrainDropPayload = dropPayload;
+      gameRef.current?.events.emit(PLACE_TERRAIN_DROP_EVENT, terrainPayload);
     } catch {
       // ignore malformed drag data
     }
@@ -70,6 +104,9 @@ function App(): JSX.Element {
         <SidebarAccordion
           catalog={catalog}
           placeables={placeables}
+          inspectedTile={inspectedTile}
+          onClearInspectedTile={() => setInspectedTile(null)}
+          runtimePerf={runtimePerf}
         />
       )}
       <div

@@ -1,6 +1,7 @@
 import { type EquipmentId, TOOL_EQUIPMENT_MAP } from "./equipmentGroups";
 
-export type EntityType = "player" | "mobs" | "props";
+export type EntityType = "player" | "mobs" | "props" | "tilesets";
+export type TilesetFamily = "animated" | "static";
 export type SpriteDirection = "up" | "down" | "side";
 export type InputDirection = "up" | "down" | "left" | "right";
 
@@ -19,7 +20,8 @@ export type AnimationCatalog = {
   playerModels: string[];
   mobFamilies: string[];
   propFamilies: string[];
-  /** key: path like "player/female", "mobs/animals/chicken", "props/animated/chest", "props/static/barrels" */
+  tilesetFamilies: TilesetFamily[];
+  /** key: path like "player/female", "mobs/animals/chicken", "props/animated/chest", "props/static/barrels", "tilesets/static/environment" */
   tracksByPath: Map<string, AnimationTrack[]>;
 };
 
@@ -30,6 +32,7 @@ export type MobCatalogDescriptor = {
 };
 
 const SPRITE_DIRECTIONS: SpriteDirection[] = ["up", "down", "side"];
+const TILESET_FAMILIES: TilesetFamily[] = ["animated", "static"];
 
 function getSpriteDirection(segment: string): SpriteDirection | null {
   for (const dir of SPRITE_DIRECTIONS) {
@@ -163,11 +166,50 @@ function parsePropKeys(
   }
 }
 
+function parseTilesetKeys(
+  keys: string[],
+  pathTracks: Map<string, Map<string, AnimationTrack>>,
+): void {
+  const PREFIX = "tilesets.bloomseed.";
+  for (const key of keys) {
+    if (!key.startsWith(PREFIX)) continue;
+    const parts = key.split(".");
+    // Current shape: tilesets.bloomseed.<group>.<tilesetType> (implicitly static)
+    // Future shape: tilesets.bloomseed.<family>.<group>.<tilesetType>
+    let family: TilesetFamily;
+    let group: string;
+    let tilesetType: string;
+
+    if (parts.length === 4) {
+      family = "static";
+      group = parts[2]!;
+      tilesetType = parts[3]!;
+    } else if (parts.length === 5 && (parts[2] === "animated" || parts[2] === "static")) {
+      family = parts[2];
+      group = parts[3]!;
+      tilesetType = parts[4]!;
+    } else {
+      continue;
+    }
+
+    const path = `tilesets/${family}/${group}`;
+
+    if (!pathTracks.has(path)) pathTracks.set(path, new Map());
+    const track = getOrCreate(pathTracks.get(path)!, tilesetType, {
+      label: tilesetType,
+      entityType: "tilesets",
+      equipmentCompatible: [],
+    });
+    track.undirectedKey = key;
+  }
+}
+
 export function buildAnimationCatalog(animationKeys: string[]): AnimationCatalog {
   const pathTracks = new Map<string, Map<string, AnimationTrack>>();
   parsePlayerKeys(animationKeys, pathTracks);
   parseMobKeys(animationKeys, pathTracks);
   parsePropKeys(animationKeys, pathTracks);
+  parseTilesetKeys(animationKeys, pathTracks);
 
   const tracksByPath = new Map<string, AnimationTrack[]>();
   for (const [path, map] of pathTracks) {
@@ -192,6 +234,8 @@ export function buildAnimationCatalog(animationKeys: string[]): AnimationCatalog
     } else if (ns === "props") {
       entityTypes.add("props");
       if (sub) propFamilies.add(sub);
+    } else if (ns === "tilesets") {
+      entityTypes.add("tilesets");
     }
   }
 
@@ -200,6 +244,7 @@ export function buildAnimationCatalog(animationKeys: string[]): AnimationCatalog
     playerModels: [...playerModels].sort(),
     mobFamilies: [...mobFamilies].sort(),
     propFamilies: [...propFamilies].sort(),
+    tilesetFamilies: [...TILESET_FAMILIES],
     tracksByPath,
   };
 }
@@ -254,6 +299,15 @@ export function listMobDescriptors(catalog: AnimationCatalog): MobCatalogDescrip
 /** Returns prop groups under a prop family (e.g. "chest", "water", "barrels"). */
 export function getPropGroups(catalog: AnimationCatalog, family: string): string[] {
   const prefix = `props/${family}/`;
+  return [...catalog.tracksByPath.keys()]
+    .filter((p) => p.startsWith(prefix))
+    .map((p) => p.slice(prefix.length))
+    .sort();
+}
+
+/** Returns tileset groups under a tileset family (e.g. "environment", "structure"). */
+export function getTilesetGroups(catalog: AnimationCatalog, family: TilesetFamily): string[] {
+  const prefix = `tilesets/${family}/`;
   return [...catalog.tracksByPath.keys()]
     .filter((p) => p.startsWith(prefix))
     .map((p) => p.slice(prefix.length))

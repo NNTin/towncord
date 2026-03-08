@@ -8,12 +8,19 @@ import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper"
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
+  PLACE_TERRAIN_DROP_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
+  RUNTIME_PERF_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
   type PlaceObjectDropPayload,
+  type PlaceTerrainDropPayload,
+  type TerrainTileInspectedPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
+  type RuntimePerfPayload,
 } from "../events";
+import { TerrainSystem } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import { createWorldEntity } from "./world/entityFactory";
 import { updateEntityMovement } from "./world/movementSystem";
@@ -35,6 +42,7 @@ export class WorldScene extends Phaser.Scene {
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
+  private terrainSystem: TerrainSystem | null = null;
   private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
@@ -45,6 +53,7 @@ export class WorldScene extends Phaser.Scene {
   private panStartY = 0;
   private camStartX = 0;
   private camStartY = 0;
+  private lastPerfEmitAtMs = 0;
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -70,13 +79,18 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerup", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
 
+    this.terrainSystem = new TerrainSystem(this);
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+    this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.events.once(
       "shutdown",
       () => {
+        this.terrainSystem?.destroy();
+        this.terrainSystem = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+        this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
         this.input.off("pointerup", this.onPointerUp, this);
@@ -89,37 +103,56 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
-    if (!this.selectedEntity || !this.wasd || !this.shiftKey || !this.catalog) {
-      return;
-    }
+    const updateStart = performance.now();
 
-    const entity = this.selectedEntity;
-    const dt = delta / 1000;
+    const terrainStart = performance.now();
+    this.terrainSystem?.update();
+    const terrainMs = performance.now() - terrainStart;
 
-    const prevState = entity.state;
-    const prevFacing = entity.facing;
+    if (this.selectedEntity && this.wasd && this.shiftKey && this.catalog) {
+      const entity = this.selectedEntity;
+      const dt = delta / 1000;
 
-    updateEntityMovement(entity, dt, {
-      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
-      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
-      isRunModifier: this.shiftKey.isDown,
-    });
+      const prevState = entity.state;
+      const prevFacing = entity.facing;
 
-    entity.position.x += entity.velocity.x * dt;
-    entity.position.y += entity.velocity.y * dt;
-    entity.sprite.setPosition(entity.position.x, entity.position.y);
+      updateEntityMovement(entity, dt, {
+        moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
+        moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
+        isRunModifier: this.shiftKey.isDown,
+      });
 
-    const stateChanged = entity.state !== prevState;
-    const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
-    if (stateChanged || dirChanged) {
-      playEntityAnimation(entity, this.catalog);
-      if (stateChanged && entity.definition.kind === "player") {
-        const payload: PlayerStateChangedPayload = { state: entity.state };
-        this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+      entity.position.x += entity.velocity.x * dt;
+      entity.position.y += entity.velocity.y * dt;
+      entity.sprite.setPosition(entity.position.x, entity.position.y);
+
+      const stateChanged = entity.state !== prevState;
+      const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
+      if (stateChanged || dirChanged) {
+        playEntityAnimation(entity, this.catalog);
+        if (stateChanged && entity.definition.kind === "player") {
+          const payload: PlayerStateChangedPayload = { state: entity.state };
+          this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+        }
       }
+
+      this.syncSelectionBadgePosition(entity);
     }
 
-    this.syncSelectionBadgePosition(entity);
+    const now = performance.now();
+    if (now - this.lastPerfEmitAtMs >= 100) {
+      const updateMs = now - updateStart;
+      const fps = delta > 0 ? 1000 / delta : 0;
+      const payload: RuntimePerfPayload = {
+        timestampMs: now,
+        fps,
+        frameMs: delta,
+        updateMs,
+        terrainMs,
+      };
+      this.game.events.emit(RUNTIME_PERF_EVENT, payload);
+      this.lastPerfEmitAtMs = now;
+    }
   }
 
   private selectEntity(entity: WorldEntity | null): void {
@@ -183,6 +216,12 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  private onPlaceTerrainDrop(payload: PlaceTerrainDropPayload): void {
+    if (!this.terrainSystem) return;
+    const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
+    this.terrainSystem.queueDrop(payload, worldPoint.x, worldPoint.y);
+  }
+
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = true;
@@ -203,6 +242,15 @@ export class WorldScene extends Phaser.Scene {
       }
 
       this.selectEntity(hit);
+
+      if (this.terrainSystem) {
+        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+        const inspected = this.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
+        if (inspected) {
+          const payload: TerrainTileInspectedPayload = inspected;
+          this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
+        }
+      }
     }
   }
 

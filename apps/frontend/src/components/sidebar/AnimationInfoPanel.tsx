@@ -38,7 +38,30 @@ export function AnimationInfoPanel({ animInfo }: Props): JSX.Element {
         >
           {animInfo ? (
             <>
+              <InfoRow
+                label="type"
+                value={animInfo.sourceType === "terrain-tile" ? "terrain tile" : "animation"}
+              />
               <InfoRow label="key" value={animInfo.animationKey} />
+              {animInfo.sourceType === "terrain-tile" && (
+                <>
+                  <InfoRow label="material" value={animInfo.materialId ?? "-"} />
+                  <InfoRow
+                    label="cell"
+                    value={
+                      animInfo.cellX !== undefined && animInfo.cellY !== undefined
+                        ? `${animInfo.cellX},${animInfo.cellY}`
+                        : "-"
+                    }
+                  />
+                  <InfoRow label="case" value={animInfo.caseId !== undefined ? String(animInfo.caseId) : "-"} />
+                  <InfoRow
+                    label="rotate90"
+                    value={animInfo.rotate90 !== undefined ? String(animInfo.rotate90) : "0"}
+                  />
+                  <InfoRow label="flipY" value={animInfo.flipY ? "yes" : "no"} />
+                </>
+              )}
               <InfoRow label="frame" value={`${animInfo.frameWidth}×${animInfo.frameHeight}`} />
               <InfoRow label="frames" value={String(animInfo.frameCount)} />
               <InfoRow label="display" value={`${animInfo.displayWidth}×${animInfo.displayHeight}`} />

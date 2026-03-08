@@ -5,7 +5,7 @@ import {
   composeBloomseedBootstrap,
 } from "../application/gameComposition";
 import { registerBloomseedAnimations } from "../assets/animation";
-import { preloadBloomseedPack } from "../assets/preload";
+import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import { PRELOAD_SCENE_KEY } from "./BootScene";
 import { WORLD_SCENE_KEY } from "./WorldScene";
 
@@ -16,6 +16,7 @@ export class PreloadScene extends Phaser.Scene {
 
   public preload(): void {
     preloadBloomseedPack(this);
+    preloadDebugPack(this);
   }
 
   public create(): void {

@@ -1,22 +1,43 @@
 import { useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
 import type { PlaceableViewModel } from "../game/application/placeableService";
+import type { RuntimePerfPayload, TerrainTileInspectedPayload } from "../game/events";
 import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
 import { PlaceablesPanel } from "./sidebar/PlaceablesPanel";
 import { PreviewPanel } from "./sidebar/PreviewPanel";
+import { RuntimePerfPanel } from "./sidebar/RuntimePerfPanel";
 
 type Props = {
   catalog: AnimationCatalog;
   placeables: PlaceableViewModel[];
+  inspectedTile: TerrainTileInspectedPayload | null;
+  onClearInspectedTile: () => void;
+  runtimePerf: RuntimePerfPayload | null;
 };
 
-export function SidebarAccordion({ catalog, placeables }: Props): JSX.Element {
+export function SidebarAccordion({
+  catalog,
+  placeables,
+  inspectedTile,
+  onClearInspectedTile,
+  runtimePerf,
+}: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
 
   function handleDragStart(e: React.DragEvent, placeable: PlaceableViewModel): void {
-    const payload: PlaceDragPayload = { entityId: placeable.entityId };
+    const payload: PlaceDragPayload =
+      placeable.type === "entity"
+        ? {
+            type: "entity",
+            entityId: placeable.entityId,
+          }
+        : {
+            type: "terrain",
+            materialId: placeable.materialId,
+            brushId: placeable.brushId,
+          };
     e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
   }
@@ -44,9 +65,15 @@ export function SidebarAccordion({ catalog, placeables }: Props): JSX.Element {
         onDragStart={handleDragStart}
       />
 
-      <PreviewPanel catalog={catalog} onInfo={setAnimInfo} />
+      <PreviewPanel
+        catalog={catalog}
+        inspectedTile={inspectedTile}
+        onClearInspectedTile={onClearInspectedTile}
+        onInfo={setAnimInfo}
+      />
 
       <AnimationInfoPanel animInfo={animInfo} />
+      <RuntimePerfPanel perf={runtimePerf} />
 
       <div
         style={{
@@ -61,6 +88,8 @@ export function SidebarAccordion({ catalog, placeables }: Props): JSX.Element {
         Drag to place · Click to select
         <br />
         WASD move · Shift run (player)
+        <br />
+        Click terrain tile to inspect
         <br />
         Mid-drag pan · Scroll zoom
       </div>

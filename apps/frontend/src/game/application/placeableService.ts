@@ -1,5 +1,7 @@
 import { type EntityRegistry } from "../domain/entityRegistry";
-import type { EntityDefinition, EntityId, EntityKind } from "../domain/model";
+import type { EntityId, EntityKind } from "../domain/model";
+import { TERRAIN_PLACEABLES } from "../terrain/placeables";
+import type { TerrainBrushId, TerrainMaterialId } from "../terrain/contracts";
 
 const KIND_LABEL_OVERRIDES: Record<string, string> = {
   npc: "Mobs",
@@ -18,12 +20,26 @@ export function resolvePlaceableGroupLabel(kind: EntityKind): string {
   return KIND_LABEL_OVERRIDES[kind] ?? formatKindLabel(kind);
 }
 
-export type PlaceableViewModel = {
+export type EntityPlaceableViewModel = {
+  id: string;
+  type: "entity";
   entityId: EntityId;
   label: string;
-  kind: EntityDefinition["kind"];
+  groupKey: string;
   groupLabel: string;
 };
+
+export type TerrainPlaceableViewModel = {
+  id: string;
+  type: "terrain";
+  materialId: TerrainMaterialId;
+  brushId: TerrainBrushId;
+  label: string;
+  groupKey: string;
+  groupLabel: string;
+};
+
+export type PlaceableViewModel = EntityPlaceableViewModel | TerrainPlaceableViewModel;
 
 export class PlaceableService {
   private constructor(private readonly registry: EntityRegistry) {}
@@ -32,16 +48,32 @@ export class PlaceableService {
     return new PlaceableService(registry);
   }
 
-  public listPlaceables(): PlaceableViewModel[] {
-    // Scope intentionally constrained in this refactor:
-    // placeables are NPCs and player models only. Tiles/props come later.
+  private listEntityPlaceables(): EntityPlaceableViewModel[] {
     return this.registry
       .listPlaceables()
       .map((definition) => ({
+        id: `entity:${definition.id}`,
+        type: "entity" as const,
         entityId: definition.id,
         label: definition.label,
-        kind: definition.kind,
+        groupKey: `entity:${definition.kind}`,
         groupLabel: resolvePlaceableGroupLabel(definition.kind),
       }));
+  }
+
+  private listTerrainPlaceables(): TerrainPlaceableViewModel[] {
+    return TERRAIN_PLACEABLES.map((placeable) => ({
+      id: placeable.id,
+      type: "terrain",
+      label: placeable.label,
+      materialId: placeable.materialId,
+      brushId: placeable.brushId,
+      groupKey: "terrain",
+      groupLabel: "Terrain",
+    }));
+  }
+
+  public listPlaceables(): PlaceableViewModel[] {
+    return [...this.listEntityPlaceables(), ...this.listTerrainPlaceables()];
   }
 }

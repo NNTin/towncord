@@ -1,0 +1,157 @@
+import type Phaser from "phaser";
+import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../events";
+import {
+  TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_TEXTURE_KEY,
+  toTerrainChunkId,
+  type TerrainChunkId,
+  type TerrainMaterialId,
+} from "./contracts";
+import { TerrainCaseMapper } from "./caseMapper";
+import { TerrainChunkBuilder } from "./chunkBuilder";
+import { loadTerrainBootstrap, validateTerrainBootstrap } from "./bootstrap";
+import { TerrainEditRouter } from "./editRouter";
+import { MarchingSquaresKernel } from "./marchingSquaresKernel";
+import { TerrainRenderer } from "./renderer";
+import { TerrainMapStore } from "./store";
+
+export class TerrainSystem {
+  private readonly store: TerrainMapStore;
+  private readonly router = new TerrainEditRouter();
+  private readonly kernel = new MarchingSquaresKernel();
+  private readonly mapper: TerrainCaseMapper;
+  private readonly chunkBuilder: TerrainChunkBuilder;
+  private readonly renderer: TerrainRenderer;
+  private readonly insideMaterial: TerrainMaterialId;
+
+  private readonly pendingDrops: Array<{ payload: PlaceTerrainDropPayload; worldX: number; worldY: number }> =
+    [];
+
+  constructor(private readonly scene: Phaser.Scene) {
+    const bootstrap = loadTerrainBootstrap();
+    validateTerrainBootstrap(this.scene, bootstrap);
+
+    this.store = new TerrainMapStore(bootstrap.gridSpec);
+    this.mapper = new TerrainCaseMapper(bootstrap.transition.rules);
+    this.insideMaterial = bootstrap.transition.insideMaterial;
+    this.chunkBuilder = new TerrainChunkBuilder(
+      this.store,
+      this.kernel,
+      this.mapper,
+      this.insideMaterial,
+    );
+    this.renderer = new TerrainRenderer(this.scene, bootstrap.gridSpec);
+  }
+
+  public queueDrop(payload: PlaceTerrainDropPayload, worldX: number, worldY: number): void {
+    this.pendingDrops.push({ payload, worldX, worldY });
+  }
+
+  public update(): void {
+    this.renderer.setVisibleChunkIds(this.resolveVisibleChunkIds());
+
+    if (this.pendingDrops.length > 0) {
+      try {
+        for (const pending of this.pendingDrops) {
+          const op = this.router.toEditOp(pending.payload, pending.worldX, pending.worldY);
+          try {
+            this.store.applyEditOp(op);
+          } catch (error) {
+            if (import.meta.env.DEV) {
+              throw error;
+            }
+            console.error(error);
+          }
+        }
+      } finally {
+        this.pendingDrops.length = 0;
+      }
+    }
+
+    if (!this.store.hasDirtyChunks()) {
+      this.renderer.updateAnimation();
+      return;
+    }
+
+    const dirtyChunks = this.store.consumeDirtyChunks();
+    for (const chunk of dirtyChunks) {
+      const payload = this.chunkBuilder.buildChunkPayload(chunk);
+      this.renderer.applyChunkPayload(payload);
+    }
+
+    this.renderer.updateAnimation();
+  }
+
+  private resolveVisibleChunkIds(): TerrainChunkId[] {
+    const camera = this.scene.cameras.main;
+    const worldView = camera.worldView;
+    const chunkPixelSize = this.store.chunkSize * TERRAIN_CELL_WORLD_SIZE;
+
+    const minChunkX = 0;
+    const minChunkY = 0;
+    const maxChunkX = this.store.chunkCountX - 1;
+    const maxChunkY = this.store.chunkCountY - 1;
+
+    const margin = 1;
+    const startChunkX = Math.max(
+      minChunkX,
+      Math.floor(worldView.left / chunkPixelSize) - margin,
+    );
+    const endChunkX = Math.min(
+      maxChunkX,
+      Math.floor((worldView.right - 1) / chunkPixelSize) + margin,
+    );
+    const startChunkY = Math.max(
+      minChunkY,
+      Math.floor(worldView.top / chunkPixelSize) - margin,
+    );
+    const endChunkY = Math.min(
+      maxChunkY,
+      Math.floor((worldView.bottom - 1) / chunkPixelSize) + margin,
+    );
+
+    const ids: TerrainChunkId[] = [];
+    for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY += 1) {
+      for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX += 1) {
+        ids.push(toTerrainChunkId(chunkX, chunkY));
+      }
+    }
+
+    return ids;
+  }
+
+  public inspectAtWorld(worldX: number, worldY: number): TerrainTileInspectedPayload | null {
+    const cellX = Math.floor(worldX / TERRAIN_CELL_WORLD_SIZE);
+    const cellY = Math.floor(worldY / TERRAIN_CELL_WORLD_SIZE);
+
+    if (cellX < 0 || cellX >= this.store.width || cellY < 0 || cellY >= this.store.height) {
+      return null;
+    }
+
+    const materialId = this.store.getCellMaterial(cellX, cellY);
+    const caseId = this.kernel.deriveCaseId(
+      (x, y) => this.store.getCellMaterial(x, y),
+      cellX,
+      cellY,
+      this.insideMaterial,
+    );
+    const mapped = this.mapper.getRule(caseId);
+
+    return {
+      textureKey: TERRAIN_TEXTURE_KEY,
+      frame: mapped.frame,
+      cellX,
+      cellY,
+      materialId,
+      caseId,
+      rotate90: mapped.rotate90 ?? 0,
+      flipX: mapped.flipX ?? false,
+      flipY: mapped.flipY ?? false,
+    };
+  }
+
+  public destroy(): void {
+    this.pendingDrops.length = 0;
+    this.renderer.destroy();
+  }
+}
