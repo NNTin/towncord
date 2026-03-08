@@ -1,0 +1,15 @@
+{
+  "namespace": "debug",
+  "atlases": [
+    {
+      "category": "tilesets",
+      "atlasKey": "debug.tilesets",
+      "textureURL": "assets/debug/atlases/tilesets.png",
+      "atlasURL": "assets/debug/atlases/tilesets.json",
+      "frameCount": 144,
+      "width": 2036,
+      "height": 38
+    }
+  ],
+  "animationCount": 1
+}
