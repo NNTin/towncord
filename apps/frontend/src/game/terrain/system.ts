@@ -3,6 +3,8 @@ import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../ev
 import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_TEXTURE_KEY,
+  toTerrainChunkId,
+  type TerrainChunkId,
   type TerrainMaterialId,
 } from "./contracts";
 import { TerrainCaseMapper } from "./caseMapper";
@@ -46,6 +48,8 @@ export class TerrainSystem {
   }
 
   public update(): void {
+    this.renderer.setVisibleChunkIds(this.resolveVisibleChunkIds());
+
     if (this.pendingDrops.length > 0) {
       try {
         for (const pending of this.pendingDrops) {
@@ -64,13 +68,56 @@ export class TerrainSystem {
       }
     }
 
-    if (!this.store.hasDirtyChunks()) return;
+    if (!this.store.hasDirtyChunks()) {
+      this.renderer.updateAnimation();
+      return;
+    }
 
     const dirtyChunks = this.store.consumeDirtyChunks();
     for (const chunk of dirtyChunks) {
       const payload = this.chunkBuilder.buildChunkPayload(chunk);
       this.renderer.applyChunkPayload(payload);
     }
+
+    this.renderer.updateAnimation();
+  }
+
+  private resolveVisibleChunkIds(): TerrainChunkId[] {
+    const camera = this.scene.cameras.main;
+    const worldView = camera.worldView;
+    const chunkPixelSize = this.store.chunkSize * TERRAIN_CELL_WORLD_SIZE;
+
+    const minChunkX = 0;
+    const minChunkY = 0;
+    const maxChunkX = this.store.chunkCountX - 1;
+    const maxChunkY = this.store.chunkCountY - 1;
+
+    const margin = 1;
+    const startChunkX = Math.max(
+      minChunkX,
+      Math.floor(worldView.left / chunkPixelSize) - margin,
+    );
+    const endChunkX = Math.min(
+      maxChunkX,
+      Math.floor((worldView.right - 1) / chunkPixelSize) + margin,
+    );
+    const startChunkY = Math.max(
+      minChunkY,
+      Math.floor(worldView.top / chunkPixelSize) - margin,
+    );
+    const endChunkY = Math.min(
+      maxChunkY,
+      Math.floor((worldView.bottom - 1) / chunkPixelSize) + margin,
+    );
+
+    const ids: TerrainChunkId[] = [];
+    for (let chunkY = startChunkY; chunkY <= endChunkY; chunkY += 1) {
+      for (let chunkX = startChunkX; chunkX <= endChunkX; chunkX += 1) {
+        ids.push(toTerrainChunkId(chunkX, chunkY));
+      }
+    }
+
+    return ids;
   }
 
   public inspectAtWorld(worldX: number, worldY: number): TerrainTileInspectedPayload | null {

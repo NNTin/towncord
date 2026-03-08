@@ -1,0 +1,24 @@
+{
+  "id": "debug-water-over-ground-15",
+  "insideMaterial": "water",
+  "outsideMaterial": "ground",
+  "notes": "caseId N maps to autotile-15 base frame #N. Animated variants are available as #N@phase.",
+  "rules": [
+    { "caseId": 0, "frame": "tilesets.debug.environment.autotile-15#0" },
+    { "caseId": 1, "frame": "tilesets.debug.environment.autotile-15#1" },
+    { "caseId": 2, "frame": "tilesets.debug.environment.autotile-15#2" },
+    { "caseId": 3, "frame": "tilesets.debug.environment.autotile-15#3" },
+    { "caseId": 4, "frame": "tilesets.debug.environment.autotile-15#4" },
+    { "caseId": 5, "frame": "tilesets.debug.environment.autotile-15#5" },
+    { "caseId": 6, "frame": "tilesets.debug.environment.autotile-15#6" },
+    { "caseId": 7, "frame": "tilesets.debug.environment.autotile-15#7" },
+    { "caseId": 8, "frame": "tilesets.debug.environment.autotile-15#8" },
+    { "caseId": 9, "frame": "tilesets.debug.environment.autotile-15#9" },
+    { "caseId": 10, "frame": "tilesets.debug.environment.autotile-15#10" },
+    { "caseId": 11, "frame": "tilesets.debug.environment.autotile-15#11" },
+    { "caseId": 12, "frame": "tilesets.debug.environment.autotile-15#12" },
+    { "caseId": 13, "frame": "tilesets.debug.environment.autotile-15#13" },
+    { "caseId": 14, "frame": "tilesets.debug.environment.autotile-15#14" },
+    { "caseId": 15, "frame": "tilesets.debug.environment.autotile-15#15" }
+  ]
+}

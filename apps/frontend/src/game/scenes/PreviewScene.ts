@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { preloadBloomseedPack } from "../assets/preload";
+import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import { registerBloomseedAnimations } from "../assets/animation";
 
 export const PREVIEW_SCENE_KEY = "preview";
@@ -62,6 +62,7 @@ export class PreviewScene extends Phaser.Scene {
 
   preload(): void {
     preloadBloomseedPack(this);
+    preloadDebugPack(this);
   }
 
   create(): void {
