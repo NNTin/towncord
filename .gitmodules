@@ -1,3 +1,6 @@
 [submodule "packages/bloomseed-assets"]
 	path = packages/bloomseed-assets
 	url = https://github.com/NNTin/bloomseed-assets.git
+[submodule "packages/debug-assets"]
+	path = packages/debug-assets
+	url = https://github.com/NNTin/debug-assets.git
