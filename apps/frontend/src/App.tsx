@@ -12,9 +12,11 @@ import {
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
+  RUNTIME_PERF_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
+  type RuntimePerfPayload,
   type TerrainTileInspectedPayload,
   parsePlaceDragPayload,
   toPlaceDropPayload,
@@ -26,6 +28,7 @@ function App(): JSX.Element {
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
+  const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -42,14 +45,20 @@ function App(): JSX.Element {
     function handleTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
       setInspectedTile(payload);
     }
+    function handleRuntimePerf(payload: RuntimePerfPayload): void {
+      setRuntimePerf(payload);
+    }
     game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
+    game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
 
     return () => {
       game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
+      game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
       game.destroy(true);
       gameRef.current = null;
       setPlaceables(null);
       setInspectedTile(null);
+      setRuntimePerf(null);
     };
   }, []);
 
@@ -97,6 +106,7 @@ function App(): JSX.Element {
           placeables={placeables}
           inspectedTile={inspectedTile}
           onClearInspectedTile={() => setInspectedTile(null)}
+          runtimePerf={runtimePerf}
         />
       )}
       <div

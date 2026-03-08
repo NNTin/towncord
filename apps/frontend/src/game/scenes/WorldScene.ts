@@ -10,6 +10,7 @@ import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
+  RUNTIME_PERF_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
   type PlaceObjectDropPayload,
@@ -17,6 +18,7 @@ import {
   type TerrainTileInspectedPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
+  type RuntimePerfPayload,
 } from "../events";
 import { TerrainSystem } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
@@ -51,6 +53,7 @@ export class WorldScene extends Phaser.Scene {
   private panStartY = 0;
   private camStartX = 0;
   private camStartY = 0;
+  private lastPerfEmitAtMs = 0;
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -100,39 +103,56 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
+    const updateStart = performance.now();
+
+    const terrainStart = performance.now();
     this.terrainSystem?.update();
+    const terrainMs = performance.now() - terrainStart;
 
-    if (!this.selectedEntity || !this.wasd || !this.shiftKey || !this.catalog) {
-      return;
-    }
+    if (this.selectedEntity && this.wasd && this.shiftKey && this.catalog) {
+      const entity = this.selectedEntity;
+      const dt = delta / 1000;
 
-    const entity = this.selectedEntity;
-    const dt = delta / 1000;
+      const prevState = entity.state;
+      const prevFacing = entity.facing;
 
-    const prevState = entity.state;
-    const prevFacing = entity.facing;
+      updateEntityMovement(entity, dt, {
+        moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
+        moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
+        isRunModifier: this.shiftKey.isDown,
+      });
 
-    updateEntityMovement(entity, dt, {
-      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
-      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
-      isRunModifier: this.shiftKey.isDown,
-    });
+      entity.position.x += entity.velocity.x * dt;
+      entity.position.y += entity.velocity.y * dt;
+      entity.sprite.setPosition(entity.position.x, entity.position.y);
 
-    entity.position.x += entity.velocity.x * dt;
-    entity.position.y += entity.velocity.y * dt;
-    entity.sprite.setPosition(entity.position.x, entity.position.y);
-
-    const stateChanged = entity.state !== prevState;
-    const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
-    if (stateChanged || dirChanged) {
-      playEntityAnimation(entity, this.catalog);
-      if (stateChanged && entity.definition.kind === "player") {
-        const payload: PlayerStateChangedPayload = { state: entity.state };
-        this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+      const stateChanged = entity.state !== prevState;
+      const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
+      if (stateChanged || dirChanged) {
+        playEntityAnimation(entity, this.catalog);
+        if (stateChanged && entity.definition.kind === "player") {
+          const payload: PlayerStateChangedPayload = { state: entity.state };
+          this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+        }
       }
+
+      this.syncSelectionBadgePosition(entity);
     }
 
-    this.syncSelectionBadgePosition(entity);
+    const now = performance.now();
+    if (now - this.lastPerfEmitAtMs >= 100) {
+      const updateMs = now - updateStart;
+      const fps = delta > 0 ? 1000 / delta : 0;
+      const payload: RuntimePerfPayload = {
+        timestampMs: now,
+        fps,
+        frameMs: delta,
+        updateMs,
+        terrainMs,
+      };
+      this.game.events.emit(RUNTIME_PERF_EVENT, payload);
+      this.lastPerfEmitAtMs = now;
+    }
   }
 
   private selectEntity(entity: WorldEntity | null): void {

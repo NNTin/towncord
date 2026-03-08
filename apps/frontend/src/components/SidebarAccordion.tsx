@@ -1,18 +1,20 @@
 import { useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
 import type { PlaceableViewModel } from "../game/application/placeableService";
-import type { TerrainTileInspectedPayload } from "../game/events";
+import type { RuntimePerfPayload, TerrainTileInspectedPayload } from "../game/events";
 import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
 import { PlaceablesPanel } from "./sidebar/PlaceablesPanel";
 import { PreviewPanel } from "./sidebar/PreviewPanel";
+import { RuntimePerfPanel } from "./sidebar/RuntimePerfPanel";
 
 type Props = {
   catalog: AnimationCatalog;
   placeables: PlaceableViewModel[];
   inspectedTile: TerrainTileInspectedPayload | null;
   onClearInspectedTile: () => void;
+  runtimePerf: RuntimePerfPayload | null;
 };
 
 export function SidebarAccordion({
@@ -20,6 +22,7 @@ export function SidebarAccordion({
   placeables,
   inspectedTile,
   onClearInspectedTile,
+  runtimePerf,
 }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
 
@@ -70,6 +73,7 @@ export function SidebarAccordion({
       />
 
       <AnimationInfoPanel animInfo={animInfo} />
+      <RuntimePerfPanel perf={runtimePerf} />
 
       <div
         style={{

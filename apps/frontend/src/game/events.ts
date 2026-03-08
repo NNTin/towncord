@@ -8,6 +8,7 @@ export const PLACE_TERRAIN_DROP_EVENT = "placeTerrainDrop";
 export const TERRAIN_TILE_INSPECTED_EVENT = "terrainTileInspected";
 export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
+export const RUNTIME_PERF_EVENT = "runtimePerf";
 
 export type PlaceEntityDragPayload = {
   type: "entity";
@@ -53,6 +54,14 @@ export type TerrainTileInspectedPayload = {
 export type PlayerPlacedPayload = { worldX: number; worldY: number };
 
 export type PlayerStateChangedPayload = { state: "idle" | "walk" | "run" };
+
+export type RuntimePerfPayload = {
+  timestampMs: number;
+  fps: number;
+  frameMs: number;
+  updateMs: number;
+  terrainMs: number;
+};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
