@@ -1,5 +1,0 @@
-frames/*
-!frames/.gitkeep
-previews/*
-!previews/.gitkeep
-*.pyc

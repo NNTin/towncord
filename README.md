@@ -12,22 +12,13 @@ towncord/
 │       ├── discord-server/        # Discord OAuth + API
 │       ├── node-red/              # Node-RED flows + config
 │       └── realtime-server/       # WebSocket server (if separate)
-│
 ├── packages/
-│   └── bloomseed-assets/          # bloomseed art source repo (git submodule)
-│
-├── assets/
-│   ├── sprites/
-│   ├── audio/
-│   └── fonts/
-│
+│   └── bloomseed-assets/          # bloomseed   art source repo (git submodule)
+│   └── debug-assets/              # placeholder art source repo (git submodule)
 ├── infrastructure/
 │   ├── docker/
 │   ├── nginx/
 │   └── deployment/
-│
-├── scripts/                   # Build / migration / tooling scripts
-│
 ├── .env.example
 ├── package.json
 ├── README.md
