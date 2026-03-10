@@ -70,6 +70,10 @@ export class TerrainMapStore {
     return this.dirtyChunkIds.size > 0;
   }
 
+  public isInBounds(cellX: number, cellY: number): boolean {
+    return cellX >= 0 && cellX < this.width && cellY >= 0 && cellY < this.height;
+  }
+
   public getCellMaterial(cellX: number, cellY: number): TerrainMaterialId {
     if (!this.isInBounds(cellX, cellY)) {
       return this.defaultMaterial;
@@ -82,7 +86,9 @@ export class TerrainMapStore {
     const { cellX, cellY } = op.center;
     if (!this.isInBounds(cellX, cellY)) return false;
 
-    const materialId = op.brushId === "eraser" ? this.defaultMaterial : op.materialId;
+    const materialId = op.brushId === "delete" || op.brushId === "eraser"
+      ? this.defaultMaterial
+      : op.materialId;
 
     if (!this.materials.has(materialId)) {
       throw new Error(`TerrainMapStore: unknown material \"${materialId}\".`);
@@ -150,10 +156,6 @@ export class TerrainMapStore {
     chunk.revision += 1;
     chunk.dirty = true;
     this.dirtyChunkIds.add(chunkId);
-  }
-
-  private isInBounds(cellX: number, cellY: number): boolean {
-    return cellX >= 0 && cellX < this.width && cellY >= 0 && cellY < this.height;
   }
 
   private toCellIndex(cellX: number, cellY: number): number {

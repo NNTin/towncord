@@ -1,7 +1,8 @@
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { RegisteredEntity } from "../../domain/entityRegistry";
-import { resolveSpawnVisual } from "./animationSystem";
+import { createAutonomyState } from "./autonomySystem";
+import { resolveAmbientActionIds, resolveSpawnVisual } from "./animationSystem";
 import type { WorldEntity } from "./types";
 
 export type CreateWorldEntityParams = {
@@ -18,6 +19,7 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
   const { scene, catalog, runtime, nextId, worldX, worldY, spriteScale } = params;
   const { definition } = runtime;
   const behavior = runtime.createBehavior();
+  const ambientActionIds = resolveAmbientActionIds(catalog, definition);
 
   const spawn = resolveSpawnVisual(catalog, scene.anims, definition);
   if (!spawn) return null;
@@ -37,6 +39,8 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
     velocity: { x: 0, y: 0 },
     facing: "down",
     state: "idle",
+    animationAction: "idle",
+    autonomy: createAutonomyState(ambientActionIds),
     sprite,
   };
 }

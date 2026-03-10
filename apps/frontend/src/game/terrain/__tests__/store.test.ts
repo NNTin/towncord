@@ -73,20 +73,20 @@ describe("TerrainMapStore dirty chunk invalidation", () => {
     ]);
   });
 
-  test("eraser brush restores the default material", () => {
+  test("delete brush restores the default material", () => {
     const store = new TerrainMapStore(createGridSpec());
     store.consumeDirtyChunks();
 
     store.applyEditOp({
       materialId: CHANGED_MATERIAL,
-      brushId: "tile",
+      brushId: "water",
       center: { cellX: 10, cellY: 10 },
     });
     store.consumeDirtyChunks();
 
     const changed = store.applyEditOp({
       materialId: CHANGED_MATERIAL,
-      brushId: "eraser",
+      brushId: "delete",
       center: { cellX: 10, cellY: 10 },
     });
 

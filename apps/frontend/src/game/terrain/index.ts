@@ -3,6 +3,7 @@ export * from "./caseMapper";
 export * from "./chunkBuilder";
 export * from "./contracts";
 export * from "./editRouter";
+export * from "./gameplayGrid";
 export * from "./marchingSquaresKernel";
 export * from "./placeables";
 export * from "./renderer";

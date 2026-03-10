@@ -7,15 +7,23 @@ const ACTION_TRACK_CANDIDATES: Readonly<Record<EntityAction, readonly string[]>>
   run: ["run", "walk", "idle"],
 };
 
+export const LOCOMOTION_TRACK_IDS = new Set<string>(["idle", "walk", "run"]);
+
 export function getTrackCandidatesForAction(action: EntityAction): readonly string[] {
   return ACTION_TRACK_CANDIDATES[action];
 }
 
+export function isLocomotionTrackId(actionId: string): boolean {
+  return LOCOMOTION_TRACK_IDS.has(actionId);
+}
+
 export function resolveTrackByActionPolicy(
   tracks: readonly AnimationTrack[],
-  action: EntityAction,
+  action: string,
 ): AnimationTrack | null {
-  const candidates = getTrackCandidatesForAction(action);
+  const candidates = isLocomotionTrackId(action)
+    ? getTrackCandidatesForAction(action as EntityAction)
+    : [action, "idle"];
 
   for (const id of candidates) {
     const track = tracks.find((item) => item.id === id);

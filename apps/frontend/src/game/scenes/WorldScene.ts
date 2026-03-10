@@ -9,22 +9,31 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
-  TERRAIN_TILE_INSPECTED_EVENT,
-  RUNTIME_PERF_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
+  RUNTIME_PERF_EVENT,
+  SELECT_TERRAIN_TOOL_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
-  type TerrainTileInspectedPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
   type RuntimePerfPayload,
+  type SelectedTerrainToolPayload,
+  type TerrainTileInspectedPayload,
 } from "../events";
-import { TerrainSystem } from "../terrain";
+import { TerrainSystem, type TerrainCellCoord } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
+import {
+  AUTONOMY_IDLE_DELAY_MS,
+  resetEntityAutonomy,
+  updateEntityAutonomy,
+} from "./world/autonomySystem";
 import { createWorldEntity } from "./world/entityFactory";
-import { updateEntityMovement } from "./world/movementSystem";
-import type { WorldEntity } from "./world/types";
+import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
+import { TerrainPaintSession } from "./world/terrainPaintSession";
+import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
+import type { WorldEntity, WorldPoint } from "./world/types";
 
 export const WORLD_SCENE_KEY = "world";
 
@@ -43,10 +52,13 @@ export class WorldScene extends Phaser.Scene {
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
   private terrainSystem: TerrainSystem | null = null;
+  private navigation: WorldNavigationService | null = null;
   private nextId = 0;
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
+  private activeTerrainTool: SelectedTerrainToolPayload = null;
+  private readonly terrainPaintSession = new TerrainPaintSession();
 
   private isPanning = false;
   private panStartX = 0;
@@ -54,6 +66,7 @@ export class WorldScene extends Phaser.Scene {
   private camStartX = 0;
   private camStartY = 0;
   private lastPerfEmitAtMs = 0;
+  private directInputIdleMs = 0;
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -77,23 +90,29 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerdown", this.onPointerDown, this);
     this.input.on("pointermove", this.onPointerMove, this);
     this.input.on("pointerup", this.onPointerUp, this);
+    this.input.on("pointerupoutside", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
 
     this.terrainSystem = new TerrainSystem(this);
+    this.navigation = createTerrainNavigationService(this.terrainSystem.getGameplayGrid());
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+    this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
     this.events.once(
       "shutdown",
       () => {
         this.terrainSystem?.destroy();
         this.terrainSystem = null;
+        this.navigation = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+        this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
         this.input.off("pointerup", this.onPointerUp, this);
+        this.input.off("pointerupoutside", this.onPointerUp, this);
         this.input.off("wheel", this.onWheel, this);
       },
       this,
@@ -109,34 +128,72 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    if (this.selectedEntity && this.wasd && this.shiftKey && this.catalog) {
-      const entity = this.selectedEntity;
+    if (this.wasd && this.shiftKey && this.catalog && this.navigation) {
       const dt = delta / 1000;
+      const directInput = this.resolveDirectMovementInput();
+      const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
+      this.directInputIdleMs = hasDirectMovement ? 0 : this.directInputIdleMs + delta;
+      const autoplayEnabled = this.directInputIdleMs >= AUTONOMY_IDLE_DELAY_MS;
 
-      const prevState = entity.state;
-      const prevFacing = entity.facing;
+      for (const entity of this.entities) {
+        const prevState = entity.state;
+        const prevFacing = entity.facing;
+        const prevAnimationAction = entity.animationAction;
+        const isSelected = entity === this.selectedEntity;
 
-      updateEntityMovement(entity, dt, {
-        moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
-        moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
-        isRunModifier: this.shiftKey.isDown,
-      });
+        const movementInput =
+          isSelected && hasDirectMovement
+            ? directInput
+            : updateEntityAutonomy(entity, delta, {
+                autoplayEnabled,
+                navigation: this.navigation,
+              });
 
-      entity.position.x += entity.velocity.x * dt;
-      entity.position.y += entity.velocity.y * dt;
-      entity.sprite.setPosition(entity.position.x, entity.position.y);
+        if (isSelected && hasDirectMovement) {
+          resetEntityAutonomy(entity);
+        }
 
-      const stateChanged = entity.state !== prevState;
-      const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
-      if (stateChanged || dirChanged) {
-        playEntityAnimation(entity, this.catalog);
-        if (stateChanged && entity.definition.kind === "player") {
-          const payload: PlayerStateChangedPayload = { state: entity.state };
-          this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+        updateEntityMovement(entity, dt, movementInput);
+        if (!entity.autonomy.currentAmbientAction) {
+          entity.animationAction = entity.state;
+        }
+
+        const nextPosition = {
+          x: entity.position.x + entity.velocity.x * dt,
+          y: entity.position.y + entity.velocity.y * dt,
+        };
+        const resolvedPosition = this.resolveEntityPosition(entity.position, nextPosition);
+        entity.position.x = resolvedPosition.x;
+        entity.position.y = resolvedPosition.y;
+        if (resolvedPosition.x !== nextPosition.x) {
+          entity.velocity.x = 0;
+        }
+        if (resolvedPosition.y !== nextPosition.y) {
+          entity.velocity.y = 0;
+        }
+        entity.sprite.setPosition(entity.position.x, entity.position.y);
+        if (entity.velocity.x === 0 && entity.velocity.y === 0 && entity.state !== "idle") {
+          entity.state = "idle";
+          if (!entity.autonomy.currentAmbientAction) {
+            entity.animationAction = entity.state;
+          }
+        }
+
+        const stateChanged = entity.state !== prevState;
+        const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
+        const animationChanged = entity.animationAction !== prevAnimationAction;
+        if (stateChanged || dirChanged || animationChanged) {
+          playEntityAnimation(entity, this.catalog);
+          if (isSelected && stateChanged && entity.definition.kind === "player") {
+            const payload: PlayerStateChangedPayload = { state: entity.state };
+            this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+          }
+        }
+
+        if (isSelected) {
+          this.syncSelectionBadgePosition(entity);
         }
       }
-
-      this.syncSelectionBadgePosition(entity);
     }
 
     const now = performance.now();
@@ -187,7 +244,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (!this.catalog || !this.entityRegistry) return;
+    if (!this.catalog || !this.entityRegistry || !this.terrainSystem) return;
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
     const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
@@ -195,13 +252,18 @@ export class WorldScene extends Phaser.Scene {
     const { definition } = runtime;
 
     const worldPoint = this.cameras.main.getWorldPoint(spawnRequest.screenX, spawnRequest.screenY);
+    const clamped = this.terrainSystem.getGameplayGrid().clampWorldPoint(worldPoint.x, worldPoint.y);
+    if (!this.terrainSystem.getGameplayGrid().isWorldWalkable(clamped.worldX, clamped.worldY)) {
+      return;
+    }
+
     const entity = createWorldEntity({
       scene: this,
       catalog: this.catalog,
       runtime,
       nextId: this.nextId,
-      worldX: worldPoint.x,
-      worldY: worldPoint.y,
+      worldX: clamped.worldX,
+      worldY: clamped.worldY,
       spriteScale: SPRITE_SCALE,
     });
     if (!entity) return;
@@ -211,7 +273,7 @@ export class WorldScene extends Phaser.Scene {
     this.selectEntity(entity);
 
     if (definition.kind === "player") {
-      const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
+      const placedPayload: PlayerPlacedPayload = { worldX: clamped.worldX, worldY: clamped.worldY };
       this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
     }
   }
@@ -219,7 +281,12 @@ export class WorldScene extends Phaser.Scene {
   private onPlaceTerrainDrop(payload: PlaceTerrainDropPayload): void {
     if (!this.terrainSystem) return;
     const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
-    this.terrainSystem.queueDrop(payload, worldPoint.x, worldPoint.y);
+    this.queueTerrainDropAtWorld(payload, worldPoint.x, worldPoint.y);
+  }
+
+  private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
+    this.activeTerrainTool = payload;
+    this.terrainPaintSession.end();
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
@@ -230,6 +297,12 @@ export class WorldScene extends Phaser.Scene {
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
     } else if (pointer.button === 0) {
+      if (this.activeTerrainTool) {
+        this.terrainPaintSession.begin();
+        this.paintTerrainAtScreen(pointer.x, pointer.y);
+        return;
+      }
+
       let hit: WorldEntity | null = null;
       const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
 
@@ -255,16 +328,23 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
-    if (!this.isPanning) return;
-    const zoom = this.cameras.main.zoom;
-    const dx = (pointer.x - this.panStartX) / zoom;
-    const dy = (pointer.y - this.panStartY) / zoom;
-    this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+    if (this.isPanning) {
+      const zoom = this.cameras.main.zoom;
+      const dx = (pointer.x - this.panStartX) / zoom;
+      const dy = (pointer.y - this.panStartY) / zoom;
+      this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+      return;
+    }
+
+    if (!this.activeTerrainTool || !this.terrainPaintSession.isActive()) return;
+    this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = false;
+    } else if (pointer.button === 0) {
+      this.terrainPaintSession.end();
     }
   }
 
@@ -277,5 +357,87 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+  }
+
+  private paintTerrainAtScreen(screenX: number, screenY: number): void {
+    if (!this.activeTerrainTool || !this.terrainSystem) return;
+
+    const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
+    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
+    if (!cell || this.isTerrainCellOccupied(cell) || !this.terrainPaintSession.shouldPaintCell(cell)) {
+      return;
+    }
+
+    this.queueTerrainDropAtWorld(
+      {
+        type: "terrain",
+        materialId: this.activeTerrainTool.materialId,
+        brushId: this.activeTerrainTool.brushId,
+        screenX,
+        screenY,
+      },
+      worldPoint.x,
+      worldPoint.y,
+    );
+  }
+
+  private queueTerrainDropAtWorld(
+    payload: PlaceTerrainDropPayload,
+    worldX: number,
+    worldY: number,
+  ): void {
+    if (!this.terrainSystem) return;
+
+    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldX, worldY);
+    if (!cell || this.isTerrainCellOccupied(cell)) return;
+
+    this.terrainSystem.queueDrop(payload, worldX, worldY);
+  }
+
+  private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
+    if (!this.terrainSystem) return false;
+
+    const grid = this.terrainSystem.getGameplayGrid();
+    return this.entities.some((entity) => {
+      const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
+      return entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY;
+    });
+  }
+
+  private resolveDirectMovementInput(): MovementInput {
+    if (!this.wasd || !this.shiftKey) {
+      return {
+        moveX: 0,
+        moveY: 0,
+        isRunModifier: false,
+      };
+    }
+
+    return {
+      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
+      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
+      isRunModifier: this.shiftKey.isDown,
+    };
+  }
+
+  private resolveEntityPosition(current: WorldPoint, next: WorldPoint): WorldPoint {
+    if (!this.navigation) return next;
+
+    const clampedNext = this.navigation.clampToBounds(next);
+    if (this.navigation.isWalkable(clampedNext)) {
+      return clampedNext;
+    }
+
+    const xOnly = this.navigation.clampToBounds({ x: clampedNext.x, y: current.y });
+    if (this.navigation.isWalkable(xOnly)) {
+      return xOnly;
+    }
+
+    const yOnly = this.navigation.clampToBounds({ x: current.x, y: clampedNext.y });
+    if (this.navigation.isWalkable(yOnly)) {
+      return yOnly;
+    }
+
+    return current;
   }
 }

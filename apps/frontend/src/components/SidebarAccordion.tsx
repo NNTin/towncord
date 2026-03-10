@@ -1,7 +1,14 @@
 import { useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
-import type { PlaceableViewModel } from "../game/application/placeableService";
-import type { RuntimePerfPayload, TerrainTileInspectedPayload } from "../game/events";
+import type {
+  PlaceableViewModel,
+  TerrainPlaceableViewModel,
+} from "../game/application/placeableService";
+import type {
+  RuntimePerfPayload,
+  SelectedTerrainToolPayload,
+  TerrainTileInspectedPayload,
+} from "../game/events";
 import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
@@ -14,6 +21,8 @@ type Props = {
   placeables: PlaceableViewModel[];
   inspectedTile: TerrainTileInspectedPayload | null;
   onClearInspectedTile: () => void;
+  activeTerrainTool: SelectedTerrainToolPayload;
+  onSelectTerrainTool: (tool: SelectedTerrainToolPayload) => void;
   runtimePerf: RuntimePerfPayload | null;
 };
 
@@ -22,6 +31,8 @@ export function SidebarAccordion({
   placeables,
   inspectedTile,
   onClearInspectedTile,
+  activeTerrainTool,
+  onSelectTerrainTool,
   runtimePerf,
 }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
@@ -40,6 +51,23 @@ export function SidebarAccordion({
           };
     e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
     e.dataTransfer.effectAllowed = "copy";
+  }
+
+  function handleSelectTerrainTool(placeable: TerrainPlaceableViewModel): void {
+    const currentTool = activeTerrainTool;
+    if (
+      currentTool &&
+      currentTool.brushId === placeable.brushId &&
+      currentTool.materialId === placeable.materialId
+    ) {
+      onSelectTerrainTool(null);
+      return;
+    }
+
+    onSelectTerrainTool({
+      materialId: placeable.materialId,
+      brushId: placeable.brushId,
+    });
   }
 
   return (
@@ -63,6 +91,14 @@ export function SidebarAccordion({
       <PlaceablesPanel
         placeables={placeables}
         onDragStart={handleDragStart}
+        activeTerrainToolId={
+          placeables.find((placeable) =>
+            placeable.type === "terrain" &&
+            activeTerrainTool?.brushId === placeable.brushId &&
+            activeTerrainTool?.materialId === placeable.materialId
+          )?.id ?? null
+        }
+        onSelectTerrainTool={handleSelectTerrainTool}
       />
 
       <PreviewPanel
@@ -85,11 +121,13 @@ export function SidebarAccordion({
           paddingTop: 8,
         }}
       >
-        Drag to place · Click to select
+        Drag entities to place
+        <br />
+        Click brush · Paint with left drag
         <br />
         WASD move · Shift run (player)
         <br />
-        Click terrain tile to inspect
+        Click terrain tile to inspect when no brush is active
         <br />
         Mid-drag pan · Scroll zoom
       </div>

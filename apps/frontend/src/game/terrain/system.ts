@@ -4,6 +4,7 @@ import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_TEXTURE_KEY,
   toTerrainChunkId,
+  type TerrainCellCoord,
   type TerrainChunkId,
   type TerrainMaterialId,
 } from "./contracts";
@@ -11,6 +12,10 @@ import { TerrainCaseMapper } from "./caseMapper";
 import { TerrainChunkBuilder } from "./chunkBuilder";
 import { loadTerrainBootstrap, validateTerrainBootstrap } from "./bootstrap";
 import { TerrainEditRouter } from "./editRouter";
+import {
+  DEFAULT_TERRAIN_MATERIAL_RULES,
+  TerrainGameplayGrid,
+} from "./gameplayGrid";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainRenderer } from "./renderer";
 import { TerrainMapStore } from "./store";
@@ -23,6 +28,7 @@ export class TerrainSystem {
   private readonly chunkBuilder: TerrainChunkBuilder;
   private readonly renderer: TerrainRenderer;
   private readonly insideMaterial: TerrainMaterialId;
+  private readonly gameplayGrid: TerrainGameplayGrid;
 
   private readonly pendingDrops: Array<{ payload: PlaceTerrainDropPayload; worldX: number; worldY: number }> =
     [];
@@ -41,21 +47,30 @@ export class TerrainSystem {
       this.insideMaterial,
     );
     this.renderer = new TerrainRenderer(this.scene, bootstrap.gridSpec);
+    this.gameplayGrid = new TerrainGameplayGrid(this.store, DEFAULT_TERRAIN_MATERIAL_RULES);
   }
 
   public queueDrop(payload: PlaceTerrainDropPayload, worldX: number, worldY: number): void {
     this.pendingDrops.push({ payload, worldX, worldY });
   }
 
+  public getGameplayGrid(): TerrainGameplayGrid {
+    return this.gameplayGrid;
+  }
+
   public update(): void {
     this.renderer.setVisibleChunkIds(this.resolveVisibleChunkIds());
 
     if (this.pendingDrops.length > 0) {
+      const changedCells: TerrainCellCoord[] = [];
       try {
         for (const pending of this.pendingDrops) {
           const op = this.router.toEditOp(pending.payload, pending.worldX, pending.worldY);
           try {
-            this.store.applyEditOp(op);
+            const changed = this.store.applyEditOp(op);
+            if (changed) {
+              changedCells.push(op.center);
+            }
           } catch (error) {
             if (import.meta.env.DEV) {
               throw error;
@@ -64,6 +79,7 @@ export class TerrainSystem {
           }
         }
       } finally {
+        this.gameplayGrid.notifyCellsChanged(changedCells);
         this.pendingDrops.length = 0;
       }
     }
