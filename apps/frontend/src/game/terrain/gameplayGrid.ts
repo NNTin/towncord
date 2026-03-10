@@ -114,6 +114,12 @@ export class TerrainGameplayGrid {
     return this.materialRules[materialId]?.walkable ?? false;
   }
 
+  public isWorldWalkable(worldX: number, worldY: number): boolean {
+    const cell = this.worldToCell(worldX, worldY);
+    if (!cell) return false;
+    return this.isCellWalkable(cell.cellX, cell.cellY);
+  }
+
   public notifyCellsChanged(changedCells: readonly TerrainCellCoord[]): void {
     if (changedCells.length === 0) return;
     this.revision += 1;

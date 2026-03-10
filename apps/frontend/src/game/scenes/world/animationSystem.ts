@@ -5,8 +5,8 @@ import {
   getTracksForPath,
   resolveTrackForDirection,
 } from "../../assets/animationCatalog";
-import { readEntityVisualRef, type EntityAction, type EntityDefinition } from "../../domain/model";
-import { resolveTrackByActionPolicy } from "./animationPolicy";
+import { readEntityVisualRef, type EntityDefinition } from "../../domain/model";
+import { isLocomotionTrackId, resolveTrackByActionPolicy } from "./animationPolicy";
 import type { WorldEntity } from "./types";
 
 export type SpawnVisual = {
@@ -19,10 +19,21 @@ export type SpawnVisual = {
 export function resolveEntityTrack(
   catalog: AnimationCatalog,
   definition: EntityDefinition,
-  action: EntityAction,
+  action: string,
 ): AnimationTrack | null {
   const tracks = getTracksForPath(catalog, readEntityVisualRef(definition.visualRef));
   return resolveTrackByActionPolicy(tracks, action);
+}
+
+export function resolveAmbientActionIds(
+  catalog: AnimationCatalog,
+  definition: EntityDefinition,
+): string[] {
+  if (definition.kind !== "npc") return [];
+
+  return getTracksForPath(catalog, readEntityVisualRef(definition.visualRef))
+    .map((track) => track.id)
+    .filter((trackId) => !isLocomotionTrackId(trackId));
 }
 
 export function resolveSpawnVisual(
@@ -51,7 +62,7 @@ export function playEntityAnimation(
   entity: WorldEntity,
   catalog: AnimationCatalog,
 ): void {
-  const track = resolveEntityTrack(catalog, entity.definition, entity.state);
+  const track = resolveEntityTrack(catalog, entity.definition, entity.animationAction);
   if (!track) return;
 
   const resolved = resolveTrackForDirection(track, entity.facing);
