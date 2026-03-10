@@ -22,8 +22,14 @@ import {
 } from "../events";
 import { TerrainSystem } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
+import {
+  AUTONOMY_IDLE_DELAY_MS,
+  resetEntityAutonomy,
+  updateEntityAutonomy,
+} from "./world/autonomySystem";
 import { createWorldEntity } from "./world/entityFactory";
-import { updateEntityMovement } from "./world/movementSystem";
+import { createFreeRoamNavigationService } from "./world/navigation";
+import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
 import type { WorldEntity } from "./world/types";
 
 export const WORLD_SCENE_KEY = "world";
@@ -54,6 +60,8 @@ export class WorldScene extends Phaser.Scene {
   private camStartX = 0;
   private camStartY = 0;
   private lastPerfEmitAtMs = 0;
+  private directInputIdleMs = 0;
+  private readonly navigation = createFreeRoamNavigationService();
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -109,34 +117,55 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    if (this.selectedEntity && this.wasd && this.shiftKey && this.catalog) {
-      const entity = this.selectedEntity;
+    if (this.wasd && this.shiftKey && this.catalog) {
       const dt = delta / 1000;
+      const directInput = this.resolveDirectMovementInput();
+      const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
+      this.directInputIdleMs = hasDirectMovement ? 0 : this.directInputIdleMs + delta;
+      const autoplayEnabled = this.directInputIdleMs >= AUTONOMY_IDLE_DELAY_MS;
 
-      const prevState = entity.state;
-      const prevFacing = entity.facing;
+      for (const entity of this.entities) {
+        const prevState = entity.state;
+        const prevFacing = entity.facing;
+        const prevAnimationAction = entity.animationAction;
+        const isSelected = entity === this.selectedEntity;
 
-      updateEntityMovement(entity, dt, {
-        moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
-        moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
-        isRunModifier: this.shiftKey.isDown,
-      });
+        const movementInput =
+          isSelected && hasDirectMovement
+            ? directInput
+            : updateEntityAutonomy(entity, delta, {
+                autoplayEnabled,
+                navigation: this.navigation,
+              });
 
-      entity.position.x += entity.velocity.x * dt;
-      entity.position.y += entity.velocity.y * dt;
-      entity.sprite.setPosition(entity.position.x, entity.position.y);
+        if (isSelected && hasDirectMovement) {
+          resetEntityAutonomy(entity);
+        }
 
-      const stateChanged = entity.state !== prevState;
-      const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
-      if (stateChanged || dirChanged) {
-        playEntityAnimation(entity, this.catalog);
-        if (stateChanged && entity.definition.kind === "player") {
-          const payload: PlayerStateChangedPayload = { state: entity.state };
-          this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+        updateEntityMovement(entity, dt, movementInput);
+        if (!entity.autonomy.currentAmbientAction) {
+          entity.animationAction = entity.state;
+        }
+
+        entity.position.x += entity.velocity.x * dt;
+        entity.position.y += entity.velocity.y * dt;
+        entity.sprite.setPosition(entity.position.x, entity.position.y);
+
+        const stateChanged = entity.state !== prevState;
+        const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
+        const animationChanged = entity.animationAction !== prevAnimationAction;
+        if (stateChanged || dirChanged || animationChanged) {
+          playEntityAnimation(entity, this.catalog);
+          if (isSelected && stateChanged && entity.definition.kind === "player") {
+            const payload: PlayerStateChangedPayload = { state: entity.state };
+            this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
+          }
+        }
+
+        if (isSelected) {
+          this.syncSelectionBadgePosition(entity);
         }
       }
-
-      this.syncSelectionBadgePosition(entity);
     }
 
     const now = performance.now();
@@ -277,5 +306,21 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+  }
+
+  private resolveDirectMovementInput(): MovementInput {
+    if (!this.wasd || !this.shiftKey) {
+      return {
+        moveX: 0,
+        moveY: 0,
+        isRunModifier: false,
+      };
+    }
+
+    return {
+      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
+      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
+      isRunModifier: this.shiftKey.isDown,
+    };
   }
 }
