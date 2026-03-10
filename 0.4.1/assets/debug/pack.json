@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "generatedAt": "2026-03-10T19:55:06.067423+00:00",
+    "generator": "packages/debug-assets/pipeline/export_from_aseprite.py",
+    "namespace": "debug",
+    "sourceRoot": "packages/debug-assets/aseprite",
+    "publicRoot": "apps/frontend/public/assets/debug",
+    "format": "phaser-asset-pack"
+  },
+  "debug": {
+    "files": [
+      {
+        "type": "atlas",
+        "key": "debug.tilesets",
+        "textureURL": "assets/debug/atlases/tilesets.png",
+        "atlasURL": "assets/debug/atlases/tilesets.json"
+      },
+      {
+        "type": "json",
+        "key": "debug.animations",
+        "url": "assets/debug/animations.json"
+      }
+    ]
+  }
+}
