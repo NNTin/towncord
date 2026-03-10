@@ -90,6 +90,7 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerdown", this.onPointerDown, this);
     this.input.on("pointermove", this.onPointerMove, this);
     this.input.on("pointerup", this.onPointerUp, this);
+    this.input.on("pointerupoutside", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
 
     this.terrainSystem = new TerrainSystem(this);
@@ -111,6 +112,7 @@ export class WorldScene extends Phaser.Scene {
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
         this.input.off("pointerup", this.onPointerUp, this);
+        this.input.off("pointerupoutside", this.onPointerUp, this);
         this.input.off("wheel", this.onWheel, this);
       },
       this,
@@ -170,6 +172,12 @@ export class WorldScene extends Phaser.Scene {
           entity.velocity.y = 0;
         }
         entity.sprite.setPosition(entity.position.x, entity.position.y);
+        if (entity.velocity.x === 0 && entity.velocity.y === 0 && entity.state !== "idle") {
+          entity.state = "idle";
+          if (!entity.autonomy.currentAmbientAction) {
+            entity.animationAction = entity.state;
+          }
+        }
 
         const stateChanged = entity.state !== prevState;
         const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;

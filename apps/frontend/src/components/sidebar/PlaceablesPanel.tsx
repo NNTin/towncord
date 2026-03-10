@@ -76,6 +76,7 @@ function TerrainToolEntry({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       style={{
         background: active ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
         border: active ? "1px solid rgba(56,189,248,0.75)" : "1px solid rgba(255,255,255,0.12)",

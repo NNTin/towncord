@@ -9,3 +9,5 @@ __pycache__/
 specs/
 .chunkhound/
 .chunkhound.json
+.worktree/*
+!.worktree/README.md

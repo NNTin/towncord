@@ -16,7 +16,7 @@ export type TerrainMaterialRule = {
   walkable: boolean;
 };
 
-export type TerrainMaterialRules = Record<TerrainMaterialId, TerrainMaterialRule>;
+export type TerrainMaterialRules = Partial<Record<TerrainMaterialId, TerrainMaterialRule>>;
 
 export type TerrainWorldBounds = {
   minX: number;
@@ -132,12 +132,13 @@ export class TerrainGameplayGrid {
     const startKey = this.toCellKey(start.cellX, start.cellY);
     const goalKey = this.toCellKey(goal.cellX, goal.cellY);
     const queue: TerrainCellCoord[] = [{ ...start }];
+    let queueIndex = 0;
     const visited = new Set<string>([startKey]);
     const parentByKey = new Map<string, string | null>([[startKey, null]]);
     const cellByKey = new Map<string, TerrainCellCoord>([[startKey, { ...start }]]);
 
-    while (queue.length > 0) {
-      const current = queue.shift()!;
+    while (queueIndex < queue.length) {
+      const current = queue[queueIndex++]!;
       const currentKey = this.toCellKey(current.cellX, current.cellY);
 
       if (currentKey === goalKey) {

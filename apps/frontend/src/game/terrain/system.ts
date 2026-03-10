@@ -4,6 +4,7 @@ import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_TEXTURE_KEY,
   toTerrainChunkId,
+  type TerrainCellCoord,
   type TerrainChunkId,
   type TerrainMaterialId,
 } from "./contracts";
@@ -61,7 +62,7 @@ export class TerrainSystem {
     this.renderer.setVisibleChunkIds(this.resolveVisibleChunkIds());
 
     if (this.pendingDrops.length > 0) {
-      const changedCells: Array<{ cellX: number; cellY: number }> = [];
+      const changedCells: TerrainCellCoord[] = [];
       try {
         for (const pending of this.pendingDrops) {
           const op = this.router.toEditOp(pending.payload, pending.worldX, pending.worldY);

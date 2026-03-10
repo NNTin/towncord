@@ -19,6 +19,10 @@ export class TerrainPaintSession {
   }
 
   public shouldPaintCell(cell: TerrainCellCoord): boolean {
+    if (!this.active) {
+      return false;
+    }
+
     const key = `${cell.cellX},${cell.cellY}`;
     if (this.paintedCellKeys.has(key)) {
       return false;
