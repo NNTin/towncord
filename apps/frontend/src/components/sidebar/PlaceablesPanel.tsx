@@ -1,10 +1,15 @@
 import { useState } from "react";
-import type { PlaceableViewModel } from "../../game/application/placeableService";
+import type {
+  PlaceableViewModel,
+  TerrainPlaceableViewModel,
+} from "../../game/application/placeableService";
 import { AccordionHeader } from "./common";
 
 type Props = {
   placeables: PlaceableViewModel[];
   onDragStart: (e: React.DragEvent, placeable: PlaceableViewModel) => void;
+  activeTerrainToolId: string | null;
+  onSelectTerrainTool: (placeable: TerrainPlaceableViewModel) => void;
 };
 
 type PlaceableGroup = {
@@ -58,9 +63,40 @@ function DraggableEntry({
   );
 }
 
+function TerrainToolEntry({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        background: active ? "rgba(56,189,248,0.18)" : "rgba(255,255,255,0.05)",
+        border: active ? "1px solid rgba(56,189,248,0.75)" : "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 4,
+        color: active ? "#e0f2fe" : "#cbd5e1",
+        cursor: "pointer",
+        fontSize: 12,
+        padding: "5px 8px",
+        textAlign: "left",
+      }}
+    >
+      {active ? "●" : "○"} {label}
+    </button>
+  );
+}
+
 export function PlaceablesPanel({
   placeables,
   onDragStart,
+  activeTerrainToolId,
+  onSelectTerrainTool,
 }: Props): JSX.Element {
   const [openByGroup, setOpenByGroup] = useState<Record<string, boolean>>({});
   const groups = groupPlaceablesByGroup(placeables);
@@ -88,11 +124,20 @@ export function PlaceablesPanel({
             {open && (
               <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
                 {group.placeables.map((placeable) => (
-                  <DraggableEntry
-                    key={placeable.id}
-                    label={placeable.label}
-                    onDragStart={(e) => onDragStart(e, placeable)}
-                  />
+                  placeable.type === "terrain" ? (
+                    <TerrainToolEntry
+                      key={placeable.id}
+                      active={activeTerrainToolId === placeable.id}
+                      label={placeable.label}
+                      onClick={() => onSelectTerrainTool(placeable)}
+                    />
+                  ) : (
+                    <DraggableEntry
+                      key={placeable.id}
+                      label={placeable.label}
+                      onDragStart={(e) => onDragStart(e, placeable)}
+                    />
+                  )
                 ))}
               </div>
             )}

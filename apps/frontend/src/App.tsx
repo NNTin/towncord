@@ -13,10 +13,12 @@ import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   RUNTIME_PERF_EVENT,
+  SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
   type RuntimePerfPayload,
+  type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
   parsePlaceDragPayload,
   toPlaceDropPayload,
@@ -29,6 +31,7 @@ function App(): JSX.Element {
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
+  const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -59,8 +62,16 @@ function App(): JSX.Element {
       setPlaceables(null);
       setInspectedTile(null);
       setRuntimePerf(null);
+      setActiveTerrainTool(null);
     };
   }, []);
+
+  useEffect(() => {
+    gameRef.current?.events.emit(SELECT_TERRAIN_TOOL_EVENT, activeTerrainTool);
+    if (activeTerrainTool) {
+      setInspectedTile(null);
+    }
+  }, [activeTerrainTool]);
 
   function handleDragOver(e: React.DragEvent<HTMLDivElement>): void {
     e.preventDefault();
@@ -88,11 +99,10 @@ function App(): JSX.Element {
       if (dropPayload.type === "entity") {
         const payload: PlaceObjectDropPayload = dropPayload;
         gameRef.current?.events.emit(PLACE_OBJECT_DROP_EVENT, payload);
-        return;
+      } else {
+        const terrainPayload: PlaceTerrainDropPayload = dropPayload;
+        gameRef.current?.events.emit(PLACE_TERRAIN_DROP_EVENT, terrainPayload);
       }
-
-      const terrainPayload: PlaceTerrainDropPayload = dropPayload;
-      gameRef.current?.events.emit(PLACE_TERRAIN_DROP_EVENT, terrainPayload);
     } catch {
       // ignore malformed drag data
     }
@@ -106,6 +116,8 @@ function App(): JSX.Element {
           placeables={placeables}
           inspectedTile={inspectedTile}
           onClearInspectedTile={() => setInspectedTile(null)}
+          activeTerrainTool={activeTerrainTool}
+          onSelectTerrainTool={setActiveTerrainTool}
           runtimePerf={runtimePerf}
         />
       )}

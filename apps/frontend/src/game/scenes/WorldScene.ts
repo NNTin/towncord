@@ -9,21 +9,24 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
-  TERRAIN_TILE_INSPECTED_EVENT,
-  RUNTIME_PERF_EVENT,
   PLAYER_PLACED_EVENT,
   PLAYER_STATE_CHANGED_EVENT,
+  RUNTIME_PERF_EVENT,
+  SELECT_TERRAIN_TOOL_EVENT,
+  TERRAIN_TILE_INSPECTED_EVENT,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
-  type TerrainTileInspectedPayload,
   type PlayerPlacedPayload,
   type PlayerStateChangedPayload,
   type RuntimePerfPayload,
+  type SelectedTerrainToolPayload,
+  type TerrainTileInspectedPayload,
 } from "../events";
 import { TerrainSystem } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import { createWorldEntity } from "./world/entityFactory";
 import { updateEntityMovement } from "./world/movementSystem";
+import { TerrainPaintSession } from "./world/terrainPaintSession";
 import type { WorldEntity } from "./world/types";
 
 export const WORLD_SCENE_KEY = "world";
@@ -47,6 +50,8 @@ export class WorldScene extends Phaser.Scene {
 
   private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
+  private activeTerrainTool: SelectedTerrainToolPayload = null;
+  private readonly terrainPaintSession = new TerrainPaintSession();
 
   private isPanning = false;
   private panStartX = 0;
@@ -82,6 +87,7 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem = new TerrainSystem(this);
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+    this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
     this.events.once(
       "shutdown",
       () => {
@@ -91,6 +97,7 @@ export class WorldScene extends Phaser.Scene {
         this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+        this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
         this.input.off("pointerdown", this.onPointerDown, this);
         this.input.off("pointermove", this.onPointerMove, this);
         this.input.off("pointerup", this.onPointerUp, this);
@@ -222,6 +229,11 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem.queueDrop(payload, worldPoint.x, worldPoint.y);
   }
 
+  private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
+    this.activeTerrainTool = payload;
+    this.terrainPaintSession.end();
+  }
+
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = true;
@@ -230,6 +242,12 @@ export class WorldScene extends Phaser.Scene {
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
     } else if (pointer.button === 0) {
+      if (this.activeTerrainTool) {
+        this.terrainPaintSession.begin();
+        this.paintTerrainAtScreen(pointer.x, pointer.y);
+        return;
+      }
+
       let hit: WorldEntity | null = null;
       const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
 
@@ -255,16 +273,23 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
-    if (!this.isPanning) return;
-    const zoom = this.cameras.main.zoom;
-    const dx = (pointer.x - this.panStartX) / zoom;
-    const dy = (pointer.y - this.panStartY) / zoom;
-    this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+    if (this.isPanning) {
+      const zoom = this.cameras.main.zoom;
+      const dx = (pointer.x - this.panStartX) / zoom;
+      const dy = (pointer.y - this.panStartY) / zoom;
+      this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+      return;
+    }
+
+    if (!this.activeTerrainTool || !this.terrainPaintSession.isActive()) return;
+    this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = false;
+    } else if (pointer.button === 0) {
+      this.terrainPaintSession.end();
     }
   }
 
@@ -277,5 +302,25 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+  }
+
+  private paintTerrainAtScreen(screenX: number, screenY: number): void {
+    if (!this.activeTerrainTool || !this.terrainSystem) return;
+
+    const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
+    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
+    if (!cell || !this.terrainPaintSession.shouldPaintCell(cell)) return;
+
+    this.terrainSystem.queueDrop(
+      {
+        type: "terrain",
+        materialId: this.activeTerrainTool.materialId,
+        brushId: this.activeTerrainTool.brushId,
+        screenX,
+        screenY,
+      },
+      worldPoint.x,
+      worldPoint.y,
+    );
   }
 }

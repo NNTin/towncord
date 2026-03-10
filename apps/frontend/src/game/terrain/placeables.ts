@@ -12,18 +12,18 @@ export const TERRAIN_PLACEABLES: TerrainPlaceableDefinition[] = [
     id: "terrain.water.tile",
     label: "Water Tile Brush",
     materialId: "water",
-    brushId: "tile",
+    brushId: "water",
   },
   {
     id: "terrain.grass.tile",
     label: "Grass Tile Brush",
     materialId: "ground",
-    brushId: "tile",
+    brushId: "ground",
   },
   {
-    id: "terrain.eraser",
-    label: "Eraser",
+    id: "terrain.delete",
+    label: "Delete Brush",
     materialId: "ground",
-    brushId: "eraser",
+    brushId: "delete",
   },
 ];
