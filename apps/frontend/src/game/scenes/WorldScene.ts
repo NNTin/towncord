@@ -36,7 +36,7 @@ import {
   resetEntityAutonomy,
   updateEntityAutonomy,
 } from "./world/autonomySystem";
-import { createWorldEntity } from "./world/entityFactory";
+import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
@@ -327,7 +327,9 @@ export class WorldScene extends Phaser.Scene {
     if (!this.selectionBadge) return;
     this.selectionBadge.setPosition(
       entity.position.x,
-      entity.position.y - entity.sprite.displayHeight * 0.5 - SELECTED_BADGE_VERTICAL_OFFSET,
+      entity.position.y -
+        entity.sprite.displayHeight * WORLD_ENTITY_SPRITE_ORIGIN_Y -
+        SELECTED_BADGE_VERTICAL_OFFSET,
     );
   }
 

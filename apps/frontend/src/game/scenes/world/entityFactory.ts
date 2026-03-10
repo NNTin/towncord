@@ -5,6 +5,9 @@ import { createAutonomyState } from "./autonomySystem";
 import { resolveAmbientActionIds, resolveSpawnVisual } from "./animationSystem";
 import type { WorldEntity } from "./types";
 
+export const WORLD_ENTITY_SPRITE_ORIGIN_X = 0.5;
+export const WORLD_ENTITY_SPRITE_ORIGIN_Y = 0.75;
+
 export type CreateWorldEntityParams = {
   scene: Phaser.Scene;
   catalog: AnimationCatalog;
@@ -27,6 +30,8 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
   const sprite = scene.add.sprite(worldX, worldY, spawn.textureKey, spawn.textureFrame);
   sprite.setScale(spriteScale);
   sprite.setFlipX(spawn.flipX);
+  // LLM Agent: do not delete below setOrigin. This is needed to have the correct collision
+  sprite.setOrigin(WORLD_ENTITY_SPRITE_ORIGIN_X, WORLD_ENTITY_SPRITE_ORIGIN_Y);
   sprite.setInteractive({ pixelPerfect: true });
   sprite.play(spawn.animationKey, true);
 

@@ -109,6 +109,25 @@ function createSceneHarness(input?: {
 }
 
 describe("WorldScene terrain painting", () => {
+  test("positions the selection badge above the anchored sprite top edge", () => {
+    const scene = new WorldScene() as unknown as Record<string, unknown>;
+    const selectionBadge = {
+      setPosition: vi.fn(),
+    };
+
+    scene.selectionBadge = selectionBadge;
+
+    (scene.syncSelectionBadgePosition as (entity: {
+      position: { x: number; y: number };
+      sprite: { displayHeight: number };
+    }) => void)({
+      position: { x: 128, y: 192 },
+      sprite: { displayHeight: 96 },
+    });
+
+    expect(selectionBadge.setPosition).toHaveBeenCalledWith(128, 108);
+  });
+
   test("creates the brush preview with a top-left origin", () => {
     const scene = new WorldScene() as unknown as Record<string, unknown>;
     const preview = {
