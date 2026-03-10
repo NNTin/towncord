@@ -42,6 +42,12 @@ const navigation: WorldNavigationService = {
   getStepToward() {
     return { moveX: 1, moveY: 0, reached: false };
   },
+  resolveSpawnPoint(worldX, worldY) {
+    return { x: worldX, y: worldY };
+  },
+  clampWorldPoint(worldX, worldY) {
+    return { x: worldX, y: worldY };
+  },
 };
 
 describe("autonomySystem", () => {

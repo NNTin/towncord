@@ -19,7 +19,7 @@ export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity 
   const { scene, catalog, runtime, nextId, worldX, worldY, spriteScale } = params;
   const { definition } = runtime;
   const behavior = runtime.createBehavior();
-  const ambientActionIds = resolveAmbientActionIds(catalog, definition);
+  const ambientActionIds = resolveAmbientActionIds(catalog, definition, behavior);
 
   const spawn = resolveSpawnVisual(catalog, scene.anims, definition);
   if (!spawn) return null;

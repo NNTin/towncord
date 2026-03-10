@@ -114,6 +114,36 @@ export class TerrainGameplayGrid {
     return this.materialRules[materialId]?.walkable ?? false;
   }
 
+  public findNearestWalkableCell(
+    origin: TerrainCellCoord,
+    maxDistance = 8,
+  ): TerrainCellCoord | null {
+    if (!this.isCellInBounds(origin.cellX, origin.cellY)) return null;
+    if (this.isCellWalkable(origin.cellX, origin.cellY)) {
+      return { ...origin };
+    }
+
+    for (let distance = 1; distance <= maxDistance; distance += 1) {
+      for (let dy = -distance; dy <= distance; dy += 1) {
+        const remaining = distance - Math.abs(dy);
+        const candidates = remaining === 0
+          ? [{ cellX: origin.cellX, cellY: origin.cellY + dy }]
+          : [
+              { cellX: origin.cellX - remaining, cellY: origin.cellY + dy },
+              { cellX: origin.cellX + remaining, cellY: origin.cellY + dy },
+            ];
+
+        for (const candidate of candidates) {
+          if (this.isCellWalkable(candidate.cellX, candidate.cellY)) {
+            return candidate;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
   public notifyCellsChanged(changedCells: readonly TerrainCellCoord[]): void {
     if (changedCells.length === 0) return;
     this.revision += 1;

@@ -68,6 +68,9 @@ function createNpcBehavior(): EntityBehavior {
     walk(_ctx: ActionContext): EntityAction {
       return "walk";
     },
+    listAmbientActionIds(availableActionIds: readonly string[]): readonly string[] {
+      return availableActionIds;
+    },
   };
 }
 

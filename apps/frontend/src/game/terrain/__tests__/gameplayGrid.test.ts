@@ -114,6 +114,20 @@ describe("TerrainGameplayGrid", () => {
     expect(grid.findPath({ cellX: 0, cellY: 0 }, { cellX: -1, cellY: 0 })).toBeNull();
   });
 
+  test("finds the nearest walkable cell when the requested cell is blocked", () => {
+    const { grid } = createGrid([
+      ".....",
+      ".~~~.",
+      ".....",
+      ".....",
+      ".....",
+    ]);
+
+    expect(grid.findNearestWalkableCell({ cellX: 2, cellY: 1 })).toEqual({ cellX: 2, cellY: 0 });
+    expect(grid.findNearestWalkableCell({ cellX: 0, cellY: 0 })).toEqual({ cellX: 0, cellY: 0 });
+    expect(grid.findNearestWalkableCell({ cellX: -1, cellY: 0 })).toBeNull();
+  });
+
   test("increments revision only when terrain changes are reported", () => {
     const { store, grid } = createGrid([
       ".....",

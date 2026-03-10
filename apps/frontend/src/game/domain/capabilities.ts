@@ -16,7 +16,11 @@ export interface CanRun {
   run(ctx: ActionContext): EntityAction;
 }
 
-export type EntityBehavior = CanIdle & Partial<CanWalk & CanRun>;
+export interface CanAmbientActions {
+  listAmbientActionIds(availableActionIds: readonly string[]): readonly string[];
+}
+
+export type EntityBehavior = CanIdle & Partial<CanWalk & CanRun & CanAmbientActions>;
 
 export function supportsWalk(behavior: EntityBehavior): behavior is EntityBehavior & CanWalk {
   return typeof (behavior as { walk?: unknown }).walk === "function";
@@ -24,6 +28,12 @@ export function supportsWalk(behavior: EntityBehavior): behavior is EntityBehavi
 
 export function supportsRun(behavior: EntityBehavior): behavior is EntityBehavior & CanRun {
   return typeof (behavior as { run?: unknown }).run === "function";
+}
+
+export function supportsAmbientActions(
+  behavior: EntityBehavior,
+): behavior is EntityBehavior & CanAmbientActions {
+  return typeof (behavior as { listAmbientActionIds?: unknown }).listAmbientActionIds === "function";
 }
 
 export function deriveCapabilitiesFromBehavior(behavior: EntityBehavior): EntityCapability[] {

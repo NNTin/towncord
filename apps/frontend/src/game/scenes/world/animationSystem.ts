@@ -5,6 +5,7 @@ import {
   getTracksForPath,
   resolveTrackForDirection,
 } from "../../assets/animationCatalog";
+import { supportsAmbientActions, type EntityBehavior } from "../../domain/capabilities";
 import { readEntityVisualRef, type EntityDefinition } from "../../domain/model";
 import { isLocomotionTrackId, resolveTrackByActionPolicy } from "./animationPolicy";
 import type { WorldEntity } from "./types";
@@ -28,12 +29,15 @@ export function resolveEntityTrack(
 export function resolveAmbientActionIds(
   catalog: AnimationCatalog,
   definition: EntityDefinition,
+  behavior: EntityBehavior,
 ): string[] {
-  if (definition.kind !== "npc") return [];
+  if (!supportsAmbientActions(behavior)) return [];
 
-  return getTracksForPath(catalog, readEntityVisualRef(definition.visualRef))
+  const availableActionIds = getTracksForPath(catalog, readEntityVisualRef(definition.visualRef))
     .map((track) => track.id)
     .filter((trackId) => !isLocomotionTrackId(trackId));
+
+  return [...behavior.listAmbientActionIds(availableActionIds)];
 }
 
 export function resolveSpawnVisual(

@@ -28,7 +28,10 @@ import {
   updateEntityAutonomy,
 } from "./world/autonomySystem";
 import { createWorldEntity } from "./world/entityFactory";
-import { createFreeRoamNavigationService } from "./world/navigation";
+import {
+  createGameplayNavigationService,
+  type WorldNavigationService,
+} from "./world/navigation";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
 import type { WorldEntity } from "./world/types";
 
@@ -61,7 +64,7 @@ export class WorldScene extends Phaser.Scene {
   private camStartY = 0;
   private lastPerfEmitAtMs = 0;
   private directInputIdleMs = 0;
-  private readonly navigation = createFreeRoamNavigationService();
+  private navigation: WorldNavigationService | null = null;
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -88,6 +91,7 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("wheel", this.onWheel, this);
 
     this.terrainSystem = new TerrainSystem(this);
+    this.navigation = createGameplayNavigationService(this.terrainSystem.getGameplayGrid());
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.events.once(
@@ -95,6 +99,7 @@ export class WorldScene extends Phaser.Scene {
       () => {
         this.terrainSystem?.destroy();
         this.terrainSystem = null;
+        this.navigation = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
@@ -117,7 +122,7 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    if (this.wasd && this.shiftKey && this.catalog) {
+    if (this.wasd && this.shiftKey && this.catalog && this.navigation && this.terrainSystem) {
       const dt = delta / 1000;
       const directInput = this.resolveDirectMovementInput();
       const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
@@ -147,8 +152,7 @@ export class WorldScene extends Phaser.Scene {
           entity.animationAction = entity.state;
         }
 
-        entity.position.x += entity.velocity.x * dt;
-        entity.position.y += entity.velocity.y * dt;
+        this.applyEntityMovement(entity, dt);
         entity.sprite.setPosition(entity.position.x, entity.position.y);
 
         const stateChanged = entity.state !== prevState;
@@ -216,7 +220,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (!this.catalog || !this.entityRegistry) return;
+    if (!this.catalog || !this.entityRegistry || !this.navigation) return;
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
     const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
@@ -224,13 +228,14 @@ export class WorldScene extends Phaser.Scene {
     const { definition } = runtime;
 
     const worldPoint = this.cameras.main.getWorldPoint(spawnRequest.screenX, spawnRequest.screenY);
+    const spawnPoint = this.navigation.resolveSpawnPoint(worldPoint.x, worldPoint.y);
     const entity = createWorldEntity({
       scene: this,
       catalog: this.catalog,
       runtime,
       nextId: this.nextId,
-      worldX: worldPoint.x,
-      worldY: worldPoint.y,
+      worldX: spawnPoint.x,
+      worldY: spawnPoint.y,
       spriteScale: SPRITE_SCALE,
     });
     if (!entity) return;
@@ -240,7 +245,7 @@ export class WorldScene extends Phaser.Scene {
     this.selectEntity(entity);
 
     if (definition.kind === "player") {
-      const placedPayload: PlayerPlacedPayload = { worldX: worldPoint.x, worldY: worldPoint.y };
+      const placedPayload: PlayerPlacedPayload = { worldX: spawnPoint.x, worldY: spawnPoint.y };
       this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
     }
   }
@@ -322,5 +327,23 @@ export class WorldScene extends Phaser.Scene {
       moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
       isRunModifier: this.shiftKey.isDown,
     };
+  }
+
+  private applyEntityMovement(entity: WorldEntity, dt: number): void {
+    if (!this.terrainSystem || !this.navigation) return;
+
+    const candidate = this.navigation.clampWorldPoint(
+      entity.position.x + entity.velocity.x * dt,
+      entity.position.y + entity.velocity.y * dt,
+    );
+    const targetCell = this.terrainSystem.getGameplayGrid().worldToCell(candidate.x, candidate.y);
+    if (!targetCell || !this.terrainSystem.getGameplayGrid().isCellWalkable(targetCell.cellX, targetCell.cellY)) {
+      entity.velocity.x = 0;
+      entity.velocity.y = 0;
+      return;
+    }
+
+    entity.position.x = candidate.x;
+    entity.position.y = candidate.y;
   }
 }
