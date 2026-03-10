@@ -86,7 +86,9 @@ export class TerrainMapStore {
     const { cellX, cellY } = op.center;
     if (!this.isInBounds(cellX, cellY)) return false;
 
-    const materialId = op.brushId === "eraser" ? this.defaultMaterial : op.materialId;
+    const materialId = op.brushId === "delete" || op.brushId === "eraser"
+      ? this.defaultMaterial
+      : op.materialId;
 
     if (!this.materials.has(materialId)) {
       throw new Error(`TerrainMapStore: unknown material \"${materialId}\".`);
