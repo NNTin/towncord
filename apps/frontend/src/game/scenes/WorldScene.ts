@@ -24,8 +24,11 @@ import {
 } from "../events";
 import {
   TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
+  TERRAIN_TEXTURE_KEY,
   TerrainSystem,
   type TerrainCellCoord,
+  type TerrainRenderTile,
 } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import {
@@ -54,6 +57,7 @@ const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;
 const TERRAIN_BRUSH_PREVIEW_READY_STROKE = 0xe0f2fe;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
+const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
@@ -63,6 +67,7 @@ export class WorldScene extends Phaser.Scene {
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
   private terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
+  private readonly terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
   private terrainSystem: TerrainSystem | null = null;
   private navigation: WorldNavigationService | null = null;
   private nextId = 0;
@@ -120,6 +125,10 @@ export class WorldScene extends Phaser.Scene {
         this.selectionBadge = null;
         this.terrainBrushPreview?.destroy();
         this.terrainBrushPreview = null;
+        for (const image of this.terrainBrushRenderPreviewImages) {
+          image.destroy();
+        }
+        this.terrainBrushRenderPreviewImages.length = 0;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
         this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
@@ -254,7 +263,7 @@ export class WorldScene extends Phaser.Scene {
       TERRAIN_BRUSH_PREVIEW_READY_FILL,
       TERRAIN_BRUSH_PREVIEW_ALPHA,
     );
-    preview.setOrigin(0.5, 0.5);
+    preview.setOrigin(0, 0);
     preview.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH);
     preview.setStrokeStyle(
       TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
@@ -273,6 +282,45 @@ export class WorldScene extends Phaser.Scene {
   private setTerrainBrushPreviewVisible(visible: boolean): void {
     if (!this.terrainBrushPreview) return;
     this.terrainBrushPreview.setVisible(visible);
+  }
+
+  private hideTerrainBrushRenderPreview(): void {
+    for (const image of this.terrainBrushRenderPreviewImages) {
+      image.setVisible(false);
+    }
+  }
+
+  private getTerrainBrushRenderPreviewImage(index: number): Phaser.GameObjects.Image {
+    const existing = this.terrainBrushRenderPreviewImages[index];
+    if (existing) {
+      return existing;
+    }
+
+    const image = this.add.image(0, 0, TERRAIN_TEXTURE_KEY);
+    image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
+    image.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH - 1);
+    image.setVisible(false);
+    this.terrainBrushRenderPreviewImages[index] = image;
+    return image;
+  }
+
+  private syncTerrainBrushRenderPreviewTiles(tiles: readonly TerrainRenderTile[]): void {
+    tiles.forEach((tile, index) => {
+      const image = this.getTerrainBrushRenderPreviewImage(index);
+      image.setTexture(TERRAIN_TEXTURE_KEY, tile.frame);
+      image.setScale(TERRAIN_CELL_WORLD_SIZE / image.width);
+      image.setRotation(tile.rotate90 * (Math.PI / 2));
+      image.setFlip(tile.flipX, tile.flipY);
+      image.setPosition(
+        tile.cellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5 + TERRAIN_RENDER_GRID_WORLD_OFFSET,
+        tile.cellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5 + TERRAIN_RENDER_GRID_WORLD_OFFSET,
+      );
+      image.setVisible(true);
+    });
+
+    for (let index = tiles.length; index < this.terrainBrushRenderPreviewImages.length; index += 1) {
+      this.terrainBrushRenderPreviewImages[index]?.setVisible(false);
+    }
   }
 
   private syncSelectionBadgePosition(entity: WorldEntity): void {
@@ -411,6 +459,7 @@ export class WorldScene extends Phaser.Scene {
   private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {
     if (!pointer) {
       this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
       return;
     }
 
@@ -420,6 +469,7 @@ export class WorldScene extends Phaser.Scene {
 
     if (!isWithinGame) {
       this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
       return;
     }
 
@@ -451,6 +501,7 @@ export class WorldScene extends Phaser.Scene {
   private syncTerrainBrushPreviewAtScreen(screenX: number, screenY: number): void {
     if (!this.activeTerrainTool || !this.terrainSystem || !this.terrainBrushPreview) {
       this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
       return;
     }
 
@@ -459,12 +510,7 @@ export class WorldScene extends Phaser.Scene {
     const cell = grid.worldToCell(worldPoint.x, worldPoint.y);
     if (!cell) {
       this.setTerrainBrushPreviewVisible(false);
-      return;
-    }
-
-    const center = grid.cellToWorldCenter(cell.cellX, cell.cellY);
-    if (!center) {
-      this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
       return;
     }
 
@@ -478,8 +524,35 @@ export class WorldScene extends Phaser.Scene {
       isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE : TERRAIN_BRUSH_PREVIEW_READY_STROKE,
       0.9,
     );
-    this.terrainBrushPreview.setPosition(center.worldX, center.worldY);
+    // Terrain edits target the placement grid anchor; render tiles are resolved on the dual grid.
+    this.terrainBrushPreview.setPosition(
+      cell.cellX * TERRAIN_CELL_WORLD_SIZE,
+      cell.cellY * TERRAIN_CELL_WORLD_SIZE,
+    );
     this.terrainBrushPreview.setVisible(true);
+
+    if (isBlocked) {
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    const previewTiles = this.terrainSystem.previewPaintAtWorld(
+      {
+        type: "terrain",
+        materialId: this.activeTerrainTool.materialId,
+        brushId: this.activeTerrainTool.brushId,
+        screenX,
+        screenY,
+      },
+      worldPoint.x,
+      worldPoint.y,
+    );
+    if (!previewTiles || previewTiles.length === 0) {
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    this.syncTerrainBrushRenderPreviewTiles(previewTiles);
   }
 
   private queueTerrainDropAtWorld(
