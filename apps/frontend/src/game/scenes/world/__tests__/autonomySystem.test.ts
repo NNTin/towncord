@@ -5,7 +5,7 @@ import {
   resetEntityAutonomy,
   updateEntityAutonomy,
 } from "../autonomySystem";
-import type { WorldNavigationService } from "../navigation";
+import type { AutonomyNavigationService } from "../navigation";
 import type { WorldEntity } from "../types";
 
 function createEntity(overrides?: Partial<WorldEntity>): WorldEntity {
@@ -35,7 +35,7 @@ function createEntity(overrides?: Partial<WorldEntity>): WorldEntity {
   };
 }
 
-const navigation: WorldNavigationService = {
+const navigation: AutonomyNavigationService = {
   pickWanderTarget(subject) {
     return { x: subject.position.x + 64, y: subject.position.y };
   },
@@ -49,12 +49,6 @@ const navigation: WorldNavigationService = {
     };
   },
   isPathValid() {
-    return true;
-  },
-  clampToBounds(point) {
-    return point;
-  },
-  isWalkable() {
     return true;
   },
 };

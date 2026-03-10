@@ -34,10 +34,13 @@ export interface CollisionMap {
   isWalkable(point: WorldPoint): boolean;
 }
 
-export type WorldNavigationService =
+export type AutonomyNavigationService =
   WanderTargetPicker &
   MovementNavigator &
-  PathPlanner &
+  PathPlanner;
+
+export type WorldNavigationService =
+  AutonomyNavigationService &
   CollisionMap;
 
 const DEFAULT_WANDER_RADIUS_CELLS = 5;

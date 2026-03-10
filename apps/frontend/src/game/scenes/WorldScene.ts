@@ -22,7 +22,7 @@ import {
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
 } from "../events";
-import { TerrainSystem } from "../terrain";
+import { TerrainSystem, type TerrainCellCoord } from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import {
   AUTONOMY_IDLE_DELAY_MS,
@@ -281,7 +281,7 @@ export class WorldScene extends Phaser.Scene {
   private onPlaceTerrainDrop(payload: PlaceTerrainDropPayload): void {
     if (!this.terrainSystem) return;
     const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
-    this.terrainSystem.queueDrop(payload, worldPoint.x, worldPoint.y);
+    this.queueTerrainDropAtWorld(payload, worldPoint.x, worldPoint.y);
   }
 
   private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
@@ -364,9 +364,11 @@ export class WorldScene extends Phaser.Scene {
 
     const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
     const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
-    if (!cell || !this.terrainPaintSession.shouldPaintCell(cell)) return;
+    if (!cell || this.isTerrainCellOccupied(cell) || !this.terrainPaintSession.shouldPaintCell(cell)) {
+      return;
+    }
 
-    this.terrainSystem.queueDrop(
+    this.queueTerrainDropAtWorld(
       {
         type: "terrain",
         materialId: this.activeTerrainTool.materialId,
@@ -377,6 +379,29 @@ export class WorldScene extends Phaser.Scene {
       worldPoint.x,
       worldPoint.y,
     );
+  }
+
+  private queueTerrainDropAtWorld(
+    payload: PlaceTerrainDropPayload,
+    worldX: number,
+    worldY: number,
+  ): void {
+    if (!this.terrainSystem) return;
+
+    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldX, worldY);
+    if (!cell || this.isTerrainCellOccupied(cell)) return;
+
+    this.terrainSystem.queueDrop(payload, worldX, worldY);
+  }
+
+  private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
+    if (!this.terrainSystem) return false;
+
+    const grid = this.terrainSystem.getGameplayGrid();
+    return this.entities.some((entity) => {
+      const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
+      return entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY;
+    });
   }
 
   private resolveDirectMovementInput(): MovementInput {

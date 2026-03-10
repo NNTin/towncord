@@ -1,6 +1,6 @@
 import { supportsWalk } from "../../domain/capabilities";
 import type { WorldEntity } from "./types";
-import type { WorldNavigationService } from "./navigation";
+import type { AutonomyNavigationService } from "./navigation";
 import type { MovementInput } from "./movementSystem";
 
 export const AUTONOMY_IDLE_DELAY_MS = 2_500;
@@ -19,7 +19,7 @@ const AUTONOMY_DECISION_DELAY_MS = 350;
 
 export type AutonomyUpdateContext = {
   autoplayEnabled: boolean;
-  navigation: WorldNavigationService;
+  navigation: AutonomyNavigationService;
   rng?: () => number;
 };
 
