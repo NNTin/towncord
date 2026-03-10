@@ -22,7 +22,11 @@ import {
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
 } from "../events";
-import { TerrainSystem, type TerrainCellCoord } from "../terrain";
+import {
+  TERRAIN_CELL_WORLD_SIZE,
+  TerrainSystem,
+  type TerrainCellCoord,
+} from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import {
   AUTONOMY_IDLE_DELAY_MS,
@@ -43,6 +47,13 @@ const MAX_ZOOM = 4;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
+const TERRAIN_BRUSH_PREVIEW_DEPTH = 9_000;
+const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
+const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
+const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;
+const TERRAIN_BRUSH_PREVIEW_READY_STROKE = 0xe0f2fe;
+const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
+const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
@@ -51,6 +62,7 @@ export class WorldScene extends Phaser.Scene {
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
+  private terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
   private terrainSystem: TerrainSystem | null = null;
   private navigation: WorldNavigationService | null = null;
   private nextId = 0;
@@ -106,6 +118,8 @@ export class WorldScene extends Phaser.Scene {
         this.navigation = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
+        this.terrainBrushPreview?.destroy();
+        this.terrainBrushPreview = null;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
         this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
@@ -119,6 +133,7 @@ export class WorldScene extends Phaser.Scene {
     );
 
     this.createSelectionBadge();
+    this.createTerrainBrushPreview();
   }
 
   public override update(_time: number, delta: number): void {
@@ -230,9 +245,34 @@ export class WorldScene extends Phaser.Scene {
     this.selectionBadge = badge;
   }
 
+  private createTerrainBrushPreview(): void {
+    const preview = this.add.rectangle(
+      0,
+      0,
+      TERRAIN_CELL_WORLD_SIZE,
+      TERRAIN_CELL_WORLD_SIZE,
+      TERRAIN_BRUSH_PREVIEW_READY_FILL,
+      TERRAIN_BRUSH_PREVIEW_ALPHA,
+    );
+    preview.setOrigin(0.5, 0.5);
+    preview.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH);
+    preview.setStrokeStyle(
+      TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
+      TERRAIN_BRUSH_PREVIEW_READY_STROKE,
+      0.9,
+    );
+    preview.setVisible(false);
+    this.terrainBrushPreview = preview;
+  }
+
   private setSelectionBadgeVisible(visible: boolean): void {
     if (!this.selectionBadge) return;
     this.selectionBadge.setVisible(visible);
+  }
+
+  private setTerrainBrushPreviewVisible(visible: boolean): void {
+    if (!this.terrainBrushPreview) return;
+    this.terrainBrushPreview.setVisible(visible);
   }
 
   private syncSelectionBadgePosition(entity: WorldEntity): void {
@@ -287,6 +327,7 @@ export class WorldScene extends Phaser.Scene {
   private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
     this.activeTerrainTool = payload;
     this.terrainPaintSession.end();
+    this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
@@ -296,9 +337,11 @@ export class WorldScene extends Phaser.Scene {
       this.panStartY = pointer.y;
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
       if (this.activeTerrainTool) {
         this.terrainPaintSession.begin();
+        this.syncTerrainBrushPreviewFromPointer(pointer);
         this.paintTerrainAtScreen(pointer.x, pointer.y);
         return;
       }
@@ -333,18 +376,23 @@ export class WorldScene extends Phaser.Scene {
       const dx = (pointer.x - this.panStartX) / zoom;
       const dy = (pointer.y - this.panStartY) / zoom;
       this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+      this.syncTerrainBrushPreviewFromPointer(pointer);
       return;
     }
 
-    if (!this.activeTerrainTool || !this.terrainPaintSession.isActive()) return;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    if (!this.activeTerrainTool) return;
+    if (!this.terrainPaintSession.isActive()) return;
     this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = false;
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
       this.terrainPaintSession.end();
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     }
   }
 
@@ -357,6 +405,25 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+    this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
+  }
+
+  private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {
+    if (!pointer) {
+      this.setTerrainBrushPreviewVisible(false);
+      return;
+    }
+
+    const isWithinGame =
+      !("withinGame" in pointer) ||
+      Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame);
+
+    if (!isWithinGame) {
+      this.setTerrainBrushPreviewVisible(false);
+      return;
+    }
+
+    this.syncTerrainBrushPreviewAtScreen(pointer.x, pointer.y);
   }
 
   private paintTerrainAtScreen(screenX: number, screenY: number): void {
@@ -379,6 +446,40 @@ export class WorldScene extends Phaser.Scene {
       worldPoint.x,
       worldPoint.y,
     );
+  }
+
+  private syncTerrainBrushPreviewAtScreen(screenX: number, screenY: number): void {
+    if (!this.activeTerrainTool || !this.terrainSystem || !this.terrainBrushPreview) {
+      this.setTerrainBrushPreviewVisible(false);
+      return;
+    }
+
+    const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
+    const grid = this.terrainSystem.getGameplayGrid();
+    const cell = grid.worldToCell(worldPoint.x, worldPoint.y);
+    if (!cell) {
+      this.setTerrainBrushPreviewVisible(false);
+      return;
+    }
+
+    const center = grid.cellToWorldCenter(cell.cellX, cell.cellY);
+    if (!center) {
+      this.setTerrainBrushPreviewVisible(false);
+      return;
+    }
+
+    const isBlocked = this.isTerrainCellOccupied(cell);
+    this.terrainBrushPreview.setFillStyle(
+      isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL : TERRAIN_BRUSH_PREVIEW_READY_FILL,
+      TERRAIN_BRUSH_PREVIEW_ALPHA,
+    );
+    this.terrainBrushPreview.setStrokeStyle(
+      TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
+      isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE : TERRAIN_BRUSH_PREVIEW_READY_STROKE,
+      0.9,
+    );
+    this.terrainBrushPreview.setPosition(center.worldX, center.worldY);
+    this.terrainBrushPreview.setVisible(true);
   }
 
   private queueTerrainDropAtWorld(
