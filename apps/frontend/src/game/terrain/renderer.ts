@@ -3,6 +3,7 @@ import {
   TERRAIN_ANIMATION_FRAME_MS,
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_DEPTH,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
   TERRAIN_TEXTURE_KEY,
   type TerrainChunkId,
   type TerrainChunkRenderPayload,
@@ -126,8 +127,8 @@ export class TerrainRenderer {
   ): Phaser.GameObjects.RenderTexture {
     const chunkPixelSize = this.grid.chunkSize * TERRAIN_CELL_WORLD_SIZE;
     const rt = this.scene.add.renderTexture(
-      chunkStartX * TERRAIN_CELL_WORLD_SIZE,
-      chunkStartY * TERRAIN_CELL_WORLD_SIZE,
+      chunkStartX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_RENDER_GRID_WORLD_OFFSET,
+      chunkStartY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_RENDER_GRID_WORLD_OFFSET,
       chunkPixelSize,
       chunkPixelSize,
     );

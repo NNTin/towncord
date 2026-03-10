@@ -2,11 +2,13 @@ import type Phaser from "phaser";
 import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../events";
 import {
   TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
   TERRAIN_TEXTURE_KEY,
   toTerrainChunkId,
   type TerrainCellCoord,
   type TerrainChunkId,
   type TerrainMaterialId,
+  type TerrainRenderTile,
 } from "./contracts";
 import { TerrainCaseMapper } from "./caseMapper";
 import { TerrainChunkBuilder } from "./chunkBuilder";
@@ -19,6 +21,13 @@ import {
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainRenderer } from "./renderer";
 import { TerrainMapStore } from "./store";
+
+const PREVIEW_RENDER_NEIGHBOR_OFFSETS = [
+  { x: -1, y: -1 },
+  { x: 0, y: -1 },
+  { x: -1, y: 0 },
+  { x: 0, y: 0 },
+] as const;
 
 export class TerrainSystem {
   private readonly store: TerrainMapStore;
@@ -56,6 +65,46 @@ export class TerrainSystem {
 
   public getGameplayGrid(): TerrainGameplayGrid {
     return this.gameplayGrid;
+  }
+
+  public previewPaintAtWorld(
+    payload: PlaceTerrainDropPayload,
+    worldX: number,
+    worldY: number,
+  ): TerrainRenderTile[] | null {
+    const center = this.gameplayGrid.worldToCell(worldX, worldY);
+    if (!center) return null;
+
+    const previewMaterialId =
+      payload.brushId === "delete" || payload.brushId === "eraser"
+        ? this.store.defaultMaterial
+        : payload.materialId;
+
+    const materialAt = (cellX: number, cellY: number): TerrainMaterialId =>
+      cellX === center.cellX && cellY === center.cellY
+        ? previewMaterialId
+        : this.store.getCellMaterial(cellX, cellY);
+
+    const tiles: TerrainRenderTile[] = [];
+    for (const offset of PREVIEW_RENDER_NEIGHBOR_OFFSETS) {
+      const cellX = center.cellX + offset.x;
+      const cellY = center.cellY + offset.y;
+      if (!this.gameplayGrid.isCellInBounds(cellX, cellY)) continue;
+
+      const caseId = this.kernel.deriveCaseId(materialAt, cellX, cellY, this.insideMaterial);
+      const mapped = this.mapper.getRule(caseId);
+      tiles.push({
+        cellX,
+        cellY,
+        caseId,
+        frame: mapped.frame,
+        rotate90: mapped.rotate90 ?? 0,
+        flipX: mapped.flipX ?? false,
+        flipY: mapped.flipY ?? false,
+      });
+    }
+
+    return tiles;
   }
 
   public update(): void {
@@ -137,8 +186,8 @@ export class TerrainSystem {
   }
 
   public inspectAtWorld(worldX: number, worldY: number): TerrainTileInspectedPayload | null {
-    const cellX = Math.floor(worldX / TERRAIN_CELL_WORLD_SIZE);
-    const cellY = Math.floor(worldY / TERRAIN_CELL_WORLD_SIZE);
+    const cellX = Math.floor((worldX - TERRAIN_RENDER_GRID_WORLD_OFFSET) / TERRAIN_CELL_WORLD_SIZE);
+    const cellY = Math.floor((worldY - TERRAIN_RENDER_GRID_WORLD_OFFSET) / TERRAIN_CELL_WORLD_SIZE);
 
     if (cellX < 0 || cellX >= this.store.width || cellY < 0 || cellY >= this.store.height) {
       return null;

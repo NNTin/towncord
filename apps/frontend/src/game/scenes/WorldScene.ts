@@ -22,14 +22,21 @@ import {
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
 } from "../events";
-import { TerrainSystem, type TerrainCellCoord } from "../terrain";
+import {
+  TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
+  TERRAIN_TEXTURE_KEY,
+  TerrainSystem,
+  type TerrainCellCoord,
+  type TerrainRenderTile,
+} from "../terrain";
 import { playEntityAnimation } from "./world/animationSystem";
 import {
   AUTONOMY_IDLE_DELAY_MS,
   resetEntityAutonomy,
   updateEntityAutonomy,
 } from "./world/autonomySystem";
-import { createWorldEntity } from "./world/entityFactory";
+import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
@@ -43,6 +50,14 @@ const MAX_ZOOM = 4;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
+const TERRAIN_BRUSH_PREVIEW_DEPTH = 9_000;
+const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
+const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
+const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;
+const TERRAIN_BRUSH_PREVIEW_READY_STROKE = 0xe0f2fe;
+const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
+const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
+const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
 
 export class WorldScene extends Phaser.Scene {
   private catalog: AnimationCatalog | null = null;
@@ -51,6 +66,8 @@ export class WorldScene extends Phaser.Scene {
   private entities: WorldEntity[] = [];
   private selectedEntity: WorldEntity | null = null;
   private selectionBadge: Phaser.GameObjects.Sprite | null = null;
+  private terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
+  private readonly terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
   private terrainSystem: TerrainSystem | null = null;
   private navigation: WorldNavigationService | null = null;
   private nextId = 0;
@@ -106,6 +123,12 @@ export class WorldScene extends Phaser.Scene {
         this.navigation = null;
         this.selectionBadge?.destroy();
         this.selectionBadge = null;
+        this.terrainBrushPreview?.destroy();
+        this.terrainBrushPreview = null;
+        for (const image of this.terrainBrushRenderPreviewImages) {
+          image.destroy();
+        }
+        this.terrainBrushRenderPreviewImages.length = 0;
         this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
         this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
         this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
@@ -119,6 +142,7 @@ export class WorldScene extends Phaser.Scene {
     );
 
     this.createSelectionBadge();
+    this.createTerrainBrushPreview();
   }
 
   public override update(_time: number, delta: number): void {
@@ -230,16 +254,82 @@ export class WorldScene extends Phaser.Scene {
     this.selectionBadge = badge;
   }
 
+  private createTerrainBrushPreview(): void {
+    const preview = this.add.rectangle(
+      0,
+      0,
+      TERRAIN_CELL_WORLD_SIZE,
+      TERRAIN_CELL_WORLD_SIZE,
+      TERRAIN_BRUSH_PREVIEW_READY_FILL,
+      TERRAIN_BRUSH_PREVIEW_ALPHA,
+    );
+    preview.setOrigin(0, 0);
+    preview.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH);
+    preview.setStrokeStyle(
+      TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
+      TERRAIN_BRUSH_PREVIEW_READY_STROKE,
+      0.9,
+    );
+    preview.setVisible(false);
+    this.terrainBrushPreview = preview;
+  }
+
   private setSelectionBadgeVisible(visible: boolean): void {
     if (!this.selectionBadge) return;
     this.selectionBadge.setVisible(visible);
+  }
+
+  private setTerrainBrushPreviewVisible(visible: boolean): void {
+    if (!this.terrainBrushPreview) return;
+    this.terrainBrushPreview.setVisible(visible);
+  }
+
+  private hideTerrainBrushRenderPreview(): void {
+    for (const image of this.terrainBrushRenderPreviewImages) {
+      image.setVisible(false);
+    }
+  }
+
+  private getTerrainBrushRenderPreviewImage(index: number): Phaser.GameObjects.Image {
+    const existing = this.terrainBrushRenderPreviewImages[index];
+    if (existing) {
+      return existing;
+    }
+
+    const image = this.add.image(0, 0, TERRAIN_TEXTURE_KEY);
+    image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
+    image.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH - 1);
+    image.setVisible(false);
+    this.terrainBrushRenderPreviewImages[index] = image;
+    return image;
+  }
+
+  private syncTerrainBrushRenderPreviewTiles(tiles: readonly TerrainRenderTile[]): void {
+    tiles.forEach((tile, index) => {
+      const image = this.getTerrainBrushRenderPreviewImage(index);
+      image.setTexture(TERRAIN_TEXTURE_KEY, tile.frame);
+      image.setScale(TERRAIN_CELL_WORLD_SIZE / image.width);
+      image.setRotation(tile.rotate90 * (Math.PI / 2));
+      image.setFlip(tile.flipX, tile.flipY);
+      image.setPosition(
+        tile.cellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5 + TERRAIN_RENDER_GRID_WORLD_OFFSET,
+        tile.cellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5 + TERRAIN_RENDER_GRID_WORLD_OFFSET,
+      );
+      image.setVisible(true);
+    });
+
+    for (let index = tiles.length; index < this.terrainBrushRenderPreviewImages.length; index += 1) {
+      this.terrainBrushRenderPreviewImages[index]?.setVisible(false);
+    }
   }
 
   private syncSelectionBadgePosition(entity: WorldEntity): void {
     if (!this.selectionBadge) return;
     this.selectionBadge.setPosition(
       entity.position.x,
-      entity.position.y - entity.sprite.displayHeight * 0.5 - SELECTED_BADGE_VERTICAL_OFFSET,
+      entity.position.y -
+        entity.sprite.displayHeight * WORLD_ENTITY_SPRITE_ORIGIN_Y -
+        SELECTED_BADGE_VERTICAL_OFFSET,
     );
   }
 
@@ -287,6 +377,7 @@ export class WorldScene extends Phaser.Scene {
   private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
     this.activeTerrainTool = payload;
     this.terrainPaintSession.end();
+    this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
@@ -296,9 +387,11 @@ export class WorldScene extends Phaser.Scene {
       this.panStartY = pointer.y;
       this.camStartX = this.cameras.main.scrollX;
       this.camStartY = this.cameras.main.scrollY;
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
       if (this.activeTerrainTool) {
         this.terrainPaintSession.begin();
+        this.syncTerrainBrushPreviewFromPointer(pointer);
         this.paintTerrainAtScreen(pointer.x, pointer.y);
         return;
       }
@@ -333,18 +426,23 @@ export class WorldScene extends Phaser.Scene {
       const dx = (pointer.x - this.panStartX) / zoom;
       const dy = (pointer.y - this.panStartY) / zoom;
       this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
+      this.syncTerrainBrushPreviewFromPointer(pointer);
       return;
     }
 
-    if (!this.activeTerrainTool || !this.terrainPaintSession.isActive()) return;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    if (!this.activeTerrainTool) return;
+    if (!this.terrainPaintSession.isActive()) return;
     this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = false;
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
       this.terrainPaintSession.end();
+      this.syncTerrainBrushPreviewFromPointer(pointer);
     }
   }
 
@@ -357,6 +455,27 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+    this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
+  }
+
+  private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {
+    if (!pointer) {
+      this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    const isWithinGame =
+      !("withinGame" in pointer) ||
+      Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame);
+
+    if (!isWithinGame) {
+      this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    this.syncTerrainBrushPreviewAtScreen(pointer.x, pointer.y);
   }
 
   private paintTerrainAtScreen(screenX: number, screenY: number): void {
@@ -379,6 +498,63 @@ export class WorldScene extends Phaser.Scene {
       worldPoint.x,
       worldPoint.y,
     );
+  }
+
+  private syncTerrainBrushPreviewAtScreen(screenX: number, screenY: number): void {
+    if (!this.activeTerrainTool || !this.terrainSystem || !this.terrainBrushPreview) {
+      this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
+    const grid = this.terrainSystem.getGameplayGrid();
+    const cell = grid.worldToCell(worldPoint.x, worldPoint.y);
+    if (!cell) {
+      this.setTerrainBrushPreviewVisible(false);
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    const isBlocked = this.isTerrainCellOccupied(cell);
+    this.terrainBrushPreview.setFillStyle(
+      isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL : TERRAIN_BRUSH_PREVIEW_READY_FILL,
+      TERRAIN_BRUSH_PREVIEW_ALPHA,
+    );
+    this.terrainBrushPreview.setStrokeStyle(
+      TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
+      isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE : TERRAIN_BRUSH_PREVIEW_READY_STROKE,
+      0.9,
+    );
+    // Terrain edits target the placement grid anchor; render tiles are resolved on the dual grid.
+    this.terrainBrushPreview.setPosition(
+      cell.cellX * TERRAIN_CELL_WORLD_SIZE,
+      cell.cellY * TERRAIN_CELL_WORLD_SIZE,
+    );
+    this.terrainBrushPreview.setVisible(true);
+
+    if (isBlocked) {
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    const previewTiles = this.terrainSystem.previewPaintAtWorld(
+      {
+        type: "terrain",
+        materialId: this.activeTerrainTool.materialId,
+        brushId: this.activeTerrainTool.brushId,
+        screenX,
+        screenY,
+      },
+      worldPoint.x,
+      worldPoint.y,
+    );
+    if (!previewTiles || previewTiles.length === 0) {
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
+    this.syncTerrainBrushRenderPreviewTiles(previewTiles);
   }
 
   private queueTerrainDropAtWorld(
