@@ -1,7 +1,7 @@
 import { supportsWalk } from "../../domain/capabilities";
-import type { WorldEntity } from "./types";
 import type { AutonomyNavigationService } from "./navigation";
 import type { MovementInput } from "./movementSystem";
+import type { WorldAutonomyActor } from "./types";
 
 export const AUTONOMY_IDLE_DELAY_MS = 2_500;
 
@@ -37,7 +37,7 @@ export function createAutonomyState(ambientActionIds: readonly string[]) {
   };
 }
 
-export function resetEntityAutonomy(entity: WorldEntity): void {
+export function resetEntityAutonomy(entity: WorldAutonomyActor): void {
   entity.autonomy.currentAmbientAction = null;
   entity.autonomy.currentAmbientMs = 0;
   entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
@@ -49,7 +49,7 @@ export function resetEntityAutonomy(entity: WorldEntity): void {
 }
 
 export function updateEntityAutonomy(
-  entity: WorldEntity,
+  entity: WorldAutonomyActor,
   deltaMs: number,
   context: AutonomyUpdateContext,
 ): MovementInput {
