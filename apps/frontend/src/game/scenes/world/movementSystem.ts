@@ -1,6 +1,6 @@
 import { resolveNextAction } from "../../application/actionResolver";
 import { supportsRun, supportsWalk } from "../../domain/capabilities";
-import type { WorldEntity } from "./types";
+import type { WorldMovementActor } from "./types";
 
 const WALK_SPEED = 100;
 const RUN_SPEED = 220;
@@ -14,7 +14,7 @@ export type MovementInput = {
 };
 
 export function updateEntityMovement(
-  entity: WorldEntity,
+  entity: WorldMovementActor,
   dt: number,
   input: MovementInput,
 ): void {

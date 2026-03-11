@@ -7,7 +7,7 @@ import {
 } from "../../assets/animationCatalog";
 import { readEntityVisualRef, type EntityDefinition } from "../../domain/model";
 import { isLocomotionTrackId, resolveTrackByActionPolicy } from "./animationPolicy";
-import type { WorldEntity } from "./types";
+import type { WorldAnimatedActor } from "./types";
 
 export type SpawnVisual = {
   animationKey: string;
@@ -59,7 +59,7 @@ export function resolveSpawnVisual(
 }
 
 export function playEntityAnimation(
-  entity: WorldEntity,
+  entity: WorldAnimatedActor,
   catalog: AnimationCatalog,
 ): void {
   const track = resolveEntityTrack(catalog, entity.definition, entity.animationAction);

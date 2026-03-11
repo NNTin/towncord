@@ -9,9 +9,13 @@ export class TerrainPaintSession {
     this.paintedCellKeys.clear();
   }
 
-  public end(): void {
+  public reset(): void {
     this.active = false;
     this.paintedCellKeys.clear();
+  }
+
+  public end(): void {
+    this.reset();
   }
 
   public isActive(): boolean {

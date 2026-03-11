@@ -1,15 +1,14 @@
 import { useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
+import { createPlaceablesSidebarBridge } from "../game/application/placeablesSidebarBridge";
 import type {
   PlaceableViewModel,
-  TerrainPlaceableViewModel,
 } from "../game/application/placeableService";
 import type {
   RuntimePerfPayload,
   SelectedTerrainToolPayload,
   TerrainTileInspectedPayload,
 } from "../game/events";
-import { PLACE_DRAG_MIME, type PlaceDragPayload } from "../game/events";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
 import { PlaceablesPanel } from "./sidebar/PlaceablesPanel";
@@ -36,39 +35,11 @@ export function SidebarAccordion({
   runtimePerf,
 }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
-
-  function handleDragStart(e: React.DragEvent, placeable: PlaceableViewModel): void {
-    const payload: PlaceDragPayload =
-      placeable.type === "entity"
-        ? {
-            type: "entity",
-            entityId: placeable.entityId,
-          }
-        : {
-            type: "terrain",
-            materialId: placeable.materialId,
-            brushId: placeable.brushId,
-          };
-    e.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(payload));
-    e.dataTransfer.effectAllowed = "copy";
-  }
-
-  function handleSelectTerrainTool(placeable: TerrainPlaceableViewModel): void {
-    const currentTool = activeTerrainTool;
-    if (
-      currentTool &&
-      currentTool.brushId === placeable.brushId &&
-      currentTool.materialId === placeable.materialId
-    ) {
-      onSelectTerrainTool(null);
-      return;
-    }
-
-    onSelectTerrainTool({
-      materialId: placeable.materialId,
-      brushId: placeable.brushId,
-    });
-  }
+  const placeablesBridge = createPlaceablesSidebarBridge({
+    placeables,
+    activeTerrainTool,
+    onSelectTerrainTool,
+  });
 
   return (
     <div
@@ -90,15 +61,9 @@ export function SidebarAccordion({
     >
       <PlaceablesPanel
         placeables={placeables}
-        onDragStart={handleDragStart}
-        activeTerrainToolId={
-          placeables.find((placeable) =>
-            placeable.type === "terrain" &&
-            activeTerrainTool?.brushId === placeable.brushId &&
-            activeTerrainTool?.materialId === placeable.materialId
-          )?.id ?? null
-        }
-        onSelectTerrainTool={handleSelectTerrainTool}
+        onDragStart={placeablesBridge.onDragStart}
+        activeTerrainToolId={placeablesBridge.activeTerrainToolId}
+        onSelectTerrainTool={placeablesBridge.onSelectTerrainTool}
       />
 
       <PreviewPanel

@@ -1,5 +1,6 @@
 import {
   TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
   type TerrainCellCoord,
   type TerrainMaterialId,
 } from "./contracts";
@@ -90,12 +91,11 @@ export class TerrainGameplayGrid {
   }
 
   public worldToCell(worldX: number, worldY: number): TerrainCellCoord | null {
-    if (!this.isWorldInBounds(worldX, worldY)) return null;
+    return this.worldToCellWithOffset(worldX, worldY, 0);
+  }
 
-    return {
-      cellX: Math.floor(worldX / TERRAIN_CELL_WORLD_SIZE),
-      cellY: Math.floor(worldY / TERRAIN_CELL_WORLD_SIZE),
-    };
+  public worldToRenderCell(worldX: number, worldY: number): TerrainCellCoord | null {
+    return this.worldToCellWithOffset(worldX, worldY, TERRAIN_RENDER_GRID_WORLD_OFFSET);
   }
 
   public cellToWorldCenter(cellX: number, cellY: number): TerrainWorldPoint | null {
@@ -185,5 +185,17 @@ export class TerrainGameplayGrid {
 
   private toCellKey(cellX: number, cellY: number): string {
     return `${cellX},${cellY}`;
+  }
+
+  private worldToCellWithOffset(
+    worldX: number,
+    worldY: number,
+    worldOffset: number,
+  ): TerrainCellCoord | null {
+    const cellX = Math.floor((worldX - worldOffset) / TERRAIN_CELL_WORLD_SIZE);
+    const cellY = Math.floor((worldY - worldOffset) / TERRAIN_CELL_WORLD_SIZE);
+    if (!this.isCellInBounds(cellX, cellY)) return null;
+
+    return { cellX, cellY };
   }
 }
