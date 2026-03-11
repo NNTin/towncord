@@ -256,31 +256,37 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
+    const runtimeState = this.runtimeState;
     const updateStart = performance.now();
 
+    const terrainSystem = runtimeState.terrainSystem;
     const terrainStart = performance.now();
-    this.terrainSystem?.update();
+    terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    if (this.wasd && this.shiftKey && this.catalog && this.navigation) {
+    const { catalog, navigation, shiftKey, wasd } = runtimeState;
+    if (wasd && shiftKey && catalog && navigation) {
       const dt = delta / 1000;
-      const directInput = this.resolveDirectMovementInput();
+      const directInput = this.resolveDirectMovementInput(wasd, shiftKey);
       const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
-      this.directInputIdleMs = hasDirectMovement ? 0 : this.directInputIdleMs + delta;
-      const autoplayEnabled = this.directInputIdleMs >= AUTONOMY_IDLE_DELAY_MS;
+      const directInputIdleMs = hasDirectMovement ? 0 : runtimeState.directInputIdleMs + delta;
+      runtimeState.directInputIdleMs = directInputIdleMs;
+      const autoplayEnabled = directInputIdleMs >= AUTONOMY_IDLE_DELAY_MS;
+      const entities = runtimeState.entities;
+      const selectedEntity = runtimeState.selectedEntity;
 
-      for (const entity of this.entities) {
+      for (const entity of entities) {
         const prevState = entity.state;
         const prevFacing = entity.facing;
         const prevAnimationAction = entity.animationAction;
-        const isSelected = entity === this.selectedEntity;
+        const isSelected = entity === selectedEntity;
 
         const movementInput =
           isSelected && hasDirectMovement
             ? directInput
             : updateEntityAutonomy(entity, delta, {
                 autoplayEnabled,
-                navigation: this.navigation,
+                navigation,
               });
 
         if (isSelected && hasDirectMovement) {
@@ -296,7 +302,7 @@ export class WorldScene extends Phaser.Scene {
           x: entity.position.x + entity.velocity.x * dt,
           y: entity.position.y + entity.velocity.y * dt,
         };
-        const resolvedPosition = this.resolveEntityPosition(entity.position, nextPosition);
+        const resolvedPosition = this.resolveEntityPosition(entity.position, nextPosition, navigation);
         entity.position.x = resolvedPosition.x;
         entity.position.y = resolvedPosition.y;
         if (resolvedPosition.x !== nextPosition.x) {
@@ -317,7 +323,7 @@ export class WorldScene extends Phaser.Scene {
         const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
         const animationChanged = entity.animationAction !== prevAnimationAction;
         if (stateChanged || dirChanged || animationChanged) {
-          playEntityAnimation(entity, this.catalog);
+          playEntityAnimation(entity, catalog);
           if (isSelected && stateChanged && entity.definition.kind === "player") {
             const payload: PlayerStateChangedPayload = { state: entity.state };
             this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
@@ -331,7 +337,7 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const now = performance.now();
-    if (now - this.lastPerfEmitAtMs >= 100) {
+    if (now - runtimeState.lastPerfEmitAtMs >= 100) {
       const updateMs = now - updateStart;
       const fps = delta > 0 ? 1000 / delta : 0;
       const payload: RuntimePerfPayload = {
@@ -342,7 +348,7 @@ export class WorldScene extends Phaser.Scene {
         terrainMs,
       };
       this.game.events.emit(RUNTIME_PERF_EVENT, payload);
-      this.lastPerfEmitAtMs = now;
+      runtimeState.lastPerfEmitAtMs = now;
     }
   }
 
@@ -690,8 +696,11 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  private resolveDirectMovementInput(): MovementInput {
-    if (!this.wasd || !this.shiftKey) {
+  private resolveDirectMovementInput(
+    wasd: WorldSceneMovementKeys | null = this.wasd,
+    shiftKey: Phaser.Input.Keyboard.Key | null = this.shiftKey,
+  ): MovementInput {
+    if (!wasd || !shiftKey) {
       return {
         moveX: 0,
         moveY: 0,
@@ -700,27 +709,31 @@ export class WorldScene extends Phaser.Scene {
     }
 
     return {
-      moveX: (this.wasd.D.isDown ? 1 : 0) - (this.wasd.A.isDown ? 1 : 0),
-      moveY: (this.wasd.S.isDown ? 1 : 0) - (this.wasd.W.isDown ? 1 : 0),
-      isRunModifier: this.shiftKey.isDown,
+      moveX: (wasd.D.isDown ? 1 : 0) - (wasd.A.isDown ? 1 : 0),
+      moveY: (wasd.S.isDown ? 1 : 0) - (wasd.W.isDown ? 1 : 0),
+      isRunModifier: shiftKey.isDown,
     };
   }
 
-  private resolveEntityPosition(current: WorldPoint, next: WorldPoint): WorldPoint {
-    if (!this.navigation) return next;
+  private resolveEntityPosition(
+    current: WorldPoint,
+    next: WorldPoint,
+    navigation: WorldNavigationService | null = this.navigation,
+  ): WorldPoint {
+    if (!navigation) return next;
 
-    const clampedNext = this.navigation.clampToBounds(next);
-    if (this.navigation.isWalkable(clampedNext)) {
+    const clampedNext = navigation.clampToBounds(next);
+    if (navigation.isWalkable(clampedNext)) {
       return clampedNext;
     }
 
-    const xOnly = this.navigation.clampToBounds({ x: clampedNext.x, y: current.y });
-    if (this.navigation.isWalkable(xOnly)) {
+    const xOnly = navigation.clampToBounds({ x: clampedNext.x, y: current.y });
+    if (navigation.isWalkable(xOnly)) {
       return xOnly;
     }
 
-    const yOnly = this.navigation.clampToBounds({ x: current.x, y: clampedNext.y });
-    if (this.navigation.isWalkable(yOnly)) {
+    const yOnly = navigation.clampToBounds({ x: current.x, y: clampedNext.y });
+    if (navigation.isWalkable(yOnly)) {
       return yOnly;
     }
 

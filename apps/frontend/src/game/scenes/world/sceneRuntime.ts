@@ -56,7 +56,7 @@ export class WorldSceneRuntime {
   public lastPerfEmitAtMs = 0;
   public directInputIdleMs = 0;
 
-  public reset(): void {
+  private reset(): void {
     this.catalog = null;
     this.entityRegistry = null;
 
