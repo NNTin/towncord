@@ -2,7 +2,11 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import { buildAnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
 import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
-import { PlaceableService, type PlaceableViewModel } from "./placeableService";
+import {
+  listEntityPlaceables,
+  type PlaceableViewModel,
+} from "./placeableService";
+import { listTerrainPlaceables } from "./terrainPlaceableCatalog";
 
 export type BloomseedWorldBootstrap = {
   catalog: AnimationCatalog;
@@ -35,8 +39,10 @@ export function getBloomseedWorldBootstrap(value: unknown): BloomseedWorldBootst
 export function composeBloomseedBootstrap(animationKeys: string[]): BloomseedBootstrap {
   const catalog = buildAnimationCatalog(animationKeys);
   const entityRegistry = buildEntityRegistryFromCatalog(catalog);
-  const placeableService = PlaceableService.fromRegistry(entityRegistry);
-  const placeables = placeableService.listPlaceables();
+  const placeables = [
+    ...listEntityPlaceables(entityRegistry),
+    ...listTerrainPlaceables(),
+  ];
 
   return {
     world: {
