@@ -6,6 +6,7 @@ import {
   type TerrainMaterialId,
   toTerrainChunkId,
 } from "./contracts";
+import { resolveTerrainEditMaterial } from "./editPolicy";
 
 const CASE_NEIGHBOR_OFFSETS = [
   { x: 0, y: 0 },
@@ -83,12 +84,15 @@ export class TerrainMapStore {
   }
 
   public applyEditOp(op: TerrainEditOp): boolean {
-    const { cellX, cellY } = op.center;
-    if (!this.isInBounds(cellX, cellY)) return false;
+    return this.setCellMaterial(
+      op.center.cellX,
+      op.center.cellY,
+      resolveTerrainEditMaterial(op, this.defaultMaterial),
+    );
+  }
 
-    const materialId = op.brushId === "delete" || op.brushId === "eraser"
-      ? this.defaultMaterial
-      : op.materialId;
+  public setCellMaterial(cellX: number, cellY: number, materialId: TerrainMaterialId): boolean {
+    if (!this.isInBounds(cellX, cellY)) return false;
 
     if (!this.materials.has(materialId)) {
       throw new Error(`TerrainMapStore: unknown material \"${materialId}\".`);
