@@ -1,6 +1,5 @@
 import type { PlaceTerrainDropPayload } from "../events";
 import type { TerrainCellCoord, TerrainEditOp } from "./contracts";
-import { resolveTerrainEditMaterial } from "./editPolicy";
 import { TerrainEditRouter } from "./editRouter";
 import { TerrainGameplayGrid } from "./gameplayGrid";
 import { TerrainMapStore } from "./store";
@@ -35,10 +34,7 @@ export class TerrainCommands {
   }
 
   public applyEditOp(op: TerrainEditOp): TerrainCellCoord | null {
-    const materialId = resolveTerrainEditMaterial(op, this.store.defaultMaterial);
-    return this.store.setCellMaterial(op.center.cellX, op.center.cellY, materialId)
-      ? op.center
-      : null;
+    return this.store.applyEditOp(op) ? op.center : null;
   }
 
   public flushPendingDrops(onError?: TerrainEditErrorHandler): TerrainCellCoord[] {
