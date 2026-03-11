@@ -2,10 +2,10 @@ import Phaser from "phaser";
 import {
   BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
   getBloomseedWorldBootstrap,
-  type BloomseedWorldBootstrap,
 } from "../application/gameComposition";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import type { AnimationCatalog } from "../assets/animationCatalog";
+import type { EntityRegistry } from "../domain/entityRegistry";
 import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
@@ -38,9 +38,10 @@ import {
 } from "./world/autonomySystem";
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
+import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
-import type { WorldEntity, WorldPoint } from "./world/types";
+import type { WorldEntity, WorldPoint, WorldSelectableActor } from "./world/types";
 
 export const WORLD_SCENE_KEY = "world";
 
@@ -60,30 +61,175 @@ const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
 const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
 
 export class WorldScene extends Phaser.Scene {
-  private catalog: AnimationCatalog | null = null;
-  private entityRegistry: BloomseedWorldBootstrap["entityRegistry"] | null = null;
+  private readonly runtimeState = new WorldSceneRuntime();
 
-  private entities: WorldEntity[] = [];
-  private selectedEntity: WorldEntity | null = null;
-  private selectionBadge: Phaser.GameObjects.Sprite | null = null;
-  private terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
-  private readonly terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
-  private terrainSystem: TerrainSystem | null = null;
-  private navigation: WorldNavigationService | null = null;
-  private nextId = 0;
+  private get catalog(): AnimationCatalog | null {
+    return this.runtimeState.catalog;
+  }
 
-  private wasd: Record<"W" | "A" | "S" | "D", Phaser.Input.Keyboard.Key> | null = null;
-  private shiftKey: Phaser.Input.Keyboard.Key | null = null;
-  private activeTerrainTool: SelectedTerrainToolPayload = null;
-  private readonly terrainPaintSession = new TerrainPaintSession();
+  private set catalog(value: AnimationCatalog | null) {
+    this.runtimeState.catalog = value;
+  }
 
-  private isPanning = false;
-  private panStartX = 0;
-  private panStartY = 0;
-  private camStartX = 0;
-  private camStartY = 0;
-  private lastPerfEmitAtMs = 0;
-  private directInputIdleMs = 0;
+  private get entityRegistry(): EntityRegistry | null {
+    return this.runtimeState.entityRegistry;
+  }
+
+  private set entityRegistry(value: EntityRegistry | null) {
+    this.runtimeState.entityRegistry = value;
+  }
+
+  private get entities(): WorldEntity[] {
+    return this.runtimeState.entities;
+  }
+
+  private set entities(value: WorldEntity[]) {
+    this.runtimeState.entities = value;
+  }
+
+  private get selectedEntity(): WorldEntity | null {
+    return this.runtimeState.selectedEntity;
+  }
+
+  private set selectedEntity(value: WorldEntity | null) {
+    this.runtimeState.selectedEntity = value;
+  }
+
+  private get selectionBadge(): Phaser.GameObjects.Sprite | null {
+    return this.runtimeState.selectionBadge;
+  }
+
+  private set selectionBadge(value: Phaser.GameObjects.Sprite | null) {
+    this.runtimeState.selectionBadge = value;
+  }
+
+  private get terrainBrushPreview(): Phaser.GameObjects.Rectangle | null {
+    return this.runtimeState.terrainBrushPreview;
+  }
+
+  private set terrainBrushPreview(value: Phaser.GameObjects.Rectangle | null) {
+    this.runtimeState.terrainBrushPreview = value;
+  }
+
+  private get terrainBrushRenderPreviewImages(): Phaser.GameObjects.Image[] {
+    return this.runtimeState.terrainBrushRenderPreviewImages;
+  }
+
+  private set terrainBrushRenderPreviewImages(value: Phaser.GameObjects.Image[]) {
+    this.runtimeState.terrainBrushRenderPreviewImages = value;
+  }
+
+  private get terrainSystem(): TerrainSystem | null {
+    return this.runtimeState.terrainSystem;
+  }
+
+  private set terrainSystem(value: TerrainSystem | null) {
+    this.runtimeState.terrainSystem = value;
+  }
+
+  private get navigation(): WorldNavigationService | null {
+    return this.runtimeState.navigation;
+  }
+
+  private set navigation(value: WorldNavigationService | null) {
+    this.runtimeState.navigation = value;
+  }
+
+  private get nextId(): number {
+    return this.runtimeState.nextId;
+  }
+
+  private set nextId(value: number) {
+    this.runtimeState.nextId = value;
+  }
+
+  private get wasd(): WorldSceneMovementKeys | null {
+    return this.runtimeState.wasd;
+  }
+
+  private set wasd(value: WorldSceneMovementKeys | null) {
+    this.runtimeState.wasd = value;
+  }
+
+  private get shiftKey(): Phaser.Input.Keyboard.Key | null {
+    return this.runtimeState.shiftKey;
+  }
+
+  private set shiftKey(value: Phaser.Input.Keyboard.Key | null) {
+    this.runtimeState.shiftKey = value;
+  }
+
+  private get activeTerrainTool(): SelectedTerrainToolPayload {
+    return this.runtimeState.activeTerrainTool;
+  }
+
+  private set activeTerrainTool(value: SelectedTerrainToolPayload) {
+    this.runtimeState.activeTerrainTool = value;
+  }
+
+  private get terrainPaintSession(): TerrainPaintSession {
+    return this.runtimeState.terrainPaintSession;
+  }
+
+  private set terrainPaintSession(value: TerrainPaintSession) {
+    this.runtimeState.terrainPaintSession = value;
+  }
+
+  private get isPanning(): boolean {
+    return this.runtimeState.isPanning;
+  }
+
+  private set isPanning(value: boolean) {
+    this.runtimeState.isPanning = value;
+  }
+
+  private get panStartX(): number {
+    return this.runtimeState.panStartX;
+  }
+
+  private set panStartX(value: number) {
+    this.runtimeState.panStartX = value;
+  }
+
+  private get panStartY(): number {
+    return this.runtimeState.panStartY;
+  }
+
+  private set panStartY(value: number) {
+    this.runtimeState.panStartY = value;
+  }
+
+  private get camStartX(): number {
+    return this.runtimeState.camStartX;
+  }
+
+  private set camStartX(value: number) {
+    this.runtimeState.camStartX = value;
+  }
+
+  private get camStartY(): number {
+    return this.runtimeState.camStartY;
+  }
+
+  private set camStartY(value: number) {
+    this.runtimeState.camStartY = value;
+  }
+
+  private get lastPerfEmitAtMs(): number {
+    return this.runtimeState.lastPerfEmitAtMs;
+  }
+
+  private set lastPerfEmitAtMs(value: number) {
+    this.runtimeState.lastPerfEmitAtMs = value;
+  }
+
+  private get directInputIdleMs(): number {
+    return this.runtimeState.directInputIdleMs;
+  }
+
+  private set directInputIdleMs(value: number) {
+    this.runtimeState.directInputIdleMs = value;
+  }
 
   constructor() {
     super(WORLD_SCENE_KEY);
@@ -98,48 +244,12 @@ export class WorldScene extends Phaser.Scene {
       this.entityRegistry = bootstrap.entityRegistry;
     }
 
-    this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as Record<
-      "W" | "A" | "S" | "D",
-      Phaser.Input.Keyboard.Key
-    >;
+    this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as WorldSceneMovementKeys;
     this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
-
-    this.input.on("pointerdown", this.onPointerDown, this);
-    this.input.on("pointermove", this.onPointerMove, this);
-    this.input.on("pointerup", this.onPointerUp, this);
-    this.input.on("pointerupoutside", this.onPointerUp, this);
-    this.input.on("wheel", this.onWheel, this);
 
     this.terrainSystem = new TerrainSystem(this);
     this.navigation = createTerrainNavigationService(this.terrainSystem.getGameplayGrid());
-    this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-    this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
-    this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
-    this.events.once(
-      "shutdown",
-      () => {
-        this.terrainSystem?.destroy();
-        this.terrainSystem = null;
-        this.navigation = null;
-        this.selectionBadge?.destroy();
-        this.selectionBadge = null;
-        this.terrainBrushPreview?.destroy();
-        this.terrainBrushPreview = null;
-        for (const image of this.terrainBrushRenderPreviewImages) {
-          image.destroy();
-        }
-        this.terrainBrushRenderPreviewImages.length = 0;
-        this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-        this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
-        this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
-        this.input.off("pointerdown", this.onPointerDown, this);
-        this.input.off("pointermove", this.onPointerMove, this);
-        this.input.off("pointerup", this.onPointerUp, this);
-        this.input.off("pointerupoutside", this.onPointerUp, this);
-        this.input.off("wheel", this.onWheel, this);
-      },
-      this,
-    );
+    this.bindSceneEvents();
 
     this.createSelectionBadge();
     this.createTerrainBrushPreview();
@@ -323,7 +433,7 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  private syncSelectionBadgePosition(entity: WorldEntity): void {
+  private syncSelectionBadgePosition(entity: WorldSelectableActor): void {
     if (!this.selectionBadge) return;
     this.selectionBadge.setPosition(
       entity.position.x,
@@ -615,5 +725,33 @@ export class WorldScene extends Phaser.Scene {
     }
 
     return current;
+  }
+
+  private bindSceneEvents(): void {
+    this.input.on("pointerdown", this.onPointerDown, this);
+    this.input.on("pointermove", this.onPointerMove, this);
+    this.input.on("pointerup", this.onPointerUp, this);
+    this.input.on("pointerupoutside", this.onPointerUp, this);
+    this.input.on("wheel", this.onWheel, this);
+    this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+    this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+    this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.events.once("shutdown", this.handleShutdown, this);
+  }
+
+  private unbindSceneEvents(): void {
+    this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
+    this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
+    this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.input.off("pointerdown", this.onPointerDown, this);
+    this.input.off("pointermove", this.onPointerMove, this);
+    this.input.off("pointerup", this.onPointerUp, this);
+    this.input.off("pointerupoutside", this.onPointerUp, this);
+    this.input.off("wheel", this.onWheel, this);
+  }
+
+  private handleShutdown(): void {
+    this.unbindSceneEvents();
+    this.runtimeState.dispose();
   }
 }
