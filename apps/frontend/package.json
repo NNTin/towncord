@@ -4,8 +4,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npm run typecheck && vite build",
+    "assets:public": "npm run -w @towncord/public-assets export:public",
+    "dev": "npm run assets:public && npm run dev:app",
+    "dev:app": "vite",
+    "build": "npm run assets:public && npm run build:app",
+    "build:app": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "preview": "vite preview",
     "test": "vitest run"

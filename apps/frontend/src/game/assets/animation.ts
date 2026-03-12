@@ -4,6 +4,16 @@ import { BLOOMSEED_ANIMATIONS_JSON_KEY } from "./preload";
 export type BloomseedAnimationDefinition = {
   atlasKey: string;
   frames: string[];
+  durationsMs?: number[];
+  phaseDurationsMs?: number[];
+  category?: string;
+  frameCount?: number;
+  frameSize?: {
+    w: number;
+    h: number;
+  };
+  paletteVariant?: string | null;
+  sourceFile?: string;
 };
 
 export type BloomseedAnimationManifest = {
@@ -78,28 +88,29 @@ export function registerBloomseedAnimations(
       continue;
     }
 
-    const frames = frameNames.map(
-      (frame): Phaser.Types.Animations.AnimationFrame => ({
-        key: definition.atlasKey,
-        frame,
-      }),
-    );
+    const frames = buildAnimationFrames(definition);
 
     if (frames.length === 0) {
       continue;
     }
 
-    scene.anims.create({
+    const animationConfig: Phaser.Types.Animations.Animation = {
       key: animationKey,
       frames,
-      frameRate: override?.frameRate ?? defaultFrameRate,
       repeat: override?.repeat ?? defaultRepeat,
       yoyo: override?.yoyo ?? false,
       delay: override?.delay ?? 0,
       repeatDelay: override?.repeatDelay ?? 0,
       showOnStart: override?.showOnStart ?? false,
       hideOnComplete: override?.hideOnComplete ?? false,
-    });
+    };
+
+    const frameRate = resolveAnimationFrameRate(definition, override?.frameRate, defaultFrameRate);
+    if (frameRate !== undefined) {
+      animationConfig.frameRate = frameRate;
+    }
+
+    scene.anims.create(animationConfig);
 
     created.push(animationKey);
   }
@@ -107,7 +118,55 @@ export function registerBloomseedAnimations(
   return created;
 }
 
-function readAnimationManifest(
+export function buildAnimationFrames(
+  definition: BloomseedAnimationDefinition,
+): Phaser.Types.Animations.AnimationFrame[] {
+  const durationsMs =
+    Array.isArray(definition.durationsMs) &&
+    definition.durationsMs.length === definition.frames.length &&
+    definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+      ? definition.durationsMs
+      : null;
+
+  return definition.frames.map((frame, index): Phaser.Types.Animations.AnimationFrame => {
+    const animationFrame: Phaser.Types.Animations.AnimationFrame = {
+      key: definition.atlasKey,
+      frame,
+    };
+
+    if (durationsMs) {
+      const duration = durationsMs[index];
+      if (duration !== undefined) {
+        animationFrame.duration = duration;
+      }
+    }
+
+    return animationFrame;
+  });
+}
+
+export function resolveAnimationFrameRate(
+  definition: BloomseedAnimationDefinition,
+  overrideFrameRate: number | undefined,
+  defaultFrameRate: number,
+): number | undefined {
+  if (overrideFrameRate !== undefined) {
+    return overrideFrameRate;
+  }
+
+  const hasDurations =
+    Array.isArray(definition.durationsMs) &&
+    definition.durationsMs.length === definition.frames.length &&
+    definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0);
+
+  if (hasDurations) {
+    return undefined;
+  }
+
+  return defaultFrameRate;
+}
+
+export function readAnimationManifest(
   scene: Phaser.Scene,
   manifestKey: string,
 ): BloomseedAnimationManifest {
@@ -122,7 +181,45 @@ function readAnimationManifest(
   return raw;
 }
 
-function isBloomseedAnimationManifest(
+export function readOptionalAnimationManifest(
+  scene: Phaser.Scene,
+  manifestKey: string,
+): BloomseedAnimationManifest | null {
+  const cache = (scene.cache as Phaser.Scene["cache"] | undefined)?.json;
+  if (!cache || typeof cache.exists !== "function" || typeof cache.get !== "function") {
+    return null;
+  }
+
+  if (!cache.exists(manifestKey)) {
+    return null;
+  }
+
+  const raw = cache.get(manifestKey) as unknown;
+  return isBloomseedAnimationManifest(raw) ? raw : null;
+}
+
+export function collectPhaseDurationsByAnimationId(
+  manifest: BloomseedAnimationManifest | null,
+): Record<string, number[]> {
+  if (!manifest) {
+    return {};
+  }
+
+  const phaseDurationsByAnimationId: Record<string, number[]> = {};
+  for (const [animationId, definition] of Object.entries(manifest.animations)) {
+    if (
+      Array.isArray(definition.phaseDurationsMs) &&
+      definition.phaseDurationsMs.length > 0 &&
+      definition.phaseDurationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+    ) {
+      phaseDurationsByAnimationId[animationId] = [...definition.phaseDurationsMs];
+    }
+  }
+
+  return phaseDurationsByAnimationId;
+}
+
+export function isBloomseedAnimationManifest(
   value: unknown,
 ): value is BloomseedAnimationManifest {
   if (!value || typeof value !== "object") {
@@ -147,6 +244,26 @@ function isBloomseedAnimationManifest(
     }
 
     if (!Array.isArray(item.frames) || !item.frames.every((frame) => typeof frame === "string")) {
+      return false;
+    }
+
+    if (
+      item.durationsMs !== undefined &&
+      (!Array.isArray(item.durationsMs) ||
+        !item.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0))
+    ) {
+      return false;
+    }
+
+    if (
+      item.phaseDurationsMs !== undefined &&
+      (!Array.isArray(item.phaseDurationsMs) ||
+        !item.phaseDurationsMs.every((duration) => Number.isInteger(duration) && duration > 0))
+    ) {
+      return false;
+    }
+
+    if (item.sourceFile !== undefined && typeof item.sourceFile !== "string") {
       return false;
     }
   }

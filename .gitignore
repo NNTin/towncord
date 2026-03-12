@@ -2,6 +2,7 @@
 /assets/debug/
 apps/frontend/public/assets/bloomseed/
 apps/frontend/public/assets/debug/
+apps/frontend/public/assets/donarg-office/
 node_modules/
 TODO.md
 __pycache__/
