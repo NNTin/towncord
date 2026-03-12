@@ -100,6 +100,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Find unused dependencies, exports, and files
+        run: npm run knip
+
       - name: Typecheck frontend
         run: npm run typecheck:frontend
 
