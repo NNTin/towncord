@@ -6,9 +6,9 @@
   "scripts": {
     "assets:public": "npm run -w @towncord/public-assets export:public",
     "contracts:generate": "npm run -w @towncord/public-animation-contracts generate",
-    "dev": "npm run assets:public && npm run contracts:generate && npm run dev:app",
+    "dev": "npm run contracts:generate && npm run dev:app",
     "dev:app": "vite",
-    "build": "npm run assets:public && npm run contracts:generate && npm run build:app",
+    "build": "npm run contracts:generate && npm run build:app",
     "build:app": "npm run typecheck && vite build",
     "typecheck": "npm run contracts:generate && tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "preview": "vite preview",
