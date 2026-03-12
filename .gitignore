@@ -4,6 +4,8 @@ apps/frontend/public/assets/bloomseed/
 apps/frontend/public/assets/debug/
 apps/frontend/public/assets/donarg-office/
 packages/public-animation-contracts/src/publicAnimations.generated.ts
+packages/public-animation-contracts/src/validatePublicAnimations.generated.js
+packages/public-animation-contracts/src/validatePublicAnimations.generated.d.ts
 node_modules/
 TODO.md
 __pycache__/
