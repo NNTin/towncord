@@ -44,10 +44,19 @@ function getSpriteDirection(segment: string): SpriteDirection | null {
 function getOrCreate(
   map: Map<string, AnimationTrack>,
   id: string,
-  defaults: Omit<AnimationTrack, "id" | "directional" | "keyByDirection" | "undirectedKey">,
+  defaults: Omit<
+    AnimationTrack,
+    "id" | "directional" | "keyByDirection" | "undirectedKey"
+  >,
 ): AnimationTrack {
   if (!map.has(id)) {
-    map.set(id, { id, ...defaults, directional: false, keyByDirection: {}, undirectedKey: null });
+    map.set(id, {
+      id,
+      ...defaults,
+      directional: false,
+      keyByDirection: {},
+      undirectedKey: null,
+    });
   }
   return map.get(id)!;
 }
@@ -104,7 +113,9 @@ function parseMobKeys(
       ? lastSegment.slice(mobPrefix.length)
       : lastSegment;
     const dir = getSpriteDirection(actionSegment);
-    const actionId = dir ? actionSegment.slice(0, actionSegment.length - `-${dir}`.length) : actionSegment;
+    const actionId = dir
+      ? actionSegment.slice(0, actionSegment.length - `-${dir}`.length)
+      : actionSegment;
 
     const path = `mobs/${family}/${mobId}`;
     if (!pathTracks.has(path)) pathTracks.set(path, new Map());
@@ -184,7 +195,10 @@ function parseTilesetKeys(
       family = "static";
       group = parts[2]!;
       tilesetType = parts[3]!;
-    } else if (parts.length === 5 && (parts[2] === "animated" || parts[2] === "static")) {
+    } else if (
+      parts.length === 5 &&
+      (parts[2] === "animated" || parts[2] === "static")
+    ) {
       family = parts[2];
       group = parts[3]!;
       tilesetType = parts[4]!;
@@ -204,7 +218,9 @@ function parseTilesetKeys(
   }
 }
 
-export function buildAnimationCatalog(animationKeys: string[]): AnimationCatalog {
+export function buildAnimationCatalog(
+  animationKeys: string[],
+): AnimationCatalog {
   const pathTracks = new Map<string, Map<string, AnimationTrack>>();
   parsePlayerKeys(animationKeys, pathTracks);
   parseMobKeys(animationKeys, pathTracks);
@@ -213,7 +229,10 @@ export function buildAnimationCatalog(animationKeys: string[]): AnimationCatalog
 
   const tracksByPath = new Map<string, AnimationTrack[]>();
   for (const [path, map] of pathTracks) {
-    tracksByPath.set(path, [...map.values()].sort((a, b) => a.id.localeCompare(b.id)));
+    tracksByPath.set(
+      path,
+      [...map.values()].sort((a, b) => a.id.localeCompare(b.id)),
+    );
   }
 
   const playerModels = new Set<string>();
@@ -262,7 +281,9 @@ export function resolveTrackForDirection(
     if (key) return { key, flipX };
     // Fallback order: down → up → side
     const fallbackKey =
-      track.keyByDirection["down"] ?? track.keyByDirection["up"] ?? track.keyByDirection["side"];
+      track.keyByDirection["down"] ??
+      track.keyByDirection["up"] ??
+      track.keyByDirection["side"];
     if (fallbackKey) return { key: fallbackKey, flipX: false };
   }
 
@@ -272,11 +293,7 @@ export function resolveTrackForDirection(
 
 /** Returns mob IDs available under a given family. */
 export function getMobIds(catalog: AnimationCatalog, family: string): string[] {
-  const prefix = `mobs/${family}/`;
-  return [...catalog.tracksByPath.keys()]
-    .filter((p) => p.startsWith(prefix))
-    .map((p) => p.slice(prefix.length))
-    .sort();
+  return listCatalogPathSuffixes(catalog, `mobs/${family}/`);
 }
 
 function parseMobVisualPath(path: string): MobCatalogDescriptor | null {
@@ -285,7 +302,19 @@ function parseMobVisualPath(path: string): MobCatalogDescriptor | null {
   return { family, mobId, visualPath: path };
 }
 
-export function listMobDescriptors(catalog: AnimationCatalog): MobCatalogDescriptor[] {
+function listCatalogPathSuffixes(
+  catalog: AnimationCatalog,
+  prefix: string,
+): string[] {
+  return [...catalog.tracksByPath.keys()]
+    .filter((path) => path.startsWith(prefix))
+    .map((path) => path.slice(prefix.length))
+    .sort();
+}
+
+export function listMobDescriptors(
+  catalog: AnimationCatalog,
+): MobCatalogDescriptor[] {
   const descriptors: MobCatalogDescriptor[] = [];
 
   for (const path of catalog.tracksByPath.keys()) {
@@ -297,24 +326,25 @@ export function listMobDescriptors(catalog: AnimationCatalog): MobCatalogDescrip
 }
 
 /** Returns prop groups under a prop family (e.g. "chest", "water", "barrels"). */
-export function getPropGroups(catalog: AnimationCatalog, family: string): string[] {
-  const prefix = `props/${family}/`;
-  return [...catalog.tracksByPath.keys()]
-    .filter((p) => p.startsWith(prefix))
-    .map((p) => p.slice(prefix.length))
-    .sort();
+export function getPropGroups(
+  catalog: AnimationCatalog,
+  family: string,
+): string[] {
+  return listCatalogPathSuffixes(catalog, `props/${family}/`);
 }
 
 /** Returns tileset groups under a tileset family (e.g. "environment", "structure"). */
-export function getTilesetGroups(catalog: AnimationCatalog, family: TilesetFamily): string[] {
-  const prefix = `tilesets/${family}/`;
-  return [...catalog.tracksByPath.keys()]
-    .filter((p) => p.startsWith(prefix))
-    .map((p) => p.slice(prefix.length))
-    .sort();
+export function getTilesetGroups(
+  catalog: AnimationCatalog,
+  family: TilesetFamily,
+): string[] {
+  return listCatalogPathSuffixes(catalog, `tilesets/${family}/`);
 }
 
 /** Returns tracks for the given path, or [] if not found. */
-export function getTracksForPath(catalog: AnimationCatalog, path: string): AnimationTrack[] {
+export function getTracksForPath(
+  catalog: AnimationCatalog,
+  path: string,
+): AnimationTrack[] {
   return catalog.tracksByPath.get(path) ?? [];
 }

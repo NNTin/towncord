@@ -38,6 +38,8 @@ type WorldPoint = {
   y: number;
 };
 
+const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
+
 function createSceneHarness(input?: {
   entityPositions?: WorldPoint[];
   worldPoint?: WorldPoint;
@@ -91,7 +93,9 @@ function createSceneHarness(input?: {
     previewPaintAtWorld,
     queueDrop,
   };
-  scene.entities = (input?.entityPositions ?? []).map((position) => ({ position }));
+  scene.entities = (input?.entityPositions ?? []).map((position) => ({
+    position,
+  }));
   scene.activeTerrainTool = {
     materialId: "water",
     brushId: "water",
@@ -108,6 +112,24 @@ function createSceneHarness(input?: {
   };
 }
 
+function createOccupiedSceneHarness() {
+  return createSceneHarness({
+    entityPositions: OCCUPIED_ENTITY_POSITIONS,
+  });
+}
+
+function paintTerrainAtPointer(scene: Record<string, unknown>): void {
+  (scene.paintTerrainAtScreen as (screenX: number, screenY: number) => void)(
+    12,
+    34,
+  );
+}
+
+function beginBrushPaint(scene: Record<string, unknown>): void {
+  (scene.terrainPaintSession as TerrainPaintSession).begin();
+  paintTerrainAtPointer(scene);
+}
+
 describe("WorldScene terrain painting", () => {
   test("positions the selection badge above the anchored sprite top edge", () => {
     const scene = new WorldScene() as unknown as Record<string, unknown>;
@@ -117,10 +139,12 @@ describe("WorldScene terrain painting", () => {
 
     scene.selectionBadge = selectionBadge;
 
-    (scene.syncSelectionBadgePosition as (entity: {
-      position: { x: number; y: number };
-      sprite: { displayHeight: number };
-    }) => void)({
+    (
+      scene.syncSelectionBadgePosition as (entity: {
+        position: { x: number; y: number };
+        sprite: { displayHeight: number };
+      }) => void
+    )({
       position: { x: 128, y: 192 },
       sprite: { displayHeight: 96 },
     });
@@ -147,33 +171,23 @@ describe("WorldScene terrain painting", () => {
   });
 
   test("does not queue brush paint when the target cell is occupied", () => {
-    const { scene, queueDrop } = createSceneHarness({
-      entityPositions: [{ x: 96, y: 96 }],
-    });
-
-    (scene.terrainPaintSession as TerrainPaintSession).begin();
-    (scene.paintTerrainAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    const { scene, queueDrop } = createOccupiedSceneHarness();
+    beginBrushPaint(scene);
 
     expect(queueDrop).not.toHaveBeenCalled();
   });
 
   test("occupied cells are not marked as painted for the rest of the stroke", () => {
-    const { scene, queueDrop } = createSceneHarness({
-      entityPositions: [{ x: 96, y: 96 }],
-    });
-
-    (scene.terrainPaintSession as TerrainPaintSession).begin();
-    (scene.paintTerrainAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    const { scene, queueDrop } = createOccupiedSceneHarness();
+    beginBrushPaint(scene);
     scene.entities = [];
-    (scene.paintTerrainAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    paintTerrainAtPointer(scene);
 
     expect(queueDrop).toHaveBeenCalledOnce();
   });
 
   test("drop-based terrain edits also skip occupied cells", () => {
-    const { scene, queueDrop } = createSceneHarness({
-      entityPositions: [{ x: 96, y: 96 }],
-    });
+    const { scene, queueDrop } = createOccupiedSceneHarness();
 
     (
       scene.onPlaceTerrainDrop as (payload: {
@@ -199,7 +213,12 @@ describe("WorldScene terrain painting", () => {
       worldPoint: { x: 100, y: 110 },
     });
 
-    (scene.syncTerrainBrushPreviewAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    (
+      scene.syncTerrainBrushPreviewAtScreen as (
+        screenX: number,
+        screenY: number,
+      ) => void
+    )(12, 34);
 
     expect(worldToCell).toHaveBeenCalledWith(100, 110);
     expect(terrainBrushPreview.setPosition).toHaveBeenCalledWith(64, 64);
@@ -224,9 +243,15 @@ describe("WorldScene terrain painting", () => {
     });
     const syncTerrainBrushRenderPreviewTiles = vi.fn();
 
-    scene.syncTerrainBrushRenderPreviewTiles = syncTerrainBrushRenderPreviewTiles;
+    scene.syncTerrainBrushRenderPreviewTiles =
+      syncTerrainBrushRenderPreviewTiles;
 
-    (scene.syncTerrainBrushPreviewAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    (
+      scene.syncTerrainBrushPreviewAtScreen as (
+        screenX: number,
+        screenY: number,
+      ) => void
+    )(12, 34);
 
     expect(previewPaintAtWorld).toHaveBeenCalledWith(
       {
@@ -239,7 +264,9 @@ describe("WorldScene terrain painting", () => {
       96,
       96,
     );
-    expect(syncTerrainBrushRenderPreviewTiles).toHaveBeenCalledWith(previewTiles);
+    expect(syncTerrainBrushRenderPreviewTiles).toHaveBeenCalledWith(
+      previewTiles,
+    );
   });
 
   test("positions resolved render-tile preview images on the shifted render grid", () => {
@@ -261,15 +288,19 @@ describe("WorldScene terrain painting", () => {
     };
     scene.terrainBrushRenderPreviewImages = [];
 
-    (scene.syncTerrainBrushRenderPreviewTiles as (tiles: Array<{
-      cellX: number;
-      cellY: number;
-      caseId: number;
-      frame: string;
-      rotate90: 0 | 1 | 2 | 3;
-      flipX: boolean;
-      flipY: boolean;
-    }>) => void)([
+    (
+      scene.syncTerrainBrushRenderPreviewTiles as (
+        tiles: Array<{
+          cellX: number;
+          cellY: number;
+          caseId: number;
+          frame: string;
+          rotate90: 0 | 1 | 2 | 3;
+          flipX: boolean;
+          flipY: boolean;
+        }>,
+      ) => void
+    )([
       {
         cellX: 1,
         cellY: 1,
@@ -289,7 +320,12 @@ describe("WorldScene terrain painting", () => {
       worldToCellResult: null,
     });
 
-    (scene.syncTerrainBrushPreviewAtScreen as (screenX: number, screenY: number) => void)(12, 34);
+    (
+      scene.syncTerrainBrushPreviewAtScreen as (
+        screenX: number,
+        screenY: number,
+      ) => void
+    )(12, 34);
 
     expect(terrainBrushPreview.setVisible).toHaveBeenCalledWith(false);
     expect(terrainBrushPreview.setPosition).not.toHaveBeenCalled();
@@ -300,10 +336,17 @@ describe("WorldScene terrain painting", () => {
     const syncTerrainBrushPreviewFromPointer = vi.fn();
     const paintTerrainAtScreen = vi.fn();
 
-    scene.syncTerrainBrushPreviewFromPointer = syncTerrainBrushPreviewFromPointer;
+    scene.syncTerrainBrushPreviewFromPointer =
+      syncTerrainBrushPreviewFromPointer;
     scene.paintTerrainAtScreen = paintTerrainAtScreen;
 
-    (scene.onPointerMove as (pointer: { withinGame: boolean; x: number; y: number }) => void)({
+    (
+      scene.onPointerMove as (pointer: {
+        withinGame: boolean;
+        x: number;
+        y: number;
+      }) => void
+    )({
       withinGame: true,
       x: 12,
       y: 34,
@@ -353,10 +396,12 @@ describe("WorldScene terrain painting", () => {
     scene.syncTerrainBrushPreviewAtScreen = syncTerrainBrushPreviewAtScreen;
 
     (
-      scene.onSelectTerrainTool as (tool: {
-        materialId: string;
-        brushId: string;
-      } | null) => void
+      scene.onSelectTerrainTool as (
+        tool: {
+          materialId: string;
+          brushId: string;
+        } | null,
+      ) => void
     )({
       materialId: "water",
       brushId: "water",

@@ -103,6 +103,9 @@ jobs:
       - name: Find unused dependencies, exports, and files
         run: npm run knip
 
+      - name: Find duplicated code
+        run: npm run jscpd
+
       - name: Typecheck frontend
         run: npm run typecheck:frontend
 
