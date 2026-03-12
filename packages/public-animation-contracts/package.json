@@ -1,0 +1,20 @@
+{
+  "name": "@towncord/public-animation-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "generate": "node ./scripts/generate-public-animations.mjs",
+    "check:generated": "node ./scripts/generate-public-animations.mjs --check"
+  },
+  "dependencies": {
+    "@towncord/public-assets": "*",
+    "ajv": "^8.17.1"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^15.0.4"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

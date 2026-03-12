@@ -27,6 +27,7 @@ function createScene(manifest: unknown) {
 describe("registerBloomseedAnimations timing", () => {
   test("uses exported per-frame durations when present", () => {
     const { scene, create } = createScene({
+      namespace: "bloomseed",
       animations: {
         "characters.hero.walk": {
           atlasKey: "bloomseed.characters",
@@ -55,6 +56,7 @@ describe("registerBloomseedAnimations timing", () => {
 
   test("falls back to default frameRate when exported durations are absent or mismatched", () => {
     const { scene, create } = createScene({
+      namespace: "bloomseed",
       animations: {
         "characters.hero.walk": {
           atlasKey: "bloomseed.characters",

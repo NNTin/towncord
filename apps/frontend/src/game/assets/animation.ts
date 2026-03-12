@@ -1,26 +1,14 @@
 import type Phaser from "phaser";
+import {
+  isPublicAnimationManifest,
+  parsePublicAnimationManifest,
+  type PublicAnimationDefinition,
+  type PublicAnimationManifest,
+} from "@towncord/public-animation-contracts";
 import { BLOOMSEED_ANIMATIONS_JSON_KEY } from "./preload";
 
-export type BloomseedAnimationDefinition = {
-  atlasKey: string;
-  frames: string[];
-  durationsMs?: number[];
-  phaseDurationsMs?: number[];
-  category?: string;
-  frameCount?: number;
-  frameSize?: {
-    w: number;
-    h: number;
-  };
-  paletteVariant?: string | null;
-  sourceFile?: string;
-};
-
-export type BloomseedAnimationManifest = {
-  generatedAt?: string;
-  namespace?: string;
-  animations: Record<string, BloomseedAnimationDefinition>;
-};
+export type BloomseedAnimationDefinition = PublicAnimationDefinition;
+export type BloomseedAnimationManifest = PublicAnimationManifest;
 
 export type BloomseedAnimationOverride = {
   key?: string;
@@ -38,7 +26,7 @@ export type RegisterBloomseedAnimationsOptions = {
   defaultFrameRate?: number;
   defaultRepeat?: number;
   onMissingAtlas?: "skip" | "throw";
-  filter?: (animationId: string, definition: BloomseedAnimationDefinition) => boolean;
+  filter?: (animationId: string, definition: PublicAnimationDefinition) => boolean;
   overrides?: Record<string, BloomseedAnimationOverride>;
 };
 
@@ -119,7 +107,7 @@ export function registerBloomseedAnimations(
 }
 
 export function buildAnimationFrames(
-  definition: BloomseedAnimationDefinition,
+  definition: PublicAnimationDefinition,
 ): Phaser.Types.Animations.AnimationFrame[] {
   const durationsMs =
     Array.isArray(definition.durationsMs) &&
@@ -146,7 +134,7 @@ export function buildAnimationFrames(
 }
 
 export function resolveAnimationFrameRate(
-  definition: BloomseedAnimationDefinition,
+  definition: PublicAnimationDefinition,
   overrideFrameRate: number | undefined,
   defaultFrameRate: number,
 ): number | undefined {
@@ -169,22 +157,22 @@ export function resolveAnimationFrameRate(
 export function readAnimationManifest(
   scene: Phaser.Scene,
   manifestKey: string,
-): BloomseedAnimationManifest {
+): PublicAnimationManifest {
   const raw = scene.cache.json.get(manifestKey) as unknown;
 
-  if (!isBloomseedAnimationManifest(raw)) {
+  try {
+    return parsePublicAnimationManifest(raw);
+  } catch {
     throw new Error(
-      `Invalid Bloomseed animation manifest for cache key "${manifestKey}".`,
+      `Invalid animation manifest for cache key "${manifestKey}".`,
     );
   }
-
-  return raw;
 }
 
 export function readOptionalAnimationManifest(
   scene: Phaser.Scene,
   manifestKey: string,
-): BloomseedAnimationManifest | null {
+): PublicAnimationManifest | null {
   const cache = (scene.cache as Phaser.Scene["cache"] | undefined)?.json;
   if (!cache || typeof cache.exists !== "function" || typeof cache.get !== "function") {
     return null;
@@ -195,11 +183,11 @@ export function readOptionalAnimationManifest(
   }
 
   const raw = cache.get(manifestKey) as unknown;
-  return isBloomseedAnimationManifest(raw) ? raw : null;
+  return isPublicAnimationManifest(raw) ? raw : null;
 }
 
 export function collectPhaseDurationsByAnimationId(
-  manifest: BloomseedAnimationManifest | null,
+  manifest: PublicAnimationManifest | null,
 ): Record<string, number[]> {
   if (!manifest) {
     return {};
@@ -217,56 +205,4 @@ export function collectPhaseDurationsByAnimationId(
   }
 
   return phaseDurationsByAnimationId;
-}
-
-export function isBloomseedAnimationManifest(
-  value: unknown,
-): value is BloomseedAnimationManifest {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const objectValue = value as Record<string, unknown>;
-  const animations = objectValue.animations;
-
-  if (!animations || typeof animations !== "object") {
-    return false;
-  }
-
-  for (const definition of Object.values(animations as Record<string, unknown>)) {
-    if (!definition || typeof definition !== "object") {
-      return false;
-    }
-
-    const item = definition as Record<string, unknown>;
-    if (typeof item.atlasKey !== "string") {
-      return false;
-    }
-
-    if (!Array.isArray(item.frames) || !item.frames.every((frame) => typeof frame === "string")) {
-      return false;
-    }
-
-    if (
-      item.durationsMs !== undefined &&
-      (!Array.isArray(item.durationsMs) ||
-        !item.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0))
-    ) {
-      return false;
-    }
-
-    if (
-      item.phaseDurationsMs !== undefined &&
-      (!Array.isArray(item.phaseDurationsMs) ||
-        !item.phaseDurationsMs.every((duration) => Number.isInteger(duration) && duration > 0))
-    ) {
-      return false;
-    }
-
-    if (item.sourceFile !== undefined && typeof item.sourceFile !== "string") {
-      return false;
-    }
-  }
-
-  return true;
 }
