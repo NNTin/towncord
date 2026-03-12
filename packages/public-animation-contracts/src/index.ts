@@ -1,12 +1,10 @@
 import validate from "./validatePublicAnimations.generated.js";
 import type {
   PublicAnimationDefinition as GeneratedPublicAnimationDefinition,
-  PublicAnimationFrameSize as GeneratedPublicAnimationFrameSize,
   PublicAnimationManifest as GeneratedPublicAnimationManifest,
 } from "./publicAnimations.generated";
 
 export type PublicAnimationDefinition = GeneratedPublicAnimationDefinition;
-export type PublicAnimationFrameSize = GeneratedPublicAnimationFrameSize;
 export type PublicAnimationManifest = GeneratedPublicAnimationManifest;
 
 export function isPublicAnimationManifest(
@@ -15,7 +13,7 @@ export function isPublicAnimationManifest(
   return validate(value);
 }
 
-export function assertPublicAnimationManifest(
+function assertPublicAnimationManifest(
   value: unknown,
 ): asserts value is PublicAnimationManifest {
   if (validate(value)) {

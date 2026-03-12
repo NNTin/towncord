@@ -15,7 +15,7 @@ type CreatePlaceablesSidebarBridgeParams = {
   onSelectTerrainTool: (tool: SelectedTerrainToolPayload) => void;
 };
 
-export type PlaceablesSidebarBridge = {
+type PlaceablesSidebarBridge = {
   activeTerrainToolId: string | null;
   onDragStart: (event: DragEvent, placeable: PlaceableViewModel) => void;
   onSelectTerrainTool: (placeable: TerrainPlaceableViewModel) => void;

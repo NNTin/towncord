@@ -24,7 +24,7 @@ import {
 } from "./gameComposition";
 import type { PlaceableViewModel } from "./placeableService";
 
-export type BloomseedSidebarBridgeProps = {
+type BloomseedSidebarBridgeProps = {
   catalog: AnimationCatalog;
   placeables: PlaceableViewModel[];
   inspectedTile: TerrainTileInspectedPayload | null;

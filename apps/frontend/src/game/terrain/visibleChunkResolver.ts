@@ -5,7 +5,7 @@ import {
   toTerrainChunkId,
 } from "./contracts";
 
-export type TerrainWorldViewRect = {
+type TerrainWorldViewRect = {
   left: number;
   right: number;
   top: number;

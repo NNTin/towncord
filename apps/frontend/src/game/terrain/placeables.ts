@@ -1,6 +1,6 @@
 import type { TerrainBrushId, TerrainMaterialId } from "./contracts";
 
-export type TerrainPlaceableDefinition = {
+type TerrainPlaceableDefinition = {
   id: string;
   label: string;
   materialId: TerrainMaterialId;

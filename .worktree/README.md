@@ -6,10 +6,20 @@ This directory is reserved for Git worktrees created by humans or LLM agents.
 
 Use `.worktree/` to run multiple feature branches in parallel without disturbing the main checkout at the repository root.
 
-- The repository root remains the primary checkout.
+- The repository root is the base/reference checkout.
+- Active feature work should happen inside a linked worktree under `.worktree/`, not in the repository root checkout.
 - Each subdirectory inside `.worktree/` is a separate linked Git worktree.
 - Agents may create new worktrees here as needed for isolated feature work.
 - Worktrees are temporary. Remove them after the branch is merged or no longer needed.
+
+## Required Workflow
+
+For any implementation task on a branch, agents must create or enter a worktree before doing substantive work.
+
+- Do not edit files, install dependencies, run feature-specific commands, commit, or push from the repository root checkout.
+- Use the repository root checkout only to determine the current base branch and to open the parent-repo pull request after the worktree branch is pushed.
+- If a user tells you to read or follow this README, treat these instructions as required workflow, not optional guidance.
+- If you accidentally start in the repository root checkout, stop, create or enter the correct worktree, clean up the root checkout, and continue only inside the worktree.
 
 ## Naming
 
@@ -22,6 +32,14 @@ Examples:
 - `.worktree/agent-npc-pathfinding`
 
 ## Create A Worktree
+
+Start every implementation task with this sequence:
+
+1. From the repository root checkout, determine the base branch.
+2. Create the worktree inside `.worktree/`.
+3. `cd` into the new worktree before installing dependencies, editing files, or running task-specific commands.
+4. Initialize submodules inside the worktree.
+5. Confirm your current working directory is the worktree, not the repository root.
 
 Create a new branch from the branch currently checked out at the repository root:
 
@@ -49,7 +67,7 @@ cd .worktree/feat-my-change
 git submodule update --init --recursive
 ```
 
-If you will modify code inside a submodule, create or switch to a branch inside that submodule before making changes:
+Only if you will modify files inside a submodule, create or switch to a branch inside that submodule before making changes:
 
 ```bash
 git -C packages/debug-assets switch -c feat/my-change
@@ -67,7 +85,10 @@ git -C packages/debug-assets switch feat/my-change
 - Prefer one branch per worktree.
 - Create the worktree from the branch currently checked out at the repository root.
 - After creating or entering a worktree, initialize submodules with `git submodule update --init --recursive`.
-- Before editing a submodule, create or switch to a branch inside that submodule.
+- Do not do branch implementation work in the repository root checkout.
+- Do not run `npm install`, `npm ci`, file edits, commits, or pushes for branch work from the repository root checkout.
+- Do not create submodule branches as part of routine worktree setup.
+- Create or switch to a branch inside a submodule only when you will actually change files in that submodule.
 - If submodule code changes, push the submodule branch before pushing the parent worktree branch.
 - When working inside `.worktree/`, agents should commit their changes and push the worktree branch automatically.
 - After pushing the worktree branch, create a parent-repo pull request with `gh` from the worktree branch to the branch currently checked out at the repository root outside `.worktree/`.
@@ -75,7 +96,24 @@ git -C packages/debug-assets switch feat/my-change
 - Assume `.worktree/` contents are disposable except for this README.
 - Coordinate branch names clearly when multiple agents are active.
 
+## If You Started In The Wrong Place
+
+If you already began work in the repository root checkout by mistake:
+
+1. Stop making changes in the repository root checkout.
+2. Inspect the root checkout with `git status`.
+3. Create the correct worktree from the branch currently checked out at the repository root.
+4. `cd` into the worktree and initialize submodules.
+5. Reapply or continue the intended work inside the worktree only.
+6. Restore the repository root checkout to a clean state if the accidental changes were not meant to stay there.
+
 ## Finish Work And Open A PR
+
+Required close-out sequence:
+
+1. Inside the worktree, push every changed submodule branch first.
+2. Commit the parent repository changes in the worktree, including updated submodule pointers, and push the worktree branch.
+3. From the repository root checkout outside `.worktree/`, create the parent-repo pull request against the branch currently checked out there.
 
 Inside the worktree, push every changed submodule branch first:
 

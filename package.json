@@ -24,7 +24,11 @@
     "assets:donarg:all": "npm run -w @towncord/donarg-office-assets export:all",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
+    "knip": "knip --include files,dependencies,exports,types --include-entry-exports --reporter compact --treat-config-hints-as-errors",
     "test": "echo \"Define workspace tests\"",
     "test:automation": "node --test .github/scripts/__tests__/*.test.mjs"
+  },
+  "devDependencies": {
+    "knip": "5.86.0"
   }
 }

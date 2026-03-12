@@ -1,17 +1,17 @@
 import type { TerrainGameplayGrid } from "../../terrain";
 import type { WorldPoint } from "./types";
 
-export type NavigationSubject = {
+type NavigationSubject = {
   position: WorldPoint;
 };
 
-export type NavigationStep = {
+type NavigationStep = {
   moveX: number;
   moveY: number;
   reached: boolean;
 };
 
-export type NavigationPath = {
+type NavigationPath = {
   waypoints: WorldPoint[];
   revision: number;
 };

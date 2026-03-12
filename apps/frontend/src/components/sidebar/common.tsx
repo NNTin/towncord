@@ -1,4 +1,4 @@
-export const BUTTON_BASE: React.CSSProperties = {
+const BUTTON_BASE: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: 4,
   cursor: "pointer",

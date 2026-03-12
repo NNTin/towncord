@@ -7,9 +7,9 @@ const ACTION_TRACK_CANDIDATES: Readonly<Record<EntityAction, readonly string[]>>
   run: ["run", "walk", "idle"],
 };
 
-export const LOCOMOTION_TRACK_IDS = new Set<string>(["idle", "walk", "run"]);
+const LOCOMOTION_TRACK_IDS = new Set<string>(["idle", "walk", "run"]);
 
-export function getTrackCandidatesForAction(action: EntityAction): readonly string[] {
+function getTrackCandidatesForAction(action: EntityAction): readonly string[] {
   return ACTION_TRACK_CANDIDATES[action];
 }
 

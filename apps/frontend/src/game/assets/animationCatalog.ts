@@ -25,7 +25,7 @@ export type AnimationCatalog = {
   tracksByPath: Map<string, AnimationTrack[]>;
 };
 
-export type MobCatalogDescriptor = {
+type MobCatalogDescriptor = {
   family: string;
   mobId: string;
   visualPath: string;
