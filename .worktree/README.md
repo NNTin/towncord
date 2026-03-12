@@ -67,7 +67,7 @@ cd .worktree/feat-my-change
 git submodule update --init --recursive
 ```
 
-If you will modify code inside a submodule, create or switch to a branch inside that submodule before making changes:
+Only if you will modify files inside a submodule, create or switch to a branch inside that submodule before making changes:
 
 ```bash
 git -C packages/debug-assets switch -c feat/my-change
@@ -87,7 +87,8 @@ git -C packages/debug-assets switch feat/my-change
 - After creating or entering a worktree, initialize submodules with `git submodule update --init --recursive`.
 - Do not do branch implementation work in the repository root checkout.
 - Do not run `npm install`, `npm ci`, file edits, commits, or pushes for branch work from the repository root checkout.
-- Before editing a submodule, create or switch to a branch inside that submodule.
+- Do not create submodule branches as part of routine worktree setup.
+- Create or switch to a branch inside a submodule only when you will actually change files in that submodule.
 - If submodule code changes, push the submodule branch before pushing the parent worktree branch.
 - When working inside `.worktree/`, agents should commit their changes and push the worktree branch automatically.
 - After pushing the worktree branch, create a parent-repo pull request with `gh` from the worktree branch to the branch currently checked out at the repository root outside `.worktree/`.
