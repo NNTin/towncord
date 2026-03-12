@@ -160,13 +160,7 @@ export function readAnimationManifest(
 ): PublicAnimationManifest {
   const raw = scene.cache.json.get(manifestKey) as unknown;
 
-  try {
-    return parsePublicAnimationManifest(raw);
-  } catch {
-    throw new Error(
-      `Invalid animation manifest for cache key "${manifestKey}".`,
-    );
-  }
+  return parsePublicAnimationManifest(raw);
 }
 
 export function readOptionalAnimationManifest(
