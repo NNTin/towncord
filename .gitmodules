@@ -4,3 +4,6 @@
 [submodule "packages/debug-assets"]
 	path = packages/debug-assets
 	url = https://github.com/NNTin/debug-assets.git
+[submodule "packages/donarg-office-assets"]
+	path = packages/donarg-office-assets
+	url = https://github.com/NNTin/donarg-office-assets.git

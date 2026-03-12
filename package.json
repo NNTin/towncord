@@ -7,8 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:frontend": "npm run assets:bloomseed:public && npm run assets:debug:public && npm run -w @towncord/frontend dev",
-    "build:frontend": "npm run assets:bloomseed:public && npm run assets:debug:public && npm run -w @towncord/frontend build",
+    "dev:frontend": "npm run assets:bloomseed:public && npm run assets:debug:public && npm run assets:donarg:public && npm run -w @towncord/frontend dev",
+    "build:frontend": "npm run assets:bloomseed:public && npm run assets:debug:public && npm run assets:donarg:public && npm run -w @towncord/frontend build",
     "typecheck:frontend": "npm run -w @towncord/frontend typecheck",
     "assets:bloomseed:dry": "npm run -w @towncord/bloomseed-assets export:dry",
     "assets:bloomseed:public": "npm run -w @towncord/bloomseed-assets export:public",
@@ -16,6 +16,9 @@
     "assets:debug:dry": "npm run -w @towncord/debug-assets export:dry",
     "assets:debug:public": "npm run -w @towncord/debug-assets export:public",
     "assets:debug:all": "npm run -w @towncord/debug-assets export:all",
+    "assets:donarg:dry": "npm run -w @towncord/donarg-office-assets export:dry",
+    "assets:donarg:public": "npm run -w @towncord/donarg-office-assets export:public",
+    "assets:donarg:all": "npm run -w @towncord/donarg-office-assets export:all",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
     "test": "echo \"Define workspace tests\""
