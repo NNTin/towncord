@@ -1,5 +1,4 @@
-import Ajv2020, { type ErrorObject } from "ajv/dist/2020.js";
-import publicAnimationsSchema from "@towncord/public-assets/schema/public-animations.schema.json";
+import validate from "./validatePublicAnimations.generated.js";
 import type {
   PublicAnimationDefinition as GeneratedPublicAnimationDefinition,
   PublicAnimationFrameSize as GeneratedPublicAnimationFrameSize,
@@ -10,25 +9,20 @@ export type PublicAnimationDefinition = GeneratedPublicAnimationDefinition;
 export type PublicAnimationFrameSize = GeneratedPublicAnimationFrameSize;
 export type PublicAnimationManifest = GeneratedPublicAnimationManifest;
 
-export { publicAnimationsSchema };
-
-const ajv = new Ajv2020({ allErrors: true });
-const validatePublicAnimationManifest = ajv.compile(publicAnimationsSchema);
-
 export function isPublicAnimationManifest(
   value: unknown,
 ): value is PublicAnimationManifest {
-  return validatePublicAnimationManifest(value) as boolean;
+  return validate(value);
 }
 
 export function assertPublicAnimationManifest(
   value: unknown,
 ): asserts value is PublicAnimationManifest {
-  if (validatePublicAnimationManifest(value)) {
+  if (validate(value)) {
     return;
   }
 
-  throw new Error(formatValidationErrors(validatePublicAnimationManifest.errors));
+  throw new Error(formatValidationErrors(validate.errors));
 }
 
 export function parsePublicAnimationManifest(
@@ -38,7 +32,9 @@ export function parsePublicAnimationManifest(
   return value;
 }
 
-function formatValidationErrors(errors: ErrorObject[] | null | undefined): string {
+function formatValidationErrors(
+  errors: { instancePath: string; message?: string }[] | null | undefined,
+): string {
   if (!errors || errors.length === 0) {
     return "Invalid public animation manifest.";
   }

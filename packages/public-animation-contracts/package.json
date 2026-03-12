@@ -8,10 +8,10 @@
     "check:generated": "node ./scripts/generate-public-animations.mjs --check"
   },
   "dependencies": {
-    "@towncord/public-assets": "*",
-    "ajv": "^8.17.1"
+    "@towncord/public-assets": "*"
   },
   "devDependencies": {
+    "ajv": "^8.17.1",
     "json-schema-to-typescript": "^15.0.4"
   },
   "exports": {

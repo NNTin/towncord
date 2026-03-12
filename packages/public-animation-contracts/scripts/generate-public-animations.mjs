@@ -8,13 +8,20 @@ import { compile } from "json-schema-to-typescript";
 const require = createRequire(import.meta.url);
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const packageRoot = path.resolve(scriptDir, "..");
-const outputPath = path.join(packageRoot, "src", "publicAnimations.generated.ts");
+const srcDir = path.join(packageRoot, "src");
+const outputPath = path.join(srcDir, "publicAnimations.generated.ts");
+const validatorJsPath = path.join(srcDir, "validatePublicAnimations.generated.js");
+const validatorDtsPath = path.join(srcDir, "validatePublicAnimations.generated.d.ts");
 const publicAssetsPackageJsonPath = require.resolve("@towncord/public-assets/package.json");
 const publicAssetsRoot = path.dirname(publicAssetsPackageJsonPath);
 const schemaPath = path.join(publicAssetsRoot, "schema", "public-animations.schema.json");
 const isCheckMode = process.argv.includes("--check");
 
-function buildOutput(compiledTypes) {
+const GENERATED_BANNER =
+  "// This file is generated from @towncord/public-assets/schema/public-animations.schema.json.\n"
+  + "// Do not edit manually.\n";
+
+function buildTypesOutput(compiledTypes) {
   const normalized = compiledTypes.replace(/\r\n/g, "\n").trimEnd();
   return `${normalized}
 
@@ -24,38 +31,72 @@ export type PublicAnimationFrameSize = FrameSize;
 `;
 }
 
-async function main() {
-  const schema = JSON.parse(await readFile(schemaPath, "utf8"));
-  const compiledTypes = await compile(schema, "PublicAnimationManifest", {
-    bannerComment:
-      "// This file is generated from @towncord/public-assets/schema/public-animations.schema.json.\n"
-      + "// Do not edit manually.\n",
-    unreachableDefinitions: true,
-  });
+async function buildValidatorJs(schema) {
+  const { Ajv2020 } = await import("ajv/dist/2020.js");
+  const { default: standaloneCode } = await import("ajv/dist/standalone/index.js");
+  const ajv = new Ajv2020({ allErrors: true, code: { source: true, esm: true } });
+  const validate = ajv.compile(schema);
+  const code = standaloneCode(ajv, validate);
+  return `${GENERATED_BANNER}\n${code.replace(/\r\n/g, "\n").trimEnd()}\n`;
+}
 
-  const nextOutput = buildOutput(compiledTypes);
+function buildValidatorDts() {
+  return `${GENERATED_BANNER}
+import type { PublicAnimationManifest } from "./publicAnimations.generated";
 
-  let currentOutput = null;
+declare function validate(data: unknown): data is PublicAnimationManifest;
+declare namespace validate {
+  let errors: {
+    keyword: string;
+    instancePath: string;
+    schemaPath: string;
+    params: Record<string, unknown>;
+    message?: string;
+  }[] | null;
+}
+
+export default validate;
+export { validate };
+`;
+}
+
+async function writeIfChanged(filePath, nextContent) {
+  let currentContent = null;
   try {
-    currentOutput = await readFile(outputPath, "utf8");
+    currentContent = await readFile(filePath, "utf8");
   } catch (error) {
     if (!error || typeof error !== "object" || !("code" in error) || error.code !== "ENOENT") {
       throw error;
     }
   }
 
-  if (currentOutput === nextOutput) {
+  if (currentContent === nextContent) {
     return;
   }
 
   if (isCheckMode) {
     throw new Error(
-      "Generated public animation contracts are out of date. Run `npm run -w @towncord/public-animation-contracts generate`.",
+      `Generated file "${path.basename(filePath)}" is out of date. Run \`npm run -w @towncord/public-animation-contracts generate\`.`,
     );
   }
 
-  await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, nextOutput);
+  await mkdir(path.dirname(filePath), { recursive: true });
+  await writeFile(filePath, nextContent);
+}
+
+async function main() {
+  const schema = JSON.parse(await readFile(schemaPath, "utf8"));
+
+  const compiledTypes = await compile(schema, "PublicAnimationManifest", {
+    bannerComment: GENERATED_BANNER,
+    unreachableDefinitions: true,
+  });
+
+  await Promise.all([
+    writeIfChanged(outputPath, buildTypesOutput(compiledTypes)),
+    writeIfChanged(validatorJsPath, await buildValidatorJs(schema)),
+    writeIfChanged(validatorDtsPath, buildValidatorDts()),
+  ]);
 }
 
 main().catch((error) => {

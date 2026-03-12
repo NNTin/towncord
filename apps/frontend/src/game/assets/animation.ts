@@ -165,10 +165,9 @@ export function readAnimationManifest(
 
   try {
     return parsePublicAnimationManifest(raw);
-  } catch {
-    throw new Error(
-      `Invalid animation manifest for cache key "${manifestKey}".`,
-    );
+  } catch (error) {
+    const details = error instanceof Error && error.message ? ` ${error.message}` : "";
+    throw new Error(`Invalid animation manifest for cache key "${manifestKey}".${details}`);
   }
 }
 

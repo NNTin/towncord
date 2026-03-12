@@ -100,7 +100,7 @@ describe("registerBloomseedAnimations timing", () => {
     });
 
     expect(() => registerBloomseedAnimations(scene as never)).toThrow(
-      'Invalid animation durations for atlas "bloomseed.characters".',
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be integer/,
     );
     expect(create).not.toHaveBeenCalled();
   });
@@ -123,7 +123,7 @@ describe("registerBloomseedAnimations timing", () => {
     });
 
     expect(() => registerBloomseedAnimations(scene as never)).toThrow(
-      'Invalid animation durations for atlas "bloomseed.characters".',
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be >= 1/,
     );
     expect(create).not.toHaveBeenCalled();
   });
@@ -146,7 +146,7 @@ describe("registerBloomseedAnimations timing", () => {
     });
 
     expect(() => registerBloomseedAnimations(scene as never)).toThrow(
-      'Invalid animation durations for atlas "bloomseed.characters".',
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be array/,
     );
     expect(create).not.toHaveBeenCalled();
   });
