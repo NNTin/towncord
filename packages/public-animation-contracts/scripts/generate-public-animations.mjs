@@ -94,7 +94,7 @@ async function main() {
 
   await Promise.all([
     writeIfChanged(outputPath, buildTypesOutput(compiledTypes)),
-    buildValidatorJs(schema).then((js) => writeIfChanged(validatorJsPath, js)),
+    writeIfChanged(validatorJsPath, await buildValidatorJs(schema)),
     writeIfChanged(validatorDtsPath, buildValidatorDts()),
   ]);
 }
