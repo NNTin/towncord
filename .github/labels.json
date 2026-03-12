@@ -1,0 +1,52 @@
+[
+  {
+    "name": "feature",
+    "color": "0e8a16",
+    "description": "Pull requests from feat/* branches."
+  },
+  {
+    "name": "bug",
+    "color": "d73a4a",
+    "description": "Pull requests from fix/* branches."
+  },
+  {
+    "name": "chore",
+    "color": "c2e0c6",
+    "description": "Pull requests from chore/* branches."
+  },
+  {
+    "name": "refactor",
+    "color": "5319e7",
+    "description": "Pull requests from refactor/* branches."
+  },
+  {
+    "name": "frontend",
+    "color": "1d76db",
+    "description": "Changes under apps/frontend."
+  },
+  {
+    "name": "backend",
+    "color": "0052cc",
+    "description": "Changes under apps/backend."
+  },
+  {
+    "name": "package",
+    "color": "fbca04",
+    "description": "Changes under packages/."
+  },
+  {
+    "name": "conflict",
+    "color": "b60205",
+    "description": "The pull request currently conflicts with its base branch."
+  },
+  {
+    "name": "dependency-blocked",
+    "color": "d93f0b",
+    "description": "The pull request is waiting on labeled or implicit PR dependencies."
+  },
+  {
+    "name": "has-dependents",
+    "color": "0366d6",
+    "description": "The pull request has open child PRs targeting its head branch."
+  }
+]

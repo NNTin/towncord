@@ -1,27 +1,66 @@
-name: PR CI
+name: Manual Bot PR CI
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number created by copilot-swe-agent[bot]
+        required: true
+        type: string
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
-  group: ci-pr-${{ github.event.pull_request.number }}
+  group: ci-pr-${{ inputs.pr_number }}
   cancel-in-progress: true
 
 jobs:
   ci:
-    if: ${{ !contains(fromJSON('["Copilot","copilot-swe-agent","copilot-swe-agent[bot]"]'), github.event.pull_request.user.login) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
+      - name: Validate bot PR input
+        id: pr
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+        with:
+          script: |
+            const allowedAuthors = new Set([
+              "Copilot",
+              "copilot-swe-agent",
+              "copilot-swe-agent[bot]",
+            ]);
+            const prNumber = Number(process.env.PR_NUMBER);
+            if (!Number.isInteger(prNumber) || prNumber <= 0) {
+              core.setFailed(`Invalid pull request number: ${process.env.PR_NUMBER}`);
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const { data: pr } = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber,
+            });
+
+            if (!allowedAuthors.has(pr.user.login)) {
+              core.setFailed(
+                `PR #${prNumber} is authored by ${pr.user.login}, not Copilot / copilot-swe-agent.`,
+              );
+              return;
+            }
+
+            if (pr.state !== "open") {
+              core.setFailed(`PR #${prNumber} is not open.`);
+              return;
+            }
+
+            core.setOutput("merge_ref", `refs/pull/${prNumber}/merge`);
+
       - name: Validate repo token
         env:
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
@@ -34,6 +73,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          ref: ${{ steps.pr.outputs.merge_ref }}
           submodules: recursive
           token: ${{ secrets.REPO_TOKEN }}
 

@@ -1,0 +1,184 @@
+pull_request_rules:
+  - name: add feature label
+    conditions:
+      - "head ~= ^feat/"
+    actions:
+      label:
+        add:
+          - feature
+
+  - name: remove feature label when branch no longer matches
+    conditions:
+      - "-head ~= ^feat/"
+      - "label = feature"
+    actions:
+      label:
+        remove:
+          - feature
+
+  - name: add bug label
+    conditions:
+      - "head ~= ^fix/"
+    actions:
+      label:
+        add:
+          - bug
+
+  - name: remove bug label when branch no longer matches
+    conditions:
+      - "-head ~= ^fix/"
+      - "label = bug"
+    actions:
+      label:
+        remove:
+          - bug
+
+  - name: add chore label
+    conditions:
+      - "head ~= ^chore/"
+    actions:
+      label:
+        add:
+          - chore
+
+  - name: remove chore label when branch no longer matches
+    conditions:
+      - "-head ~= ^chore/"
+      - "label = chore"
+    actions:
+      label:
+        remove:
+          - chore
+
+  - name: add refactor label
+    conditions:
+      - "head ~= ^refactor/"
+    actions:
+      label:
+        add:
+          - refactor
+
+  - name: remove refactor label when branch no longer matches
+    conditions:
+      - "-head ~= ^refactor/"
+      - "label = refactor"
+    actions:
+      label:
+        remove:
+          - refactor
+
+  - name: add frontend label
+    conditions:
+      - "files ~= ^apps/frontend/"
+    actions:
+      label:
+        add:
+          - frontend
+
+  - name: remove frontend label when files no longer match
+    conditions:
+      - "-files ~= ^apps/frontend/"
+      - "label = frontend"
+    actions:
+      label:
+        remove:
+          - frontend
+
+  - name: add backend label
+    conditions:
+      - "files ~= ^apps/backend/"
+    actions:
+      label:
+        add:
+          - backend
+
+  - name: remove backend label when files no longer match
+    conditions:
+      - "-files ~= ^apps/backend/"
+      - "label = backend"
+    actions:
+      label:
+        remove:
+          - backend
+
+  - name: add package label
+    conditions:
+      - "files ~= ^packages/"
+    actions:
+      label:
+        add:
+          - package
+
+  - name: remove package label when files no longer match
+    conditions:
+      - "-files ~= ^packages/"
+      - "label = package"
+    actions:
+      label:
+        remove:
+          - package
+
+  - name: add conflict label
+    conditions:
+      - "conflict"
+    actions:
+      label:
+        add:
+          - conflict
+
+  - name: remove conflict label
+    conditions:
+      - "-conflict"
+      - "label = conflict"
+    actions:
+      label:
+        remove:
+          - conflict
+
+  - name: update pull requests targeting main when behind
+    conditions:
+      - "base = main"
+      - "#commits-behind > 0"
+      - "-draft"
+      - "-conflict"
+    actions:
+      update:
+
+  - name: update dependency-driven stacked pull requests when behind
+    conditions:
+      - "label ~= ^depends-on:#"
+      - "#commits-behind > 0"
+      - "-draft"
+      - "-conflict"
+    actions:
+      update:
+
+  - name: auto merge copilot PRs after manual CI
+    conditions:
+      - "author ~= ^(Copilot|copilot-swe-agent(\\[bot\\])?)$"
+      - "check-success = ci"
+      - "-draft"
+      - "-conflict"
+    actions:
+      merge:
+        method: merge
+
+  - name: auto merge dependency-labeled PRs when blockers are clear
+    conditions:
+      - "label ~= ^depends-on:#"
+      - "check-success = pr-dependencies"
+      - "check-success = ci"
+      - "-draft"
+      - "-conflict"
+    actions:
+      merge:
+        method: merge
+
+merge_protections:
+  - name: block main until CI and dependency checks pass
+    if:
+      - "base = main"
+    success_conditions:
+      - "check-success = ci"
+      - "check-success = pr-dependencies"
+      - "-conflict"
