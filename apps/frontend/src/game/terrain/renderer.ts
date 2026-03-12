@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import {
-  TERRAIN_ANIMATION_FRAME_MS,
+  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_DEPTH,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
@@ -21,19 +21,86 @@ type ChunkRenderState = {
   animatedTiles: TerrainRenderTile[];
 };
 
+const BASE_FRAME_CASE_SUFFIX_RE = /#[0-9]+$/;
+
+export function getTerrainAnimationId(baseFrame: string): string {
+  return baseFrame.replace(BASE_FRAME_CASE_SUFFIX_RE, "");
+}
+
+export function normalizeTerrainPhaseDurations(
+  durationsMs: readonly number[] | undefined,
+  variantCount: number,
+  fallbackDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+): number[] {
+  if (variantCount <= 0) {
+    return [];
+  }
+
+  if (
+    Array.isArray(durationsMs) &&
+    durationsMs.length > 0 &&
+    durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+  ) {
+    const normalized = durationsMs.slice(0, variantCount);
+    while (normalized.length < variantCount) {
+      normalized.push(fallbackDurationMs);
+    }
+    return normalized;
+  }
+
+  return Array.from({ length: variantCount }, () => fallbackDurationMs);
+}
+
+export function resolveTerrainPhaseIndex(
+  nowMs: number,
+  durationsMs: readonly number[],
+): number {
+  if (durationsMs.length === 0) {
+    return 0;
+  }
+
+  const cycleDurationMs = durationsMs.reduce((total, duration) => total + duration, 0);
+  if (cycleDurationMs <= 0) {
+    return 0;
+  }
+
+  let offsetMs = ((Math.floor(nowMs) % cycleDurationMs) + cycleDurationMs) % cycleDurationMs;
+  for (const [index, duration] of durationsMs.entries()) {
+    if (offsetMs < duration) {
+      return index;
+    }
+    offsetMs -= duration;
+  }
+
+  return durationsMs.length - 1;
+}
+
 export class TerrainRenderer {
   private readonly chunkStates = new Map<TerrainChunkId, ChunkRenderState>();
   private readonly animatedFrameVariantsByBase = new Map<string, string[]>();
   private readonly animatedBaseFrameByName = new Map<string, boolean>();
+  private readonly animationPhaseDurationsById = new Map<string, number[]>();
+  private readonly currentPhaseByAnimationId = new Map<string, number>();
   private visibleChunkIds = new Set<TerrainChunkId>();
   private scratchImage: Phaser.GameObjects.Image | null = null;
-  private phaseTick = 0;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly grid: TerrainGridSpec,
     private readonly textureKey: string = TERRAIN_TEXTURE_KEY,
-  ) {}
+    animationPhaseDurationsById: Readonly<Record<string, readonly number[]>> = {},
+    private readonly fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+  ) {
+    for (const [animationId, durationsMs] of Object.entries(animationPhaseDurationsById)) {
+      if (
+        Array.isArray(durationsMs) &&
+        durationsMs.length > 0 &&
+        durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+      ) {
+        this.animationPhaseDurationsById.set(animationId, [...durationsMs]);
+      }
+    }
+  }
 
   private getScratchImage(): Phaser.GameObjects.Image {
     if (!this.scratchImage) {
@@ -75,11 +142,25 @@ export class TerrainRenderer {
     return isAnimated;
   }
 
+  private getPhaseDurationsForBaseFrame(
+    baseFrame: string,
+    variantCount: number,
+  ): number[] {
+    const animationId = getTerrainAnimationId(baseFrame);
+    const durationsMs = this.animationPhaseDurationsById.get(animationId);
+    return normalizeTerrainPhaseDurations(
+      durationsMs,
+      variantCount,
+      this.fallbackPhaseDurationMs,
+    );
+  }
+
   private resolveFrameForCurrentPhase(baseFrame: string): string {
     const variants = this.resolveFrameVariants(baseFrame);
     if (variants.length <= 1) return baseFrame;
 
-    const index = this.phaseTick % variants.length;
+    const animationId = getTerrainAnimationId(baseFrame);
+    const index = this.currentPhaseByAnimationId.get(animationId) ?? 0;
     return variants[index] ?? baseFrame;
   }
 
@@ -238,10 +319,46 @@ export class TerrainRenderer {
   }
 
   public updateAnimation(nowMs: number = this.scene.time.now): void {
-    const nextPhaseTick = Math.floor(nowMs / TERRAIN_ANIMATION_FRAME_MS);
-    if (nextPhaseTick === this.phaseTick) return;
+    const nextPhaseByAnimationId = new Map<string, number>();
 
-    this.phaseTick = nextPhaseTick;
+    for (const chunkId of this.visibleChunkIds) {
+      const state = this.chunkStates.get(chunkId);
+      if (!state || state.animatedTiles.length === 0) continue;
+
+      for (const tile of state.animatedTiles) {
+        const variants = this.resolveFrameVariants(tile.frame);
+        if (variants.length <= 1) continue;
+
+        const animationId = getTerrainAnimationId(tile.frame);
+        if (nextPhaseByAnimationId.has(animationId)) continue;
+
+        const durationsMs = this.getPhaseDurationsForBaseFrame(tile.frame, variants.length);
+        nextPhaseByAnimationId.set(
+          animationId,
+          resolveTerrainPhaseIndex(nowMs, durationsMs),
+        );
+      }
+    }
+
+    if (nextPhaseByAnimationId.size === 0) {
+      return;
+    }
+
+    let changed = false;
+    for (const [animationId, phaseIndex] of nextPhaseByAnimationId.entries()) {
+      if (this.currentPhaseByAnimationId.get(animationId) !== phaseIndex) {
+        changed = true;
+        break;
+      }
+    }
+    if (!changed && this.currentPhaseByAnimationId.size === nextPhaseByAnimationId.size) {
+      return;
+    }
+
+    this.currentPhaseByAnimationId.clear();
+    for (const [animationId, phaseIndex] of nextPhaseByAnimationId.entries()) {
+      this.currentPhaseByAnimationId.set(animationId, phaseIndex);
+    }
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
@@ -260,9 +377,10 @@ export class TerrainRenderer {
     this.chunkStates.clear();
     this.animatedFrameVariantsByBase.clear();
     this.animatedBaseFrameByName.clear();
+    this.animationPhaseDurationsById.clear();
+    this.currentPhaseByAnimationId.clear();
     this.visibleChunkIds.clear();
     this.scratchImage?.destroy();
     this.scratchImage = null;
-    this.phaseTick = 0;
   }
 }

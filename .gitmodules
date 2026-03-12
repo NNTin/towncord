@@ -7,3 +7,6 @@
 [submodule "packages/donarg-office-assets"]
 	path = packages/donarg-office-assets
 	url = https://github.com/NNTin/donarg-office-assets.git
+[submodule "packages/public-assets"]
+	path = packages/public-assets
+	url = https://github.com/NNTin/towncord-assets-export.git
