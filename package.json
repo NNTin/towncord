@@ -24,6 +24,7 @@
     "assets:donarg:all": "npm run -w @towncord/donarg-office-assets export:all",
     "build": "echo \"Define workspace build scripts\"",
     "dev": "echo \"Define workspace dev scripts\"",
-    "test": "echo \"Define workspace tests\""
+    "test": "echo \"Define workspace tests\"",
+    "test:automation": "node --test .github/scripts/__tests__/*.test.mjs"
   }
 }
