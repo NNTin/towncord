@@ -41,10 +41,19 @@ Create a detached worktree for investigation or review:
 git worktree add --detach .worktree/review-issue-123 HEAD
 ```
 
+Initialize submodules inside the new worktree:
+
+```bash
+cd .worktree/feat-my-change
+git submodule update --init --recursive
+```
+
 ## Agent Guidance
 
 - Create worktrees only inside `.worktree/`.
 - Prefer one branch per worktree.
+- After creating or entering a worktree, initialize submodules with `git submodule update --init --recursive`.
+- When working inside `.worktree/`, agents should commit their changes and push the worktree branch automatically.
 - Do not store notes, artifacts, or unrelated files in `.worktree/`.
 - Assume `.worktree/` contents are disposable except for this README.
 - Coordinate branch names clearly when multiple agents are active.

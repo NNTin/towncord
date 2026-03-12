@@ -23,7 +23,6 @@ export type BloomseedAnimationOverride = {
 
 export type RegisterBloomseedAnimationsOptions = {
   manifestKey?: string;
-  defaultFrameRate?: number;
   defaultRepeat?: number;
   onMissingAtlas?: "skip" | "throw";
   filter?: (animationId: string, definition: PublicAnimationDefinition) => boolean;
@@ -40,7 +39,6 @@ export function registerBloomseedAnimations(
 ): string[] {
   const {
     manifestKey = BLOOMSEED_ANIMATIONS_JSON_KEY,
-    defaultFrameRate = 10,
     defaultRepeat = -1,
     onMissingAtlas = "skip",
     filter,
@@ -93,7 +91,7 @@ export function registerBloomseedAnimations(
       hideOnComplete: override?.hideOnComplete ?? false,
     };
 
-    const frameRate = resolveAnimationFrameRate(definition, override?.frameRate, defaultFrameRate);
+    const frameRate = resolveAnimationFrameRate(override?.frameRate);
     if (frameRate !== undefined) {
       animationConfig.frameRate = frameRate;
     }
@@ -109,12 +107,34 @@ export function registerBloomseedAnimations(
 export function buildAnimationFrames(
   definition: PublicAnimationDefinition,
 ): Phaser.Types.Animations.AnimationFrame[] {
-  const durationsMs =
-    Array.isArray(definition.durationsMs) &&
-    definition.durationsMs.length === definition.frames.length &&
-    definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
-      ? definition.durationsMs
-      : null;
+  if (
+    definition.durationsMs.length !== definition.frames.length ||
+    !definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+  ) {
+    const expectedDurations = definition.frames.length;
+    const actualDurations = definition.durationsMs.length;
+    const invalidDurationDetails: string[] = [];
+
+    definition.durationsMs.forEach((duration, index) => {
+      if (!Number.isInteger(duration) || duration <= 0) {
+        invalidDurationDetails.push(`${index}:${String(duration)}`);
+      }
+    });
+
+    const parts: string[] = [
+      `Invalid animation durations for atlas "${definition.atlasKey}".`,
+      `Expected ${expectedDurations} duration values for ${expectedDurations} frames,`,
+      `but got ${actualDurations}.`,
+    ];
+
+    if (invalidDurationDetails.length > 0) {
+      parts.push(
+        `Invalid duration values at index:value -> [${invalidDurationDetails.join(", ")}].`,
+      );
+    }
+
+    throw new Error(parts.join(" "));
+  }
 
   return definition.frames.map((frame, index): Phaser.Types.Animations.AnimationFrame => {
     const animationFrame: Phaser.Types.Animations.AnimationFrame = {
@@ -122,11 +142,9 @@ export function buildAnimationFrames(
       frame,
     };
 
-    if (durationsMs) {
-      const duration = durationsMs[index];
-      if (duration !== undefined) {
-        animationFrame.duration = duration;
-      }
+    const duration = definition.durationsMs[index];
+    if (duration !== undefined) {
+      animationFrame.duration = duration;
     }
 
     return animationFrame;
@@ -134,24 +152,9 @@ export function buildAnimationFrames(
 }
 
 export function resolveAnimationFrameRate(
-  definition: PublicAnimationDefinition,
   overrideFrameRate: number | undefined,
-  defaultFrameRate: number,
 ): number | undefined {
-  if (overrideFrameRate !== undefined) {
-    return overrideFrameRate;
-  }
-
-  const hasDurations =
-    Array.isArray(definition.durationsMs) &&
-    definition.durationsMs.length === definition.frames.length &&
-    definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0);
-
-  if (hasDurations) {
-    return undefined;
-  }
-
-  return defaultFrameRate;
+  return overrideFrameRate;
 }
 
 export function readAnimationManifest(
@@ -160,7 +163,12 @@ export function readAnimationManifest(
 ): PublicAnimationManifest {
   const raw = scene.cache.json.get(manifestKey) as unknown;
 
-  return parsePublicAnimationManifest(raw);
+  try {
+    return parsePublicAnimationManifest(raw);
+  } catch (error) {
+    const details = error instanceof Error && error.message ? ` ${error.message}` : "";
+    throw new Error(`Invalid animation manifest for cache key "${manifestKey}".${details}`);
+  }
 }
 
 export function readOptionalAnimationManifest(

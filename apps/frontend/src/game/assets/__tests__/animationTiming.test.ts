@@ -33,6 +33,11 @@ describe("registerBloomseedAnimations timing", () => {
           atlasKey: "bloomseed.characters",
           frames: ["walk#0", "walk#1"],
           durationsMs: [80, 120],
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
         },
       },
     });
@@ -54,7 +59,7 @@ describe("registerBloomseedAnimations timing", () => {
     expect(config).not.toHaveProperty("frameRate");
   });
 
-  test("falls back to default frameRate when exported durations are absent or mismatched", () => {
+  test("throws when exported durations are mismatched", () => {
     const { scene, create } = createScene({
       namespace: "bloomseed",
       animations: {
@@ -62,22 +67,87 @@ describe("registerBloomseedAnimations timing", () => {
           atlasKey: "bloomseed.characters",
           frames: ["walk#0", "walk#1"],
           durationsMs: [80],
+          phaseDurationsMs: [80],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
         },
       },
     });
 
-    registerBloomseedAnimations(scene as never, { defaultFrameRate: 12 });
-
-    expect(create).toHaveBeenCalledTimes(1);
-    expect(create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        key: "characters.hero.walk",
-        frameRate: 12,
-        frames: [
-          { key: "bloomseed.characters", frame: "walk#0" },
-          { key: "bloomseed.characters", frame: "walk#1" },
-        ],
-      }),
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      'Invalid animation durations for atlas "bloomseed.characters".',
     );
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("throws when exported durations include non-integer values", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          durationsMs: [80.5, 120],
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be integer/,
+    );
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("throws when exported durations include non-positive values", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          durationsMs: [0, 120],
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be >= 1/,
+    );
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("throws when exported durations are not an array", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          durationsMs: "not-an-array",
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be array/,
+    );
+    expect(create).not.toHaveBeenCalled();
   });
 });
