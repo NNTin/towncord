@@ -21,7 +21,7 @@ import { TerrainMapStore } from "./store";
 import { TerrainTileResolver } from "./tileResolver";
 import { TerrainVisibleChunkResolver } from "./visibleChunkResolver";
 
-export type TerrainRuntime = {
+type TerrainRuntime = {
   store: TerrainMapStore;
   chunkBuilder: TerrainChunkBuilder;
   renderer: TerrainRenderer;

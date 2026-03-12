@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import { registerBloomseedAnimations } from "../assets/animation";
 
-export const PREVIEW_SCENE_KEY = "preview";
+const PREVIEW_SCENE_KEY = "preview";
 
 // Internal events for the preview game instance (not shared with main game)
 export const PREVIEW_READY_EVENT = "preview:ready";
@@ -12,7 +12,7 @@ export const PREVIEW_INFO_EVENT = "preview:info";
 
 const EQUIPMENT_ATLAS = "bloomseed.equipment";
 
-export const PREVIEW_SCALE = 3;
+const PREVIEW_SCALE = 3;
 
 export type PreviewPlayPayload = {
   key: string;

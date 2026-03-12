@@ -4,13 +4,13 @@ import { TerrainEditRouter } from "./editRouter";
 import { TerrainGameplayGrid } from "./gameplayGrid";
 import { TerrainMapStore } from "./store";
 
-export type QueuedTerrainDrop = {
+type QueuedTerrainDrop = {
   payload: PlaceTerrainDropPayload;
   worldX: number;
   worldY: number;
 };
 
-export type TerrainEditErrorHandler = (error: unknown) => void;
+type TerrainEditErrorHandler = (error: unknown) => void;
 
 export class TerrainCommands {
   private readonly pendingDrops: QueuedTerrainDrop[] = [];

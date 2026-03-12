@@ -15,7 +15,7 @@ function formatKindLabel(kind: string): string {
     .join(" ");
 }
 
-export function resolvePlaceableGroupLabel(kind: EntityKind): string {
+function resolvePlaceableGroupLabel(kind: EntityKind): string {
   return KIND_LABEL_OVERRIDES[kind] ?? formatKindLabel(kind);
 }
 

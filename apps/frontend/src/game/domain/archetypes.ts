@@ -12,12 +12,12 @@ export type NpcArchetypeSeed = {
   visualRef: EntityVisualRef;
 };
 
-export type BuildArchetypeRuntimesInput = {
+type BuildArchetypeRuntimesInput = {
   players: readonly PlayerArchetypeSeed[];
   npcs: readonly NpcArchetypeSeed[];
 };
 
-export type ArchetypeRuntime = {
+type ArchetypeRuntime = {
   definition: EntityDefinition;
   createBehavior: () => EntityBehavior;
 };

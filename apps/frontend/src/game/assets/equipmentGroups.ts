@@ -21,10 +21,6 @@ export const TOOL_EQUIPMENT_MAP: Record<string, EquipmentId[]> = {
   "tool-watering": ["watering-can"],
 };
 
-export function getCompatibleEquipment(baseType: string): EquipmentId[] {
-  return TOOL_EQUIPMENT_MAP[baseType] ?? [];
-}
-
 export function resolveEquipmentKey(
   equipmentId: EquipmentId,
   material: Material,

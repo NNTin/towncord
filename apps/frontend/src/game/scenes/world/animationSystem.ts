@@ -9,14 +9,14 @@ import { readEntityVisualRef, type EntityDefinition } from "../../domain/model";
 import { isLocomotionTrackId, resolveTrackByActionPolicy } from "./animationPolicy";
 import type { WorldAnimatedActor } from "./types";
 
-export type SpawnVisual = {
+type SpawnVisual = {
   animationKey: string;
   flipX: boolean;
   textureKey: string;
   textureFrame: string | number;
 };
 
-export function resolveEntityTrack(
+function resolveEntityTrack(
   catalog: AnimationCatalog,
   definition: EntityDefinition,
   action: string,

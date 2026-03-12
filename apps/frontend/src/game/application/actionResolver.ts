@@ -1,7 +1,7 @@
 import { supportsRun, supportsWalk, type ActionContext, type EntityBehavior } from "../domain/capabilities";
 import type { EntityAction } from "../domain/model";
 
-export type ActionResolverInput = {
+type ActionResolverInput = {
   isMoving: boolean;
   isRunModifier: boolean;
   deltaSeconds: number;

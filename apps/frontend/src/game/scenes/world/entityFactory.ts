@@ -8,7 +8,7 @@ import type { WorldActor, WorldEntity } from "./types";
 export const WORLD_ENTITY_SPRITE_ORIGIN_X = 0.5;
 export const WORLD_ENTITY_SPRITE_ORIGIN_Y = 0.75;
 
-export type CreateWorldEntityParams = {
+type CreateWorldEntityParams = {
   scene: Phaser.Scene;
   catalog: AnimationCatalog;
   runtime: RegisteredEntity;
