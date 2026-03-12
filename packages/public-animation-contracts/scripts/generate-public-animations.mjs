@@ -31,13 +31,30 @@ export type PublicAnimationFrameSize = FrameSize;
 `;
 }
 
+function assertBrowserSafeStandalone(code) {
+  if (code.includes("ajv/dist/runtime")) {
+    throw new Error(
+      "Generated public animation validator still references AJV runtime helpers. "
+      + "Keep the standalone validator browser-safe so AJV is not bundled into the frontend.",
+    );
+  }
+}
+
 async function buildValidatorJs(schema) {
   const { Ajv2020 } = await import("ajv/dist/2020.js");
   const { default: standaloneCode } = await import("ajv/dist/standalone/index.js");
-  const ajv = new Ajv2020({ allErrors: true, code: { source: true, esm: true } });
+  const ajv = new Ajv2020({
+    allErrors: true,
+    code: { source: true, esm: true },
+  });
+  // Force a fully self-contained validator. AJV's unicode string-length helper
+  // pulls in ajv/dist/runtime/ucs2length, which leaks AJV into the frontend bundle.
+  ajv.opts.unicode = false;
   const validate = ajv.compile(schema);
   const code = standaloneCode(ajv, validate);
-  return `${GENERATED_BANNER}\n${code.replace(/\r\n/g, "\n").trimEnd()}\n`;
+  const normalized = code.replace(/\r\n/g, "\n").trimEnd();
+  assertBrowserSafeStandalone(normalized);
+  return `${GENERATED_BANNER}\n${normalized}\n`;
 }
 
 function buildValidatorDts() {
