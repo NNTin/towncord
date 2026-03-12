@@ -12,3 +12,7 @@ specs/
 .chunkhound.json
 .worktree/*
 !.worktree/README.md
+
+*.generated.ts
+*.generated.js
+*.generated.d.ts
