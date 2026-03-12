@@ -135,7 +135,6 @@ describe("registerBloomseedAnimations timing", () => {
         "characters.hero.walk": {
           atlasKey: "bloomseed.characters",
           frames: ["walk#0", "walk#1"],
-          // @ts-expect-error Testing runtime validation of invalid manifest shape
           durationsMs: "not-an-array",
           phaseDurationsMs: [80, 120],
           category: "characters",
