@@ -3,7 +3,6 @@
 apps/frontend/public/assets/bloomseed/
 apps/frontend/public/assets/debug/
 apps/frontend/public/assets/donarg-office/
-packages/public-animation-contracts/src/publicAnimations.generated.ts
 node_modules/
 TODO.md
 __pycache__/
@@ -13,3 +12,7 @@ specs/
 .chunkhound.json
 .worktree/*
 !.worktree/README.md
+
+*.generated.ts
+*.generated.js
+*.generated.d.ts
