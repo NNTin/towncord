@@ -1,0 +1,10 @@
+{
+  "threshold": 0,
+  "gitignore": true,
+  "reporters": ["console"],
+  "path": [
+    ".github/scripts",
+    "apps/frontend",
+    "packages/public-animation-contracts"
+  ]
+}

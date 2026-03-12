@@ -9,7 +9,9 @@ function createScene(manifest: unknown) {
     scene: {
       cache: {
         json: {
-          get: vi.fn((key: string) => (key === BLOOMSEED_ANIMATIONS_JSON_KEY ? manifest : null)),
+          get: vi.fn((key: string) =>
+            key === BLOOMSEED_ANIMATIONS_JSON_KEY ? manifest : null,
+          ),
         },
       },
       textures: {
@@ -22,6 +24,36 @@ function createScene(manifest: unknown) {
     },
     create,
   };
+}
+
+function createTimingManifest(durationsMs: unknown) {
+  return {
+    namespace: "bloomseed",
+    animations: {
+      "characters.hero.walk": {
+        atlasKey: "bloomseed.characters",
+        frames: ["walk#0", "walk#1"],
+        durationsMs,
+        phaseDurationsMs: [80, 120],
+        category: "characters",
+        frameCount: 2,
+        frameSize: { w: 16, h: 16 },
+        sourceFile: "aseprite/characters/hero.aseprite",
+      },
+    },
+  };
+}
+
+function expectInvalidDurationsManifest(
+  durationsMs: unknown,
+  expectedMessage: RegExp | string,
+): void {
+  const { scene, create } = createScene(createTimingManifest(durationsMs));
+
+  expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+    expectedMessage,
+  );
+  expect(create).not.toHaveBeenCalled();
 }
 
 describe("registerBloomseedAnimations timing", () => {
@@ -83,71 +115,23 @@ describe("registerBloomseedAnimations timing", () => {
   });
 
   test("throws when exported durations include non-integer values", () => {
-    const { scene, create } = createScene({
-      namespace: "bloomseed",
-      animations: {
-        "characters.hero.walk": {
-          atlasKey: "bloomseed.characters",
-          frames: ["walk#0", "walk#1"],
-          durationsMs: [80.5, 120],
-          phaseDurationsMs: [80, 120],
-          category: "characters",
-          frameCount: 2,
-          frameSize: { w: 16, h: 16 },
-          sourceFile: "aseprite/characters/hero.aseprite",
-        },
-      },
-    });
-
-    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+    expectInvalidDurationsManifest(
+      [80.5, 120],
       /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be integer/,
     );
-    expect(create).not.toHaveBeenCalled();
   });
 
   test("throws when exported durations include non-positive values", () => {
-    const { scene, create } = createScene({
-      namespace: "bloomseed",
-      animations: {
-        "characters.hero.walk": {
-          atlasKey: "bloomseed.characters",
-          frames: ["walk#0", "walk#1"],
-          durationsMs: [0, 120],
-          phaseDurationsMs: [80, 120],
-          category: "characters",
-          frameCount: 2,
-          frameSize: { w: 16, h: 16 },
-          sourceFile: "aseprite/characters/hero.aseprite",
-        },
-      },
-    });
-
-    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+    expectInvalidDurationsManifest(
+      [0, 120],
       /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be >= 1/,
     );
-    expect(create).not.toHaveBeenCalled();
   });
 
   test("throws when exported durations are not an array", () => {
-    const { scene, create } = createScene({
-      namespace: "bloomseed",
-      animations: {
-        "characters.hero.walk": {
-          atlasKey: "bloomseed.characters",
-          frames: ["walk#0", "walk#1"],
-          durationsMs: "not-an-array",
-          phaseDurationsMs: [80, 120],
-          category: "characters",
-          frameCount: 2,
-          frameSize: { w: 16, h: 16 },
-          sourceFile: "aseprite/characters/hero.aseprite",
-        },
-      },
-    });
-
-    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+    expectInvalidDurationsManifest(
+      "not-an-array",
       /Invalid animation manifest for cache key "bloomseed\.animations"\..*must be array/,
     );
-    expect(create).not.toHaveBeenCalled();
   });
 });

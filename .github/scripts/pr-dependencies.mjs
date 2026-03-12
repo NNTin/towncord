@@ -3,50 +3,21 @@
 import { readFile } from "node:fs/promises";
 import { resolve as resolvePath } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createGitHubClient, upsertLabel } from "./github-client.mjs";
 
 export const DEPENDENTS_LABEL = "has-dependents";
 export const DEPENDS_ON_PATTERN = /^depends-on:#(\d+)$/;
 export const STACK_BRANCH_PATTERN = /^feat\//;
 const DYNAMIC_DEPENDENCY_LABEL_COLOR = "bfd4f2";
 
-function createGitHubClient(token) {
-  return async function github(path, init = {}) {
-    const response = await fetch(`https://api.github.com${path}`, {
-      ...init,
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-        "User-Agent": "towncord-pr-dependencies",
-        ...init.headers,
-      },
-    });
-
-    if (response.status === 204) {
-      return null;
-    }
-
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : null;
-
-    if (!response.ok) {
-      const message = data?.message ?? response.statusText;
-      const error = new Error(`${response.status} ${message}`);
-      error.status = response.status;
-      error.data = data;
-      throw error;
-    }
-
-    return data;
-  };
-}
-
 async function paginate(github, path) {
   const items = [];
   let page = 1;
 
   while (true) {
-    const data = await github(`${path}${path.includes("?") ? "&" : "?"}per_page=100&page=${page}`);
+    const data = await github(
+      `${path}${path.includes("?") ? "&" : "?"}per_page=100&page=${page}`,
+    );
     items.push(...data);
 
     if (data.length < 100) {
@@ -62,34 +33,19 @@ async function ensureLabels(github, owner, repo) {
   const labels = JSON.parse(await readFile(labelsPath, "utf8"));
 
   for (const label of labels) {
-    const encodedName = encodeURIComponent(label.name);
-    let exists = false;
-
-    try {
-      await github(`/repos/${owner}/${repo}/labels/${encodedName}`);
-      exists = true;
-    } catch (error) {
-      if (error.status !== 404) {
-        throw error;
-      }
-    }
-
-    if (exists) {
-      await github(`/repos/${owner}/${repo}/labels/${encodedName}`, {
-        method: "PATCH",
-        body: JSON.stringify(label),
-      });
-      continue;
-    }
-
-    await github(`/repos/${owner}/${repo}/labels`, {
-      method: "POST",
-      body: JSON.stringify(label),
-    });
+    await upsertLabel(github, owner, repo, label);
   }
 }
 
-async function toggleLabel(github, owner, repo, prNumber, labelsByName, labelName, shouldExist) {
+async function toggleLabel(
+  github,
+  owner,
+  repo,
+  prNumber,
+  labelsByName,
+  labelName,
+  shouldExist,
+) {
   const hasLabel = labelsByName.has(labelName);
 
   if (shouldExist && !hasLabel) {
@@ -101,31 +57,20 @@ async function toggleLabel(github, owner, repo, prNumber, labelsByName, labelNam
   }
 
   if (!shouldExist && hasLabel) {
-    await github(`/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`, {
-      method: "DELETE",
-    });
+    await github(
+      `/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 }
 
 async function ensureDynamicDependencyLabel(github, owner, repo, labelName) {
-  const encodedName = encodeURIComponent(labelName);
-
-  try {
-    await github(`/repos/${owner}/${repo}/labels/${encodedName}`);
-    return;
-  } catch (error) {
-    if (error.status !== 404) {
-      throw error;
-    }
-  }
-
-  await github(`/repos/${owner}/${repo}/labels`, {
-    method: "POST",
-    body: JSON.stringify({
-      name: labelName,
-      color: DYNAMIC_DEPENDENCY_LABEL_COLOR,
-      description: "Automatically managed stacked PR dependency label.",
-    }),
+  await upsertLabel(github, owner, repo, {
+    name: labelName,
+    color: DYNAMIC_DEPENDENCY_LABEL_COLOR,
+    description: "Automatically managed stacked PR dependency label.",
   });
 }
 
@@ -177,7 +122,9 @@ export function computeDependencyUpdates(openPulls) {
 
   for (const pr of openPulls) {
     const parentPr = resolveParentPull(pr, parentPullsByHeadRef);
-    const dependencyLabelName = parentPr ? `depends-on:#${parentPr.number}` : null;
+    const dependencyLabelName = parentPr
+      ? `depends-on:#${parentPr.number}`
+      : null;
 
     if (dependencyLabelName) {
       desiredDependencyLabelByPrNumber.set(pr.number, dependencyLabelName);
@@ -190,7 +137,8 @@ export function computeDependencyUpdates(openPulls) {
 
   return openPulls.map((pr) => ({
     prNumber: pr.number,
-    desiredDependencyLabel: desiredDependencyLabelByPrNumber.get(pr.number) ?? null,
+    desiredDependencyLabel:
+      desiredDependencyLabelByPrNumber.get(pr.number) ?? null,
     hasDependents: (childCountByParentPrNumber.get(pr.number) ?? 0) > 0,
   }));
 }
@@ -208,38 +156,74 @@ export async function main({
   }
 
   const [owner, repo] = repository.split("/");
-  const github = createGitHubClient(token);
+  const github = createGitHubClient(token, "towncord-pr-dependencies");
 
   await ensureLabels(github, owner, repo);
 
-  const openPulls = await paginate(github, `/repos/${owner}/${repo}/pulls?state=open`);
+  const openPulls = await paginate(
+    github,
+    `/repos/${owner}/${repo}/pulls?state=open`,
+  );
   const dependencyUpdatesByPrNumber = new Map(
-    computeDependencyUpdates(openPulls).map((update) => [update.prNumber, update]),
+    computeDependencyUpdates(openPulls).map((update) => [
+      update.prNumber,
+      update,
+    ]),
   );
 
   for (const pr of openPulls) {
     const labelsByName = new Set((pr.labels ?? []).map((label) => label.name));
     const existingDependencyLabels = getDependencyLabelNames(pr);
     const dependencyUpdate = dependencyUpdatesByPrNumber.get(pr.number);
-    const desiredDependencyLabel = dependencyUpdate?.desiredDependencyLabel ?? null;
+    const desiredDependencyLabel =
+      dependencyUpdate?.desiredDependencyLabel ?? null;
 
     for (const labelName of existingDependencyLabels) {
       if (labelName === desiredDependencyLabel) {
         continue;
       }
 
-      await toggleLabel(github, owner, repo, pr.number, labelsByName, labelName, false);
+      await toggleLabel(
+        github,
+        owner,
+        repo,
+        pr.number,
+        labelsByName,
+        labelName,
+        false,
+      );
       labelsByName.delete(labelName);
     }
 
     if (desiredDependencyLabel) {
-      await ensureDynamicDependencyLabel(github, owner, repo, desiredDependencyLabel);
-      await toggleLabel(github, owner, repo, pr.number, labelsByName, desiredDependencyLabel, true);
+      await ensureDynamicDependencyLabel(
+        github,
+        owner,
+        repo,
+        desiredDependencyLabel,
+      );
+      await toggleLabel(
+        github,
+        owner,
+        repo,
+        pr.number,
+        labelsByName,
+        desiredDependencyLabel,
+        true,
+      );
       labelsByName.add(desiredDependencyLabel);
     }
 
     const hasDependents = dependencyUpdate?.hasDependents ?? false;
-    await toggleLabel(github, owner, repo, pr.number, labelsByName, DEPENDENTS_LABEL, hasDependents);
+    await toggleLabel(
+      github,
+      owner,
+      repo,
+      pr.number,
+      labelsByName,
+      DEPENDENTS_LABEL,
+      hasDependents,
+    );
 
     console.log(
       `Processed PR #${pr.number}: dependency=${desiredDependencyLabel ?? "none"}, hasDependents=${hasDependents}`,
@@ -248,7 +232,8 @@ export async function main({
 }
 
 const isDirectExecution =
-  process.argv[1] && resolvePath(process.argv[1]) === fileURLToPath(import.meta.url);
+  process.argv[1] &&
+  resolvePath(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isDirectExecution) {
   await main();
