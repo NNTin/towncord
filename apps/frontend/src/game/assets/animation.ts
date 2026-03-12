@@ -111,7 +111,29 @@ export function buildAnimationFrames(
     definition.durationsMs.length !== definition.frames.length ||
     !definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
   ) {
-    throw new Error(`Invalid animation durations for atlas "${definition.atlasKey}".`);
+    const expectedDurations = definition.frames.length;
+    const actualDurations = definition.durationsMs.length;
+    const invalidDurationDetails: string[] = [];
+
+    definition.durationsMs.forEach((duration, index) => {
+      if (!Number.isInteger(duration) || duration <= 0) {
+        invalidDurationDetails.push(`${index}:${String(duration)}`);
+      }
+    });
+
+    const parts: string[] = [
+      `Invalid animation durations for atlas "${definition.atlasKey}".`,
+      `Expected ${expectedDurations} duration values for ${expectedDurations} frames,`,
+      `but got ${actualDurations}.`,
+    ];
+
+    if (invalidDurationDetails.length > 0) {
+      parts.push(
+        `Invalid duration values at index:value -> [${invalidDurationDetails.join(", ")}].`,
+      );
+    }
+
+    throw new Error(parts.join(" "));
   }
 
   return definition.frames.map((frame, index): Phaser.Types.Animations.AnimationFrame => {

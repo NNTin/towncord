@@ -81,4 +81,74 @@ describe("registerBloomseedAnimations timing", () => {
     );
     expect(create).not.toHaveBeenCalled();
   });
+
+  test("throws when exported durations include non-integer values", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          durationsMs: [80.5, 120],
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      'Invalid animation durations for atlas "bloomseed.characters".',
+    );
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("throws when exported durations include non-positive values", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          durationsMs: [0, 120],
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      'Invalid animation durations for atlas "bloomseed.characters".',
+    );
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  test("throws when exported durations are not an array", () => {
+    const { scene, create } = createScene({
+      namespace: "bloomseed",
+      animations: {
+        "characters.hero.walk": {
+          atlasKey: "bloomseed.characters",
+          frames: ["walk#0", "walk#1"],
+          // @ts-expect-error Testing runtime validation of invalid manifest shape
+          durationsMs: "not-an-array",
+          phaseDurationsMs: [80, 120],
+          category: "characters",
+          frameCount: 2,
+          frameSize: { w: 16, h: 16 },
+          sourceFile: "aseprite/characters/hero.aseprite",
+        },
+      },
+    });
+
+    expect(() => registerBloomseedAnimations(scene as never)).toThrow(
+      'Invalid animation durations for atlas "bloomseed.characters".',
+    );
+    expect(create).not.toHaveBeenCalled();
+  });
 });
