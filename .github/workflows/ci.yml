@@ -19,7 +19,6 @@ concurrency:
 
 jobs:
   ci:
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains(fromJSON('["Copilot","copilot-swe-agent","copilot-swe-agent[bot]"]'), github.event.pull_request.user.login) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
