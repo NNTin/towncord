@@ -1,4 +1,4 @@
-name: PR Dependencies
+name: Sync PR Stack Labels
 
 on:
   pull_request_target:
@@ -15,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  checks: write
   issues: write
   pull-requests: write
 

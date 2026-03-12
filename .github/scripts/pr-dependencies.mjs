@@ -2,10 +2,10 @@
 
 import { readFile } from "node:fs/promises";
 
-const CHECK_NAME = "pr-dependencies";
-const DEPENDENCY_LABEL = "dependency-blocked";
 const DEPENDENTS_LABEL = "has-dependents";
 const DEPENDS_ON_PATTERN = /^depends-on:#(\d+)$/;
+const STACK_BRANCH_PATTERN = /^feat\//;
+const DYNAMIC_DEPENDENCY_LABEL_COLOR = "bfd4f2";
 
 const token = process.env.GITHUB_TOKEN;
 const repository = process.env.GITHUB_REPOSITORY;
@@ -98,60 +98,6 @@ async function ensureLabels() {
   }
 }
 
-function getDependencyNumbers(pr) {
-  const dependencyNumbers = new Set();
-
-  for (const label of pr.labels ?? []) {
-    const match = DEPENDS_ON_PATTERN.exec(label.name);
-
-    if (match) {
-      dependencyNumbers.add(Number(match[1]));
-    }
-  }
-
-  return [...dependencyNumbers];
-}
-
-function buildSummary(pr, explicitBlockers, childBlockers) {
-  const lines = [
-    `PR #${pr.number}: ${pr.title}`,
-    "",
-  ];
-
-  if (explicitBlockers.length === 0 && childBlockers.length === 0) {
-    lines.push("No open or unresolved dependencies were detected.");
-    return {
-      conclusion: "success",
-      title: "Dependencies satisfied",
-      summary: lines.join("\n"),
-    };
-  }
-
-  lines.push("This pull request is blocked by dependency rules.");
-
-  if (explicitBlockers.length > 0) {
-    lines.push("");
-    lines.push("Explicit dependencies:");
-    for (const blocker of explicitBlockers) {
-      lines.push(`- ${blocker}`);
-    }
-  }
-
-  if (childBlockers.length > 0) {
-    lines.push("");
-    lines.push("Open child pull requests:");
-    for (const blocker of childBlockers) {
-      lines.push(`- ${blocker}`);
-    }
-  }
-
-  return {
-    conclusion: "failure",
-    title: "Dependencies blocked",
-    summary: lines.join("\n"),
-  };
-}
-
 async function toggleLabel(prNumber, labelsByName, labelName, shouldExist) {
   const hasLabel = labelsByName.has(labelName);
 
@@ -170,122 +116,118 @@ async function toggleLabel(prNumber, labelsByName, labelName, shouldExist) {
   }
 }
 
-async function upsertCheckRun(pr, outcome) {
-  const checkRuns = await github(
-    `/repos/${owner}/${repo}/commits/${pr.head.sha}/check-runs?check_name=${encodeURIComponent(CHECK_NAME)}`,
-  );
+async function ensureDynamicDependencyLabel(labelName) {
+  const encodedName = encodeURIComponent(labelName);
 
-  const existing = checkRuns.check_runs.find((checkRun) => checkRun.name === CHECK_NAME);
-  const payload = {
-    status: "completed",
-    conclusion: outcome.conclusion,
-    external_id: String(pr.number),
-    output: {
-      title: outcome.title,
-      summary: outcome.summary,
-    },
-  };
-
-  if (existing) {
-    await github(`/repos/${owner}/${repo}/check-runs/${existing.id}`, {
-      method: "PATCH",
-      body: JSON.stringify(payload),
-    });
+  try {
+    await github(`/repos/${owner}/${repo}/labels/${encodedName}`);
     return;
+  } catch (error) {
+    if (error.status !== 404) {
+      throw error;
+    }
   }
 
-  await github(`/repos/${owner}/${repo}/check-runs`, {
+  await github(`/repos/${owner}/${repo}/labels`, {
     method: "POST",
     body: JSON.stringify({
-      name: CHECK_NAME,
-      head_sha: pr.head.sha,
-      ...payload,
+      name: labelName,
+      color: DYNAMIC_DEPENDENCY_LABEL_COLOR,
+      description: "Automatically managed stacked PR dependency label.",
     }),
   });
 }
 
+function getDependencyLabelNames(pr) {
+  return (pr.labels ?? [])
+    .map((label) => label.name)
+    .filter((name) => DEPENDS_ON_PATTERN.test(name));
+}
+
+function resolveParentPull(childPr, parentPullsByHeadRef, defaultBranch) {
+  if (!STACK_BRANCH_PATTERN.test(childPr.base.ref)) {
+    return null;
+  }
+
+  const candidates = (parentPullsByHeadRef.get(childPr.base.ref) ?? []).filter(
+    (candidate) => candidate.number !== childPr.number,
+  );
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  if (candidates.length === 1) {
+    return candidates[0];
+  }
+
+  const defaultBranchCandidates = candidates.filter(
+    (candidate) => candidate.base.ref === defaultBranch,
+  );
+
+  if (defaultBranchCandidates.length === 1) {
+    return defaultBranchCandidates[0];
+  }
+
+  console.warn(
+    `Skipping dependency label for PR #${childPr.number}; base ${childPr.base.ref} maps to multiple open parent PRs.`,
+  );
+  return null;
+}
+
 await ensureLabels();
 
+const repositoryData = await github(`/repos/${owner}/${repo}`);
+const defaultBranch = repositoryData.default_branch;
 const openPulls = await paginate(`/repos/${owner}/${repo}/pulls?state=open`);
-const childPullsByHeadRef = new Map();
-const referencedDependencyNumbers = new Set();
+const parentPullsByHeadRef = new Map();
 
 for (const pr of openPulls) {
-  const childPulls = childPullsByHeadRef.get(pr.base.ref) ?? [];
-  childPulls.push(pr);
-  childPullsByHeadRef.set(pr.base.ref, childPulls);
-
-  for (const dependencyNumber of getDependencyNumbers(pr)) {
-    referencedDependencyNumbers.add(dependencyNumber);
-  }
+  const parentPulls = parentPullsByHeadRef.get(pr.head.ref) ?? [];
+  parentPulls.push(pr);
+  parentPullsByHeadRef.set(pr.head.ref, parentPulls);
 }
 
-const cachedPulls = new Map();
+const desiredDependencyLabelByPrNumber = new Map();
+const childCountByParentPrNumber = new Map();
 
 for (const pr of openPulls) {
-  cachedPulls.set(pr.number, pr);
-}
+  const parentPr = resolveParentPull(pr, parentPullsByHeadRef, defaultBranch);
+  const dependencyLabelName = parentPr ? `depends-on:#${parentPr.number}` : null;
 
-for (const dependencyNumber of referencedDependencyNumbers) {
-  if (cachedPulls.has(dependencyNumber)) {
-    continue;
-  }
-
-  try {
-    const dependencyPr = await github(`/repos/${owner}/${repo}/pulls/${dependencyNumber}`);
-    cachedPulls.set(dependencyNumber, dependencyPr);
-  } catch (error) {
-    if (error.status === 404) {
-      cachedPulls.set(dependencyNumber, null);
-      continue;
-    }
-
-    throw error;
+  if (dependencyLabelName) {
+    desiredDependencyLabelByPrNumber.set(pr.number, dependencyLabelName);
+    childCountByParentPrNumber.set(
+      parentPr.number,
+      (childCountByParentPrNumber.get(parentPr.number) ?? 0) + 1,
+    );
   }
 }
 
 for (const pr of openPulls) {
   const labelsByName = new Set((pr.labels ?? []).map((label) => label.name));
-  const explicitBlockers = [];
-  const childBlockers = [];
+  const existingDependencyLabels = getDependencyLabelNames(pr);
+  const desiredDependencyLabel = desiredDependencyLabelByPrNumber.get(pr.number) ?? null;
 
-  for (const dependencyNumber of getDependencyNumbers(pr)) {
-    const dependencyPr = cachedPulls.get(dependencyNumber);
-
-    if (dependencyPr === null) {
-      explicitBlockers.push(`PR #${dependencyNumber} does not exist.`);
+  for (const labelName of existingDependencyLabels) {
+    if (labelName === desiredDependencyLabel) {
       continue;
     }
 
-    if (dependencyPr?.state === "open") {
-      explicitBlockers.push(
-        `Waiting for PR #${dependencyPr.number} (${dependencyPr.head.ref} -> ${dependencyPr.base.ref}) to merge.`,
-      );
-      continue;
-    }
-
-    if (!dependencyPr?.merged_at) {
-      explicitBlockers.push(`PR #${dependencyNumber} was closed without merging.`);
-    }
+    await toggleLabel(pr.number, labelsByName, labelName, false);
+    labelsByName.delete(labelName);
   }
 
-  const childPulls = (childPullsByHeadRef.get(pr.head.ref) ?? []).filter(
-    (childPr) => childPr.number !== pr.number,
-  );
-
-  for (const childPr of childPulls) {
-    childBlockers.push(
-      `PR #${childPr.number} (${childPr.head.ref} -> ${childPr.base.ref}) still targets ${pr.head.ref}.`,
-    );
+  if (desiredDependencyLabel) {
+    await ensureDynamicDependencyLabel(desiredDependencyLabel);
+    await toggleLabel(pr.number, labelsByName, desiredDependencyLabel, true);
+    labelsByName.add(desiredDependencyLabel);
   }
 
-  const outcome = buildSummary(pr, explicitBlockers, childBlockers);
-
-  await toggleLabel(pr.number, labelsByName, DEPENDENCY_LABEL, outcome.conclusion === "failure");
-  await toggleLabel(pr.number, labelsByName, DEPENDENTS_LABEL, childPulls.length > 0);
-  await upsertCheckRun(pr, outcome);
+  const hasDependents = (childCountByParentPrNumber.get(pr.number) ?? 0) > 0;
+  await toggleLabel(pr.number, labelsByName, DEPENDENTS_LABEL, hasDependents);
 
   console.log(
-    `Processed PR #${pr.number}: ${outcome.conclusion} (${explicitBlockers.length} explicit blockers, ${childBlockers.length} child blockers)`,
+    `Processed PR #${pr.number}: dependency=${desiredDependencyLabel ?? "none"}, hasDependents=${hasDependents}`,
   );
 }

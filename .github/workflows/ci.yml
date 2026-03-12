@@ -7,17 +7,18 @@ on:
       - reopened
       - synchronize
       - ready_for_review
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-pr-${{ github.event.pull_request.number }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   ci:
-    if: ${{ !contains(fromJSON('["Copilot","copilot-swe-agent","copilot-swe-agent[bot]"]'), github.event.pull_request.user.login) }}
+    if: ${{ github.event_name == 'workflow_dispatch' || !contains(fromJSON('["Copilot","copilot-swe-agent","copilot-swe-agent[bot]"]'), github.event.pull_request.user.login) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
 

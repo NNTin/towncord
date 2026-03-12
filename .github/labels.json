@@ -40,11 +40,6 @@
     "description": "The pull request currently conflicts with its base branch."
   },
   {
-    "name": "dependency-blocked",
-    "color": "d93f0b",
-    "description": "The pull request is waiting on labeled or implicit PR dependencies."
-  },
-  {
     "name": "has-dependents",
     "color": "0366d6",
     "description": "The pull request has open child PRs targeting its head branch."

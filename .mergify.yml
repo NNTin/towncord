@@ -166,7 +166,6 @@ pull_request_rules:
   - name: auto merge dependency-labeled PRs when blockers are clear
     conditions:
       - "label ~= ^depends-on:#"
-      - "check-success = pr-dependencies"
       - "check-success = ci"
       - "-draft"
       - "-conflict"
@@ -175,10 +174,10 @@ pull_request_rules:
         method: merge
 
 merge_protections:
-  - name: block main until CI and dependency checks pass
+  - name: block main until CI passes and child PRs are merged
     if:
       - "base = main"
     success_conditions:
       - "check-success = ci"
-      - "check-success = pr-dependencies"
       - "-conflict"
+      - "-label = has-dependents"
