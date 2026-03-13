@@ -37,7 +37,7 @@ type BloomseedSidebarBridgeProps = {
   runtimePerf: RuntimePerfPayload | null;
 };
 
-export type ZoomControlsProps = {
+type ZoomControlsProps = {
   zoom: number;
   minZoom: number;
   maxZoom: number;
