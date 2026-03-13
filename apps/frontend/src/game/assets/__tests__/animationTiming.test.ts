@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   registerBloomseedAnimations,
   registerDonargOfficeAnimations,
+  registerPreloadAnimations,
 } from "../animation";
 import {
   BLOOMSEED_ANIMATIONS_JSON_KEY,
@@ -45,6 +46,29 @@ function createTimingManifest(durationsMs: unknown) {
         sourceFile: "aseprite/characters/hero.aseprite",
       },
     },
+  };
+}
+
+function createAnimationDefinition(
+  atlasKey: string,
+  sourceFile: string,
+  category: string,
+  frames: string[],
+  durationsMs: number[],
+  options: { paletteVariant?: string | null } = {},
+) {
+  return {
+    atlasKey,
+    frames,
+    durationsMs,
+    phaseDurationsMs: durationsMs,
+    category,
+    frameCount: frames.length,
+    frameSize: { w: 16, h: 16 },
+    sourceFile,
+    ...(options.paletteVariant !== undefined
+      ? { paletteVariant: options.paletteVariant }
+      : {}),
   };
 }
 
@@ -175,6 +199,64 @@ describe("registerBloomseedAnimations timing", () => {
           { key: "donarg.office.characters", frame: "walk-right#0", duration: 100 },
           { key: "donarg.office.characters", frame: "walk-right#1", duration: 100 },
         ],
+      }),
+    );
+  });
+
+  test("registers Bloomseed and Donarg office character animations during preload", () => {
+    const { scene, create } = createScene({
+      [BLOOMSEED_ANIMATIONS_JSON_KEY]: {
+        namespace: "bloomseed",
+        animations: {
+          "characters.bloomseed.player.female.walk-down": createAnimationDefinition(
+            "bloomseed.characters",
+            "aseprite/characters/player-female.aseprite",
+            "characters",
+            ["walk-down#0", "walk-down#1"],
+            [80, 120],
+          ),
+        },
+      },
+      [DONARG_OFFICE_ANIMATIONS_JSON_KEY]: {
+        namespace: "donarg.office",
+        animations: {
+          "characters.palette-0.office-worker.walk-right": createAnimationDefinition(
+            "donarg.office.characters",
+            "aseprite/characters/office-worker.aseprite",
+            "characters",
+            ["walk-right#0", "walk-right#1"],
+            [100, 100],
+            { paletteVariant: "palette-0" },
+          ),
+          "environment.floors.pattern-01": createAnimationDefinition(
+            "donarg.office.environment",
+            "aseprite/environment/floors.aseprite",
+            "environment",
+            ["pattern-01#0"],
+            [100],
+          ),
+        },
+      },
+    });
+
+    const registration = registerPreloadAnimations(scene as never);
+
+    expect(create).toHaveBeenCalledTimes(2);
+    expect(registration).toEqual({
+      bloomseedAnimationKeys: [
+        "characters.bloomseed.player.female.walk-down",
+      ],
+      donargOfficeCharacterAnimationKeys: [
+        "characters.palette-0.office-worker.walk-right",
+      ],
+      animationKeys: [
+        "characters.bloomseed.player.female.walk-down",
+        "characters.palette-0.office-worker.walk-right",
+      ],
+    });
+    expect(create).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        key: "environment.floors.pattern-01",
       }),
     );
   });
