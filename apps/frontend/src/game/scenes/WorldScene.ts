@@ -21,6 +21,9 @@ import {
   type RuntimePerfPayload,
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
+  ZOOM_CHANGED_EVENT,
+  SET_ZOOM_EVENT,
+  type SetZoomPayload,
 } from "../events";
 import {
   TERRAIN_CELL_WORLD_SIZE,
@@ -253,6 +256,12 @@ export class WorldScene extends Phaser.Scene {
 
     this.createSelectionBadge();
     this.createTerrainBrushPreview();
+
+    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+      zoom: this.cameras.main.zoom,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
   }
 
   public override update(_time: number, delta: number): void {
@@ -571,7 +580,22 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
     cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
+    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+      zoom: cam.zoom,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
+  }
+
+  private onSetZoom(payload: SetZoomPayload): void {
+    const cam = this.cameras.main;
+    cam.setZoom(Phaser.Math.Clamp(payload.zoom, MIN_ZOOM, MAX_ZOOM));
+    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+      zoom: cam.zoom,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
   }
 
   private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {
@@ -749,6 +773,7 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.game.events.on(SET_ZOOM_EVENT, this.onSetZoom, this);
     this.events.once("shutdown", this.handleShutdown, this);
   }
 
@@ -756,6 +781,7 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.game.events.off(SET_ZOOM_EVENT, this.onSetZoom, this);
     this.input.off("pointerdown", this.onPointerDown, this);
     this.input.off("pointermove", this.onPointerMove, this);
     this.input.off("pointerup", this.onPointerUp, this);

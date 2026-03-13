@@ -9,6 +9,9 @@ import {
   RUNTIME_PERF_EVENT,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
+  ZOOM_CHANGED_EVENT,
+  SET_ZOOM_EVENT,
+  type ZoomChangedPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
   type RuntimePerfPayload,
@@ -39,12 +42,21 @@ type BottomToolbarBridgeProps = {
   onToggleLayoutMode: () => void;
 };
 
+type ZoomControlsProps = {
+  zoom: number;
+  minZoom: number;
+  maxZoom: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+};
+
 type BloomseedUiBridge = {
   gameRootRef: MutableRefObject<HTMLDivElement | null>;
   onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
   bottomToolbarProps: BottomToolbarBridgeProps;
+  zoomProps: ZoomControlsProps | null;
 };
 
 function emitPlaceDrop(
@@ -78,6 +90,7 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
   const [isLayoutMode, setIsLayoutMode] = useState(false);
+  const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
 
   useEffect(() => {
     const container = gameRootRef.current;
@@ -99,13 +112,19 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
       setRuntimePerf(payload);
     }
 
+    function handleZoomChanged(payload: ZoomChangedPayload): void {
+      setZoomState(payload);
+    }
+
     game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
     game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
     game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
+    game.events.on(ZOOM_CHANGED_EVENT, handleZoomChanged);
 
     return () => {
       game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
       game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
+      game.events.off(ZOOM_CHANGED_EVENT, handleZoomChanged);
       game.destroy(true);
       gameRef.current = null;
       setCatalog(null);
@@ -113,6 +132,7 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
       setInspectedTile(null);
       setRuntimePerf(null);
       setActiveTerrainTool(null);
+      setZoomState(null);
     };
   }, []);
 
@@ -162,6 +182,16 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     setIsLayoutMode((prev) => !prev);
   }, []);
 
+  const onZoomIn = useCallback(() => {
+    if (!zoomState) return;
+    gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 1.1 });
+  }, [zoomState]);
+
+  const onZoomOut = useCallback(() => {
+    if (!zoomState) return;
+    gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 0.9 });
+  }, [zoomState]);
+
   return {
     gameRootRef,
     onGameRootDragOver,
@@ -182,5 +212,14 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
       isLayoutMode,
       onToggleLayoutMode,
     },
+    zoomProps: zoomState
+      ? {
+          zoom: zoomState.zoom,
+          minZoom: zoomState.minZoom,
+          maxZoom: zoomState.maxZoom,
+          onZoomIn,
+          onZoomOut,
+        }
+      : null,
   };
 }
