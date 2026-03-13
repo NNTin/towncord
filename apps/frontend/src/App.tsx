@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OfficeEditorDrawer } from "./components/OfficeEditorDrawer";
 import { BottomToolbar, type OfficeLayoutTool } from "./components/BottomToolbar";
 import { SidebarAccordion } from "./components/SidebarAccordion";
@@ -13,11 +13,21 @@ function App(): JSX.Element {
     onGameRootDrop,
     sidebarProps,
     zoomProps,
+    emitOfficeEditorTool,
   } = useBloomseedUiBridge();
   const officeEditor = useOfficeLayoutEditor();
   const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
   const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
   const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
+
+  // Sync tool state to the Phaser scene whenever it changes
+  useEffect(() => {
+    emitOfficeEditorTool({
+      tool: activeTool,
+      tileColor: activeTileColor,
+      furnitureId: activeFurnitureId,
+    });
+  }, [activeTool, activeTileColor, activeFurnitureId, emitOfficeEditorTool]);
 
   return (
     <main className="app">

@@ -3,6 +3,7 @@ import type { DragEvent, MutableRefObject } from "react";
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
+  OFFICE_SET_EDITOR_TOOL_EVENT,
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
@@ -11,6 +12,7 @@ import {
   TERRAIN_TILE_INSPECTED_EVENT,
   ZOOM_CHANGED_EVENT,
   SET_ZOOM_EVENT,
+  type OfficeSetEditorToolPayload,
   type ZoomChangedPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
@@ -51,6 +53,7 @@ type BloomseedUiBridge = {
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
   zoomProps: ZoomControlsProps | null;
+  emitOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
 };
 
 function emitPlaceDrop(
@@ -181,10 +184,15 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 0.9 });
   }, [zoomState]);
 
+  const emitOfficeEditorTool = useCallback((payload: OfficeSetEditorToolPayload) => {
+    gameRef.current?.events.emit(OFFICE_SET_EDITOR_TOOL_EVENT, payload);
+  }, []);
+
   return {
     gameRootRef,
     onGameRootDragOver,
     onGameRootDrop,
+    emitOfficeEditorTool,
     sidebarProps:
       catalog && placeables
         ? {
