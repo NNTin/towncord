@@ -11,6 +11,12 @@ export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
 export const RUNTIME_PERF_EVENT = "runtimePerf";
 
+export const ZOOM_CHANGED_EVENT = "zoomChanged";
+export const SET_ZOOM_EVENT = "setZoom";
+
+export type ZoomChangedPayload = { zoom: number; minZoom: number; maxZoom: number };
+export type SetZoomPayload = { zoom: number };
+
 export type PlaceEntityDragPayload = {
   type: "entity";
   entityId: EntityId;
