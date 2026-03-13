@@ -4,12 +4,16 @@ import {
   BLOOMSEED_READY_EVENT,
   composeBloomseedBootstrap,
 } from "../application/gameComposition";
-import { registerBloomseedAnimations } from "../assets/animation";
-import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import {
   createOfficeSceneBootstrap,
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
 } from "./office/bootstrap";
+import { registerPreloadAnimations } from "../assets/animation";
+import {
+  preloadBloomseedPack,
+  preloadDebugPack,
+  preloadDonargOfficePack,
+} from "../assets/preload";
 import { PRELOAD_SCENE_KEY } from "./BootScene";
 import { OFFICE_SCENE_KEY } from "./OfficeScene";
 import { WORLD_SCENE_KEY } from "./WorldScene";
@@ -22,11 +26,12 @@ export class PreloadScene extends Phaser.Scene {
   public preload(): void {
     preloadBloomseedPack(this);
     preloadDebugPack(this);
+    preloadDonargOfficePack(this);
   }
 
   public create(): void {
-    const animationKeys = registerBloomseedAnimations(this);
-    const bootstrap = composeBloomseedBootstrap(animationKeys);
+    const { bloomseedAnimationKeys } = registerPreloadAnimations(this);
+    const bootstrap = composeBloomseedBootstrap(bloomseedAnimationKeys);
     this.registry.set(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
     this.registry.set(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY, createOfficeSceneBootstrap());
     this.game.events.emit(BLOOMSEED_READY_EVENT, bootstrap.ui);
