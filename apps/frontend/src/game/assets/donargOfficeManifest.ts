@@ -3,9 +3,9 @@ import type {
   PublicAnimationManifest,
 } from "@towncord/public-animation-contracts";
 
-export type DonargOfficeAnimationDirection = "up" | "down" | "side" | "right";
+type DonargOfficeAnimationDirection = "up" | "down" | "side" | "right";
 
-export type DonargOfficeCharacterAnimation = {
+type DonargOfficeCharacterAnimation = {
   animationId: string;
   atlasKey: string;
   palette: string;
@@ -38,7 +38,7 @@ export function listDonargOfficeCharacterAnimations(
   return animations.sort((left, right) => left.animationId.localeCompare(right.animationId));
 }
 
-export function normalizeDonargOfficeCharacterAnimation(
+function normalizeDonargOfficeCharacterAnimation(
   animationId: string,
   definition: PublicAnimationDefinition,
 ): DonargOfficeCharacterAnimation | null {

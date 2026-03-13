@@ -35,7 +35,7 @@ type MobCatalogDescriptor = {
   visualPath: string;
 };
 
-export type OfficeCharacterDescriptor = {
+type OfficeCharacterDescriptor = {
   palette: string;
   characterId: string;
   visualPath: string;

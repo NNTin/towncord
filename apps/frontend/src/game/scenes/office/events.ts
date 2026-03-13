@@ -32,7 +32,7 @@ export type OfficeSelectionChangedPayload = {
   target: OfficeSceneHoverTarget;
 };
 
-export type OfficeCameraChangedPayload = {
+type OfficeCameraChangedPayload = {
   zoom: number;
   scrollX: number;
   scrollY: number;

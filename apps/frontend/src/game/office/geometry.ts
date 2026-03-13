@@ -14,7 +14,7 @@ import type {
 
 const FULL_TILE_SPAN = 1;
 
-export type OfficeRect = {
+type OfficeRect = {
   x: number;
   y: number;
   width: number;
@@ -62,7 +62,7 @@ export function getFurnitureFloorSize(furniture: OfficeFurnitureInstance): Offic
   return { x: footprint.width, y: footprint.height };
 }
 
-export function getFurnitureSurfaceSize(furniture: OfficeFurnitureInstance): OfficePoint | null {
+function getFurnitureSurfaceSize(furniture: OfficeFurnitureInstance): OfficePoint | null {
   const footprint = furniture.geometry.surface;
   if (!footprint) return null;
 
@@ -109,7 +109,7 @@ export function getSurfacePlacementRect(furniture: OfficeFurnitureInstance): Off
   };
 }
 
-export function getAnchorTile(anchor: OfficeFurnitureAnchor): OfficeGridPosition | null {
+function getAnchorTile(anchor: OfficeFurnitureAnchor): OfficeGridPosition | null {
   switch (anchor.kind) {
     case "floor":
     case "wall":
