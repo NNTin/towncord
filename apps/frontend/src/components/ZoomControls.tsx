@@ -41,7 +41,7 @@ export function ZoomControls({
       style={{
         position: "absolute",
         top: 8,
-        left: 8,
+        right: 8,
         zIndex: "var(--pixel-controls-z)" as unknown as number,
         display: "flex",
         flexDirection: "column",

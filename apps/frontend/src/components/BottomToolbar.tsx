@@ -8,7 +8,7 @@ type BottomToolbarProps = {
 const panelStyle: React.CSSProperties = {
   position: "absolute",
   bottom: 10,
-  left: 10,
+  right: 10,
   zIndex: "var(--pixel-controls-z)" as unknown as number,
   display: "flex",
   alignItems: "center",
