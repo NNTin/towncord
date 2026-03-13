@@ -1,52 +1,33 @@
 import Phaser from "phaser";
-import {
-  OFFICE_TILE_TYPE,
-  type OfficeFloorColor,
-  type OfficeTileType,
-} from "../../office";
+import type { OfficeSceneTileKind } from "./bootstrap";
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value));
-}
+const FLOOR_HUE = 0.48;
+const FLOOR_SATURATION = 0.55;
+const FLOOR_LIGHTNESS = 0.19;
+const WALL_HUE = 0.61;
+const WALL_SATURATION = 0.24;
+const WALL_LIGHTNESS = 0.29;
 
-function toHex(color: Phaser.Display.Color): number {
-  return Number.parseInt(color.rgba.slice(1, 7), 16);
-}
-
-export function resolveOfficeTileFill(
-  tile: OfficeTileType,
-  tint?: OfficeFloorColor | null,
-): number {
-  if (tile === OFFICE_TILE_TYPE.VOID) {
-    return 0x0f172a;
+export function resolveOfficeTileFill(kind: OfficeSceneTileKind, tint?: number): number {
+  if (typeof tint === "number") {
+    return tint;
   }
 
-  if (tile === OFFICE_TILE_TYPE.WALL) {
-    return 0x475569;
+  if (kind === "floor") {
+    return Phaser.Display.Color.HSLToColor(
+      FLOOR_HUE,
+      FLOOR_SATURATION,
+      FLOOR_LIGHTNESS,
+    ).color;
   }
 
-  if (tint) {
-    const hue = clamp(tint.h / 360, 0, 1);
-    const saturation = clamp(tint.s / 100, 0, 1);
-    const lightness = clamp(0.52 + tint.b / 200, 0.12, 0.88);
-    return toHex(Phaser.Display.Color.HSLToColor(hue, saturation, lightness));
+  if (kind === "wall") {
+    return Phaser.Display.Color.HSLToColor(
+      WALL_HUE,
+      WALL_SATURATION,
+      WALL_LIGHTNESS,
+    ).color;
   }
 
-  switch (tile) {
-    case OFFICE_TILE_TYPE.FLOOR_2:
-      return 0x8db9c7;
-    case OFFICE_TILE_TYPE.FLOOR_3:
-      return 0x7c9a56;
-    case OFFICE_TILE_TYPE.FLOOR_4:
-      return 0x9b7a59;
-    case OFFICE_TILE_TYPE.FLOOR_5:
-      return 0x705d8f;
-    case OFFICE_TILE_TYPE.FLOOR_6:
-      return 0xb59f5a;
-    case OFFICE_TILE_TYPE.FLOOR_7:
-      return 0x7b4f8a;
-    case OFFICE_TILE_TYPE.FLOOR_1:
-    default:
-      return 0xc7ae7a;
-  }
+  return 0x020617;
 }

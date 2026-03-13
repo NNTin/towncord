@@ -1,579 +1,707 @@
 import {
-  DEFAULT_OFFICE_FLOOR_COLOR,
-  OFFICE_LAYOUT_VERSION,
-  OFFICE_TILE_TYPE,
-  type ExpandDirection,
-  type OfficeCatalog,
-  type OfficeCharacterDirection,
-  type OfficeCharacterPose,
-  type OfficeColorAdjustment,
+  OFFICE_LAYOUT_DOCUMENT_VERSION,
+  type OfficeCharacterId,
+  type OfficeFurnitureAnchor,
+  type OfficeFurnitureId,
   type OfficeFurnitureInstance,
+  type OfficeGridExpansion,
+  type OfficeGridPosition,
+  type OfficeLayoutAction,
+  type OfficeLayoutCreateInput,
   type OfficeLayoutDocument,
   type OfficePlacedCharacter,
-  type OfficePlacedFurniture,
-  getOfficeCharacters,
-  getOfficeTileIndex,
-  isOfficeTileInBounds,
+  type OfficeTile,
+  type OfficeTileColor,
 } from "./model";
 import {
-  getOfficeFurnitureEntry,
-  getRotatedOfficeFurnitureType,
-  getToggledOfficeFurnitureType,
-} from "./catalog";
+  getFurnitureFloorSize,
+  getFurnitureFloorTiles,
+  getFurnitureSurfaceRect,
+  getSurfacePlacementRect,
+  getWallInterval,
+  rectContainsRect,
+  rectsOverlap,
+  rotateOfficeRotation,
+  toOfficeTileKey,
+} from "./geometry";
 
-function cloneTileColors(
-  layout: OfficeLayoutDocument,
-): Array<OfficeColorAdjustment | null> {
-  return [...(layout.tileColors ?? Array.from({ length: layout.tiles.length }, () => null))];
-}
+type OfficeErrorCode =
+  | "character-not-found"
+  | "character-position-blocked"
+  | "character-position-out-of-bounds"
+  | "duplicate-character"
+  | "duplicate-furniture"
+  | "furniture-anchor-invalid"
+  | "furniture-not-found"
+  | "furniture-placement-blocked"
+  | "furniture-position-out-of-bounds"
+  | "grid-expansion-invalid"
+  | "parent-furniture-not-found"
+  | "surface-not-found"
+  | "surface-placement-blocked"
+  | "tile-out-of-bounds";
 
-function normalizeColorForTile(
-  tileType: number,
-  color: OfficeColorAdjustment | null | undefined,
-): OfficeColorAdjustment | null {
-  if (tileType === OFFICE_TILE_TYPE.WALL || tileType === OFFICE_TILE_TYPE.VOID) {
-    return null;
+type OfficeLayoutError = {
+  code: OfficeErrorCode;
+  message: string;
+};
+
+type OfficeLayoutResult<T> =
+  | {
+      ok: true;
+      value: T;
+    }
+  | {
+      ok: false;
+      error: OfficeLayoutError;
+    };
+
+const DEFAULT_TILE_COLOR: OfficeTileColor = "neutral";
+const DEFAULT_TOGGLE_ID = "active";
+
+export function createOfficeLayoutDocument(input: OfficeLayoutCreateInput): OfficeLayoutDocument {
+  const defaultTileColor = input.defaultTileColor ?? DEFAULT_TILE_COLOR;
+  const tiles: OfficeLayoutDocument["grid"]["tiles"] = {};
+
+  for (let y = 0; y < input.rows; y += 1) {
+    for (let x = 0; x < input.columns; x += 1) {
+      const key = toOfficeTileKey(x, y);
+      tiles[key] = {
+        position: { x, y },
+        color: defaultTileColor,
+      };
+    }
   }
-  return color ? { ...color } : { ...DEFAULT_OFFICE_FLOOR_COLOR };
-}
 
-function withCharacters(
-  layout: OfficeLayoutDocument,
-  characters: OfficePlacedCharacter[],
-): OfficeLayoutDocument {
   return {
-    ...layout,
-    ...(characters.length > 0 ? { characters } : { characters: [] }),
+    version: OFFICE_LAYOUT_DOCUMENT_VERSION,
+    grid: {
+      columns: input.columns,
+      rows: input.rows,
+      defaultTileColor,
+      tiles,
+    },
+    furniture: {},
+    characters: {},
   };
 }
 
-export function paintOfficeTile(
+export function applyOfficeLayoutAction(
   layout: OfficeLayoutDocument,
-  col: number,
-  row: number,
-  tileType: number,
-  color?: OfficeColorAdjustment | null,
-): OfficeLayoutDocument {
-  if (!isOfficeTileInBounds(layout, col, row)) return layout;
+  action: OfficeLayoutAction,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  switch (action.type) {
+    case "paintTile":
+      return paintOfficeTile(layout, action.position, action.color);
+    case "eraseTile":
+      return eraseOfficeTile(layout, action.position);
+    case "placeFurniture":
+      return placeOfficeFurniture(layout, action.furniture);
+    case "moveFurniture":
+      return moveOfficeFurniture(layout, action.furnitureId, action.anchor);
+    case "rotateFurniture":
+      return rotateOfficeFurniture(layout, action.furnitureId, action.direction);
+    case "toggleFurnitureState":
+      return toggleOfficeFurnitureState(layout, action.furnitureId, action.stateId);
+    case "removeFurniture":
+      return removeOfficeFurniture(layout, action.furnitureId);
+    case "placeCharacter":
+      return placeOfficeCharacter(layout, action.character);
+    case "moveCharacter":
+      return moveOfficeCharacter(layout, action.characterId, action.position);
+    case "removeCharacter":
+      return removeOfficeCharacter(layout, action.characterId);
+    case "expandGrid":
+      return expandOfficeLayout(layout, action.expansion);
+  }
+}
 
-  const index = getOfficeTileIndex(layout, col, row);
-  const tileColors = cloneTileColors(layout);
-  const nextColor = normalizeColorForTile(tileType, color);
-  const currentColor = tileColors[index];
-
-  const colorChanged =
-    currentColor?.h !== nextColor?.h ||
-    currentColor?.s !== nextColor?.s ||
-    currentColor?.b !== nextColor?.b ||
-    currentColor?.c !== nextColor?.c ||
-    currentColor?.colorize !== nextColor?.colorize;
-
-  if (layout.tiles[index] === tileType && !colorChanged) {
-    return layout;
+function paintOfficeTile(
+  layout: OfficeLayoutDocument,
+  position: OfficeGridPosition,
+  color: OfficeTileColor,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const tile = getTile(layout, position);
+  if (!tile) {
+    return failure("tile-out-of-bounds", "Tile is outside the office grid.");
   }
 
-  const tiles = [...layout.tiles];
-  tiles[index] = tileType as OfficeLayoutDocument["tiles"][number];
-  tileColors[index] = nextColor;
+  if (tile.color === color) {
+    return success(layout);
+  }
 
-  return {
-    ...layout,
-    tiles,
-    tileColors,
+  const nextTile: OfficeTile = {
+    ...tile,
+    color,
   };
-}
 
-export function eraseOfficeTile(
-  layout: OfficeLayoutDocument,
-  col: number,
-  row: number,
-): OfficeLayoutDocument {
-  return paintOfficeTile(layout, col, row, OFFICE_TILE_TYPE.VOID, null);
-}
-
-export function removeOfficeFurniture(
-  layout: OfficeLayoutDocument,
-  uid: string,
-): OfficeLayoutDocument {
-  const nextFurniture = layout.furniture.filter((item) => item.uid !== uid);
-  if (nextFurniture.length === layout.furniture.length) return layout;
-
-  return {
+  return success({
     ...layout,
-    furniture: nextFurniture,
-  };
+    grid: {
+      ...layout.grid,
+      tiles: {
+        ...layout.grid.tiles,
+        [toOfficeTileKey(position.x, position.y)]: nextTile,
+      },
+    },
+  });
 }
 
-export function getWallPlacementRow(
-  catalog: OfficeCatalog,
-  type: string,
-  row: number,
-): number {
-  const entry = getOfficeFurnitureEntry(catalog, type);
-  if (!entry?.canPlaceOnWalls) return row;
-  return row - (entry.footprintH - 1);
-}
-
-export function getFurnitureBlockedTiles(
+function eraseOfficeTile(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  excludeUid?: string,
-): Set<string> {
-  const blocked = new Set<string>();
-
-  for (const item of layout.furniture) {
-    if (item.uid === excludeUid) continue;
-    const entry = getOfficeFurnitureEntry(catalog, item.type);
-    if (!entry) continue;
-
-    for (let rowOffset = entry.backgroundTiles; rowOffset < entry.footprintH; rowOffset += 1) {
-      const row = item.row + rowOffset;
-      if (row < 0) continue;
-      for (let colOffset = 0; colOffset < entry.footprintW; colOffset += 1) {
-        blocked.add(`${item.col + colOffset},${row}`);
-      }
-    }
-  }
-
-  return blocked;
+  position: OfficeGridPosition,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  return paintOfficeTile(layout, position, layout.grid.defaultTileColor);
 }
 
-export function getCharacterOccupiedTiles(
+function expandOfficeLayout(
   layout: OfficeLayoutDocument,
-  excludeUid?: string,
-): Set<string> {
-  const occupied = new Set<string>();
-  for (const character of getOfficeCharacters(layout)) {
-    if (character.uid === excludeUid) continue;
-    occupied.add(`${character.col},${character.row}`);
-  }
-  return occupied;
-}
+  expansion: OfficeGridExpansion,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const top = expansion.top ?? 0;
+  const right = expansion.right ?? 0;
+  const bottom = expansion.bottom ?? 0;
+  const left = expansion.left ?? 0;
 
-export function getPlacementBlockedTiles(
-  layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  excludeFurnitureUid?: string,
-): Set<string> {
-  const blocked = getFurnitureBlockedTiles(layout, catalog, excludeFurnitureUid);
-  for (const key of getCharacterOccupiedTiles(layout)) {
-    blocked.add(key);
-  }
-  return blocked;
-}
-
-function isWallPlacementValid(
-  layout: OfficeLayoutDocument,
-  col: number,
-  row: number,
-  footprintW: number,
-  footprintH: number,
-): boolean {
-  const bottomRow = row + footprintH - 1;
-  if (col < 0 || col + footprintW > layout.cols || bottomRow < 0 || bottomRow >= layout.rows) {
-    return false;
+  if ([top, right, bottom, left].some((value) => value < 0 || !Number.isInteger(value))) {
+    return failure("grid-expansion-invalid", "Grid expansion must use non-negative integers.");
   }
 
-  for (let rowOffset = 0; rowOffset < footprintH; rowOffset += 1) {
-    const currentRow = row + rowOffset;
-    if (currentRow < 0) continue;
-    const isBottomFootprintRow = rowOffset === footprintH - 1;
+  const nextColumns = layout.grid.columns + left + right;
+  const nextRows = layout.grid.rows + top + bottom;
+  const fillColor = expansion.fillColor ?? layout.grid.defaultTileColor;
 
-    for (let colOffset = 0; colOffset < footprintW; colOffset += 1) {
-      const index = getOfficeTileIndex(layout, col + colOffset, currentRow);
-      const tile = layout.tiles[index];
+  const expanded = createOfficeLayoutDocument({
+    columns: nextColumns,
+    rows: nextRows,
+    defaultTileColor: layout.grid.defaultTileColor,
+  });
 
-      if (!isBottomFootprintRow) {
-        continue;
-      }
-
-      if (tile === OFFICE_TILE_TYPE.WALL) {
-        continue;
-      }
-
-      const belowRow = currentRow + 1;
-      if (belowRow >= layout.rows) return false;
-      const belowIndex = getOfficeTileIndex(layout, col + colOffset, belowRow);
-      if (layout.tiles[belowIndex] !== OFFICE_TILE_TYPE.WALL) {
-        return false;
-      }
-    }
+  for (const tile of Object.values(expanded.grid.tiles)) {
+    tile.color = fillColor;
   }
 
-  return true;
-}
-
-export function canPlaceOfficeFurniture(
-  layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  type: string,
-  col: number,
-  row: number,
-  excludeUid?: string,
-): boolean {
-  const entry = getOfficeFurnitureEntry(catalog, type);
-  if (!entry) return false;
-
-  if (entry.canPlaceOnWalls) {
-    if (!isWallPlacementValid(layout, col, row, entry.footprintW, entry.footprintH)) {
-      return false;
-    }
-  } else if (
-    col < 0 ||
-    row < 0 ||
-    col + entry.footprintW > layout.cols ||
-    row + entry.footprintH > layout.rows
-  ) {
-    return false;
+  for (const tile of Object.values(layout.grid.tiles)) {
+    expanded.grid.tiles[toOfficeTileKey(tile.position.x + left, tile.position.y + top)] = {
+      position: {
+        x: tile.position.x + left,
+        y: tile.position.y + top,
+      },
+      color: tile.color,
+    };
   }
 
-  const blockedTiles = getPlacementBlockedTiles(layout, catalog, excludeUid);
-  let deskTiles: Set<string> | null = null;
+  const furniture = Object.fromEntries(
+    Object.values(layout.furniture).map((item) => [item.id, translateFurniture(item, left, top)]),
+  ) as OfficeLayoutDocument["furniture"];
 
-  if (entry.canPlaceOnSurfaces) {
-    deskTiles = new Set<string>();
-    for (const item of layout.furniture) {
-      if (item.uid === excludeUid) continue;
-      const furnitureEntry = getOfficeFurnitureEntry(catalog, item.type);
-      if (!furnitureEntry?.isDesk) continue;
+  const characters = Object.fromEntries(
+    Object.values(layout.characters).map((character) => [
+      character.id,
+      {
+        ...character,
+        position: {
+          x: character.position.x + left,
+          y: character.position.y + top,
+        },
+      },
+    ]),
+  ) as OfficeLayoutDocument["characters"];
 
-      for (let rowOffset = 0; rowOffset < furnitureEntry.footprintH; rowOffset += 1) {
-        for (let colOffset = 0; colOffset < furnitureEntry.footprintW; colOffset += 1) {
-          deskTiles.add(`${item.col + colOffset},${item.row + rowOffset}`);
-        }
-      }
-    }
-  }
-
-  for (let rowOffset = 0; rowOffset < entry.footprintH; rowOffset += 1) {
-    const currentRow = row + rowOffset;
-    if (currentRow < 0) continue;
-    if (rowOffset < entry.backgroundTiles) continue;
-
-    const ignoreTileValidity = entry.canPlaceOnWalls && rowOffset < entry.footprintH - 1;
-
-    for (let colOffset = 0; colOffset < entry.footprintW; colOffset += 1) {
-      const currentCol = col + colOffset;
-      const tileKey = `${currentCol},${currentRow}`;
-
-      if (entry.canPlaceOnSurfaces && !deskTiles?.has(tileKey)) {
-        return false;
-      }
-
-      if (!ignoreTileValidity) {
-        const index = getOfficeTileIndex(layout, currentCol, currentRow);
-        const tile = layout.tiles[index];
-        if (!entry.canPlaceOnWalls) {
-          if (tile === OFFICE_TILE_TYPE.VOID) return false;
-          if (tile === OFFICE_TILE_TYPE.WALL) return false;
-        }
-      }
-
-      if (blockedTiles.has(tileKey) && !(deskTiles?.has(tileKey))) {
-        return false;
-      }
-    }
-  }
-
-  return true;
+  return success({
+    ...expanded,
+    furniture,
+    characters,
+  });
 }
 
 export function placeOfficeFurniture(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  furniture: OfficePlacedFurniture,
-): OfficeLayoutDocument {
-  if (
-    !canPlaceOfficeFurniture(
-      layout,
-      catalog,
-      furniture.type,
-      furniture.col,
-      furniture.row,
-      undefined,
-    )
-  ) {
-    return layout;
+  furniture: OfficeFurnitureInstance,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (layout.furniture[furniture.id]) {
+    return failure("duplicate-furniture", `Furniture "${furniture.id}" already exists.`);
   }
 
-  return {
+  const validation = validateFurniturePlacement(layout, furniture);
+  if (!validation.ok) {
+    return validation;
+  }
+
+  return success({
     ...layout,
-    furniture: [...layout.furniture, furniture],
-  };
+    furniture: {
+      ...layout.furniture,
+      [furniture.id]: furniture,
+    },
+  });
 }
 
-export function moveOfficeFurniture(
+function moveOfficeFurniture(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  uid: string,
-  col: number,
-  row: number,
-): OfficeLayoutDocument {
-  const item = layout.furniture.find((candidate) => candidate.uid === uid);
-  if (!item) return layout;
-  if (!canPlaceOfficeFurniture(layout, catalog, item.type, col, row, uid)) {
-    return layout;
+  furnitureId: OfficeFurnitureId,
+  anchor: OfficeFurnitureAnchor,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const current = layout.furniture[furnitureId];
+  if (!current) {
+    return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
   }
 
-  return {
-    ...layout,
-    furniture: layout.furniture.map((candidate) =>
-      candidate.uid === uid ? { ...candidate, col, row } : candidate,
-    ),
+  const candidate: OfficeFurnitureInstance = {
+    ...current,
+    anchor,
   };
+
+  const validation = validateFurniturePlacement(layout, candidate, furnitureId);
+  if (!validation.ok) {
+    return validation;
+  }
+
+  return success({
+    ...layout,
+    furniture: {
+      ...layout.furniture,
+      [furnitureId]: candidate,
+    },
+  });
 }
 
-export function rotateOfficeFurniture(
+function rotateOfficeFurniture(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  uid: string,
-  direction: "cw" | "ccw",
-): OfficeLayoutDocument {
-  const item = layout.furniture.find((candidate) => candidate.uid === uid);
-  if (!item) return layout;
-
-  const nextType = getRotatedOfficeFurnitureType(catalog, item.type, direction);
-  if (!nextType) return layout;
-  if (!canPlaceOfficeFurniture(layout, catalog, nextType, item.col, item.row, uid)) {
-    return layout;
+  furnitureId: OfficeFurnitureId,
+  direction: "clockwise" | "counterclockwise" = "clockwise",
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const current = layout.furniture[furnitureId];
+  if (!current) {
+    return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
   }
 
-  return {
-    ...layout,
-    furniture: layout.furniture.map((candidate) =>
-      candidate.uid === uid ? { ...candidate, type: nextType } : candidate,
-    ),
+  const candidate: OfficeFurnitureInstance = {
+    ...current,
+    rotation: rotateOfficeRotation(current.rotation, direction),
   };
+
+  const validation = validateFurniturePlacement(layout, candidate, furnitureId);
+  if (!validation.ok) {
+    return validation;
+  }
+
+  return success({
+    ...layout,
+    furniture: {
+      ...layout.furniture,
+      [furnitureId]: candidate,
+    },
+  });
 }
 
-export function toggleOfficeFurnitureState(
+function toggleOfficeFurnitureState(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  uid: string,
-): OfficeLayoutDocument {
-  const item = layout.furniture.find((candidate) => candidate.uid === uid);
-  if (!item) return layout;
-
-  const nextType = getToggledOfficeFurnitureType(catalog, item.type);
-  if (!nextType) return layout;
-  if (!canPlaceOfficeFurniture(layout, catalog, nextType, item.col, item.row, uid)) {
-    return layout;
+  furnitureId: OfficeFurnitureId,
+  stateId = DEFAULT_TOGGLE_ID,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const furniture = layout.furniture[furnitureId];
+  if (!furniture) {
+    return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
   }
 
-  return {
+  const current = furniture.toggles[stateId] ?? false;
+  return success({
     ...layout,
-    furniture: layout.furniture.map((candidate) =>
-      candidate.uid === uid ? { ...candidate, type: nextType } : candidate,
-    ),
-  };
+    furniture: {
+      ...layout.furniture,
+      [furnitureId]: {
+        ...furniture,
+        toggles: {
+          ...furniture.toggles,
+          [stateId]: !current,
+        },
+      },
+    },
+  });
 }
 
-export function canPlaceOfficeCharacter(
+function removeOfficeFurniture(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  col: number,
-  row: number,
-  excludeUid?: string,
-): boolean {
-  if (!isOfficeTileInBounds(layout, col, row)) return false;
-
-  const index = getOfficeTileIndex(layout, col, row);
-  const tile = layout.tiles[index];
-  if (tile === OFFICE_TILE_TYPE.WALL || tile === OFFICE_TILE_TYPE.VOID) {
-    return false;
+  furnitureId: OfficeFurnitureId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (!layout.furniture[furnitureId]) {
+    return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
   }
 
-  const furnitureBlocked = getFurnitureBlockedTiles(layout, catalog);
-  if (furnitureBlocked.has(`${col},${row}`)) {
-    return false;
+  const idsToRemove = collectFurnitureDescendants(layout, furnitureId);
+  const nextFurniture: OfficeLayoutDocument["furniture"] = {};
+
+  for (const furniture of Object.values(layout.furniture)) {
+    if (!idsToRemove.has(furniture.id)) {
+      nextFurniture[furniture.id] = furniture;
+    }
   }
 
-  return !getCharacterOccupiedTiles(layout, excludeUid).has(`${col},${row}`);
+  return success({
+    ...layout,
+    furniture: nextFurniture,
+  });
 }
 
 export function placeOfficeCharacter(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
   character: OfficePlacedCharacter,
-): OfficeLayoutDocument {
-  if (!canPlaceOfficeCharacter(layout, catalog, character.col, character.row)) {
-    return layout;
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (layout.characters[character.id]) {
+    return failure("duplicate-character", `Character "${character.id}" already exists.`);
   }
 
-  return withCharacters(layout, [...getOfficeCharacters(layout), character]);
-}
-
-export function moveOfficeCharacter(
-  layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-  uid: string,
-  col: number,
-  row: number,
-): OfficeLayoutDocument {
-  const characters = [...getOfficeCharacters(layout)];
-  const index = characters.findIndex((candidate) => candidate.uid === uid);
-  if (index < 0) return layout;
-  if (!canPlaceOfficeCharacter(layout, catalog, col, row, uid)) {
-    return layout;
+  const validation = validateCharacterPlacement(layout, character);
+  if (!validation.ok) {
+    return validation;
   }
 
-  characters[index] = {
-    ...characters[index]!,
-    col,
-    row,
-  };
-
-  return withCharacters(layout, characters);
+  return success({
+    ...layout,
+    characters: {
+      ...layout.characters,
+      [character.id]: character,
+    },
+  });
 }
 
-export function removeOfficeCharacter(
+function moveOfficeCharacter(
   layout: OfficeLayoutDocument,
-  uid: string,
-): OfficeLayoutDocument {
-  const nextCharacters = getOfficeCharacters(layout).filter(
-    (character) => character.uid !== uid,
-  );
-  if (nextCharacters.length === getOfficeCharacters(layout).length) return layout;
-  return withCharacters(layout, [...nextCharacters]);
-}
+  characterId: OfficeCharacterId,
+  position: OfficeGridPosition,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  const current = layout.characters[characterId];
+  if (!current) {
+    return failure("character-not-found", `Character "${characterId}" was not found.`);
+  }
 
-export function updateOfficeCharacter(
-  layout: OfficeLayoutDocument,
-  uid: string,
-  patch: Partial<Pick<OfficePlacedCharacter, "paletteVariant" | "pose" | "direction">>,
-): OfficeLayoutDocument {
-  const characters = [...getOfficeCharacters(layout)];
-  const index = characters.findIndex((candidate) => candidate.uid === uid);
-  if (index < 0) return layout;
-
-  const current = characters[index]!;
-  characters[index] = {
+  const candidate: OfficePlacedCharacter = {
     ...current,
-    ...patch,
+    position,
   };
 
-  return withCharacters(layout, characters);
-}
-
-export function expandOfficeLayout(
-  layout: OfficeLayoutDocument,
-  direction: ExpandDirection,
-): {
-  layout: OfficeLayoutDocument;
-  shift: { col: number; row: number };
-} {
-  let cols = layout.cols;
-  let rows = layout.rows;
-  let shiftCol = 0;
-  let shiftRow = 0;
-
-  switch (direction) {
-    case "left":
-      cols += 1;
-      shiftCol = 1;
-      break;
-    case "right":
-      cols += 1;
-      break;
-    case "up":
-      rows += 1;
-      shiftRow = 1;
-      break;
-    case "down":
-      rows += 1;
-      break;
+  const validation = validateCharacterPlacement(layout, candidate, characterId);
+  if (!validation.ok) {
+    return validation;
   }
 
-  const tiles: OfficeLayoutDocument["tiles"] = Array.from(
-    { length: cols * rows },
-    () => OFFICE_TILE_TYPE.VOID,
-  ) as OfficeLayoutDocument["tiles"];
-  const tileColors: Array<OfficeColorAdjustment | null> = Array.from(
-    { length: cols * rows },
-    () => null as OfficeColorAdjustment | null,
-  );
-  const existingTileColors = cloneTileColors(layout);
+  return success({
+    ...layout,
+    characters: {
+      ...layout.characters,
+      [characterId]: candidate,
+    },
+  });
+}
 
-  for (let row = 0; row < layout.rows; row += 1) {
-    for (let col = 0; col < layout.cols; col += 1) {
-      const sourceIndex = getOfficeTileIndex(layout, col, row);
-      const targetIndex = (row + shiftRow) * cols + (col + shiftCol);
-      tiles[targetIndex] = layout.tiles[sourceIndex]!;
-      tileColors[targetIndex] = existingTileColors[sourceIndex]!;
+function removeOfficeCharacter(
+  layout: OfficeLayoutDocument,
+  characterId: OfficeCharacterId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (!layout.characters[characterId]) {
+    return failure("character-not-found", `Character "${characterId}" was not found.`);
+  }
+
+  const nextCharacters = { ...layout.characters };
+  delete nextCharacters[characterId];
+
+  return success({
+    ...layout,
+    characters: nextCharacters,
+  });
+}
+
+function validateFurniturePlacement(
+  layout: OfficeLayoutDocument,
+  furniture: OfficeFurnitureInstance,
+  ignoreFurnitureId?: OfficeFurnitureId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  switch (furniture.anchor.kind) {
+    case "floor":
+      return validateFloorFurniturePlacement(layout, furniture, ignoreFurnitureId);
+    case "wall":
+      return validateWallFurniturePlacement(layout, furniture, ignoreFurnitureId);
+    case "surface":
+      return validateSurfaceFurniturePlacement(layout, furniture, ignoreFurnitureId);
+  }
+}
+
+function validateFloorFurniturePlacement(
+  layout: OfficeLayoutDocument,
+  furniture: OfficeFurnitureInstance,
+  ignoreFurnitureId?: OfficeFurnitureId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (furniture.anchor.kind !== "floor" || !furniture.geometry.floor) {
+    return failure("furniture-anchor-invalid", "Floor placement requires floor geometry.");
+  }
+
+  const anchor = furniture.anchor;
+  const size = getFurnitureFloorSize(furniture);
+  if (!size) {
+    return failure("furniture-anchor-invalid", "Floor placement requires floor geometry.");
+  }
+
+  const origin = anchor.position;
+  const maxX = origin.x + size.x;
+  const maxY = origin.y + size.y;
+  if (origin.x < 0 || origin.y < 0 || maxX > layout.grid.columns || maxY > layout.grid.rows) {
+    return failure("furniture-position-out-of-bounds", "Furniture footprint is outside the office grid.");
+  }
+
+  const candidateTiles = getFurnitureFloorTiles(furniture);
+
+  for (const existing of Object.values(layout.furniture)) {
+    if (existing.id === ignoreFurnitureId || existing.anchor.kind !== "floor") {
+      continue;
+    }
+
+    const overlaps = getFurnitureFloorTiles(existing).some((tile) =>
+      candidateTiles.some((candidateTile) => candidateTile.x === tile.x && candidateTile.y === tile.y),
+    );
+    if (overlaps && (furniture.collision.blocksPlacement || existing.collision.blocksPlacement)) {
+      return failure("furniture-placement-blocked", "Furniture collides with another floor item.");
     }
   }
 
-  return {
-    layout: {
-      version: OFFICE_LAYOUT_VERSION,
-      cols,
-      rows,
-      tiles,
-      tileColors,
-      furniture: layout.furniture.map((item) => ({
-        ...item,
-        col: item.col + shiftCol,
-        row: item.row + shiftRow,
-      })),
-      characters: getOfficeCharacters(layout).map((character) => ({
-        ...character,
-        col: character.col + shiftCol,
-        row: character.row + shiftRow,
-      })),
-    },
-    shift: { col: shiftCol, row: shiftRow },
-  };
+  for (const character of Object.values(layout.characters)) {
+    const occupied = candidateTiles.some(
+      (tile) => tile.x === character.position.x && tile.y === character.position.y,
+    );
+    if (occupied && (furniture.collision.blocksPlacement || character.collision.blocksPlacement)) {
+      return failure("furniture-placement-blocked", "Furniture footprint overlaps a character.");
+    }
+  }
+
+  return success(layout);
 }
 
-export function resolveOfficeFurnitureInstances(
+function validateWallFurniturePlacement(
   layout: OfficeLayoutDocument,
-  catalog: OfficeCatalog,
-): OfficeFurnitureInstance[] {
-  return layout.furniture
-    .map((item) => {
-      const entry = getOfficeFurnitureEntry(catalog, item.type);
-      if (!entry) return null;
-      return {
-        ...item,
-        entry,
-      };
-    })
-    .filter((item): item is OfficeFurnitureInstance => Boolean(item));
+  furniture: OfficeFurnitureInstance,
+  ignoreFurnitureId?: OfficeFurnitureId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (furniture.anchor.kind !== "wall" || !furniture.geometry.wall) {
+    return failure("furniture-anchor-invalid", "Wall placement requires wall geometry.");
+  }
+
+  const anchor = furniture.anchor;
+
+  if (!isInBounds(layout, anchor.position)) {
+    return failure("furniture-position-out-of-bounds", "Wall anchor is outside the office grid.");
+  }
+
+  const candidateInterval = getWallInterval(furniture);
+  if (!candidateInterval) {
+    return failure("furniture-anchor-invalid", "Wall placement requires a valid wall anchor.");
+  }
+
+  for (const existing of Object.values(layout.furniture)) {
+    if (existing.id === ignoreFurnitureId || existing.anchor.kind !== "wall") {
+      continue;
+    }
+
+    if (
+      existing.anchor.position.x !== anchor.position.x ||
+      existing.anchor.position.y !== anchor.position.y ||
+      existing.anchor.wall !== anchor.wall
+    ) {
+      continue;
+    }
+
+    const existingInterval = getWallInterval(existing);
+    if (
+      existingInterval &&
+      intervalsOverlap(candidateInterval, existingInterval) &&
+      (furniture.collision.blocksPlacement || existing.collision.blocksPlacement)
+    ) {
+      return failure("furniture-placement-blocked", "Wall placement overlaps another wall-mounted item.");
+    }
+  }
+
+  return success(layout);
 }
 
-export function createEmptyOfficeLayout(
-  cols: number,
-  rows: number,
-): OfficeLayoutDocument {
+function validateSurfaceFurniturePlacement(
+  layout: OfficeLayoutDocument,
+  furniture: OfficeFurnitureInstance,
+  ignoreFurnitureId?: OfficeFurnitureId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (furniture.anchor.kind !== "surface" || !furniture.geometry.surface) {
+    return failure("furniture-anchor-invalid", "Surface placement requires surface geometry.");
+  }
+
+  const anchor = furniture.anchor;
+  const parent = layout.furniture[anchor.parentFurnitureId];
+  if (!parent) {
+    return failure("parent-furniture-not-found", "Surface placement parent furniture was not found.");
+  }
+
+  const surface = parent.geometry.surfaces?.find((entry) => entry.id === anchor.surfaceId);
+  if (!surface) {
+    return failure("surface-not-found", `Surface "${anchor.surfaceId}" was not found.`);
+  }
+
+  const candidateRect = getSurfacePlacementRect(furniture);
+  if (!candidateRect) {
+    return failure("furniture-anchor-invalid", "Surface placement requires a valid surface anchor.");
+  }
+
+  if (!rectContainsRect(getFurnitureSurfaceRect(parent, surface), candidateRect)) {
+    return failure("surface-placement-blocked", "Furniture does not fit inside the target surface.");
+  }
+
+  for (const existing of Object.values(layout.furniture)) {
+    if (existing.id === ignoreFurnitureId || existing.anchor.kind !== "surface") {
+      continue;
+    }
+
+    if (
+      existing.anchor.parentFurnitureId !== anchor.parentFurnitureId ||
+      existing.anchor.surfaceId !== anchor.surfaceId
+    ) {
+      continue;
+    }
+
+    const existingRect = getSurfacePlacementRect(existing);
+    if (
+      existingRect &&
+      rectsOverlap(candidateRect, existingRect) &&
+      (furniture.collision.blocksPlacement || existing.collision.blocksPlacement)
+    ) {
+      return failure("surface-placement-blocked", "Furniture overlaps another item on the same surface.");
+    }
+  }
+
+  return success(layout);
+}
+
+function validateCharacterPlacement(
+  layout: OfficeLayoutDocument,
+  character: OfficePlacedCharacter,
+  ignoreCharacterId?: OfficeCharacterId,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  if (!isInBounds(layout, character.position)) {
+    return failure("character-position-out-of-bounds", "Character is outside the office grid.");
+  }
+
+  for (const existing of Object.values(layout.characters)) {
+    if (existing.id === ignoreCharacterId) {
+      continue;
+    }
+
+    if (existing.position.x === character.position.x && existing.position.y === character.position.y) {
+      return failure("character-position-blocked", "Character position is already occupied.");
+    }
+  }
+
+  for (const furniture of Object.values(layout.furniture)) {
+    if (furniture.anchor.kind !== "floor") {
+      continue;
+    }
+
+    const occupied = getFurnitureFloorTiles(furniture).some(
+      (tile) => tile.x === character.position.x && tile.y === character.position.y,
+    );
+    if (occupied && (furniture.collision.blocksMovement || furniture.collision.blocksPlacement)) {
+      return failure("character-position-blocked", "Character cannot move onto blocking furniture.");
+    }
+  }
+
+  return success(layout);
+}
+
+function collectFurnitureDescendants(
+  layout: OfficeLayoutDocument,
+  furnitureId: OfficeFurnitureId,
+): Set<OfficeFurnitureId> {
+  const pending = [furnitureId];
+  const collected = new Set<OfficeFurnitureId>();
+
+  while (pending.length > 0) {
+    const nextId = pending.pop();
+    if (!nextId || collected.has(nextId)) {
+      continue;
+    }
+
+    collected.add(nextId);
+    for (const furniture of Object.values(layout.furniture)) {
+      if (furniture.anchor.kind === "surface" && furniture.anchor.parentFurnitureId === nextId) {
+        pending.push(furniture.id);
+      }
+    }
+  }
+
+  return collected;
+}
+
+function translateFurniture(
+  furniture: OfficeFurnitureInstance,
+  left: number,
+  top: number,
+): OfficeFurnitureInstance {
+  switch (furniture.anchor.kind) {
+    case "floor":
+      return {
+        ...furniture,
+        anchor: {
+          ...furniture.anchor,
+          position: {
+            x: furniture.anchor.position.x + left,
+            y: furniture.anchor.position.y + top,
+          },
+        },
+      };
+    case "wall":
+      return {
+        ...furniture,
+        anchor: {
+          ...furniture.anchor,
+          position: {
+            x: furniture.anchor.position.x + left,
+            y: furniture.anchor.position.y + top,
+          },
+        },
+      };
+    case "surface":
+      return furniture;
+  }
+}
+
+function getTile(layout: OfficeLayoutDocument, position: OfficeGridPosition): OfficeTile | null {
+  return layout.grid.tiles[toOfficeTileKey(position.x, position.y)] ?? null;
+}
+
+function isInBounds(layout: OfficeLayoutDocument, position: OfficeGridPosition): boolean {
+  return (
+    position.x >= 0 &&
+    position.y >= 0 &&
+    position.x < layout.grid.columns &&
+    position.y < layout.grid.rows
+  );
+}
+
+function intervalsOverlap(
+  a: { start: number; end: number },
+  b: { start: number; end: number },
+): boolean {
+  return a.start < b.end && b.start < a.end;
+}
+
+
+function success<T>(value: T): OfficeLayoutResult<T> {
   return {
-    version: OFFICE_LAYOUT_VERSION,
-    cols,
-    rows,
-    tiles: Array.from({ length: cols * rows }, () => OFFICE_TILE_TYPE.VOID),
-    tileColors: Array.from({ length: cols * rows }, () => null),
-    furniture: [],
-    characters: [],
+    ok: true,
+    value,
   };
 }
 
-export function createOfficeCharacter(
-  uid: string,
-  col: number,
-  row: number,
-  options: Partial<{
-    characterType: string;
-    paletteVariant: string;
-    pose: OfficeCharacterPose;
-    direction: OfficeCharacterDirection;
-  }> = {},
-): OfficePlacedCharacter {
+function failure<T>(code: OfficeErrorCode, message: string): OfficeLayoutResult<T> {
   return {
-    uid,
-    characterType: options.characterType ?? "office-worker",
-    paletteVariant: options.paletteVariant ?? "palette-0",
-    pose: options.pose ?? "idle",
-    direction: options.direction ?? "down",
-    col,
-    row,
+    ok: false,
+    error: {
+      code,
+      message,
+    },
   };
 }

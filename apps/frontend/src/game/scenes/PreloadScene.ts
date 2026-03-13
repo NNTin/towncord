@@ -5,9 +5,10 @@ import {
   composeBloomseedBootstrap,
 } from "../application/gameComposition";
 import {
-  registerBloomseedAnimations,
-  registerDonargOfficeAnimations,
-} from "../assets/animation";
+  createOfficeSceneBootstrap,
+  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
+} from "./office/bootstrap";
+import { registerPreloadAnimations } from "../assets/animation";
 import {
   preloadBloomseedPack,
   preloadDebugPack,
@@ -15,16 +16,7 @@ import {
 } from "../assets/preload";
 import { PRELOAD_SCENE_KEY } from "./BootScene";
 import { OFFICE_SCENE_KEY } from "./OfficeScene";
-import {
-  createOfficeSceneBootstrap,
-  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
-} from "./office/bootstrap";
 import { WORLD_SCENE_KEY } from "./WorldScene";
-
-function resolveInitialSceneKey(search: string = window.location.search): string {
-  const params = new URLSearchParams(search);
-  return params.get("scene") === "office" ? OFFICE_SCENE_KEY : WORLD_SCENE_KEY;
-}
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -38,12 +30,20 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const animationKeys = registerBloomseedAnimations(this);
-    registerDonargOfficeAnimations(this);
-    const bootstrap = composeBloomseedBootstrap(animationKeys);
+    const { bloomseedAnimationKeys } = registerPreloadAnimations(this);
+    const bootstrap = composeBloomseedBootstrap(bloomseedAnimationKeys);
     this.registry.set(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
     this.registry.set(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY, createOfficeSceneBootstrap());
     this.game.events.emit(BLOOMSEED_READY_EVENT, bootstrap.ui);
-    this.scene.start(resolveInitialSceneKey());
+    this.scene.start(resolveStartupSceneKey());
   }
+}
+
+function resolveStartupSceneKey(): string {
+  if (typeof window === "undefined") {
+    return WORLD_SCENE_KEY;
+  }
+
+  const scene = new URLSearchParams(window.location.search).get("scene");
+  return scene === OFFICE_SCENE_KEY ? OFFICE_SCENE_KEY : WORLD_SCENE_KEY;
 }
