@@ -37,11 +37,6 @@ type BloomseedSidebarBridgeProps = {
   runtimePerf: RuntimePerfPayload | null;
 };
 
-type BottomToolbarBridgeProps = {
-  isLayoutMode: boolean;
-  onToggleLayoutMode: () => void;
-};
-
 type ZoomControlsProps = {
   zoom: number;
   minZoom: number;
@@ -55,7 +50,6 @@ type BloomseedUiBridge = {
   onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
-  bottomToolbarProps: BottomToolbarBridgeProps;
   zoomProps: ZoomControlsProps | null;
 };
 
@@ -89,7 +83,6 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
-  const [isLayoutMode, setIsLayoutMode] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
 
   useEffect(() => {
@@ -178,10 +171,6 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     }
   }
 
-  const onToggleLayoutMode = useCallback(() => {
-    setIsLayoutMode((prev) => !prev);
-  }, []);
-
   const onZoomIn = useCallback(() => {
     if (!zoomState) return;
     gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 1.1 });
@@ -208,10 +197,6 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
             runtimePerf,
           }
         : null,
-    bottomToolbarProps: {
-      isLayoutMode,
-      onToggleLayoutMode,
-    },
     zoomProps: zoomState
       ? {
           zoom: zoomState.zoom,

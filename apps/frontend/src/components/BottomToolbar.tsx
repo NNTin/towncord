@@ -3,6 +3,13 @@ import { useState } from "react";
 type BottomToolbarProps = {
   isLayoutMode: boolean;
   onToggleLayoutMode: () => void;
+  onResetLayout?: () => void;
+  onSaveLayout?: () => void;
+  canResetLayout?: boolean;
+  canSaveLayout?: boolean;
+  isLayoutDirty?: boolean;
+  isSavingLayout?: boolean;
+  layoutStatusText?: string | null;
 };
 
 const panelStyle: React.CSSProperties = {
@@ -41,29 +48,93 @@ const btnActive: React.CSSProperties = {
 export function BottomToolbar({
   isLayoutMode,
   onToggleLayoutMode,
+  onResetLayout,
+  onSaveLayout,
+  canResetLayout = false,
+  canSaveLayout = false,
+  isLayoutDirty = false,
+  isSavingLayout = false,
+  layoutStatusText = null,
 }: BottomToolbarProps): JSX.Element {
-  const [hovered, setHovered] = useState(false);
+  const [hovered, setHovered] = useState<string | null>(null);
+
+  function resolveButtonStyle(
+    key: string,
+    options: {
+      active?: boolean;
+      disabled?: boolean;
+    } = {},
+  ): React.CSSProperties {
+    const { active = false, disabled = false } = options;
+    if (active) {
+      return btnActive;
+    }
+
+    return {
+      ...btnBase,
+      background:
+        hovered === key && !disabled
+          ? "var(--pixel-btn-hover-bg)"
+          : btnBase.background,
+      cursor: disabled ? "default" : "pointer",
+      opacity: disabled
+        ? "var(--pixel-btn-disabled-opacity)" as unknown as number
+        : 1,
+    };
+  }
 
   return (
     <div style={panelStyle}>
       <button
         onClick={onToggleLayoutMode}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={
-          isLayoutMode
-            ? btnActive
-            : {
-                ...btnBase,
-                background: hovered
-                  ? "var(--pixel-btn-hover-bg)"
-                  : btnBase.background,
-              }
-        }
+        onMouseEnter={() => setHovered("layout")}
+        onMouseLeave={() => setHovered(null)}
+        style={resolveButtonStyle("layout", { active: isLayoutMode })}
         title="Toggle layout editing mode"
       >
-        Layout
+        Layout{isLayoutDirty ? "*" : ""}
       </button>
+
+      {isLayoutMode ? (
+        <>
+          <button
+            type="button"
+            disabled={!canSaveLayout}
+            onClick={onSaveLayout}
+            onMouseEnter={() => setHovered("save")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("save", { disabled: !canSaveLayout })}
+            title="Save office layout JSON"
+          >
+            {isSavingLayout ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            disabled={!canResetLayout}
+            onClick={onResetLayout}
+            onMouseEnter={() => setHovered("reset")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("reset", { disabled: !canResetLayout })}
+            title="Reset unsaved office layout changes"
+          >
+            Reset
+          </button>
+          {layoutStatusText ? (
+            <div
+              style={{
+                color: "var(--pixel-text)",
+                fontFamily: "monospace",
+                fontSize: 12,
+                opacity: 0.8,
+                paddingLeft: 2,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {layoutStatusText}
+            </div>
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }

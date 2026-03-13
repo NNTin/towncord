@@ -1,9 +1,13 @@
 import { describe, expect, test } from "vitest";
 import {
   buildAnimationCatalog,
+  getOfficeCharacterIds,
+  getOfficeEnvironmentGroups,
+  getOfficeFurnitureGroups,
   getPropGroups,
   getTilesetGroups,
   getTracksForPath,
+  resolveTrackForDirection,
 } from "../animationCatalog";
 
 describe("animationCatalog", () => {
@@ -43,5 +47,49 @@ describe("animationCatalog", () => {
     expect(
       getTracksForPath(catalog, "tilesets/animated/environment").map((track) => track.id),
     ).toEqual(["water-tileset-vfx"]);
+  });
+
+  test("parses Donarg office characters and office asset groups without polluting bloomseed entity selectors", () => {
+    const catalog = buildAnimationCatalog([
+      "characters.palette-0.office-worker.walk-down",
+      "characters.palette-0.office-worker.walk-right",
+      "characters.palette-0.office-worker.read-up",
+      "characters.palette-1.office-worker.walk-down",
+      "environment.floors.pattern-01",
+      "environment.walls.mask-00",
+      "furniture.chairs.chair-cushioned-front",
+      "furniture.desks.counter-wood-md",
+    ]);
+
+    expect(catalog.entityTypes).toEqual([]);
+    expect(catalog.officeCharacterPalettes).toEqual(["palette-0", "palette-1"]);
+    expect(catalog.officeCharacterIds).toEqual(["office-worker"]);
+    expect(getOfficeCharacterIds(catalog, "palette-0")).toEqual(["office-worker"]);
+    expect(getOfficeEnvironmentGroups(catalog)).toEqual(["floors", "walls"]);
+    expect(getOfficeFurnitureGroups(catalog)).toEqual(["chairs", "desks"]);
+    expect(
+      getTracksForPath(catalog, "office/characters/palette-0/office-worker").map((track) => track.id),
+    ).toEqual(["read", "walk"]);
+  });
+
+  test("resolves horizontal office-character tracks from right-facing exports and flips left", () => {
+    const catalog = buildAnimationCatalog([
+      "characters.palette-0.office-worker.walk-down",
+      "characters.palette-0.office-worker.walk-right",
+      "characters.palette-0.office-worker.walk-up",
+    ]);
+
+    const track = getTracksForPath(catalog, "office/characters/palette-0/office-worker")
+      .find((item) => item.id === "walk");
+
+    expect(track).toBeTruthy();
+    expect(resolveTrackForDirection(track!, "right")).toEqual({
+      key: "characters.palette-0.office-worker.walk-right",
+      flipX: false,
+    });
+    expect(resolveTrackForDirection(track!, "left")).toEqual({
+      key: "characters.palette-0.office-worker.walk-right",
+      flipX: true,
+    });
   });
 });
