@@ -2,6 +2,7 @@
 
 import { readFile } from "node:fs/promises";
 import { resolve as resolvePath } from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { createGitHubClient, upsertLabel } from "./github-client.mjs";
 
@@ -9,6 +10,7 @@ export const DEPENDENTS_LABEL = "has-dependents";
 export const DEPENDS_ON_PATTERN = /^depends-on:#(\d+)$/;
 export const STACK_BRANCH_PATTERN = /^feat\//;
 const DYNAMIC_DEPENDENCY_LABEL_COLOR = "bfd4f2";
+const DYNAMIC_DEPENDENCY_LABEL_ATTACH_RETRY_DELAYS_MS = [250, 1000, 2000];
 
 async function paginate(github, path) {
   const items = [];
@@ -37,7 +39,11 @@ async function ensureLabels(github, owner, repo) {
   }
 }
 
-async function toggleLabel(
+function isMissingIssueLabelDelete(error) {
+  return error?.status === 404 && error?.data?.message === "Label does not exist";
+}
+
+export async function toggleLabel(
   github,
   owner,
   repo,
@@ -57,21 +63,89 @@ async function toggleLabel(
   }
 
   if (!shouldExist && hasLabel) {
-    await github(
-      `/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`,
-      {
-        method: "DELETE",
-      },
-    );
+    // Delete handling stays local to this workflow instead of the shared GitHub
+    // client because stack reconciliation intentionally mutates labels on related
+    // PRs. Those cross-PR writes emit their own label events, which can trigger a
+    // second reconciliation run with a fresher snapshot. If that newer run removes
+    // the label first, this older run sees a 404 "Label does not exist" while
+    // trying to reach the same final state. Treating only that delete miss as
+    // success keeps label removal idempotent without hiding unrelated 404s.
+    try {
+      await github(
+        `/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`,
+        {
+          method: "DELETE",
+        },
+      );
+    } catch (error) {
+      if (!isMissingIssueLabelDelete(error)) {
+        throw error;
+      }
+    }
   }
 }
 
 async function ensureDynamicDependencyLabel(github, owner, repo, labelName) {
-  await upsertLabel(github, owner, repo, {
+  return upsertLabel(github, owner, repo, {
     name: labelName,
     color: DYNAMIC_DEPENDENCY_LABEL_COLOR,
     description: "Automatically managed stacked PR dependency label.",
   });
+}
+
+export function isDependencyLabelFirstCreationRace(error, labelName) {
+  if (error?.status !== 422 || !DEPENDS_ON_PATTERN.test(labelName)) {
+    return false;
+  }
+
+  return (error.data?.errors ?? []).some(
+    (detail) =>
+      detail?.value === labelName &&
+      detail?.resource === "Label" &&
+      detail?.field === "name" &&
+      detail?.code === "invalid",
+  );
+}
+
+export async function addDependencyLabelWithRetry(
+  github,
+  owner,
+  repo,
+  prNumber,
+  labelsByName,
+  labelName,
+  {
+    retryDelaysMs = DYNAMIC_DEPENDENCY_LABEL_ATTACH_RETRY_DELAYS_MS,
+  } = {},
+) {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      await toggleLabel(
+        github,
+        owner,
+        repo,
+        prNumber,
+        labelsByName,
+        labelName,
+        true,
+      );
+      return;
+    } catch (error) {
+      const delayMs = retryDelaysMs[attempt];
+
+      if (
+        delayMs == null ||
+        !isDependencyLabelFirstCreationRace(error, labelName)
+      ) {
+        throw error;
+      }
+
+      console.warn(
+        `Retrying dependency label ${labelName} on PR #${prNumber} after ${delayMs}ms due to a suspected first-creation race.`,
+      );
+      await sleep(delayMs);
+    }
+  }
 }
 
 export function getDependencyLabelNames(pr) {
@@ -196,21 +270,36 @@ export async function main({
     }
 
     if (desiredDependencyLabel) {
-      await ensureDynamicDependencyLabel(
+      const dependencyLabelState = await ensureDynamicDependencyLabel(
         github,
         owner,
         repo,
         desiredDependencyLabel,
       );
-      await toggleLabel(
-        github,
-        owner,
-        repo,
-        pr.number,
-        labelsByName,
-        desiredDependencyLabel,
-        true,
-      );
+
+      if (dependencyLabelState === "created") {
+        // GitHub can briefly reject a freshly created dynamic dependency label
+        // as invalid when attaching it to the PR. See
+        // specs/pr-dependency-label-first-creation-race.md.
+        await addDependencyLabelWithRetry(
+          github,
+          owner,
+          repo,
+          pr.number,
+          labelsByName,
+          desiredDependencyLabel,
+        );
+      } else {
+        await toggleLabel(
+          github,
+          owner,
+          repo,
+          pr.number,
+          labelsByName,
+          desiredDependencyLabel,
+          true,
+        );
+      }
       labelsByName.add(desiredDependencyLabel);
     }
 

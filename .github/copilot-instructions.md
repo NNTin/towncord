@@ -11,7 +11,8 @@ Towncord is a browser-based multiplayer game built with [Phaser](https://phaser.
 
 ## Conventions
 
-- **Conventional Commits**: All commit messages must follow `type(scope): message` format (e.g. `feat:`, `fix:`, `refactor:`, `docs:`).
+- **Conventional Commits**: All commit messages must follow `type(scope): message` format (e.g. `feat:`, `fix:`, `refactor:`, `docs:`). If Copilot creates its automatic empty `Initial plan` commit while opening a PR, treat it as a temporary exception and remove it immediately after PR creation so the final branch history only contains conventional commits.
+- **PR cleanup**: After creating a PR, run `bash .github/scripts/drop-empty-initial-plan-commit.sh`. If it reports an error, stop and surface the failure instead of continuing. If it removes a commit, let it force-push the branch with `--force-with-lease`.
 - **TypeScript**: Use strict mode. Prefer `import type` for type-only imports. `moduleResolution` is `Bundler` in the frontend tsconfig.
 - **ESM**: All packages use `"type": "module"`.
 - **Testing**: Use [Vitest](https://vitest.dev/) (`vitest run`). Tests live in `__tests__/` directories alongside source files.
