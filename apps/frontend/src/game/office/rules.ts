@@ -41,12 +41,12 @@ type OfficeErrorCode =
   | "surface-placement-blocked"
   | "tile-out-of-bounds";
 
-export type OfficeLayoutError = {
+type OfficeLayoutError = {
   code: OfficeErrorCode;
   message: string;
 };
 
-export type OfficeLayoutResult<T> =
+type OfficeLayoutResult<T> =
   | {
       ok: true;
       value: T;
@@ -116,7 +116,7 @@ export function applyOfficeLayoutAction(
   }
 }
 
-export function paintOfficeTile(
+function paintOfficeTile(
   layout: OfficeLayoutDocument,
   position: OfficeGridPosition,
   color: OfficeTileColor,
@@ -147,14 +147,14 @@ export function paintOfficeTile(
   });
 }
 
-export function eraseOfficeTile(
+function eraseOfficeTile(
   layout: OfficeLayoutDocument,
   position: OfficeGridPosition,
 ): OfficeLayoutResult<OfficeLayoutDocument> {
   return paintOfficeTile(layout, position, layout.grid.defaultTileColor);
 }
 
-export function expandOfficeLayout(
+function expandOfficeLayout(
   layout: OfficeLayoutDocument,
   expansion: OfficeGridExpansion,
 ): OfficeLayoutResult<OfficeLayoutDocument> {
@@ -237,7 +237,7 @@ export function placeOfficeFurniture(
   });
 }
 
-export function moveOfficeFurniture(
+function moveOfficeFurniture(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
   anchor: OfficeFurnitureAnchor,
@@ -266,7 +266,7 @@ export function moveOfficeFurniture(
   });
 }
 
-export function rotateOfficeFurniture(
+function rotateOfficeFurniture(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
   direction: "clockwise" | "counterclockwise" = "clockwise",
@@ -295,7 +295,7 @@ export function rotateOfficeFurniture(
   });
 }
 
-export function toggleOfficeFurnitureState(
+function toggleOfficeFurnitureState(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
   stateId = DEFAULT_TOGGLE_ID,
@@ -321,7 +321,7 @@ export function toggleOfficeFurnitureState(
   });
 }
 
-export function removeOfficeFurniture(
+function removeOfficeFurniture(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
 ): OfficeLayoutResult<OfficeLayoutDocument> {
@@ -366,7 +366,7 @@ export function placeOfficeCharacter(
   });
 }
 
-export function moveOfficeCharacter(
+function moveOfficeCharacter(
   layout: OfficeLayoutDocument,
   characterId: OfficeCharacterId,
   position: OfficeGridPosition,
@@ -395,7 +395,7 @@ export function moveOfficeCharacter(
   });
 }
 
-export function removeOfficeCharacter(
+function removeOfficeCharacter(
   layout: OfficeLayoutDocument,
   characterId: OfficeCharacterId,
 ): OfficeLayoutResult<OfficeLayoutDocument> {

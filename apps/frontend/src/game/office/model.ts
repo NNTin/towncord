@@ -49,7 +49,7 @@ export type OfficeSurfaceFootprint = {
   height: number;
 };
 
-export type OfficeWallMount = {
+type OfficeWallMount = {
   span: number;
 };
 

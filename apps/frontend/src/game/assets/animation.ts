@@ -50,7 +50,7 @@ type RegisterAnimationsFromManifestOptions = Omit<
   "manifestKey"
 >;
 
-export type PreloadAnimationRegistration = {
+type PreloadAnimationRegistration = {
   bloomseedAnimationKeys: string[];
   donargOfficeCharacterAnimationKeys: string[];
   animationKeys: string[];
@@ -60,7 +60,7 @@ export type PreloadAnimationRegistration = {
  * Registers animations from any public animations manifest loaded into Phaser's JSON cache.
  * Returns animation keys that were created during this call.
  */
-export function registerPublicAnimations(
+function registerPublicAnimations(
   scene: Phaser.Scene,
   options: RegisterPublicAnimationsOptions,
 ): string[] {
@@ -193,7 +193,7 @@ export function registerDonargOfficeAnimations(
  * Registers only Donarg office character animations discovered from the public manifest.
  * Returns animation keys that were created during this call.
  */
-export function registerDonargOfficeCharacterAnimations(
+function registerDonargOfficeCharacterAnimations(
   scene: Phaser.Scene,
   options: RegisterDonargOfficeAnimationsOptions = {},
 ): string[] {
