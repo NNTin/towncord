@@ -7,6 +7,7 @@ import {
   getDependencyLabelNames,
   isDependencyLabelFirstCreationRace,
   resolveParentPull,
+  toggleLabel,
 } from "../pr-dependencies.mjs";
 
 function createPr({ number, headRef, baseRef, labels = [] }) {
@@ -201,6 +202,61 @@ test("addDependencyLabelWithRetry does not retry unrelated failures", async () =
       { retryDelaysMs: [0] },
     ),
     { message: "403 Forbidden" },
+  );
+
+  assert.equal(callCount, 1);
+});
+
+test("toggleLabel ignores a missing label when delete reached the desired state", async () => {
+  let callCount = 0;
+  const github = async () => {
+    callCount += 1;
+
+    const error = new Error("404 Label does not exist");
+    error.status = 404;
+    error.data = {
+      message: "Label does not exist",
+    };
+    throw error;
+  };
+
+  await toggleLabel(
+    github,
+    "owner",
+    "repo",
+    20,
+    new Set(["has-dependents"]),
+    "has-dependents",
+    false,
+  );
+
+  assert.equal(callCount, 1);
+});
+
+test("toggleLabel rethrows unrelated 404 delete failures", async () => {
+  let callCount = 0;
+  const github = async () => {
+    callCount += 1;
+
+    const error = new Error("404 Not Found");
+    error.status = 404;
+    error.data = {
+      message: "Not Found",
+    };
+    throw error;
+  };
+
+  await assert.rejects(
+    toggleLabel(
+      github,
+      "owner",
+      "repo",
+      20,
+      new Set(["has-dependents"]),
+      "has-dependents",
+      false,
+    ),
+    { message: "404 Not Found" },
   );
 
   assert.equal(callCount, 1);

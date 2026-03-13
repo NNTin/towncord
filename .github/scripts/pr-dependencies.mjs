@@ -39,7 +39,11 @@ async function ensureLabels(github, owner, repo) {
   }
 }
 
-async function toggleLabel(
+function isMissingIssueLabelDelete(error) {
+  return error?.status === 404 && error?.data?.message === "Label does not exist";
+}
+
+export async function toggleLabel(
   github,
   owner,
   repo,
@@ -59,12 +63,25 @@ async function toggleLabel(
   }
 
   if (!shouldExist && hasLabel) {
-    await github(
-      `/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`,
-      {
-        method: "DELETE",
-      },
-    );
+    // Delete handling stays local to this workflow instead of the shared GitHub
+    // client because stack reconciliation intentionally mutates labels on related
+    // PRs. Those cross-PR writes emit their own label events, which can trigger a
+    // second reconciliation run with a fresher snapshot. If that newer run removes
+    // the label first, this older run sees a 404 "Label does not exist" while
+    // trying to reach the same final state. Treating only that delete miss as
+    // success keeps label removal idempotent without hiding unrelated 404s.
+    try {
+      await github(
+        `/repos/${owner}/${repo}/issues/${prNumber}/labels/${encodeURIComponent(labelName)}`,
+        {
+          method: "DELETE",
+        },
+      );
+    } catch (error) {
+      if (!isMissingIssueLabelDelete(error)) {
+        throw error;
+      }
+    }
   }
 }
 
