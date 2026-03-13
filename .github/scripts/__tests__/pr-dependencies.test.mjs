@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  addDependencyLabelWithRetry,
   computeDependencyUpdates,
   getDependencyLabelNames,
+  isDependencyLabelFirstCreationRace,
   resolveParentPull,
 } from "../pr-dependencies.mjs";
 
@@ -108,4 +110,98 @@ test("getDependencyLabelNames returns only dependency labels", () => {
   });
 
   assert.deepEqual(getDependencyLabelNames(pr), ["depends-on:#10", "depends-on:#11"]);
+});
+
+test("isDependencyLabelFirstCreationRace matches the observed GitHub validation error", () => {
+  const error = new Error("422 Validation Failed");
+  error.status = 422;
+  error.data = {
+    errors: [
+      {
+        value: "depends-on:#10",
+        resource: "Label",
+        field: "name",
+        code: "invalid",
+      },
+    ],
+  };
+
+  assert.equal(
+    isDependencyLabelFirstCreationRace(error, "depends-on:#10"),
+    true,
+  );
+  assert.equal(
+    isDependencyLabelFirstCreationRace(error, "has-dependents"),
+    false,
+  );
+});
+
+test("addDependencyLabelWithRetry retries the observed first-creation race once", async () => {
+  let callCount = 0;
+  const originalWarn = console.warn;
+  const github = async () => {
+    callCount += 1;
+
+    if (callCount === 1) {
+      const error = new Error("422 Validation Failed");
+      error.status = 422;
+      error.data = {
+        errors: [
+          {
+            value: "depends-on:#10",
+            resource: "Label",
+            field: "name",
+            code: "invalid",
+          },
+        ],
+      };
+      throw error;
+    }
+
+    return null;
+  };
+
+  console.warn = () => {};
+
+  try {
+    await addDependencyLabelWithRetry(
+      github,
+      "owner",
+      "repo",
+      20,
+      new Set(),
+      "depends-on:#10",
+      { retryDelaysMs: [0] },
+    );
+  } finally {
+    console.warn = originalWarn;
+  }
+
+  assert.equal(callCount, 2);
+});
+
+test("addDependencyLabelWithRetry does not retry unrelated failures", async () => {
+  let callCount = 0;
+  const github = async () => {
+    callCount += 1;
+
+    const error = new Error("403 Forbidden");
+    error.status = 403;
+    throw error;
+  };
+
+  await assert.rejects(
+    addDependencyLabelWithRetry(
+      github,
+      "owner",
+      "repo",
+      20,
+      new Set(),
+      "depends-on:#10",
+      { retryDelaysMs: [0] },
+    ),
+    { message: "403 Forbidden" },
+  );
+
+  assert.equal(callCount, 1);
 });
