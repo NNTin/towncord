@@ -28,19 +28,47 @@ export type OfficeSceneRenderIndex = {
   characters: OfficeRenderableTarget[];
 };
 
+export type OfficeLayoutRenderable = {
+  renderIndex: OfficeSceneRenderIndex;
+  destroy(): void;
+};
+
 export function renderOfficeLayout(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
-): OfficeSceneRenderIndex {
-  renderTiles(scene, layout);
+): OfficeLayoutRenderable {
+  const tilesGraphics = renderTiles(scene, layout);
+
+  const furnitureEntries = layout.furniture.map((item) => {
+    const { target, container } = renderFurniture(scene, layout, item);
+    return { target, container };
+  });
+
+  const characterEntries = layout.characters.map((actor) => {
+    const { target, container } = renderCharacter(scene, layout, actor);
+    return { target, container };
+  });
+
+  const renderIndex: OfficeSceneRenderIndex = {
+    furniture: furnitureEntries.map((e) => e.target),
+    characters: characterEntries.map((e) => e.target),
+  };
 
   return {
-    furniture: layout.furniture.map((item) => renderFurniture(scene, layout, item)),
-    characters: layout.characters.map((actor) => renderCharacter(scene, layout, actor)),
+    renderIndex,
+    destroy() {
+      tilesGraphics.destroy();
+      for (const e of furnitureEntries) {
+        e.container.destroy(true);
+      }
+      for (const e of characterEntries) {
+        e.container.destroy(true);
+      }
+    },
   };
 }
 
-function renderTiles(scene: Phaser.Scene, layout: OfficeSceneLayout): void {
+function renderTiles(scene: Phaser.Scene, layout: OfficeSceneLayout): Phaser.GameObjects.Graphics {
   const graphics = scene.add.graphics();
   const { cols, rows, cellSize, tiles } = layout;
 
@@ -78,13 +106,15 @@ function renderTiles(scene: Phaser.Scene, layout: OfficeSceneLayout): void {
       }
     }
   }
+
+  return graphics;
 }
 
 function renderFurniture(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
   item: OfficeSceneFurniture,
-): OfficeRenderableTarget {
+): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const x = item.col * layout.cellSize;
   const y = item.row * layout.cellSize;
   const width = item.width * layout.cellSize;
@@ -164,19 +194,21 @@ function renderFurniture(
   container.add(text);
   container.setDepth(resolveRenderableDepth(item.row + item.height, item.placement === "wall" ? 6 : 18));
 
-  return {
+  const target: OfficeRenderableTarget = {
     kind: "furniture",
     id: item.id,
     label: item.label,
     bounds: new Phaser.Geom.Rectangle(x, y, width, height),
   };
+
+  return { target, container };
 }
 
 function renderCharacter(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
   actor: OfficeSceneCharacter,
-): OfficeRenderableTarget {
+): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const cellSize = layout.cellSize;
   const x = actor.col * cellSize;
   const y = actor.row * cellSize;
@@ -216,12 +248,14 @@ function renderCharacter(
   container.add([shadow, body, head, badge]);
   container.setDepth(resolveRenderableDepth(actor.row + 1, 34));
 
-  return {
+  const target: OfficeRenderableTarget = {
     kind: "character",
     id: actor.id,
     label: actor.label,
     bounds: new Phaser.Geom.Rectangle(x, y, cellSize, cellSize),
   };
+
+  return { target, container };
 }
 
 function resolveRenderableDepth(bottomRow: number, layer: number): number {

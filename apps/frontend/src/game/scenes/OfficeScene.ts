@@ -1,10 +1,19 @@
 import Phaser from "phaser";
-import { SET_ZOOM_EVENT, ZOOM_CHANGED_EVENT, type SetZoomPayload } from "../events";
+import {
+  OFFICE_SET_EDITOR_TOOL_EVENT,
+  SET_ZOOM_EVENT,
+  ZOOM_CHANGED_EVENT,
+  type OfficeEditorToolId,
+  type OfficeSetEditorToolPayload,
+  type SetZoomPayload,
+} from "../events";
 import {
   createOfficeSceneBootstrap,
   getOfficeSceneBootstrap,
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
   type OfficeSceneBootstrap,
+  type OfficeSceneFurniture,
+  type OfficeSceneFurnitureCategory,
   type OfficeSceneLayout,
 } from "./office/bootstrap";
 import {
@@ -18,9 +27,11 @@ import {
 } from "./office/events";
 import {
   renderOfficeLayout,
+  type OfficeLayoutRenderable,
   type OfficeRenderableTarget,
   type OfficeSceneRenderIndex,
 } from "./office/render";
+import { FURNITURE_PALETTE_ITEMS, type FurniturePaletteItem } from "../office/officeFurniturePalette";
 
 export const OFFICE_SCENE_KEY = "office";
 
@@ -29,6 +40,19 @@ const MAX_ZOOM = 3;
 const CAMERA_PADDING = 96;
 const HOVER_STROKE_COLOR = 0x38bdf8;
 const SELECTED_STROKE_COLOR = 0xf59e0b;
+const GHOST_COLOR = 0x38bdf8;
+
+// OfficeTileColor → hex tint for OfficeSceneTile
+const TILE_COLOR_TINTS: Record<string, number> = {
+  neutral: 0x475569,
+  blue: 0x2563eb,
+  green: 0x059669,
+  yellow: 0xd97706,
+  orange: 0xea580c,
+  red: 0xdc2626,
+  pink: 0xdb2777,
+  purple: 0x7c3aed,
+};
 
 type ResolvedPointerState = {
   cell: OfficeSceneCellCoord | null;
@@ -42,10 +66,11 @@ export class OfficeScene extends Phaser.Scene {
 
   private layout: OfficeSceneLayout = this.bootstrap.layout;
 
-  private renderIndex: OfficeSceneRenderIndex = {
-    furniture: [],
-    characters: [],
-  };
+  private renderable: OfficeLayoutRenderable | null = null;
+
+  private get renderIndex(): OfficeSceneRenderIndex {
+    return this.renderable?.renderIndex ?? { furniture: [], characters: [] };
+  }
 
   private hoverCell: OfficeSceneCellCoord | null = null;
 
@@ -59,13 +84,28 @@ export class OfficeScene extends Phaser.Scene {
 
   private selectionMarker: Phaser.GameObjects.Rectangle | null = null;
 
+  private ghostMarker: Phaser.GameObjects.Rectangle | null = null;
+
   private overlayText: Phaser.GameObjects.Text | null = null;
 
   private isPanning = false;
 
+  private isPainting = false;
+
   private panStartPointer = new Phaser.Math.Vector2();
 
   private panStartScroll = new Phaser.Math.Vector2();
+
+  // Editor tool state
+  private activeTool: OfficeEditorToolId | null = null;
+
+  private activeTileColor = "neutral";
+
+  private activeFurnitureId: string | null = null;
+
+  private furniturePaletteMap: Map<string, FurniturePaletteItem> = new Map(
+    FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
+  );
 
   constructor() {
     super(OFFICE_SCENE_KEY);
@@ -80,7 +120,7 @@ export class OfficeScene extends Phaser.Scene {
 
     this.input.mouse?.disableContextMenu();
 
-    this.renderIndex = renderOfficeLayout(this, this.layout);
+    this.renderable = renderOfficeLayout(this, this.layout);
     this.createMarkers();
     this.createOverlay();
     this.configureCamera();
@@ -97,6 +137,7 @@ export class OfficeScene extends Phaser.Scene {
     this.input.on(Phaser.Input.Events.POINTER_WHEEL, this.onPointerWheel, this);
     this.input.on(Phaser.Input.Events.GAME_OUT, this.onGameOut, this);
     this.game.events.on(SET_ZOOM_EVENT, this.onSetZoom, this);
+    this.game.events.on(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetEditorTool, this);
     this.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown, this);
   }
@@ -108,6 +149,7 @@ export class OfficeScene extends Phaser.Scene {
     this.input.off(Phaser.Input.Events.POINTER_WHEEL, this.onPointerWheel, this);
     this.input.off(Phaser.Input.Events.GAME_OUT, this.onGameOut, this);
     this.game.events.off(SET_ZOOM_EVENT, this.onSetZoom, this);
+    this.game.events.off(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetEditorTool, this);
     this.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
   }
 
@@ -127,6 +169,13 @@ export class OfficeScene extends Phaser.Scene {
     this.selectionMarker.setStrokeStyle(2, SELECTED_STROKE_COLOR, 1);
     this.selectionMarker.setVisible(false);
     this.selectionMarker.setDepth(20_001);
+
+    this.ghostMarker = this.add.rectangle(0, 0, cellSize, cellSize);
+    this.ghostMarker.setOrigin(0);
+    this.ghostMarker.setFillStyle(GHOST_COLOR, 0.22);
+    this.ghostMarker.setStrokeStyle(2, GHOST_COLOR, 0.85);
+    this.ghostMarker.setVisible(false);
+    this.ghostMarker.setDepth(20_002);
   }
 
   private createOverlay(): void {
@@ -160,6 +209,14 @@ export class OfficeScene extends Phaser.Scene {
     camera.setZoom(1);
   }
 
+  private onSetEditorTool(payload: OfficeSetEditorToolPayload): void {
+    this.activeTool = payload.tool;
+    this.activeTileColor = payload.tileColor ?? "neutral";
+    this.activeFurnitureId = payload.furnitureId;
+    this.updateGhostMarker();
+    this.refreshOverlay();
+  }
+
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.rightButtonDown() || pointer.middleButtonDown()) {
       this.isPanning = true;
@@ -173,6 +230,14 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     const pointerState = this.resolvePointerState(pointer);
+
+    if (this.activeTool) {
+      this.isPainting = true;
+      this.applyTool(pointerState);
+      return;
+    }
+
+    // No active tool: selection mode
     this.selectedCell = pointerState.cell;
     this.selectedTarget = pointerState.target;
     this.updateSelectionMarker();
@@ -190,6 +255,9 @@ export class OfficeScene extends Phaser.Scene {
     if (pointer.button === 1 || pointer.button === 2) {
       this.isPanning = false;
     }
+    if (pointer.button === 0) {
+      this.isPainting = false;
+    }
   }
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
@@ -204,6 +272,13 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     const pointerState = this.resolvePointerState(pointer);
+
+    // Drag-paint when left button is held and a tool is active
+    if (this.isPainting && this.activeTool && pointer.isDown) {
+      this.applyTool(pointerState);
+      return;
+    }
+
     if (
       this.isSameCell(this.hoverCell, pointerState.cell) &&
       this.isSameTarget(this.hoverTarget, pointerState.target)
@@ -214,6 +289,7 @@ export class OfficeScene extends Phaser.Scene {
     this.hoverCell = pointerState.cell;
     this.hoverTarget = pointerState.target;
     this.updateHoverMarker();
+    this.updateGhostMarker();
     this.refreshOverlay(pointerState);
     this.game.events.emit(
       OFFICE_POINTER_MOVED_EVENT,
@@ -234,7 +310,9 @@ export class OfficeScene extends Phaser.Scene {
   private onGameOut(): void {
     this.hoverCell = null;
     this.hoverTarget = null;
+    this.isPainting = false;
     this.updateHoverMarker();
+    this.updateGhostMarker();
     this.refreshOverlay();
     this.game.events.emit(
       OFFICE_POINTER_MOVED_EVENT,
@@ -256,6 +334,237 @@ export class OfficeScene extends Phaser.Scene {
     this.refreshOverlay();
   }
 
+  // ─── Tool application ────────────────────────────────────────────────────────
+
+  private applyTool(pointerState: ResolvedPointerState): void {
+    const { cell, target } = pointerState;
+
+    switch (this.activeTool) {
+      case "floor":
+        if (cell) this.applyPaintTile(cell, "floor");
+        break;
+      case "wall":
+        if (cell) this.applyPaintTile(cell, "wall");
+        break;
+      case "erase":
+        if (target?.kind === "furniture") {
+          this.applyRemoveFurniture(target.id);
+        } else if (cell) {
+          this.applyEraseTile(cell);
+        }
+        break;
+      case "furniture":
+        if (cell && this.activeFurnitureId) {
+          this.applyPlaceFurniture(cell, this.activeFurnitureId);
+        }
+        break;
+    }
+  }
+
+  private applyPaintTile(cell: OfficeSceneCellCoord, kind: "floor" | "wall"): void {
+    const idx = cell.row * this.layout.cols + cell.col;
+    const tile = this.layout.tiles[idx];
+    if (!tile) return;
+
+    const tint = TILE_COLOR_TINTS[this.activeTileColor] ?? TILE_COLOR_TINTS.neutral ?? 0x475569;
+    const changed = tile.kind !== kind || (kind === "floor" && tile.tint !== tint);
+    if (!changed) return;
+
+    tile.kind = kind;
+    if (kind === "floor") {
+      tile.tint = tint;
+    } else {
+      delete tile.tint;
+    }
+
+    this.rerenderLayout();
+  }
+
+  private applyEraseTile(cell: OfficeSceneCellCoord): void {
+    const idx = cell.row * this.layout.cols + cell.col;
+    const tile = this.layout.tiles[idx];
+    if (!tile || tile.kind === "void") return;
+
+    tile.kind = "void";
+    delete tile.tint;
+    this.rerenderLayout();
+  }
+
+  private applyPlaceFurniture(cell: OfficeSceneCellCoord, furnitureId: string): void {
+    const paletteItem = this.furniturePaletteMap.get(furnitureId);
+    if (!paletteItem) return;
+
+    // Don't place if it would go out of bounds
+    if (
+      cell.col + paletteItem.footprintW > this.layout.cols ||
+      cell.row + paletteItem.footprintH > this.layout.rows
+    ) {
+      return;
+    }
+
+    const newFurniture: OfficeSceneFurniture = {
+      id: `placed-${furnitureId}-${Date.now()}`,
+      assetId: furnitureId,
+      label: paletteItem.label,
+      category: paletteItem.category as OfficeSceneFurnitureCategory,
+      placement: paletteItem.placement,
+      col: cell.col,
+      row: cell.row,
+      width: paletteItem.footprintW,
+      height: paletteItem.footprintH,
+      color: paletteItem.color,
+      accentColor: paletteItem.accentColor,
+    };
+
+    this.layout.furniture.push(newFurniture);
+    this.rerenderLayout();
+  }
+
+  private applyRemoveFurniture(furnitureId: string): void {
+    const idx = this.layout.furniture.findIndex((f) => f.id === furnitureId);
+    if (idx === -1) return;
+
+    this.layout.furniture.splice(idx, 1);
+    this.rerenderLayout();
+  }
+
+  private rerenderLayout(): void {
+    this.renderable?.destroy();
+    this.renderable = renderOfficeLayout(this, this.layout);
+
+    // Re-stack markers and overlay above the new render
+    this.hoverMarker?.setDepth(20_000);
+    this.selectionMarker?.setDepth(20_001);
+    this.ghostMarker?.setDepth(20_002);
+    this.overlayText?.setDepth(30_000);
+
+    // Re-resolve hover/selection from current state
+    this.updateHoverMarker();
+    this.updateGhostMarker();
+    this.updateSelectionMarker();
+  }
+
+  // ─── Markers ─────────────────────────────────────────────────────────────────
+
+  private updateHoverMarker(): void {
+    if (this.activeTool) {
+      // In edit mode, ghost marker handles hover feedback; hide the regular hover marker
+      this.hoverMarker?.setVisible(false);
+      return;
+    }
+    this.updateMarker(this.hoverMarker, this.hoverCell, this.hoverTarget);
+  }
+
+  private updateGhostMarker(): void {
+    const ghost = this.ghostMarker;
+    if (!ghost) return;
+
+    if (!this.activeTool || !this.hoverCell) {
+      ghost.setVisible(false);
+      return;
+    }
+
+    let w = 1;
+    let h = 1;
+
+    if (this.activeTool === "furniture" && this.activeFurnitureId) {
+      const item = this.furniturePaletteMap.get(this.activeFurnitureId);
+      if (item) {
+        w = item.footprintW;
+        h = item.footprintH;
+      }
+    }
+
+    const { cellSize } = this.layout;
+    ghost.setPosition(this.hoverCell.col * cellSize, this.hoverCell.row * cellSize);
+    ghost.setSize(w * cellSize, h * cellSize);
+    ghost.setVisible(true);
+  }
+
+  private updateSelectionMarker(): void {
+    if (this.activeTool) {
+      this.selectionMarker?.setVisible(false);
+      return;
+    }
+    this.updateMarker(this.selectionMarker, this.selectedCell, this.selectedTarget);
+  }
+
+  private updateMarker(
+    marker: Phaser.GameObjects.Rectangle | null,
+    cell: OfficeSceneCellCoord | null,
+    target: OfficeRenderableTarget | null,
+  ): void {
+    if (!marker) {
+      return;
+    }
+
+    const bounds = target?.bounds ?? this.getCellBounds(cell);
+    if (!bounds) {
+      marker.setVisible(false);
+      return;
+    }
+
+    marker.setPosition(bounds.x, bounds.y);
+    marker.setSize(bounds.width, bounds.height);
+    marker.setVisible(true);
+  }
+
+  private getCellBounds(cell: OfficeSceneCellCoord | null): Phaser.Geom.Rectangle | null {
+    if (!cell) {
+      return null;
+    }
+
+    const { cellSize } = this.layout;
+    return new Phaser.Geom.Rectangle(
+      cell.col * cellSize,
+      cell.row * cellSize,
+      cellSize,
+      cellSize,
+    );
+  }
+
+  // ─── Overlay ─────────────────────────────────────────────────────────────────
+
+  private refreshOverlay(pointerState: ResolvedPointerState | null = null): void {
+    if (!this.overlayText) {
+      return;
+    }
+
+    const hoverCell = pointerState?.cell ?? this.hoverCell;
+    const hoverTarget = pointerState?.target ?? this.hoverTarget;
+    const selectedTarget = this.selectedTarget;
+    const camera = this.cameras.main;
+
+    const hoverLabel = hoverCell
+      ? `${hoverCell.col},${hoverCell.row}${
+          hoverTarget ? ` ${hoverTarget.kind}:${hoverTarget.label}` : ""
+        }`
+      : "none";
+    const selectedLabel = this.selectedCell
+      ? `${this.selectedCell.col},${this.selectedCell.row}${
+          selectedTarget ? ` ${selectedTarget.kind}:${selectedTarget.label}` : ""
+        }`
+      : "none";
+
+    const toolLine = this.activeTool
+      ? `tool ${this.activeTool}${this.activeTool === "floor" ? ` (${this.activeTileColor})` : ""}${this.activeTool === "furniture" && this.activeFurnitureId ? ` (${this.activeFurnitureId})` : ""}`
+      : "tool none (select mode)";
+
+    this.overlayText.setText(
+      [
+        "Donarg Office",
+        `zoom ${camera.zoom.toFixed(2)} scroll ${camera.scrollX.toFixed(0)},${camera.scrollY.toFixed(0)}`,
+        `hover ${hoverLabel}`,
+        this.activeTool ? `ghost ${toolLine}` : `selected ${selectedLabel}`,
+        this.activeTool
+          ? "left click/drag paint | wheel zoom | middle/right drag pan"
+          : "left click select | wheel zoom | middle/right drag pan",
+      ].join("\n"),
+    );
+  }
+
+  // ─── Zoom ────────────────────────────────────────────────────────────────────
+
   private setZoom(nextZoom: number, pointer: Phaser.Input.Pointer): void {
     const camera = this.cameras.main;
     const clampedZoom = Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM);
@@ -272,6 +581,7 @@ export class OfficeScene extends Phaser.Scene {
     camera.scrollY += worldPointBefore.y - worldPointAfter.y;
 
     this.updateHoverMarker();
+    this.updateGhostMarker();
     this.updateSelectionMarker();
     this.refreshOverlay();
     this.emitZoomChanged();
@@ -293,6 +603,8 @@ export class OfficeScene extends Phaser.Scene {
       scrollY: this.cameras.main.scrollY,
     });
   }
+
+  // ─── Pointer state ───────────────────────────────────────────────────────────
 
   private resolvePointerState(pointer: Phaser.Input.Pointer): ResolvedPointerState {
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
@@ -333,80 +645,6 @@ export class OfficeScene extends Phaser.Scene {
     }
 
     return null;
-  }
-
-  private updateHoverMarker(): void {
-    this.updateMarker(this.hoverMarker, this.hoverCell, this.hoverTarget);
-  }
-
-  private updateSelectionMarker(): void {
-    this.updateMarker(this.selectionMarker, this.selectedCell, this.selectedTarget);
-  }
-
-  private updateMarker(
-    marker: Phaser.GameObjects.Rectangle | null,
-    cell: OfficeSceneCellCoord | null,
-    target: OfficeRenderableTarget | null,
-  ): void {
-    if (!marker) {
-      return;
-    }
-
-    const bounds = target?.bounds ?? this.getCellBounds(cell);
-    if (!bounds) {
-      marker.setVisible(false);
-      return;
-    }
-
-    marker.setPosition(bounds.x, bounds.y);
-    marker.setSize(bounds.width, bounds.height);
-    marker.setVisible(true);
-  }
-
-  private getCellBounds(cell: OfficeSceneCellCoord | null): Phaser.Geom.Rectangle | null {
-    if (!cell) {
-      return null;
-    }
-
-    const { cellSize } = this.layout;
-    return new Phaser.Geom.Rectangle(
-      cell.col * cellSize,
-      cell.row * cellSize,
-      cellSize,
-      cellSize,
-    );
-  }
-
-  private refreshOverlay(pointerState: ResolvedPointerState | null = null): void {
-    if (!this.overlayText) {
-      return;
-    }
-
-    const hoverCell = pointerState?.cell ?? this.hoverCell;
-    const hoverTarget = pointerState?.target ?? this.hoverTarget;
-    const selectedTarget = this.selectedTarget;
-    const camera = this.cameras.main;
-
-    const hoverLabel = hoverCell
-      ? `${hoverCell.col},${hoverCell.row}${
-          hoverTarget ? ` ${hoverTarget.kind}:${hoverTarget.label}` : ""
-        }`
-      : "none";
-    const selectedLabel = this.selectedCell
-      ? `${this.selectedCell.col},${this.selectedCell.row}${
-          selectedTarget ? ` ${selectedTarget.kind}:${selectedTarget.label}` : ""
-        }`
-      : "none";
-
-    this.overlayText.setText(
-      [
-        "Donarg Office",
-        `zoom ${camera.zoom.toFixed(2)} scroll ${camera.scrollX.toFixed(0)},${camera.scrollY.toFixed(0)}`,
-        `hover ${hoverLabel}`,
-        `selected ${selectedLabel}`,
-        "left click select | wheel zoom | middle/right drag pan",
-      ].join("\n"),
-    );
   }
 
   private toPointerPayload(pointerState: ResolvedPointerState): OfficePointerMovedPayload {
