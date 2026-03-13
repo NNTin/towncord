@@ -5,12 +5,8 @@ import {
   getOfficeSceneBootstrap,
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
   type OfficeSceneBootstrap,
-  type OfficeSceneCharacter,
-  type OfficeSceneFurniture,
   type OfficeSceneLayout,
-  type OfficeSceneTile,
 } from "./office/bootstrap";
-import { resolveOfficeTileFill } from "./office/colors";
 import {
   OFFICE_CAMERA_CHANGED_EVENT,
   OFFICE_POINTER_MOVED_EVENT,
@@ -20,25 +16,44 @@ import {
   type OfficeSceneHoverTarget,
   type OfficeSelectionChangedPayload,
 } from "./office/events";
+import {
+  renderOfficeLayout,
+  type OfficeRenderableTarget,
+  type OfficeSceneRenderIndex,
+} from "./office/render";
 
 export const OFFICE_SCENE_KEY = "office";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 3;
 const CAMERA_PADDING = 96;
-const GRID_LINE_COLOR = 0x1f2937;
-const VOID_TILE_COLOR = 0x020617;
 const HOVER_STROKE_COLOR = 0x38bdf8;
 const SELECTED_STROKE_COLOR = 0xf59e0b;
+
+type ResolvedPointerState = {
+  cell: OfficeSceneCellCoord | null;
+  worldX: number;
+  worldY: number;
+  target: OfficeRenderableTarget | null;
+};
 
 export class OfficeScene extends Phaser.Scene {
   private bootstrap: OfficeSceneBootstrap = createOfficeSceneBootstrap();
 
   private layout: OfficeSceneLayout = this.bootstrap.layout;
 
+  private renderIndex: OfficeSceneRenderIndex = {
+    furniture: [],
+    characters: [],
+  };
+
   private hoverCell: OfficeSceneCellCoord | null = null;
 
+  private hoverTarget: OfficeRenderableTarget | null = null;
+
   private selectedCell: OfficeSceneCellCoord | null = null;
+
+  private selectedTarget: OfficeRenderableTarget | null = null;
 
   private hoverMarker: Phaser.GameObjects.Rectangle | null = null;
 
@@ -65,7 +80,7 @@ export class OfficeScene extends Phaser.Scene {
 
     this.input.mouse?.disableContextMenu();
 
-    this.renderLayout();
+    this.renderIndex = renderOfficeLayout(this, this.layout);
     this.createMarkers();
     this.createOverlay();
     this.configureCamera();
@@ -96,71 +111,6 @@ export class OfficeScene extends Phaser.Scene {
     this.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
   }
 
-  private renderLayout(): void {
-    const graphics = this.add.graphics();
-    const { cols, rows, cellSize, tiles, furniture, characters } = this.layout;
-
-    for (let row = 0; row < rows; row += 1) {
-      for (let col = 0; col < cols; col += 1) {
-        const tile = tiles[this.getTileIndex(col, row)] ?? { kind: "void" satisfies OfficeSceneTile["kind"] };
-        const x = col * cellSize;
-        const y = row * cellSize;
-        const fill = tile.kind === "void" ? VOID_TILE_COLOR : resolveOfficeTileFill(tile.kind, tile.tint);
-        const alpha = tile.kind === "void" ? 0.45 : 1;
-
-        graphics.fillStyle(fill, alpha);
-        graphics.fillRect(x, y, cellSize, cellSize);
-        graphics.lineStyle(1, GRID_LINE_COLOR, tile.kind === "void" ? 0.25 : 0.75);
-        graphics.strokeRect(x, y, cellSize, cellSize);
-      }
-    }
-
-    for (const item of furniture) {
-      this.renderFurniture(item);
-    }
-
-    for (const actor of characters) {
-      this.renderCharacter(actor);
-    }
-  }
-
-  private renderFurniture(item: OfficeSceneFurniture): void {
-    const { cellSize } = this.layout;
-    const x = item.col * cellSize;
-    const y = item.row * cellSize;
-    const width = item.width * cellSize;
-    const height = item.height * cellSize;
-    const rect = this.add.rectangle(x, y, width, height, item.color, 0.95);
-    rect.setOrigin(0);
-    rect.setStrokeStyle(2, 0xfef3c7, 0.9);
-    rect.setDepth(100 + item.row * 10 + item.height);
-
-    const label = this.add.text(x + width / 2, y + height / 2, item.label, {
-      fontFamily: "monospace",
-      fontSize: "12px",
-      color: "#f8fafc",
-    });
-    label.setOrigin(0.5);
-    label.setDepth(rect.depth + 1);
-  }
-
-  private renderCharacter(actor: OfficeSceneCharacter): void {
-    const { cellSize } = this.layout;
-    const x = actor.col * cellSize + cellSize / 2;
-    const y = actor.row * cellSize + cellSize / 2;
-    const circle = this.add.circle(x, y, cellSize * 0.26, actor.color, 1);
-    circle.setStrokeStyle(2, 0xe2e8f0, 0.95);
-    circle.setDepth(400 + actor.row * 10);
-
-    const label = this.add.text(x, y - 1, actor.label, {
-      fontFamily: "monospace",
-      fontSize: "14px",
-      color: "#020617",
-    });
-    label.setOrigin(0.5);
-    label.setDepth(circle.depth + 1);
-  }
-
   private createMarkers(): void {
     const { cellSize } = this.layout;
 
@@ -169,14 +119,14 @@ export class OfficeScene extends Phaser.Scene {
     this.hoverMarker.setFillStyle(HOVER_STROKE_COLOR, 0.12);
     this.hoverMarker.setStrokeStyle(2, HOVER_STROKE_COLOR, 0.95);
     this.hoverMarker.setVisible(false);
-    this.hoverMarker.setDepth(1_000);
+    this.hoverMarker.setDepth(20_000);
 
     this.selectionMarker = this.add.rectangle(0, 0, cellSize, cellSize);
     this.selectionMarker.setOrigin(0);
     this.selectionMarker.setFillStyle(SELECTED_STROKE_COLOR, 0.12);
     this.selectionMarker.setStrokeStyle(2, SELECTED_STROKE_COLOR, 1);
     this.selectionMarker.setVisible(false);
-    this.selectionMarker.setDepth(1_001);
+    this.selectionMarker.setDepth(20_001);
   }
 
   private createOverlay(): void {
@@ -184,13 +134,13 @@ export class OfficeScene extends Phaser.Scene {
       fontFamily: "monospace",
       fontSize: "13px",
       color: "#e2e8f0",
-      backgroundColor: "rgba(2, 6, 23, 0.7)",
+      backgroundColor: "rgba(2, 6, 23, 0.72)",
       padding: {
         x: 10,
         y: 8,
       },
     });
-    this.overlayText.setDepth(10_000);
+    this.overlayText.setDepth(30_000);
     this.overlayText.setScrollFactor(0);
   }
 
@@ -222,15 +172,16 @@ export class OfficeScene extends Phaser.Scene {
       return;
     }
 
-    const payload = this.getPointerPayload(pointer);
-    this.selectedCell = payload.cell;
+    const pointerState = this.resolvePointerState(pointer);
+    this.selectedCell = pointerState.cell;
+    this.selectedTarget = pointerState.target;
     this.updateSelectionMarker();
-    this.refreshOverlay();
+    this.refreshOverlay(pointerState);
     this.game.events.emit(
       OFFICE_SELECTION_CHANGED_EVENT,
       {
         cell: this.selectedCell,
-        target: payload.target,
+        target: this.toHoverTarget(pointerState.target),
       } satisfies OfficeSelectionChangedPayload,
     );
   }
@@ -252,16 +203,22 @@ export class OfficeScene extends Phaser.Scene {
       return;
     }
 
-    const payload = this.getPointerPayload(pointer);
-    const nextHover = payload.cell;
-    if (this.isSameCell(this.hoverCell, nextHover)) {
+    const pointerState = this.resolvePointerState(pointer);
+    if (
+      this.isSameCell(this.hoverCell, pointerState.cell) &&
+      this.isSameTarget(this.hoverTarget, pointerState.target)
+    ) {
       return;
     }
 
-    this.hoverCell = nextHover;
+    this.hoverCell = pointerState.cell;
+    this.hoverTarget = pointerState.target;
     this.updateHoverMarker();
-    this.refreshOverlay(payload);
-    this.game.events.emit(OFFICE_POINTER_MOVED_EVENT, payload satisfies OfficePointerMovedPayload);
+    this.refreshOverlay(pointerState);
+    this.game.events.emit(
+      OFFICE_POINTER_MOVED_EVENT,
+      this.toPointerPayload(pointerState) satisfies OfficePointerMovedPayload,
+    );
   }
 
   private onPointerWheel(
@@ -276,6 +233,7 @@ export class OfficeScene extends Phaser.Scene {
 
   private onGameOut(): void {
     this.hoverCell = null;
+    this.hoverTarget = null;
     this.updateHoverMarker();
     this.refreshOverlay();
     this.game.events.emit(
@@ -295,6 +253,7 @@ export class OfficeScene extends Phaser.Scene {
 
   private onResize(gameSize: Phaser.Structs.Size): void {
     this.cameras.main.setViewport(0, 0, gameSize.width, gameSize.height);
+    this.refreshOverlay();
   }
 
   private setZoom(nextZoom: number, pointer: Phaser.Input.Pointer): void {
@@ -335,10 +294,10 @@ export class OfficeScene extends Phaser.Scene {
     });
   }
 
-  private getPointerPayload(pointer: Phaser.Input.Pointer): OfficePointerMovedPayload {
+  private resolvePointerState(pointer: Phaser.Input.Pointer): ResolvedPointerState {
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
     const cell = this.worldToCell(worldPoint.x, worldPoint.y);
-    const target = this.findHoverTarget(cell);
+    const target = this.findHoverTarget(worldPoint.x, worldPoint.y);
 
     return {
       cell,
@@ -360,33 +319,16 @@ export class OfficeScene extends Phaser.Scene {
     return { col, row };
   }
 
-  private findHoverTarget(cell: OfficeSceneCellCoord | null): OfficeSceneHoverTarget {
-    if (!cell) {
-      return null;
-    }
-
-    for (const actor of this.layout.characters) {
-      if (actor.col === cell.col && actor.row === cell.row) {
-        return {
-          kind: "character",
-          id: actor.id,
-          label: actor.label,
-        };
+  private findHoverTarget(worldX: number, worldY: number): OfficeRenderableTarget | null {
+    for (const actor of this.renderIndex.characters) {
+      if (actor.bounds.contains(worldX, worldY)) {
+        return actor;
       }
     }
 
-    for (const item of this.layout.furniture) {
-      if (
-        cell.col >= item.col &&
-        cell.col < item.col + item.width &&
-        cell.row >= item.row &&
-        cell.row < item.row + item.height
-      ) {
-        return {
-          kind: "furniture",
-          id: item.id,
-          label: item.label,
-        };
+    for (const item of this.renderIndex.furniture) {
+      if (item.bounds.contains(worldX, worldY)) {
+        return item;
       }
     }
 
@@ -394,42 +336,61 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private updateHoverMarker(): void {
-    if (!this.hoverMarker || !this.hoverCell) {
-      this.hoverMarker?.setVisible(false);
-      return;
-    }
-
-    const { cellSize } = this.layout;
-    this.hoverMarker.setPosition(this.hoverCell.col * cellSize, this.hoverCell.row * cellSize);
-    this.hoverMarker.setVisible(true);
+    this.updateMarker(this.hoverMarker, this.hoverCell, this.hoverTarget);
   }
 
   private updateSelectionMarker(): void {
-    if (!this.selectionMarker || !this.selectedCell) {
-      this.selectionMarker?.setVisible(false);
+    this.updateMarker(this.selectionMarker, this.selectedCell, this.selectedTarget);
+  }
+
+  private updateMarker(
+    marker: Phaser.GameObjects.Rectangle | null,
+    cell: OfficeSceneCellCoord | null,
+    target: OfficeRenderableTarget | null,
+  ): void {
+    if (!marker) {
       return;
     }
 
-    const { cellSize } = this.layout;
-    this.selectionMarker.setPosition(
-      this.selectedCell.col * cellSize,
-      this.selectedCell.row * cellSize,
-    );
-    this.selectionMarker.setVisible(true);
+    const bounds = target?.bounds ?? this.getCellBounds(cell);
+    if (!bounds) {
+      marker.setVisible(false);
+      return;
+    }
+
+    marker.setPosition(bounds.x, bounds.y);
+    marker.setSize(bounds.width, bounds.height);
+    marker.setVisible(true);
   }
 
-  private refreshOverlay(payload: OfficePointerMovedPayload | null = null): void {
+  private getCellBounds(cell: OfficeSceneCellCoord | null): Phaser.Geom.Rectangle | null {
+    if (!cell) {
+      return null;
+    }
+
+    const { cellSize } = this.layout;
+    return new Phaser.Geom.Rectangle(
+      cell.col * cellSize,
+      cell.row * cellSize,
+      cellSize,
+      cellSize,
+    );
+  }
+
+  private refreshOverlay(pointerState: ResolvedPointerState | null = null): void {
     if (!this.overlayText) {
       return;
     }
 
-    const hoverCell = payload?.cell ?? this.hoverCell;
-    const hoverTarget = payload?.target ?? this.findHoverTarget(this.hoverCell);
-    const selectedTarget = this.findHoverTarget(this.selectedCell);
+    const hoverCell = pointerState?.cell ?? this.hoverCell;
+    const hoverTarget = pointerState?.target ?? this.hoverTarget;
+    const selectedTarget = this.selectedTarget;
     const camera = this.cameras.main;
 
     const hoverLabel = hoverCell
-      ? `${hoverCell.col},${hoverCell.row}${hoverTarget ? ` ${hoverTarget.kind}:${hoverTarget.label}` : ""}`
+      ? `${hoverCell.col},${hoverCell.row}${
+          hoverTarget ? ` ${hoverTarget.kind}:${hoverTarget.label}` : ""
+        }`
       : "none";
     const selectedLabel = this.selectedCell
       ? `${this.selectedCell.col},${this.selectedCell.row}${
@@ -439,7 +400,7 @@ export class OfficeScene extends Phaser.Scene {
 
     this.overlayText.setText(
       [
-        "Office Scene Scaffold",
+        "Donarg Office",
         `zoom ${camera.zoom.toFixed(2)} scroll ${camera.scrollX.toFixed(0)},${camera.scrollY.toFixed(0)}`,
         `hover ${hoverLabel}`,
         `selected ${selectedLabel}`,
@@ -448,8 +409,25 @@ export class OfficeScene extends Phaser.Scene {
     );
   }
 
-  private getTileIndex(col: number, row: number): number {
-    return row * this.layout.cols + col;
+  private toPointerPayload(pointerState: ResolvedPointerState): OfficePointerMovedPayload {
+    return {
+      cell: pointerState.cell,
+      worldX: pointerState.worldX,
+      worldY: pointerState.worldY,
+      target: this.toHoverTarget(pointerState.target),
+    };
+  }
+
+  private toHoverTarget(target: OfficeRenderableTarget | null): OfficeSceneHoverTarget {
+    if (!target) {
+      return null;
+    }
+
+    return {
+      kind: target.kind,
+      id: target.id,
+      label: target.label,
+    };
   }
 
   private isSameCell(
@@ -457,5 +435,12 @@ export class OfficeScene extends Phaser.Scene {
     right: OfficeSceneCellCoord | null,
   ): boolean {
     return left?.col === right?.col && left?.row === right?.row;
+  }
+
+  private isSameTarget(
+    left: OfficeRenderableTarget | null,
+    right: OfficeRenderableTarget | null,
+  ): boolean {
+    return left?.kind === right?.kind && left?.id === right?.id;
   }
 }

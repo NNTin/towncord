@@ -1,28 +1,106 @@
+import officeLayoutData from "../../../../../../packages/donarg-office-assets/assets/default-layout.json";
+import furnitureCatalogData from "../../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
+
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
+
+const DONARG_TILE_WORLD_SIZE = 16;
+const MAX_DERIVED_CHARACTERS = 6;
+const WALL_TILE_IDS = new Set([8]);
+const FLOOR_TILE_IDS = new Set([0, 1, 2, 6]);
+const CHARACTER_NAMES = ["Ari", "Bea", "Cai", "Dia", "Eli", "Faye"] as const;
+const CHARACTER_PALETTE = [
+  { color: 0x2563eb, accentColor: 0xbfdbfe },
+  { color: 0xdb2777, accentColor: 0xfbcfe8 },
+  { color: 0x059669, accentColor: 0xa7f3d0 },
+  { color: 0xd97706, accentColor: 0xfde68a },
+  { color: 0x7c3aed, accentColor: 0xddd6fe },
+  { color: 0xea580c, accentColor: 0xfdba74 },
+] as const;
+
+type DonargLayoutColor = {
+  h: number;
+  s: number;
+  b: number;
+  c: number;
+};
+
+type DonargLayoutPlacement = {
+  uid: string;
+  type: string;
+  col: number;
+  row: number;
+};
+
+type DonargOfficeLayoutSource = {
+  version: number;
+  cols: number;
+  rows: number;
+  tiles: number[];
+  tileColors: Array<DonargLayoutColor | null>;
+  furniture: DonargLayoutPlacement[];
+};
+
+type DonargFurnitureAssetSource = {
+  id: string;
+  label?: string;
+  category?: string;
+  width?: number;
+  height?: number;
+  footprintW?: number;
+  footprintH?: number;
+  canPlaceOnWalls?: boolean;
+  canPlaceOnSurfaces?: boolean;
+  groupId?: string;
+  orientation?: string;
+  state?: string;
+};
+
+type DonargFurnitureCatalogSource = {
+  assets: DonargFurnitureAssetSource[];
+};
 
 export type OfficeSceneTileKind = "void" | "floor" | "wall";
 
 export type OfficeSceneTile = {
   kind: OfficeSceneTileKind;
+  tileId: number;
   tint?: number;
 };
 
+export type OfficeSceneFurnitureCategory =
+  | "chairs"
+  | "decor"
+  | "desks"
+  | "electronics"
+  | "misc"
+  | "storage"
+  | "wall"
+  | "unknown";
+
+export type OfficeSceneFurniturePlacement = "floor" | "surface" | "wall";
+
 export type OfficeSceneFurniture = {
   id: string;
+  assetId: string;
   label: string;
+  category: OfficeSceneFurnitureCategory;
+  placement: OfficeSceneFurniturePlacement;
   col: number;
   row: number;
   width: number;
   height: number;
   color: number;
+  accentColor: number;
 };
 
 export type OfficeSceneCharacter = {
   id: string;
   label: string;
+  glyph: string;
   col: number;
   row: number;
   color: number;
+  accentColor: number;
 };
 
 export type OfficeSceneLayout = {
@@ -38,109 +116,469 @@ export type OfficeSceneBootstrap = {
   layout: OfficeSceneLayout;
 };
 
-const OFFICE_LAYOUT_ROWS = [
-  "############",
-  "#..........#",
-  "#..##......#",
-  "#..........#",
-  "#...####...#",
-  "#..........#",
-  "#..........#",
-  "############",
-] as const;
+type MappedFurnitureEntry = OfficeSceneFurniture & {
+  sourceOrder: number;
+  orientation?: string;
+  groupId?: string;
+};
 
-function toTileKind(symbol: string): OfficeSceneTileKind {
-  switch (symbol) {
-    case "#":
-      return "wall";
-    case ".":
-      return "floor";
-    default:
-      return "void";
-  }
-}
+const OFFICE_SCENE_BOOTSTRAP = buildOfficeSceneBootstrap(
+  officeLayoutData as DonargOfficeLayoutSource,
+  furnitureCatalogData as DonargFurnitureCatalogSource,
+);
 
-function createLayoutTiles(rows: readonly string[]): OfficeSceneTile[] {
-  const cols = rows.reduce((max, row) => Math.max(max, row.length), 0);
-  const tiles: OfficeSceneTile[] = [];
-
-  for (const row of rows) {
-    for (let col = 0; col < cols; col += 1) {
-      const symbol = row[col] ?? " ";
-      const kind = toTileKind(symbol);
-      if (kind === "floor") {
-        tiles.push({
-          kind,
-          tint: 0x0f766e,
-        });
-        continue;
-      }
-
-      tiles.push({ kind });
-    }
-  }
-
-  return tiles;
-}
-
-// Temporary scene bootstrap until the shared office domain lands on its own branch.
 export function createOfficeSceneBootstrap(): OfficeSceneBootstrap {
-  const cols = OFFICE_LAYOUT_ROWS.reduce((max, row) => Math.max(max, row.length), 0);
-  const rows = OFFICE_LAYOUT_ROWS.length;
+  return OFFICE_SCENE_BOOTSTRAP;
+}
+
+function buildOfficeSceneBootstrap(
+  sourceLayout: DonargOfficeLayoutSource,
+  sourceCatalog: DonargFurnitureCatalogSource,
+): OfficeSceneBootstrap {
+  const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
+  const tiles = sourceLayout.tiles.map((tileId, index) => {
+    const kind = toTileKind(tileId);
+    const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors[index] ?? null);
+
+    return typeof tint === "number"
+      ? {
+          kind,
+          tileId,
+          tint,
+        }
+      : {
+          kind,
+          tileId,
+        };
+  });
+
+  const furniture = sourceLayout.furniture.map((entry, index) =>
+    mapFurnitureEntry(entry, catalog.get(entry.type), index),
+  );
 
   return {
     layout: {
-      cols,
-      rows,
-      cellSize: 48,
-      tiles: createLayoutTiles(OFFICE_LAYOUT_ROWS),
-      furniture: [
-        {
-          id: "desk-1",
-          label: "Desk",
-          col: 2,
-          row: 2,
-          width: 2,
-          height: 1,
-          color: 0xa16207,
-        },
-        {
-          id: "table-1",
-          label: "Table",
-          col: 7,
-          row: 4,
-          width: 2,
-          height: 2,
-          color: 0x854d0e,
-        },
-        {
-          id: "shelf-1",
-          label: "Shelf",
-          col: 9,
-          row: 1,
-          width: 1,
-          height: 2,
-          color: 0x57534e,
-        },
-      ],
-      characters: [
-        {
-          id: "worker-1",
-          label: "A",
-          col: 4,
-          row: 5,
-          color: 0x60a5fa,
-        },
-        {
-          id: "worker-2",
-          label: "B",
-          col: 8,
-          row: 2,
-          color: 0xf472b6,
-        },
-      ],
+      cols: sourceLayout.cols,
+      rows: sourceLayout.rows,
+      cellSize: DONARG_TILE_WORLD_SIZE * 3,
+      tiles,
+      furniture,
+      characters: createDerivedCharacters(sourceLayout, furniture),
     },
   };
+}
+
+function mapFurnitureEntry(
+  entry: DonargLayoutPlacement,
+  sourceAsset: DonargFurnitureAssetSource | undefined,
+  sourceOrder: number,
+): MappedFurnitureEntry {
+  const width = Math.max(
+    1,
+    sourceAsset?.footprintW ?? fallbackFootprintFromPixels(sourceAsset?.width),
+  );
+  const height = Math.max(
+    1,
+    sourceAsset?.footprintH ?? fallbackFootprintFromPixels(sourceAsset?.height),
+  );
+  const colors = resolveFurnitureColors(sourceAsset);
+  const category = normalizeFurnitureCategory(sourceAsset?.category);
+
+  return {
+    id: entry.uid,
+    assetId: entry.type,
+    label: sourceAsset?.label ?? entry.type,
+    category,
+    placement: resolveFurniturePlacement(sourceAsset),
+    col: entry.col,
+    row: entry.row,
+    width,
+    height,
+    color: colors.color,
+    accentColor: colors.accentColor,
+    sourceOrder,
+    ...(sourceAsset?.orientation ? { orientation: sourceAsset.orientation } : {}),
+    ...(sourceAsset?.groupId ? { groupId: sourceAsset.groupId } : {}),
+  };
+}
+
+function fallbackFootprintFromPixels(pixels?: number): number {
+  if (!Number.isFinite(pixels)) {
+    return 1;
+  }
+
+  return Math.max(1, Math.ceil((pixels as number) / DONARG_TILE_WORLD_SIZE));
+}
+
+function normalizeFurnitureCategory(
+  category?: string,
+): OfficeSceneFurnitureCategory {
+  switch (category) {
+    case "chairs":
+    case "decor":
+    case "desks":
+    case "electronics":
+    case "misc":
+    case "storage":
+    case "wall":
+      return category;
+    default:
+      return "unknown";
+  }
+}
+
+function resolveFurniturePlacement(
+  sourceAsset?: DonargFurnitureAssetSource,
+): OfficeSceneFurniturePlacement {
+  if (sourceAsset?.canPlaceOnWalls) {
+    return "wall";
+  }
+
+  if (sourceAsset?.canPlaceOnSurfaces) {
+    return "surface";
+  }
+
+  return "floor";
+}
+
+function resolveFurnitureColors(sourceAsset?: DonargFurnitureAssetSource): {
+  color: number;
+  accentColor: number;
+} {
+  const label = sourceAsset?.label?.toLowerCase() ?? "";
+  const category = normalizeFurnitureCategory(sourceAsset?.category);
+
+  if (label.includes("plant")) {
+    return {
+      color: 0x166534,
+      accentColor: 0x86efac,
+    };
+  }
+
+  if (label.includes("fridge")) {
+    return {
+      color: 0xe5e7eb,
+      accentColor: 0x94a3b8,
+    };
+  }
+
+  if (label.includes("vending")) {
+    return {
+      color: 0x4338ca,
+      accentColor: 0xc4b5fd,
+    };
+  }
+
+  if (
+    label.includes("computer") ||
+    label.includes("laptop") ||
+    label.includes("monitor") ||
+    label.includes("server") ||
+    label.includes("telephone")
+  ) {
+    return {
+      color: 0x334155,
+      accentColor: 0x93c5fd,
+    };
+  }
+
+  switch (category) {
+    case "chairs":
+      return label.includes("cushioned")
+        ? {
+            color: 0x1d4ed8,
+            accentColor: 0xbfdbfe,
+          }
+        : {
+            color: 0x92400e,
+            accentColor: 0xfcd34d,
+          };
+    case "decor":
+      return {
+        color: 0x0f766e,
+        accentColor: 0x99f6e4,
+      };
+    case "desks":
+      return label.includes("white")
+        ? {
+            color: 0xe2e8f0,
+            accentColor: 0x94a3b8,
+          }
+        : {
+            color: 0x8b5a2b,
+            accentColor: 0xf4a261,
+          };
+    case "misc":
+      return {
+        color: 0x9a3412,
+        accentColor: 0xfdba74,
+      };
+    case "storage":
+      return {
+        color: 0x475569,
+        accentColor: 0xcbd5e1,
+      };
+    case "wall":
+      return {
+        color: 0xf8fafc,
+        accentColor: 0xf59e0b,
+      };
+    default:
+      return {
+        color: 0x64748b,
+        accentColor: 0xe2e8f0,
+      };
+  }
+}
+
+function createDerivedCharacters(
+  layout: DonargOfficeLayoutSource,
+  furniture: MappedFurnitureEntry[],
+): OfficeSceneCharacter[] {
+  const tileKindByIndex = layout.tiles.map(toTileKind);
+  const seatCandidates = furniture.filter(isSeatFurniture);
+  const workstationCandidates = furniture.filter(isWorkstationFurniture);
+  const occupiedSeats = new Set<string>();
+  const characters: OfficeSceneCharacter[] = [];
+
+  for (const station of workstationCandidates) {
+    const seat = findClosestAvailableSeat(station, seatCandidates, occupiedSeats);
+    if (!seat) {
+      continue;
+    }
+
+    occupiedSeats.add(seat.id);
+    characters.push(
+      createCharacterRecord(characters.length, seat.col, seat.row),
+    );
+
+    if (characters.length >= MAX_DERIVED_CHARACTERS) {
+      return characters;
+    }
+  }
+
+  const fallbackAnchors = seatCandidates
+    .filter((seat) => !occupiedSeats.has(seat.id))
+    .sort(compareFurnitureBySourceOrder);
+
+  for (const seat of fallbackAnchors) {
+    if (!isWalkableFloor(layout, tileKindByIndex, seat.col, seat.row)) {
+      continue;
+    }
+
+    characters.push(
+      createCharacterRecord(characters.length, seat.col, seat.row),
+    );
+    if (characters.length >= MAX_DERIVED_CHARACTERS) {
+      break;
+    }
+  }
+
+  return characters;
+}
+
+function createCharacterRecord(
+  index: number,
+  col: number,
+  row: number,
+): OfficeSceneCharacter {
+  const palette = CHARACTER_PALETTE[index % CHARACTER_PALETTE.length]!;
+  const label = CHARACTER_NAMES[index % CHARACTER_NAMES.length]!;
+
+  return {
+    id: `worker-${index + 1}`,
+    label,
+    glyph: label.charAt(0).toUpperCase(),
+    col,
+    row,
+    color: palette.color,
+    accentColor: palette.accentColor,
+  };
+}
+
+function findClosestAvailableSeat(
+  anchor: MappedFurnitureEntry,
+  seats: readonly MappedFurnitureEntry[],
+  occupiedSeats: ReadonlySet<string>,
+): MappedFurnitureEntry | null {
+  const anchorPoint = getFurnitureAnchorPoint(anchor);
+  const availableSeats = seats
+    .filter((seat) => !occupiedSeats.has(seat.id))
+    .map((seat) => ({
+      seat,
+      distance:
+        Math.abs(seat.col - anchorPoint.col) + Math.abs(seat.row - anchorPoint.row),
+    }))
+    .sort((left, right) => left.distance - right.distance || compareFurnitureBySourceOrder(left.seat, right.seat));
+
+  return availableSeats[0]?.seat ?? null;
+}
+
+function getFurnitureAnchorPoint(furniture: MappedFurnitureEntry): {
+  col: number;
+  row: number;
+} {
+  const centerCol = furniture.col + Math.floor((furniture.width - 1) / 2);
+  const centerRow = furniture.row + Math.floor((furniture.height - 1) / 2);
+
+  switch (furniture.orientation) {
+    case "left":
+      return {
+        col: furniture.col - 1,
+        row: centerRow,
+      };
+    case "right":
+      return {
+        col: furniture.col + furniture.width,
+        row: centerRow,
+      };
+    case "front":
+      return {
+        col: centerCol,
+        row: furniture.row + furniture.height,
+      };
+    case "back":
+      return {
+        col: centerCol,
+        row: furniture.row - 1,
+      };
+    default:
+      return {
+        col: centerCol,
+        row: furniture.row + furniture.height,
+      };
+  }
+}
+
+function compareFurnitureBySourceOrder(
+  left: MappedFurnitureEntry,
+  right: MappedFurnitureEntry,
+): number {
+  return left.sourceOrder - right.sourceOrder;
+}
+
+function isSeatFurniture(furniture: MappedFurnitureEntry): boolean {
+  return furniture.category === "chairs";
+}
+
+function isWorkstationFurniture(furniture: MappedFurnitureEntry): boolean {
+  if (furniture.category !== "electronics") {
+    return false;
+  }
+
+  const label = furniture.label.toLowerCase();
+  return (
+    label.includes("laptop") ||
+    label.includes("computer") ||
+    label.includes("monitor")
+  );
+}
+
+function isWalkableFloor(
+  layout: DonargOfficeLayoutSource,
+  tileKindByIndex: readonly OfficeSceneTileKind[],
+  col: number,
+  row: number,
+): boolean {
+  if (col < 0 || row < 0 || col >= layout.cols || row >= layout.rows) {
+    return false;
+  }
+
+  return tileKindByIndex[row * layout.cols + col] === "floor";
+}
+
+function toTileKind(tileId: number): OfficeSceneTileKind {
+  if (WALL_TILE_IDS.has(tileId)) {
+    return "wall";
+  }
+
+  if (FLOOR_TILE_IDS.has(tileId)) {
+    return "floor";
+  }
+
+  return "void";
+}
+
+function resolveSourceTileTint(
+  tileId: number,
+  sourceColor: DonargLayoutColor | null,
+): number | null {
+  const fallback = fallbackTileTint(tileId);
+  if (!sourceColor) {
+    return fallback;
+  }
+
+  const hue = ((sourceColor.h % 360) + 360) % 360 / 360;
+  const saturation = clamp01(sourceColor.s / 100);
+  const brightness = clamp01((sourceColor.b + 100) / 200);
+  const contrast = sourceColor.c / 100;
+  const lightness = clamp01(0.16 + brightness * 0.42 + contrast * 0.05);
+  const color = hslToHex(hue, saturation, lightness);
+
+  return color ?? fallback;
+}
+
+function fallbackTileTint(tileId: number): number | null {
+  switch (tileId) {
+    case 0:
+      return 0x7c5b3b;
+    case 1:
+      return 0x6b7280;
+    case 2:
+      return 0xa16207;
+    case 6:
+      return 0x4b6b80;
+    case 8:
+      return 0x334155;
+    default:
+      return null;
+  }
+}
+
+function clamp01(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
+function hslToHex(hue: number, saturation: number, lightness: number): number {
+  if (saturation === 0) {
+    const channel = Math.round(lightness * 255);
+    return (channel << 16) | (channel << 8) | channel;
+  }
+
+  const q =
+    lightness < 0.5
+      ? lightness * (1 + saturation)
+      : lightness + saturation - lightness * saturation;
+  const p = 2 * lightness - q;
+  const red = hueToRgb(p, q, hue + 1 / 3);
+  const green = hueToRgb(p, q, hue);
+  const blue = hueToRgb(p, q, hue - 1 / 3);
+
+  return (
+    (Math.round(red * 255) << 16) |
+    (Math.round(green * 255) << 8) |
+    Math.round(blue * 255)
+  );
+}
+
+function hueToRgb(p: number, q: number, value: number): number {
+  let channel = value;
+  if (channel < 0) {
+    channel += 1;
+  }
+  if (channel > 1) {
+    channel -= 1;
+  }
+  if (channel < 1 / 6) {
+    return p + (q - p) * 6 * channel;
+  }
+  if (channel < 1 / 2) {
+    return q;
+  }
+  if (channel < 2 / 3) {
+    return p + (q - p) * (2 / 3 - channel) * 6;
+  }
+  return p;
 }
 
 function isTileRecord(value: unknown): value is OfficeSceneTile {
@@ -148,7 +586,10 @@ function isTileRecord(value: unknown): value is OfficeSceneTile {
     typeof value === "object" &&
     value !== null &&
     "kind" in value &&
-    (value.kind === "void" || value.kind === "floor" || value.kind === "wall")
+    (value.kind === "void" || value.kind === "floor" || value.kind === "wall") &&
+    "tileId" in value &&
+    Number.isFinite((value as OfficeSceneTile).tileId) &&
+    (!("tint" in value) || Number.isFinite((value as OfficeSceneTile).tint))
   );
 }
 
@@ -157,12 +598,16 @@ function isFurnitureRecord(value: unknown): value is OfficeSceneFurniture {
     typeof value === "object" &&
     value !== null &&
     typeof (value as OfficeSceneFurniture).id === "string" &&
+    typeof (value as OfficeSceneFurniture).assetId === "string" &&
     typeof (value as OfficeSceneFurniture).label === "string" &&
+    typeof (value as OfficeSceneFurniture).category === "string" &&
+    typeof (value as OfficeSceneFurniture).placement === "string" &&
     Number.isFinite((value as OfficeSceneFurniture).col) &&
     Number.isFinite((value as OfficeSceneFurniture).row) &&
     Number.isFinite((value as OfficeSceneFurniture).width) &&
     Number.isFinite((value as OfficeSceneFurniture).height) &&
-    Number.isFinite((value as OfficeSceneFurniture).color)
+    Number.isFinite((value as OfficeSceneFurniture).color) &&
+    Number.isFinite((value as OfficeSceneFurniture).accentColor)
   );
 }
 
@@ -172,9 +617,11 @@ function isCharacterRecord(value: unknown): value is OfficeSceneCharacter {
     value !== null &&
     typeof (value as OfficeSceneCharacter).id === "string" &&
     typeof (value as OfficeSceneCharacter).label === "string" &&
+    typeof (value as OfficeSceneCharacter).glyph === "string" &&
     Number.isFinite((value as OfficeSceneCharacter).col) &&
     Number.isFinite((value as OfficeSceneCharacter).row) &&
-    Number.isFinite((value as OfficeSceneCharacter).color)
+    Number.isFinite((value as OfficeSceneCharacter).color) &&
+    Number.isFinite((value as OfficeSceneCharacter).accentColor)
   );
 }
 
@@ -189,34 +636,31 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
   }
 
   const candidate = layout as Partial<OfficeSceneLayout>;
-  const cols = candidate.cols;
-  const rows = candidate.rows;
-  const cellSize = candidate.cellSize;
+  if (
+    !Number.isFinite(candidate.cols) ||
+    !Number.isFinite(candidate.rows) ||
+    !Number.isFinite(candidate.cellSize) ||
+    !Array.isArray(candidate.tiles) ||
+    !Array.isArray(candidate.furniture) ||
+    !Array.isArray(candidate.characters)
+  ) {
+    return null;
+  }
+
+  if (
+    !candidate.tiles.every(isTileRecord) ||
+    !candidate.furniture.every(isFurnitureRecord) ||
+    !candidate.characters.every(isCharacterRecord)
+  ) {
+    return null;
+  }
+
+  const cols = candidate.cols as number;
+  const rows = candidate.rows as number;
+  const cellSize = candidate.cellSize as number;
   const tiles = candidate.tiles;
   const furniture = candidate.furniture;
   const characters = candidate.characters;
-
-  if (
-    typeof cols !== "number" ||
-    !Number.isFinite(cols) ||
-    typeof rows !== "number" ||
-    !Number.isFinite(rows) ||
-    typeof cellSize !== "number" ||
-    !Number.isFinite(cellSize) ||
-    !Array.isArray(tiles) ||
-    !Array.isArray(furniture) ||
-    !Array.isArray(characters)
-  ) {
-    return null;
-  }
-
-  if (
-    !tiles.every(isTileRecord) ||
-    !furniture.every(isFurnitureRecord) ||
-    !characters.every(isCharacterRecord)
-  ) {
-    return null;
-  }
 
   return {
     layout: {
