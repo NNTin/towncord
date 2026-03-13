@@ -34,7 +34,7 @@ type BloomseedSidebarBridgeProps = {
   runtimePerf: RuntimePerfPayload | null;
 };
 
-export type BottomToolbarBridgeProps = {
+type BottomToolbarBridgeProps = {
   isLayoutMode: boolean;
   onToggleLayoutMode: () => void;
 };
