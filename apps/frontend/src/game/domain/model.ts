@@ -1,5 +1,5 @@
 export type EntityId = string;
-export const KNOWN_ENTITY_KINDS = ["player", "npc"] as const;
+const KNOWN_ENTITY_KINDS = ["player", "npc"] as const;
 export type KnownEntityKind = (typeof KNOWN_ENTITY_KINDS)[number];
 export type EntityKind = KnownEntityKind | (string & {});
 export type EntityCapability = "idle" | "walk" | "run";

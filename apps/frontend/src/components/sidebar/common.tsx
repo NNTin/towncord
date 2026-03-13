@@ -1,4 +1,4 @@
-export const BUTTON_BASE: React.CSSProperties = {
+const BUTTON_BASE: React.CSSProperties = {
   border: "1px solid rgba(255,255,255,0.1)",
   borderRadius: 4,
   cursor: "pointer",
@@ -29,8 +29,52 @@ const SECTION_LABEL_STYLE: React.CSSProperties = {
   textTransform: "uppercase",
 };
 
-export function SectionLabel({ children }: { children: React.ReactNode }): JSX.Element {
+const PANEL_BODY_STYLE: React.CSSProperties = {
+  background: "rgba(15, 23, 42, 0.5)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 4,
+  display: "flex",
+  flexDirection: "column",
+  fontSize: 11,
+  marginLeft: 4,
+  padding: "6px 7px",
+};
+
+export function SectionLabel({
+  children,
+}: {
+  children: React.ReactNode;
+}): JSX.Element {
   return <div style={SECTION_LABEL_STYLE}>{children}</div>;
+}
+
+export function PanelBody({
+  children,
+  gap = 6,
+}: {
+  children: React.ReactNode;
+  gap?: number;
+}): JSX.Element {
+  return <div style={{ ...PANEL_BODY_STYLE, gap }}>{children}</div>;
+}
+
+export function KeyValueRow({
+  label,
+  value,
+  gap = 6,
+  valueStyle,
+}: {
+  label: string;
+  value: string;
+  gap?: number;
+  valueStyle?: React.CSSProperties;
+}): JSX.Element {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", gap }}>
+      <span style={{ color: "#64748b" }}>{label}</span>
+      <span style={{ color: "#cbd5e1", ...valueStyle }}>{value}</span>
+    </div>
+  );
 }
 
 export function AccordionHeader({
@@ -45,7 +89,11 @@ export function AccordionHeader({
   return (
     <button
       onClick={onToggle}
-      style={{ ...BUTTON_BASE, background: "rgba(255,255,255,0.05)", color: "#e2e8f0" }}
+      style={{
+        ...BUTTON_BASE,
+        background: "rgba(255,255,255,0.05)",
+        color: "#e2e8f0",
+      }}
     >
       {open ? "▾" : "▸"} {label}
     </button>

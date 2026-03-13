@@ -17,7 +17,7 @@ const AMBIENT_ACTION_CHANCE = 0.35;
 const AMBIENT_ACTION_COOLDOWN_MS = 2_400;
 const AUTONOMY_DECISION_DELAY_MS = 350;
 
-export type AutonomyUpdateContext = {
+type AutonomyUpdateContext = {
   autoplayEnabled: boolean;
   navigation: AutonomyNavigationService;
   rng?: () => number;

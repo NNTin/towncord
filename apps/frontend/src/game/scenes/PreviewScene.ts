@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import { registerBloomseedAnimations } from "../assets/animation";
 
-export const PREVIEW_SCENE_KEY = "preview";
+const PREVIEW_SCENE_KEY = "preview";
 
 // Internal events for the preview game instance (not shared with main game)
 export const PREVIEW_READY_EVENT = "preview:ready";
@@ -12,7 +12,7 @@ export const PREVIEW_INFO_EVENT = "preview:info";
 
 const EQUIPMENT_ATLAS = "bloomseed.equipment";
 
-export const PREVIEW_SCALE = 3;
+const PREVIEW_SCALE = 3;
 
 export type PreviewPlayPayload = {
   key: string;
@@ -78,6 +78,34 @@ export class PreviewScene extends Phaser.Scene {
     this.game.events.emit(PREVIEW_READY_EVENT);
   }
 
+  private getPreviewCenter(): { x: number; y: number } {
+    return {
+      x: Math.round(this.scale.width / 2),
+      y: Math.round(this.scale.height / 2),
+    };
+  }
+
+  private ensurePreviewSprite(
+    textureKey: string,
+    textureFrame: string | number,
+    syncTexture: boolean,
+  ): Phaser.GameObjects.Sprite {
+    const { x, y } = this.getPreviewCenter();
+
+    if (!this.sprite) {
+      this.sprite = this.add.sprite(x, y, textureKey, textureFrame);
+      this.sprite.setScale(PREVIEW_SCALE);
+      return this.sprite;
+    }
+
+    if (syncTexture) {
+      this.sprite.setTexture(textureKey, textureFrame);
+    }
+
+    this.sprite.setPosition(x, y);
+    return this.sprite;
+  }
+
   private onPlay(payload: PreviewPlayPayload): void {
     const { key, flipX, equipKey, equipFlipX, frameIndex } = payload;
 
@@ -85,35 +113,42 @@ export class PreviewScene extends Phaser.Scene {
     const firstFrame = animation?.frames[0];
     if (!animation || !firstFrame) return;
 
-    const cx = Math.round(this.scale.width / 2);
-    const cy = Math.round(this.scale.height / 2);
-
-    if (!this.sprite) {
-      this.sprite = this.add.sprite(cx, cy, firstFrame.textureKey, firstFrame.textureFrame);
-      this.sprite.setScale(PREVIEW_SCALE);
-    }
-
     const resolvedFrameIndex =
       typeof frameIndex === "number" && Number.isFinite(frameIndex)
-        ? Phaser.Math.Clamp(Math.floor(frameIndex), 0, animation.frames.length - 1)
+        ? Phaser.Math.Clamp(
+            Math.floor(frameIndex),
+            0,
+            animation.frames.length - 1,
+          )
         : null;
     const selectedAnimationFrame =
-      resolvedFrameIndex === null ? firstFrame : animation.frames[resolvedFrameIndex];
+      resolvedFrameIndex === null
+        ? firstFrame
+        : animation.frames[resolvedFrameIndex];
     if (!selectedAnimationFrame) return;
 
-    this.sprite.setFlip(flipX, false);
-    this.sprite.setRotation(0);
+    const previewSprite = this.ensurePreviewSprite(
+      selectedAnimationFrame.textureKey,
+      selectedAnimationFrame.textureFrame,
+      resolvedFrameIndex !== null,
+    );
+    const { x: centerX, y: centerY } = this.getPreviewCenter();
+
+    previewSprite.setFlip(flipX, false);
+    previewSprite.setRotation(0);
     if (resolvedFrameIndex === null) {
-      this.sprite.play(key, false);
+      previewSprite.play(key, false);
     } else {
-      this.sprite.setTexture(selectedAnimationFrame.textureKey, selectedAnimationFrame.textureFrame);
-      this.sprite.setPosition(cx, cy);
-      this.sprite.stop();
+      previewSprite.stop();
     }
 
-    if (resolvedFrameIndex === null && equipKey && this.anims.exists(equipKey)) {
+    if (
+      resolvedFrameIndex === null &&
+      equipKey &&
+      this.anims.exists(equipKey)
+    ) {
       if (!this.equipSprite) {
-        this.equipSprite = this.add.sprite(cx, cy, EQUIPMENT_ATLAS);
+        this.equipSprite = this.add.sprite(centerX, centerY, EQUIPMENT_ATLAS);
         this.equipSprite.setScale(PREVIEW_SCALE);
       }
       this.equipSprite.setFlipX(equipFlipX);
@@ -143,28 +178,28 @@ export class PreviewScene extends Phaser.Scene {
   }
 
   private onShowTile(payload: PreviewShowTilePayload): void {
-    const { textureKey, frame, caseId, materialId, cellX, cellY, rotate90, flipX, flipY } = payload;
+    const {
+      textureKey,
+      frame,
+      caseId,
+      materialId,
+      cellX,
+      cellY,
+      rotate90,
+      flipX,
+      flipY,
+    } = payload;
     if (!this.textures.exists(textureKey)) return;
 
     const texture = this.textures.get(textureKey);
     const resolvedFrame = texture.get(frame);
     if (!resolvedFrame) return;
 
-    const cx = Math.round(this.scale.width / 2);
-    const cy = Math.round(this.scale.height / 2);
-
-    if (!this.sprite) {
-      this.sprite = this.add.sprite(cx, cy, textureKey, frame);
-      this.sprite.setScale(PREVIEW_SCALE);
-    } else {
-      this.sprite.setTexture(textureKey, frame);
-      this.sprite.setPosition(cx, cy);
-    }
-
-    this.sprite.setFlip(flipX, flipY);
-    this.sprite.setRotation(rotate90 * (Math.PI / 2));
-    this.sprite.setScale(PREVIEW_SCALE);
-    this.sprite.stop();
+    const previewSprite = this.ensurePreviewSprite(textureKey, frame, true);
+    previewSprite.setFlip(flipX, flipY);
+    previewSprite.setRotation(rotate90 * (Math.PI / 2));
+    previewSprite.setScale(PREVIEW_SCALE);
+    previewSprite.stop();
 
     if (this.equipSprite) {
       this.equipSprite.setVisible(false);

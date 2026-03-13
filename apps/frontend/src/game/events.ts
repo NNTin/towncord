@@ -36,7 +36,7 @@ export type PlaceTerrainDropPayload = PlaceTerrainDragPayload & {
   screenY: number;
 };
 
-export type PlaceDropPayload = PlaceEntityDropPayload | PlaceTerrainDropPayload;
+type PlaceDropPayload = PlaceEntityDropPayload | PlaceTerrainDropPayload;
 
 // Kept for entity placement compatibility while terrain drops use PLACE_TERRAIN_DROP_EVENT.
 export type PlaceObjectDropPayload = PlaceEntityDropPayload;

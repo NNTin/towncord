@@ -19,7 +19,7 @@ type TerrainSeedFixture = {
   rows: string[];
 };
 
-export type TerrainBootstrap = {
+type TerrainBootstrap = {
   gridSpec: TerrainGridSpec;
   transition: TerrainTransitionRuleset;
 };

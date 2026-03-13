@@ -1,7 +1,7 @@
 import type { PlaceObjectDropPayload } from "../events";
 import type { EntityId } from "../domain/model";
 
-export type SpawnRequest = {
+type SpawnRequest = {
   entityId: EntityId;
   screenX: number;
   screenY: number;

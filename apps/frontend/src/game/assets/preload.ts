@@ -1,15 +1,15 @@
 import type Phaser from "phaser";
 
-export const BLOOMSEED_PACK_KEY = "bloomseed";
-export const BLOOMSEED_PACK_URL = "assets/bloomseed/pack.json";
-export const BLOOMSEED_PACK_SECTION = "bloomseed";
+const BLOOMSEED_PACK_KEY = "bloomseed";
+const BLOOMSEED_PACK_URL = "assets/bloomseed/pack.json";
+const BLOOMSEED_PACK_SECTION = "bloomseed";
 export const BLOOMSEED_ANIMATIONS_JSON_KEY = "bloomseed.animations";
-export const DEBUG_PACK_KEY = "debug";
-export const DEBUG_PACK_URL = "assets/debug/pack.json";
-export const DEBUG_PACK_SECTION = "debug";
+const DEBUG_PACK_KEY = "debug";
+const DEBUG_PACK_URL = "assets/debug/pack.json";
+const DEBUG_PACK_SECTION = "debug";
 export const DEBUG_ANIMATIONS_JSON_KEY = "debug.animations";
 
-export type BloomseedPreloadOptions = {
+type BloomseedPreloadOptions = {
   packKey?: string;
   packUrl?: string;
   section?: string;
@@ -39,7 +39,7 @@ export function preloadBloomseedPack(
   return true;
 }
 
-export type DebugPreloadOptions = {
+type DebugPreloadOptions = {
   packKey?: string;
   packUrl?: string;
   section?: string;

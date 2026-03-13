@@ -8,7 +8,7 @@ import {
 } from "./placeableService";
 import { listTerrainPlaceables } from "./terrainPlaceableCatalog";
 
-export type BloomseedWorldBootstrap = {
+type BloomseedWorldBootstrap = {
   catalog: AnimationCatalog;
   entityRegistry: EntityRegistry;
 };
@@ -18,7 +18,7 @@ export type BloomseedUiBootstrap = {
   placeables: PlaceableViewModel[];
 };
 
-export type BloomseedBootstrap = {
+type BloomseedBootstrap = {
   world: BloomseedWorldBootstrap;
   ui: BloomseedUiBootstrap;
 };

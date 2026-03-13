@@ -7,10 +7,7 @@ import {
 } from "@towncord/public-animation-contracts";
 import { BLOOMSEED_ANIMATIONS_JSON_KEY } from "./preload";
 
-export type BloomseedAnimationDefinition = PublicAnimationDefinition;
-export type BloomseedAnimationManifest = PublicAnimationManifest;
-
-export type BloomseedAnimationOverride = {
+type BloomseedAnimationOverride = {
   key?: string;
   frameRate?: number;
   repeat?: number;
@@ -21,7 +18,7 @@ export type BloomseedAnimationOverride = {
   hideOnComplete?: boolean;
 };
 
-export type RegisterBloomseedAnimationsOptions = {
+type RegisterBloomseedAnimationsOptions = {
   manifestKey?: string;
   defaultRepeat?: number;
   onMissingAtlas?: "skip" | "throw";
@@ -104,7 +101,7 @@ export function registerBloomseedAnimations(
   return created;
 }
 
-export function buildAnimationFrames(
+function buildAnimationFrames(
   definition: PublicAnimationDefinition,
 ): Phaser.Types.Animations.AnimationFrame[] {
   if (
@@ -151,13 +148,13 @@ export function buildAnimationFrames(
   });
 }
 
-export function resolveAnimationFrameRate(
+function resolveAnimationFrameRate(
   overrideFrameRate: number | undefined,
 ): number | undefined {
   return overrideFrameRate;
 }
 
-export function readAnimationManifest(
+function readAnimationManifest(
   scene: Phaser.Scene,
   manifestKey: string,
 ): PublicAnimationManifest {

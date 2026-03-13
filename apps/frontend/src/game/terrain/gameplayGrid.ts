@@ -13,13 +13,13 @@ const BFS_NEIGHBOR_OFFSETS = [
   { x: 0, y: -1 },
 ] as const;
 
-export type TerrainMaterialRule = {
+type TerrainMaterialRule = {
   walkable: boolean;
 };
 
-export type TerrainMaterialRules = Partial<Record<TerrainMaterialId, TerrainMaterialRule>>;
+type TerrainMaterialRules = Partial<Record<TerrainMaterialId, TerrainMaterialRule>>;
 
-export type TerrainWorldBounds = {
+type TerrainWorldBounds = {
   minX: number;
   minY: number;
   maxX: number;
@@ -28,12 +28,12 @@ export type TerrainWorldBounds = {
   height: number;
 };
 
-export type TerrainWorldPoint = {
+type TerrainWorldPoint = {
   worldX: number;
   worldY: number;
 };
 
-export type TerrainPath = {
+type TerrainPath = {
   cells: TerrainCellCoord[];
   revision: number;
 };
