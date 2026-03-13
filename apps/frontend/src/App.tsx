@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { OfficeEditorDrawer } from "./components/OfficeEditorDrawer";
-import { BottomToolbar } from "./components/BottomToolbar";
+import { BottomToolbar, type OfficeLayoutTool } from "./components/BottomToolbar";
 import { SidebarAccordion } from "./components/SidebarAccordion";
 import { ZoomControls } from "./components/ZoomControls";
 import { useOfficeLayoutEditor } from "./app/useOfficeLayoutEditor";
@@ -14,6 +15,9 @@ function App(): JSX.Element {
     zoomProps,
   } = useBloomseedUiBridge();
   const officeEditor = useOfficeLayoutEditor();
+  const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
+  const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
+  const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
 
   return (
     <main className="app">
@@ -42,6 +46,12 @@ function App(): JSX.Element {
       <BottomToolbar
         isLayoutMode={officeEditor.isOpen}
         onToggleLayoutMode={officeEditor.toggleOpen}
+        activeTool={activeTool}
+        onSelectTool={setActiveTool}
+        activeTileColor={activeTileColor}
+        onSelectTileColor={setActiveTileColor}
+        activeFurnitureId={activeFurnitureId}
+        onSelectFurnitureId={setActiveFurnitureId}
         onResetLayout={officeEditor.reset}
         onSaveLayout={() => void officeEditor.save()}
         canResetLayout={officeEditor.canReset}
