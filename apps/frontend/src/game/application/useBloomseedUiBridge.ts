@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent, MutableRefObject } from "react";
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
@@ -34,11 +34,17 @@ type BloomseedSidebarBridgeProps = {
   runtimePerf: RuntimePerfPayload | null;
 };
 
+export type BottomToolbarBridgeProps = {
+  isLayoutMode: boolean;
+  onToggleLayoutMode: () => void;
+};
+
 type BloomseedUiBridge = {
   gameRootRef: MutableRefObject<HTMLDivElement | null>;
   onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
+  bottomToolbarProps: BottomToolbarBridgeProps;
 };
 
 function emitPlaceDrop(
@@ -71,6 +77,7 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
+  const [isLayoutMode, setIsLayoutMode] = useState(false);
 
   useEffect(() => {
     const container = gameRootRef.current;
@@ -151,6 +158,10 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     }
   }
 
+  const onToggleLayoutMode = useCallback(() => {
+    setIsLayoutMode((prev) => !prev);
+  }, []);
+
   return {
     gameRootRef,
     onGameRootDragOver,
@@ -167,5 +178,9 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
             runtimePerf,
           }
         : null,
+    bottomToolbarProps: {
+      isLayoutMode,
+      onToggleLayoutMode,
+    },
   };
 }
