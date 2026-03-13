@@ -2,11 +2,13 @@ import { describe, expect, test } from "vitest";
 import {
   buildAnimationCatalog,
   getOfficeCharacterIds,
+  getOfficeCharacterPalettes,
   getOfficeEnvironmentGroups,
   getOfficeFurnitureGroups,
   getPropGroups,
   getTilesetGroups,
   getTracksForPath,
+  listOfficeCharacterDescriptors,
   resolveTrackForDirection,
 } from "../animationCatalog";
 
@@ -62,11 +64,23 @@ describe("animationCatalog", () => {
     ]);
 
     expect(catalog.entityTypes).toEqual([]);
-    expect(catalog.officeCharacterPalettes).toEqual(["palette-0", "palette-1"]);
+    expect(getOfficeCharacterPalettes(catalog)).toEqual(["palette-0", "palette-1"]);
     expect(catalog.officeCharacterIds).toEqual(["office-worker"]);
     expect(getOfficeCharacterIds(catalog, "palette-0")).toEqual(["office-worker"]);
     expect(getOfficeEnvironmentGroups(catalog)).toEqual(["floors", "walls"]);
     expect(getOfficeFurnitureGroups(catalog)).toEqual(["chairs", "desks"]);
+    expect(listOfficeCharacterDescriptors(catalog)).toEqual([
+      {
+        palette: "palette-0",
+        characterId: "office-worker",
+        visualPath: "office/characters/palette-0/office-worker",
+      },
+      {
+        palette: "palette-1",
+        characterId: "office-worker",
+        visualPath: "office/characters/palette-1/office-worker",
+      },
+    ]);
     expect(
       getTracksForPath(catalog, "office/characters/palette-0/office-worker").map((track) => track.id),
     ).toEqual(["read", "walk"]);

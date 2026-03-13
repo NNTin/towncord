@@ -426,6 +426,14 @@ function parseMobVisualPath(path: string): MobCatalogDescriptor | null {
   return { family, mobId, visualPath: path };
 }
 
+function parseOfficeCharacterVisualPath(path: string): OfficeCharacterDescriptor | null {
+  const [ns, group, palette, characterId, extra] = path.split("/");
+  if (ns !== "office" || group !== "characters" || !palette || !characterId || extra) {
+    return null;
+  }
+  return { palette, characterId, visualPath: path };
+}
+
 function listCatalogPathSuffixes(
   catalog: AnimationCatalog,
   prefix: string,
@@ -449,14 +457,6 @@ export function listMobDescriptors(
   return descriptors;
 }
 
-function parseOfficeCharacterVisualPath(path: string): OfficeCharacterDescriptor | null {
-  const [ns, group, palette, characterId, extra] = path.split("/");
-  if (ns !== "office" || group !== "characters" || !palette || !characterId || extra) {
-    return null;
-  }
-  return { palette, characterId, visualPath: path };
-}
-
 /** Returns prop groups under a prop family (e.g. "chest", "water", "barrels"). */
 export function getPropGroups(
   catalog: AnimationCatalog,
@@ -471,6 +471,10 @@ export function getTilesetGroups(
   family: TilesetFamily,
 ): string[] {
   return listCatalogPathSuffixes(catalog, `tilesets/${family}/`);
+}
+
+export function getOfficeCharacterPalettes(catalog: AnimationCatalog): string[] {
+  return [...catalog.officeCharacterPalettes];
 }
 
 export function getOfficeCharacterIds(
