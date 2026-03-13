@@ -155,16 +155,18 @@ describe("office rules", () => {
       catalog,
       { uid: "desk-1", type: "DESK_FRONT", col: 1, row: 1 },
     );
+    layout = rotateOfficeFurniture(layout, catalog, "desk-1", "cw");
+
+    expect(layout.furniture.find((item) => item.uid === "desk-1")?.type).toBe("DESK_RIGHT");
+
     layout = placeOfficeFurniture(
       layout,
       catalog,
       { uid: "laptop-1", type: "LAPTOP_OFF", col: 1, row: 1 },
     );
 
-    layout = rotateOfficeFurniture(layout, catalog, "desk-1", "cw");
     layout = toggleOfficeFurnitureState(layout, catalog, "laptop-1");
 
-    expect(layout.furniture.find((item) => item.uid === "desk-1")?.type).toBe("DESK_RIGHT");
     expect(layout.furniture.find((item) => item.uid === "laptop-1")?.type).toBe("LAPTOP_ON");
   });
 

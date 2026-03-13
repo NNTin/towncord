@@ -256,6 +256,10 @@ export function canPlaceOfficeFurniture(
       const currentCol = col + colOffset;
       const tileKey = `${currentCol},${currentRow}`;
 
+      if (entry.canPlaceOnSurfaces && !deskTiles?.has(tileKey)) {
+        return false;
+      }
+
       if (!ignoreTileValidity) {
         const index = getOfficeTileIndex(layout, currentCol, currentRow);
         const tile = layout.tiles[index];
@@ -480,8 +484,14 @@ export function expandOfficeLayout(
       break;
   }
 
-  const tiles = Array.from({ length: cols * rows }, () => OFFICE_TILE_TYPE.VOID);
-  const tileColors = Array.from({ length: cols * rows }, () => null as OfficeColorAdjustment | null);
+  const tiles: OfficeLayoutDocument["tiles"] = Array.from(
+    { length: cols * rows },
+    () => OFFICE_TILE_TYPE.VOID,
+  ) as OfficeLayoutDocument["tiles"];
+  const tileColors: Array<OfficeColorAdjustment | null> = Array.from(
+    { length: cols * rows },
+    () => null as OfficeColorAdjustment | null,
+  );
   const existingTileColors = cloneTileColors(layout);
 
   for (let row = 0; row < layout.rows; row += 1) {
@@ -567,4 +577,3 @@ export function createOfficeCharacter(
     row,
   };
 }
-

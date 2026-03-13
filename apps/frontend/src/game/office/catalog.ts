@@ -1,12 +1,25 @@
 import type {
-  OfficeCatalog,
-  OfficeFurnitureAsset,
+  OfficeCatalogCategory,
+  OfficeFurnitureCatalogAsset,
   OfficeFurnitureCatalogEntry,
 } from "./model";
 
+type RotationGroup = {
+  orientations: string[];
+  members: Record<string, string>;
+};
+
+export type OfficeFurnitureCatalogIndex = {
+  byType: Map<string, OfficeFurnitureCatalogEntry>;
+  visibleTypes: string[];
+  categories: OfficeCatalogCategory[];
+  rotationGroupByType: Map<string, RotationGroup>;
+  toggledTypeByType: Map<string, string>;
+};
+
 const ORIENTATION_ORDER = ["front", "right", "back", "left"] as const;
 
-function toCatalogEntry(asset: OfficeFurnitureAsset): OfficeFurnitureCatalogEntry {
+function toCatalogEntry(asset: OfficeFurnitureCatalogAsset): OfficeFurnitureCatalogEntry {
   return {
     type: asset.id,
     label: asset.label,
@@ -14,173 +27,130 @@ function toCatalogEntry(asset: OfficeFurnitureAsset): OfficeFurnitureCatalogEntr
     footprintW: asset.footprintW,
     footprintH: asset.footprintH,
     isDesk: asset.isDesk,
-    canPlaceOnWalls: asset.canPlaceOnWalls ?? false,
-    canPlaceOnSurfaces: asset.canPlaceOnSurfaces ?? false,
-    backgroundTiles: asset.backgroundTiles ?? 0,
-    ...(asset.groupId ? { groupId: asset.groupId } : {}),
     ...(asset.orientation ? { orientation: asset.orientation } : {}),
     ...(asset.state ? { state: asset.state } : {}),
+    ...(asset.canPlaceOnSurfaces ? { canPlaceOnSurfaces: true } : {}),
+    ...(asset.backgroundTiles ? { backgroundTiles: asset.backgroundTiles } : {}),
+    ...(asset.canPlaceOnWalls ? { canPlaceOnWalls: true } : {}),
   };
 }
 
-function stripGroupedVariantLabel(label: string): string {
-  return label
-    .replace(/ - Front - Off$/u, "")
-    .replace(/ - Front$/u, "")
-    .replace(/ - Off$/u, "");
-}
-
-export function buildOfficeCatalog(
-  assets: readonly OfficeFurnitureAsset[],
-): OfficeCatalog {
+export function buildOfficeFurnitureCatalogIndex(
+  assets: readonly OfficeFurnitureCatalogAsset[],
+): OfficeFurnitureCatalogIndex {
   const byType = new Map<string, OfficeFurnitureCatalogEntry>();
-  const rotationOrderByType = new Map<string, readonly string[]>();
-  const statePartnerByType = new Map<string, string>();
+  const rotationGroupByType = new Map<string, RotationGroup>();
+  const toggledTypeByType = new Map<string, string>();
 
-  const allEntries = assets.map(toCatalogEntry);
-  for (const entry of allEntries) {
-    byType.set(entry.type, entry);
+  for (const asset of assets) {
+    byType.set(asset.id, toCatalogEntry(asset));
   }
 
-  const orientationByGroup = new Map<string, Map<string, string>>();
+  const groupOrientations = new Map<string, Map<string, string>>();
   for (const asset of assets) {
     if (!asset.groupId || !asset.orientation) continue;
     if (asset.state && asset.state !== "off") continue;
 
-    let group = orientationByGroup.get(asset.groupId);
-    if (!group) {
-      group = new Map<string, string>();
-      orientationByGroup.set(asset.groupId, group);
-    }
-    group.set(asset.orientation, asset.id);
+    const orientMap = groupOrientations.get(asset.groupId) ?? new Map<string, string>();
+    orientMap.set(asset.orientation, asset.id);
+    groupOrientations.set(asset.groupId, orientMap);
   }
 
-  const hiddenVisibleTypes = new Set<string>();
+  const hiddenTypes = new Set<string>();
+  for (const orientMap of groupOrientations.values()) {
+    const orientations = ORIENTATION_ORDER.filter((orientation) => orientMap.has(orientation));
+    if (orientations.length < 2) continue;
 
-  for (const orientationMap of orientationByGroup.values()) {
-    const orderedTypes = ORIENTATION_ORDER
-      .map((orientation) => orientationMap.get(orientation))
-      .filter((type): type is string => Boolean(type));
-    if (orderedTypes.length < 2) continue;
-
-    for (const type of orderedTypes) {
-      rotationOrderByType.set(type, orderedTypes);
+    const members: Record<string, string> = {};
+    for (const orientation of orientations) {
+      members[orientation] = orientMap.get(orientation)!;
     }
 
-    orderedTypes.slice(1).forEach((type) => hiddenVisibleTypes.add(type));
+    const group: RotationGroup = { orientations: [...orientations], members };
+    for (const type of Object.values(members)) {
+      rotationGroupByType.set(type, group);
+    }
+
+    const primaryType = members[orientations[0]!]!;
+    for (const type of Object.values(members)) {
+      if (type !== primaryType) hiddenTypes.add(type);
+    }
   }
 
-  const stateByGroupOrientation = new Map<string, Map<string, string>>();
+  const statePairs = new Map<string, Map<string, string>>();
   for (const asset of assets) {
     if (!asset.groupId || !asset.state) continue;
     const key = `${asset.groupId}|${asset.orientation ?? ""}`;
-    let stateMap = stateByGroupOrientation.get(key);
-    if (!stateMap) {
-      stateMap = new Map<string, string>();
-      stateByGroupOrientation.set(key, stateMap);
-    }
-    stateMap.set(asset.state, asset.id);
+    const pair = statePairs.get(key) ?? new Map<string, string>();
+    pair.set(asset.state, asset.id);
+    statePairs.set(key, pair);
   }
 
-  for (const stateMap of stateByGroupOrientation.values()) {
-    const onType = stateMap.get("on");
-    const offType = stateMap.get("off");
+  const onStateTypes = new Set<string>();
+  for (const pair of statePairs.values()) {
+    const onType = pair.get("on");
+    const offType = pair.get("off");
     if (!onType || !offType) continue;
-    statePartnerByType.set(onType, offType);
-    statePartnerByType.set(offType, onType);
-    hiddenVisibleTypes.add(onType);
+
+    toggledTypeByType.set(onType, offType);
+    toggledTypeByType.set(offType, onType);
+    onStateTypes.add(onType);
   }
 
-  for (const asset of assets) {
-    if (!asset.groupId || asset.state !== "on" || !asset.orientation) continue;
-    const offType = statePartnerByType.get(asset.id);
-    if (!offType) continue;
+  const visibleTypes = [...byType.keys()]
+    .filter((type) => !hiddenTypes.has(type) && !onStateTypes.has(type))
+    .sort((a, b) => {
+      const aEntry = byType.get(a)!;
+      const bEntry = byType.get(b)!;
+      if (aEntry.category !== bEntry.category) return aEntry.category.localeCompare(bEntry.category);
+      return aEntry.label.localeCompare(bEntry.label);
+    });
 
-    const offRotationOrder = rotationOrderByType.get(offType);
-    if (!offRotationOrder || offRotationOrder.length < 2) continue;
-
-    const onRotationOrder = offRotationOrder.map(
-      (memberType) => statePartnerByType.get(memberType) ?? memberType,
-    );
-    for (const type of onRotationOrder) {
-      if (!rotationOrderByType.has(type)) {
-        rotationOrderByType.set(type, onRotationOrder);
-      }
-    }
-  }
-
-  const visibleTypesByCategory = new Map<string, string[]>();
-
-  for (const entry of allEntries) {
-    if (hiddenVisibleTypes.has(entry.type)) continue;
-
-    const visibleEntry: OfficeFurnitureCatalogEntry = {
-      ...entry,
-      label:
-        rotationOrderByType.has(entry.type) || statePartnerByType.has(entry.type)
-          ? stripGroupedVariantLabel(entry.label)
-          : entry.label,
-    };
-    byType.set(visibleEntry.type, visibleEntry);
-
-    let types = visibleTypesByCategory.get(visibleEntry.category);
-    if (!types) {
-      types = [];
-      visibleTypesByCategory.set(visibleEntry.category, types);
-    }
-    types.push(visibleEntry.type);
-  }
-
-  for (const [category, types] of visibleTypesByCategory) {
-    visibleTypesByCategory.set(category, [...types].sort());
-  }
+  const categories = [...new Set(visibleTypes.map((type) => byType.get(type)!.category))].sort();
 
   return {
     byType,
-    visibleTypesByCategory,
-    visibleCategories: [...visibleTypesByCategory.keys()].sort(),
-    rotationOrderByType,
-    statePartnerByType,
+    visibleTypes,
+    categories,
+    rotationGroupByType,
+    toggledTypeByType,
   };
 }
 
-export function getOfficeFurnitureEntry(
-  catalog: OfficeCatalog,
+export function getFurnitureCatalogEntry(
+  index: OfficeFurnitureCatalogIndex,
   type: string,
-): OfficeFurnitureCatalogEntry | undefined {
-  return catalog.byType.get(type);
+): OfficeFurnitureCatalogEntry | null {
+  return index.byType.get(type) ?? null;
 }
 
-export function listVisibleOfficeFurnitureTypes(
-  catalog: OfficeCatalog,
-  category: string,
-): readonly string[] {
-  return catalog.visibleTypesByCategory.get(category) ?? [];
+export function getVisibleFurnitureTypesForCategory(
+  index: OfficeFurnitureCatalogIndex,
+  category: OfficeCatalogCategory,
+): string[] {
+  return index.visibleTypes.filter((type) => index.byType.get(type)?.category === category);
 }
 
-export function getRotatedOfficeFurnitureType(
-  catalog: OfficeCatalog,
+export function getRotatedFurnitureType(
+  index: OfficeFurnitureCatalogIndex,
   currentType: string,
   direction: "cw" | "ccw",
 ): string | null {
-  const order = catalog.rotationOrderByType.get(currentType);
-  if (!order || order.length < 2) return null;
+  const group = index.rotationGroupByType.get(currentType);
+  if (!group) return null;
 
-  const index = order.indexOf(currentType);
-  if (index < 0) return null;
+  const order = group.orientations.map((orientation) => group.members[orientation]!);
+  const currentIndex = order.indexOf(currentType);
+  if (currentIndex === -1) return null;
 
-  const nextIndex =
-    direction === "cw"
-      ? (index + 1) % order.length
-      : (index - 1 + order.length) % order.length;
-
+  const delta = direction === "cw" ? 1 : -1;
+  const nextIndex = (currentIndex + delta + order.length) % order.length;
   return order[nextIndex] ?? null;
 }
 
-export function getToggledOfficeFurnitureType(
-  catalog: OfficeCatalog,
+export function getToggledFurnitureType(
+  index: OfficeFurnitureCatalogIndex,
   currentType: string,
 ): string | null {
-  return catalog.statePartnerByType.get(currentType) ?? null;
+  return index.toggledTypeByType.get(currentType) ?? null;
 }
-
