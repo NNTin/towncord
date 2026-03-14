@@ -67,7 +67,10 @@ describe("TownCollisionGrid — office precedence", () => {
   const rows = 4;
 
   // Cell (0,0) = wall, everything else = floor
-  const tileKinds = Array.from<"floor" | "wall" | "void">({ length: cols * rows }, () => "floor");
+  const tileKinds: Array<"floor" | "wall" | "void"> = Array.from(
+    { length: cols * rows },
+    (): "floor" => "floor",
+  );
   tileKinds[0] = "wall";
 
   const region = makeOfficeRegion(anchorX16, anchorY16, cols, rows, tileKinds);

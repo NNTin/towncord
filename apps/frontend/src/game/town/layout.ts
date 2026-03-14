@@ -10,8 +10,14 @@ import { loadTerrainBootstrap } from "../terrain/bootstrap";
  */
 export const TOWN_BASE_PX = 16;
 
-/** Number of 16px units in one office cell (3 × 16px = 48px). */
-const OFFICE_CELL_UNITS = 3;
+/**
+ * Returns the number of 16px base units per office cell for the given region.
+ * Derived from `layout.cellSize` rather than a hard-coded constant so the
+ * helper functions stay self-consistent if the cell size ever changes.
+ */
+function officeCellUnits(region: TownOfficeRegion): number {
+  return Math.round(region.layout.cellSize / TOWN_BASE_PX);
+}
 
 export type TownLayout = {
   terrain: TerrainGridSpec;
@@ -44,8 +50,8 @@ export function isInsideOffice(
   return (
     relX >= 0 &&
     relY >= 0 &&
-    relX < region.layout.cols * OFFICE_CELL_UNITS &&
-    relY < region.layout.rows * OFFICE_CELL_UNITS
+    relX < region.layout.cols * officeCellUnits(region) &&
+    relY < region.layout.rows * officeCellUnits(region)
   );
 }
 
@@ -63,18 +69,14 @@ export function worldToOfficeCell(
   const relX = x16 - region.anchorX16;
   const relY = y16 - region.anchorY16;
 
-  if (
-    relX < 0 ||
-    relY < 0 ||
-    relX >= region.layout.cols * OFFICE_CELL_UNITS ||
-    relY >= region.layout.rows * OFFICE_CELL_UNITS
-  ) {
+  const cu = officeCellUnits(region);
+  if (relX < 0 || relY < 0 || relX >= region.layout.cols * cu || relY >= region.layout.rows * cu) {
     return null;
   }
 
   return {
-    col: Math.floor(relX / OFFICE_CELL_UNITS),
-    row: Math.floor(relY / OFFICE_CELL_UNITS),
+    col: Math.floor(relX / cu),
+    row: Math.floor(relY / cu),
   };
 }
 
@@ -89,9 +91,10 @@ export function officeCellToWorldPixel(
   row: number,
   region: TownOfficeRegion,
 ): { worldX: number; worldY: number } {
+  const cu = officeCellUnits(region);
   return {
-    worldX: (region.anchorX16 + col * OFFICE_CELL_UNITS) * TOWN_BASE_PX,
-    worldY: (region.anchorY16 + row * OFFICE_CELL_UNITS) * TOWN_BASE_PX,
+    worldX: (region.anchorX16 + col * cu) * TOWN_BASE_PX,
+    worldY: (region.anchorY16 + row * cu) * TOWN_BASE_PX,
   };
 }
 
@@ -104,19 +107,27 @@ const DEFAULT_OFFICE_ANCHOR_X16 = 20;
 const DEFAULT_OFFICE_ANCHOR_Y16 = 20;
 
 /**
+ * Returns the office region with its hardcoded anchor position.
+ * Does not load terrain data; prefer this over `loadTownLayout` when
+ * only the office region is needed.
+ */
+export function loadTownOfficeRegion(): TownOfficeRegion {
+  const { layout } = createOfficeSceneBootstrap();
+  return {
+    anchorX16: DEFAULT_OFFICE_ANCHOR_X16,
+    anchorY16: DEFAULT_OFFICE_ANCHOR_Y16,
+    layout,
+  };
+}
+
+/**
  * Produces the unified TownLayout by merging the existing terrain spec and
  * the default office layout with a hardcoded anchor position.
  */
 export function loadTownLayout(): TownLayout {
   const { gridSpec } = loadTerrainBootstrap();
-  const { layout } = createOfficeSceneBootstrap();
-
   return {
     terrain: gridSpec,
-    office: {
-      anchorX16: DEFAULT_OFFICE_ANCHOR_X16,
-      anchorY16: DEFAULT_OFFICE_ANCHOR_Y16,
-      layout,
-    },
+    office: loadTownOfficeRegion(),
   };
 }

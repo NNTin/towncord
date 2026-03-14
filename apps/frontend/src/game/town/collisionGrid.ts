@@ -1,5 +1,5 @@
 import type { TerrainGameplayGrid } from "../terrain/gameplayGrid";
-import { isInsideOffice, worldToOfficeCell, type TownOfficeRegion } from "./layout";
+import { worldToOfficeCell, type TownOfficeRegion } from "./layout";
 
 /**
  * Unified walkability grid at 16px resolution.
@@ -18,13 +18,12 @@ export class TownCollisionGrid {
 
   isWorldWalkable(worldX: number, worldY: number): boolean {
     const office = this.office;
-    if (office && isInsideOffice(worldX, worldY, office)) {
+    if (office) {
       const cell = worldToOfficeCell(worldX, worldY, office);
       if (cell) {
         const tile = office.layout.tiles[cell.row * office.layout.cols + cell.col];
         return tile?.kind === "floor";
       }
-      return false;
     }
     return this.terrain.isWorldWalkable(worldX, worldY);
   }
