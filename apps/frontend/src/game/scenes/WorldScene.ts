@@ -41,6 +41,8 @@ import {
 } from "./world/autonomySystem";
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
+import { TownCollisionGrid } from "../town/collisionGrid";
+import { loadTownLayout } from "../town/layout";
 import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
@@ -251,7 +253,15 @@ export class WorldScene extends Phaser.Scene {
     this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
     this.terrainSystem = new TerrainSystem(this);
-    this.navigation = createTerrainNavigationService(this.terrainSystem.getGameplayGrid());
+    const townLayout = loadTownLayout();
+    const collisionGrid = new TownCollisionGrid(
+      this.terrainSystem.getGameplayGrid(),
+      townLayout.office,
+    );
+    this.navigation = createTerrainNavigationService(
+      this.terrainSystem.getGameplayGrid(),
+      collisionGrid,
+    );
     this.bindSceneEvents();
 
     this.createSelectionBadge();
