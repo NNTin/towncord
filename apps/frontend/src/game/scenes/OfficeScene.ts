@@ -41,6 +41,7 @@ const CAMERA_PADDING = 96;
 const HOVER_STROKE_COLOR = 0x38bdf8;
 const SELECTED_STROKE_COLOR = 0xf59e0b;
 const GHOST_COLOR = 0x38bdf8;
+const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 
 // OfficeTileColor → hex tint for OfficeSceneTile
 const TILE_COLOR_TINTS: Record<string, number> = {
@@ -86,6 +87,10 @@ export class OfficeScene extends Phaser.Scene {
 
   private ghostMarker: Phaser.GameObjects.Rectangle | null = null;
 
+  private ghostSprite: Phaser.GameObjects.Image | null = null;
+
+  private ghostSpriteItemId: string | null = null;
+
   private overlayText: Phaser.GameObjects.Text | null = null;
 
   private isPanning = false;
@@ -102,6 +107,10 @@ export class OfficeScene extends Phaser.Scene {
   private activeTileColor = "neutral";
 
   private activeFurnitureId: string | null = null;
+
+  private furnitureRotationTurns: 0 | 1 | 2 | 3 = 0;
+
+  private rKey: Phaser.Input.Keyboard.Key | null = null;
 
   private furniturePaletteMap: Map<string, FurniturePaletteItem> = new Map(
     FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
@@ -140,6 +149,11 @@ export class OfficeScene extends Phaser.Scene {
     this.game.events.on(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetEditorTool, this);
     this.scale.on(Phaser.Scale.Events.RESIZE, this.onResize, this);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.onShutdown, this);
+
+    if (this.input.keyboard) {
+      this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+      this.rKey.on("down", this.onRKeyDown, this);
+    }
   }
 
   private onShutdown(): void {
@@ -151,6 +165,7 @@ export class OfficeScene extends Phaser.Scene {
     this.game.events.off(SET_ZOOM_EVENT, this.onSetZoom, this);
     this.game.events.off(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetEditorTool, this);
     this.scale.off(Phaser.Scale.Events.RESIZE, this.onResize, this);
+    this.rKey?.off("down", this.onRKeyDown, this);
   }
 
   private createMarkers(): void {
@@ -210,9 +225,20 @@ export class OfficeScene extends Phaser.Scene {
   }
 
   private onSetEditorTool(payload: OfficeSetEditorToolPayload): void {
+    const prevTool = this.activeTool;
     this.activeTool = payload.tool;
     this.activeTileColor = payload.tileColor ?? "neutral";
     this.activeFurnitureId = payload.furnitureId;
+    if (prevTool !== "furniture" || payload.tool !== "furniture") {
+      this.furnitureRotationTurns = 0;
+    }
+    this.updateGhostMarker();
+    this.refreshOverlay();
+  }
+
+  private onRKeyDown(): void {
+    if (this.activeTool !== "furniture") return;
+    this.furnitureRotationTurns = ((this.furnitureRotationTurns + 1) % 4) as 0 | 1 | 2 | 3;
     this.updateGhostMarker();
     this.refreshOverlay();
   }
@@ -394,10 +420,12 @@ export class OfficeScene extends Phaser.Scene {
     const paletteItem = this.furniturePaletteMap.get(furnitureId);
     if (!paletteItem) return;
 
+    const { effectiveW, effectiveH } = this.getEffectiveFootprint(paletteItem);
+
     // Don't place if it would go out of bounds
     if (
-      cell.col + paletteItem.footprintW > this.layout.cols ||
-      cell.row + paletteItem.footprintH > this.layout.rows
+      cell.col + effectiveW > this.layout.cols ||
+      cell.row + effectiveH > this.layout.rows
     ) {
       return;
     }
@@ -410,14 +438,22 @@ export class OfficeScene extends Phaser.Scene {
       placement: paletteItem.placement,
       col: cell.col,
       row: cell.row,
-      width: paletteItem.footprintW,
-      height: paletteItem.footprintH,
+      width: effectiveW,
+      height: effectiveH,
       color: paletteItem.color,
       accentColor: paletteItem.accentColor,
     };
 
     this.layout.furniture.push(newFurniture);
     this.rerenderLayout();
+  }
+
+  private getEffectiveFootprint(item: FurniturePaletteItem): { effectiveW: number; effectiveH: number } {
+    const swap = this.furnitureRotationTurns % 2 === 1;
+    return {
+      effectiveW: swap ? item.footprintH : item.footprintW,
+      effectiveH: swap ? item.footprintW : item.footprintH,
+    };
   }
 
   private applyRemoveFurniture(furnitureId: string): void {
@@ -461,6 +497,7 @@ export class OfficeScene extends Phaser.Scene {
 
     if (!this.activeTool || !this.hoverCell) {
       ghost.setVisible(false);
+      this.ghostSprite?.setVisible(false);
       return;
     }
 
@@ -470,15 +507,49 @@ export class OfficeScene extends Phaser.Scene {
     if (this.activeTool === "furniture" && this.activeFurnitureId) {
       const item = this.furniturePaletteMap.get(this.activeFurnitureId);
       if (item) {
-        w = item.footprintW;
-        h = item.footprintH;
+        const { effectiveW, effectiveH } = this.getEffectiveFootprint(item);
+        w = effectiveW;
+        h = effectiveH;
+        this.updateGhostSprite(item, w, h);
+      } else {
+        this.ghostSprite?.setVisible(false);
       }
+    } else {
+      this.ghostSprite?.setVisible(false);
     }
 
     const { cellSize } = this.layout;
     ghost.setPosition(this.hoverCell.col * cellSize, this.hoverCell.row * cellSize);
     ghost.setSize(w * cellSize, h * cellSize);
     ghost.setVisible(true);
+  }
+
+  private updateGhostSprite(item: FurniturePaletteItem, effectiveW: number, effectiveH: number): void {
+    if (!this.hoverCell) return;
+
+    const { cellSize } = this.layout;
+    const { atlasKey, atlasFrame } = item;
+
+    if (!this.ghostSprite || this.ghostSpriteItemId !== item.id) {
+      this.ghostSprite?.destroy();
+      this.ghostSprite = this.add.image(0, 0, DONARG_OFFICE_FURNITURE_ATLAS_KEY, atlasKey);
+      this.ghostSprite.setDepth(20_003);
+      this.ghostSprite.setAlpha(0.75);
+      this.ghostSpriteItemId = item.id;
+    }
+
+    // Scale sprite to its natural footprint then rotate so it fits the effective footprint
+    this.ghostSprite.setScale(
+      (item.footprintW * cellSize) / atlasFrame.w,
+      (item.footprintH * cellSize) / atlasFrame.h,
+    );
+    this.ghostSprite.setAngle(this.furnitureRotationTurns * 90);
+
+    // Center the sprite within the effective footprint area
+    const cx = this.hoverCell.col * cellSize + (effectiveW * cellSize) / 2;
+    const cy = this.hoverCell.row * cellSize + (effectiveH * cellSize) / 2;
+    this.ghostSprite.setPosition(cx, cy);
+    this.ghostSprite.setVisible(true);
   }
 
   private updateSelectionMarker(): void {
@@ -546,9 +617,19 @@ export class OfficeScene extends Phaser.Scene {
         }`
       : "none";
 
+    const furnitureSuffix =
+      this.activeTool === "furniture" && this.activeFurnitureId
+        ? ` (${this.activeFurnitureId}) rot:${this.furnitureRotationTurns * 90}°`
+        : "";
     const toolLine = this.activeTool
-      ? `tool ${this.activeTool}${this.activeTool === "floor" ? ` (${this.activeTileColor})` : ""}${this.activeTool === "furniture" && this.activeFurnitureId ? ` (${this.activeFurnitureId})` : ""}`
+      ? `tool ${this.activeTool}${this.activeTool === "floor" ? ` (${this.activeTileColor})` : ""}${furnitureSuffix}`
       : "tool none (select mode)";
+    const hintLine =
+      this.activeTool === "furniture"
+        ? "left click place | R rotate | wheel zoom | middle/right drag pan"
+        : this.activeTool
+          ? "left click/drag paint | wheel zoom | middle/right drag pan"
+          : "left click select | wheel zoom | middle/right drag pan";
 
     this.overlayText.setText(
       [
@@ -556,9 +637,7 @@ export class OfficeScene extends Phaser.Scene {
         `zoom ${camera.zoom.toFixed(2)} scroll ${camera.scrollX.toFixed(0)},${camera.scrollY.toFixed(0)}`,
         `hover ${hoverLabel}`,
         this.activeTool ? `ghost ${toolLine}` : `selected ${selectedLabel}`,
-        this.activeTool
-          ? "left click/drag paint | wheel zoom | middle/right drag pan"
-          : "left click select | wheel zoom | middle/right drag pan",
+        hintLine,
       ].join("\n"),
     );
   }
