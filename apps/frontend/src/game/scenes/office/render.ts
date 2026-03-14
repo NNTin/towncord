@@ -5,6 +5,7 @@ import type {
   OfficeSceneLayout,
 } from "./bootstrap";
 import { resolveOfficeTileFill } from "./colors";
+import { FURNITURE_PALETTE_ITEMS, type FurniturePaletteItem } from "../../office/officeFurniturePalette";
 
 const GRID_LINE_COLOR = 0x0f172a;
 const VOID_TILE_COLOR = 0x020617;
@@ -13,6 +14,11 @@ const WALL_INSET_ALPHA = 0.28;
 const SHADOW_COLOR = 0x020617;
 const LABEL_TEXT_COLOR = "#f8fafc";
 const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
+const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
+
+const FURNITURE_PALETTE_MAP = new Map<string, FurniturePaletteItem>(
+  FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
+);
 
 export type OfficeRenderableTargetKind = "furniture" | "character";
 
@@ -40,7 +46,8 @@ export function renderOfficeLayout(
   const tilesGraphics = renderTiles(scene, layout);
 
   const furnitureEntries = layout.furniture.map((item) => {
-    const { target, container } = renderFurniture(scene, layout, item);
+    const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
+    const { target, container } = renderFurniture(scene, layout, item, paletteItem);
     return { target, container };
   });
 
@@ -114,12 +121,54 @@ function renderFurniture(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
   item: OfficeSceneFurniture,
+  paletteItem: FurniturePaletteItem | undefined,
 ): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const x = item.col * layout.cellSize;
   const y = item.row * layout.cellSize;
   const width = item.width * layout.cellSize;
   const height = item.height * layout.cellSize;
   const container = scene.add.container(x, y);
+
+  if (paletteItem) {
+    renderFurnitureSprite(scene, container, paletteItem, width, height);
+  } else {
+    renderFurnitureFallback(scene, container, layout, item, width, height);
+  }
+
+  container.setDepth(resolveRenderableDepth(item.row + item.height, item.placement === "wall" ? 6 : 18));
+
+  const target: OfficeRenderableTarget = {
+    kind: "furniture",
+    id: item.id,
+    label: item.label,
+    bounds: new Phaser.Geom.Rectangle(x, y, width, height),
+  };
+
+  return { target, container };
+}
+
+function renderFurnitureSprite(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  paletteItem: FurniturePaletteItem,
+  width: number,
+  height: number,
+): void {
+  const { atlasFrame } = paletteItem;
+  const sprite = scene.add.image(width / 2, height / 2, DONARG_OFFICE_FURNITURE_ATLAS_KEY, paletteItem.atlasKey);
+  sprite.setOrigin(0.5, 0.5);
+  sprite.setScale(width / atlasFrame.w, height / atlasFrame.h);
+  container.add(sprite);
+}
+
+function renderFurnitureFallback(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  layout: OfficeSceneLayout,
+  item: OfficeSceneFurniture,
+  width: number,
+  height: number,
+): void {
   const label = shortenLabel(item.label, Math.max(6, item.width * 6));
 
   if (item.placement === "wall") {
@@ -192,16 +241,6 @@ function renderFurniture(
   text.setOrigin(0.5);
   text.setAlpha(0.88);
   container.add(text);
-  container.setDepth(resolveRenderableDepth(item.row + item.height, item.placement === "wall" ? 6 : 18));
-
-  const target: OfficeRenderableTarget = {
-    kind: "furniture",
-    id: item.id,
-    label: item.label,
-    bounds: new Phaser.Geom.Rectangle(x, y, width, height),
-  };
-
-  return { target, container };
 }
 
 function renderCharacter(

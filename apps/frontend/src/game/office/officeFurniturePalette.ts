@@ -7,6 +7,7 @@ export type FurniturePaletteItem = {
   id: string;
   label: string;
   category: string;
+  atlasKey: string;
   atlasFrame: { x: number; y: number; w: number; h: number };
   footprintW: number;
   footprintH: number;
@@ -140,6 +141,7 @@ function buildVisibleItems(): FurniturePaletteItem[] {
       id: asset.id,
       label: asset.label,
       category: asset.category,
+      atlasKey,
       atlasFrame: frameData.frame,
       footprintW,
       footprintH,
