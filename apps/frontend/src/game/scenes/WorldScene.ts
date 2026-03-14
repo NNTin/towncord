@@ -7,6 +7,7 @@ import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper"
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
 import {
+  OFFICE_SET_EDITOR_TOOL_EVENT,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
@@ -14,6 +15,8 @@ import {
   RUNTIME_PERF_EVENT,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
+  type OfficeEditorToolId,
+  type OfficeSetEditorToolPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
   type PlayerPlacedPayload,
@@ -42,8 +45,12 @@ import {
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
-import { loadTownLayout } from "../town/layout";
+import { loadTownLayout, worldToOfficeCell } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
+import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
+import { FURNITURE_PALETTE_ITEMS } from "../office/officeFurniturePalette";
+import type { OfficeSceneFurniture, OfficeSceneFurnitureCategory } from "./office/bootstrap";
+import type { TownOfficeRegion } from "../town/layout";
 import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
@@ -139,6 +146,46 @@ export class WorldScene extends Phaser.Scene {
 
   private set officeRenderable(value: OfficeLayoutRenderable | null) {
     this.runtimeState.officeRenderable = value;
+  }
+
+  private get officeRegion(): TownOfficeRegion | null {
+    return this.runtimeState.officeRegion;
+  }
+
+  private set officeRegion(value: TownOfficeRegion | null) {
+    this.runtimeState.officeRegion = value;
+  }
+
+  private get activeOfficeTool(): OfficeEditorToolId | null {
+    return this.runtimeState.activeOfficeTool;
+  }
+
+  private set activeOfficeTool(value: OfficeEditorToolId | null) {
+    this.runtimeState.activeOfficeTool = value;
+  }
+
+  private get activeTileColor(): string {
+    return this.runtimeState.activeTileColor;
+  }
+
+  private set activeTileColor(value: string) {
+    this.runtimeState.activeTileColor = value;
+  }
+
+  private get activeFurnitureId(): string | null {
+    return this.runtimeState.activeFurnitureId;
+  }
+
+  private set activeFurnitureId(value: string | null) {
+    this.runtimeState.activeFurnitureId = value;
+  }
+
+  private get isOfficePainting(): boolean {
+    return this.runtimeState.isOfficePainting;
+  }
+
+  private set isOfficePainting(value: boolean) {
+    this.runtimeState.isOfficePainting = value;
   }
 
   private get navigation(): WorldNavigationService | null {
@@ -274,6 +321,7 @@ export class WorldScene extends Phaser.Scene {
 
     if (townLayout.office) {
       const { anchorX16, anchorY16, layout } = townLayout.office;
+      this.officeRegion = townLayout.office;
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * 16,
         worldOffsetY: anchorY16 * 16,
@@ -534,6 +582,104 @@ export class WorldScene extends Phaser.Scene {
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
+  private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
+    this.activeOfficeTool = payload.tool;
+    this.activeTileColor = payload.tileColor ?? "neutral";
+    this.activeFurnitureId = payload.furnitureId;
+  }
+
+  /**
+   * Applies the active office editor tool at a world-pixel position.
+   * Returns true if the point was inside the office region and the tool was applied.
+   */
+  private applyOfficeTool(worldX: number, worldY: number): boolean {
+    const region = this.officeRegion;
+    const tool = this.activeOfficeTool;
+    if (!region || !tool) return false;
+
+    const { worldToOfficeCell } = (this.constructor as typeof WorldScene)._officeHelpers;
+    const cell = worldToOfficeCell(worldX, worldY, region);
+    if (!cell) return false;
+
+    const layout = region.layout;
+    const idx = cell.row * layout.cols + cell.col;
+
+    switch (tool) {
+      case "floor": {
+        const tile = layout.tiles[idx];
+        if (!tile) return true;
+        const tint = OFFICE_TILE_COLOR_TINTS[this.activeTileColor] ?? OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
+        if (tile.kind === "floor" && tile.tint === tint) return true;
+        tile.kind = "floor";
+        tile.tint = tint;
+        this.rerenderOffice();
+        return true;
+      }
+      case "wall": {
+        const tile = layout.tiles[idx];
+        if (!tile) return true;
+        if (tile.kind === "wall") return true;
+        tile.kind = "wall";
+        delete tile.tint;
+        this.rerenderOffice();
+        return true;
+      }
+      case "erase": {
+        const tile = layout.tiles[idx];
+        if (!tile || tile.kind === "void") return true;
+        tile.kind = "void";
+        delete tile.tint;
+        this.rerenderOffice();
+        return true;
+      }
+      case "furniture": {
+        const furnitureId = this.activeFurnitureId;
+        if (!furnitureId) return true;
+        const paletteItems = FURNITURE_PALETTE_ITEMS;
+        const paletteItem = paletteItems.find((item) => item.id === furnitureId);
+        if (!paletteItem) return true;
+
+        if (cell.col + paletteItem.footprintW > layout.cols || cell.row + paletteItem.footprintH > layout.rows) {
+          return true;
+        }
+
+        const newFurniture: OfficeSceneFurniture = {
+          id: `placed-${furnitureId}-${Date.now()}`,
+          assetId: furnitureId,
+          label: paletteItem.label,
+          category: paletteItem.category as OfficeSceneFurnitureCategory,
+          placement: paletteItem.placement,
+          col: cell.col,
+          row: cell.row,
+          width: paletteItem.footprintW,
+          height: paletteItem.footprintH,
+          color: paletteItem.color,
+          accentColor: paletteItem.accentColor,
+        };
+
+        layout.furniture.push(newFurniture);
+        this.rerenderOffice();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private rerenderOffice(): void {
+    const region = this.officeRegion;
+    if (!region) return;
+
+    this.officeRenderable?.destroy();
+    const { anchorX16, anchorY16, layout } = region;
+    this.officeRenderable = renderOfficeLayout(this, layout, {
+      worldOffsetX: anchorX16 * 16,
+      worldOffsetY: anchorY16 * 16,
+      tileDepth: -500,
+      depthAnchorRow: Math.round(anchorY16 / 3),
+    });
+  }
+
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = true;
@@ -543,6 +689,14 @@ export class WorldScene extends Phaser.Scene {
       this.camStartY = this.cameras.main.scrollY;
       this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
+      if (this.activeOfficeTool) {
+        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+        if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
+          this.isOfficePainting = true;
+          return;
+        }
+      }
+
       if (this.activeTerrainTool) {
         this.terrainPaintSession.begin();
         this.syncTerrainBrushPreviewFromPointer(pointer);
@@ -585,6 +739,13 @@ export class WorldScene extends Phaser.Scene {
     }
 
     this.syncTerrainBrushPreviewFromPointer(pointer);
+
+    if (this.isOfficePainting && this.activeOfficeTool && pointer.isDown) {
+      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+      this.applyOfficeTool(worldPoint.x, worldPoint.y);
+      return;
+    }
+
     if (!this.activeTerrainTool) return;
     if (!this.terrainPaintSession.isActive()) return;
     this.paintTerrainAtScreen(pointer.x, pointer.y);
@@ -595,6 +756,7 @@ export class WorldScene extends Phaser.Scene {
       this.isPanning = false;
       this.syncTerrainBrushPreviewFromPointer(pointer);
     } else if (pointer.button === 0) {
+      this.isOfficePainting = false;
       this.terrainPaintSession.end();
       this.syncTerrainBrushPreviewFromPointer(pointer);
     }
@@ -802,6 +964,7 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.game.events.on(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetOfficeEditorTool, this);
     this.game.events.on(SET_ZOOM_EVENT, this.onSetZoom, this);
     this.events.once("shutdown", this.handleShutdown, this);
   }
@@ -810,6 +973,7 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
     this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
     this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
+    this.game.events.off(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetOfficeEditorTool, this);
     this.game.events.off(SET_ZOOM_EVENT, this.onSetZoom, this);
     this.input.off("pointerdown", this.onPointerDown, this);
     this.input.off("pointermove", this.onPointerMove, this);
