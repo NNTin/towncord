@@ -641,9 +641,16 @@ export class WorldScene extends Phaser.Scene {
       }
       case "erase": {
         const tile = layout.tiles[idx];
-        if (!tile || tile.kind === "void") return true;
-        tile.kind = "void";
-        delete tile.tint;
+        const furnitureAtCell = layout.furniture.filter(
+          (f) => cell.col >= f.col && cell.col < f.col + f.width &&
+                 cell.row >= f.row && cell.row < f.row + f.height,
+        );
+        if ((tile?.kind === "void" || !tile) && furnitureAtCell.length === 0) return true;
+        if (tile) { tile.kind = "void"; delete tile.tint; }
+        if (furnitureAtCell.length > 0) {
+          const removeIds = new Set(furnitureAtCell.map((f) => f.id));
+          layout.furniture = layout.furniture.filter((f) => !removeIds.has(f.id));
+        }
         this.officeDirty = true;
         return true;
       }
@@ -656,6 +663,14 @@ export class WorldScene extends Phaser.Scene {
         if (cell.col + paletteItem.footprintW > layout.cols || cell.row + paletteItem.footprintH > layout.rows) {
           return true;
         }
+
+        // Remove existing furniture that overlaps the new placement footprint.
+        const newRight = cell.col + paletteItem.footprintW;
+        const newBottom = cell.row + paletteItem.footprintH;
+        layout.furniture = layout.furniture.filter(
+          (f) => f.col >= newRight || f.col + f.width <= cell.col ||
+                 f.row >= newBottom || f.row + f.height <= cell.row,
+        );
 
         const newFurniture: OfficeSceneFurniture = {
           id: `placed-${furnitureId}-${Date.now()}`,

@@ -20,6 +20,15 @@ function App(): JSX.Element {
   const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
   const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
 
+  // Clear active tool when layout mode is closed so Phaser doesn't retain a
+  // stale tool between layout mode sessions.
+  const isLayoutMode = officeEditor.isOpen;
+  useEffect(() => {
+    if (!isLayoutMode) {
+      setActiveTool(null);
+    }
+  }, [isLayoutMode]);
+
   // Sync tool state to the Phaser scene whenever it changes
   useEffect(() => {
     emitOfficeEditorTool({
@@ -32,7 +41,7 @@ function App(): JSX.Element {
   return (
     <main className="app">
       {sidebarProps ? <SidebarAccordion {...sidebarProps} /> : null}
-      {officeEditor.isOpen ? (
+      {isLayoutMode ? (
         <OfficeEditorDrawer
           canReload={officeEditor.isAvailable && !officeEditor.isLoading && !officeEditor.isSaving}
           canReset={officeEditor.canReset}
@@ -54,7 +63,7 @@ function App(): JSX.Element {
       ) : null}
       {zoomProps ? <ZoomControls {...zoomProps} /> : null}
       <BottomToolbar
-        isLayoutMode={officeEditor.isOpen}
+        isLayoutMode={isLayoutMode}
         onToggleLayoutMode={officeEditor.toggleOpen}
         activeTool={activeTool}
         onSelectTool={setActiveTool}
