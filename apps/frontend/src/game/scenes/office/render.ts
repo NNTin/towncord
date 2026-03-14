@@ -180,7 +180,7 @@ function renderFurniture(
     kind: "furniture",
     id: item.id,
     label: item.label,
-    bounds: new Phaser.Geom.Rectangle(x, y, width, height),
+    bounds: new Phaser.Geom.Rectangle(x + worldOffsetX, y + worldOffsetY, width, height),
   };
 
   return { target, container };
@@ -333,7 +333,7 @@ function renderCharacter(
     kind: "character",
     id: actor.id,
     label: actor.label,
-    bounds: new Phaser.Geom.Rectangle(x, y, cellSize, cellSize),
+    bounds: new Phaser.Geom.Rectangle(x + worldOffsetX, y + worldOffsetY, cellSize, cellSize),
   };
 
   return { target, container };
