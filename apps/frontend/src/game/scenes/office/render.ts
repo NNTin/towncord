@@ -39,20 +39,48 @@ export type OfficeLayoutRenderable = {
   destroy(): void;
 };
 
+export type RenderOfficeLayoutOptions = {
+  /** World-space X offset applied to all game objects (default: 0). */
+  worldOffsetX?: number;
+  /** World-space Y offset applied to all game objects (default: 0). */
+  worldOffsetY?: number;
+  /**
+   * Depth assigned to the floor/wall tile graphics layer.
+   * Default: 0 (suitable for standalone OfficeScene).
+   * Use -500 when rendering inside WorldScene above terrain.
+   */
+  tileDepth?: number;
+  /**
+   * Additional row offset added to furniture/character depth to place them
+   * correctly relative to world entities. Use Math.round(anchorY16 / 3) when
+   * embedding in WorldScene.
+   * Default: 0.
+   */
+  depthAnchorRow?: number;
+};
+
 export function renderOfficeLayout(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
+  options: RenderOfficeLayoutOptions = {},
 ): OfficeLayoutRenderable {
-  const tilesGraphics = renderTiles(scene, layout);
+  const {
+    worldOffsetX = 0,
+    worldOffsetY = 0,
+    tileDepth = 0,
+    depthAnchorRow = 0,
+  } = options;
+
+  const tilesGraphics = renderTiles(scene, layout, worldOffsetX, worldOffsetY, tileDepth);
 
   const furnitureEntries = layout.furniture.map((item) => {
     const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
-    const { target, container } = renderFurniture(scene, layout, item, paletteItem);
+    const { target, container } = renderFurniture(scene, layout, item, paletteItem, worldOffsetX, worldOffsetY, depthAnchorRow);
     return { target, container };
   });
 
   const characterEntries = layout.characters.map((actor) => {
-    const { target, container } = renderCharacter(scene, layout, actor);
+    const { target, container } = renderCharacter(scene, layout, actor, worldOffsetX, worldOffsetY, depthAnchorRow);
     return { target, container };
   });
 
@@ -75,8 +103,16 @@ export function renderOfficeLayout(
   };
 }
 
-function renderTiles(scene: Phaser.Scene, layout: OfficeSceneLayout): Phaser.GameObjects.Graphics {
+function renderTiles(
+  scene: Phaser.Scene,
+  layout: OfficeSceneLayout,
+  worldOffsetX: number,
+  worldOffsetY: number,
+  tileDepth: number,
+): Phaser.GameObjects.Graphics {
   const graphics = scene.add.graphics();
+  graphics.setPosition(worldOffsetX, worldOffsetY);
+  graphics.setDepth(tileDepth);
   const { cols, rows, cellSize, tiles } = layout;
 
   for (let row = 0; row < rows; row += 1) {
@@ -122,12 +158,15 @@ function renderFurniture(
   layout: OfficeSceneLayout,
   item: OfficeSceneFurniture,
   paletteItem: FurniturePaletteItem | undefined,
+  worldOffsetX: number,
+  worldOffsetY: number,
+  depthAnchorRow: number,
 ): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const x = item.col * layout.cellSize;
   const y = item.row * layout.cellSize;
   const width = item.width * layout.cellSize;
   const height = item.height * layout.cellSize;
-  const container = scene.add.container(x, y);
+  const container = scene.add.container(x + worldOffsetX, y + worldOffsetY);
 
   if (paletteItem) {
     renderFurnitureSprite(scene, container, paletteItem, width, height);
@@ -135,7 +174,7 @@ function renderFurniture(
     renderFurnitureFallback(scene, container, layout, item, width, height);
   }
 
-  container.setDepth(resolveRenderableDepth(item.row + item.height, item.placement === "wall" ? 6 : 18));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? 6 : 18));
 
   const target: OfficeRenderableTarget = {
     kind: "furniture",
@@ -247,11 +286,14 @@ function renderCharacter(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
   actor: OfficeSceneCharacter,
+  worldOffsetX: number,
+  worldOffsetY: number,
+  depthAnchorRow: number,
 ): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const cellSize = layout.cellSize;
   const x = actor.col * cellSize;
   const y = actor.row * cellSize;
-  const container = scene.add.container(x, y);
+  const container = scene.add.container(x + worldOffsetX, y + worldOffsetY);
   const shadow = scene.add.ellipse(
     cellSize / 2,
     cellSize * 0.88,
@@ -285,7 +327,7 @@ function renderCharacter(
   badge.setOrigin(0.5);
 
   container.add([shadow, body, head, badge]);
-  container.setDepth(resolveRenderableDepth(actor.row + 1, 34));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, 34));
 
   const target: OfficeRenderableTarget = {
     kind: "character",

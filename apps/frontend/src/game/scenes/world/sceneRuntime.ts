@@ -3,6 +3,7 @@ import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { EntityRegistry } from "../../domain/entityRegistry";
 import type { SelectedTerrainToolPayload } from "../../events";
 import type { TerrainSystem } from "../../terrain";
+import type { OfficeLayoutRenderable } from "../../scenes/office/render";
 import type { WorldNavigationService } from "./navigation";
 import { TerrainPaintSession } from "./terrainPaintSession";
 import type { WorldEntity } from "./types";
@@ -41,6 +42,7 @@ export class WorldSceneRuntime {
   public terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
   public terrainSystem: TerrainSystem | null = null;
   public navigation: WorldNavigationService | null = null;
+  public officeRenderable: OfficeLayoutRenderable | null = null;
   public nextId = 0;
 
   public wasd: WorldSceneMovementKeys | null = null;
@@ -67,6 +69,7 @@ export class WorldSceneRuntime {
     this.terrainBrushRenderPreviewImages = [];
     this.terrainSystem = null;
     this.navigation = null;
+    this.officeRenderable = null;
     this.nextId = 0;
 
     this.wasd = null;
@@ -85,6 +88,7 @@ export class WorldSceneRuntime {
 
   public dispose(): void {
     this.terrainSystem?.destroy();
+    this.officeRenderable?.destroy();
     destroyGameObjects(this.entities.map((entity) => entity.sprite));
     destroyGameObject(this.selectionBadge);
     destroyGameObject(this.terrainBrushPreview);

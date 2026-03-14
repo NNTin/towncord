@@ -43,6 +43,7 @@ import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityF
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
 import { loadTownLayout } from "../town/layout";
+import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
 import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
@@ -130,6 +131,14 @@ export class WorldScene extends Phaser.Scene {
 
   private set terrainSystem(value: TerrainSystem | null) {
     this.runtimeState.terrainSystem = value;
+  }
+
+  private get officeRenderable(): OfficeLayoutRenderable | null {
+    return this.runtimeState.officeRenderable;
+  }
+
+  private set officeRenderable(value: OfficeLayoutRenderable | null) {
+    this.runtimeState.officeRenderable = value;
   }
 
   private get navigation(): WorldNavigationService | null {
@@ -262,6 +271,16 @@ export class WorldScene extends Phaser.Scene {
       this.terrainSystem.getGameplayGrid(),
       collisionGrid,
     );
+
+    if (townLayout.office) {
+      const { anchorX16, anchorY16, layout } = townLayout.office;
+      this.officeRenderable = renderOfficeLayout(this, layout, {
+        worldOffsetX: anchorX16 * 16,
+        worldOffsetY: anchorY16 * 16,
+        tileDepth: -500,
+        depthAnchorRow: Math.round(anchorY16 / 3),
+      });
+    }
     this.bindSceneEvents();
 
     this.createSelectionBadge();
