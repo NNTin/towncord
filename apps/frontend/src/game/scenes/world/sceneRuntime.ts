@@ -50,6 +50,7 @@ export class WorldSceneRuntime {
   public activeTileColor = "neutral";
   public activeFurnitureId: string | null = null;
   public isOfficePainting = false;
+  public officeDirty = false;
   public nextId = 0;
 
   public wasd: WorldSceneMovementKeys | null = null;
@@ -82,6 +83,7 @@ export class WorldSceneRuntime {
     this.activeTileColor = "neutral";
     this.activeFurnitureId = null;
     this.isOfficePainting = false;
+    this.officeDirty = false;
     this.nextId = 0;
 
     this.wasd = null;
