@@ -32,6 +32,7 @@ import {
   type OfficeSceneRenderIndex,
 } from "./office/render";
 import { FURNITURE_PALETTE_ITEMS, type FurniturePaletteItem } from "../office/officeFurniturePalette";
+import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
 
 export const OFFICE_SCENE_KEY = "office";
 
@@ -44,16 +45,7 @@ const GHOST_COLOR = 0x38bdf8;
 const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 
 // OfficeTileColor → hex tint for OfficeSceneTile
-const TILE_COLOR_TINTS: Record<string, number> = {
-  neutral: 0x475569,
-  blue: 0x2563eb,
-  green: 0x059669,
-  yellow: 0xd97706,
-  orange: 0xea580c,
-  red: 0xdc2626,
-  pink: 0xdb2777,
-  purple: 0x7c3aed,
-};
+const TILE_COLOR_TINTS = OFFICE_TILE_COLOR_TINTS;
 
 type ResolvedPointerState = {
   cell: OfficeSceneCellCoord | null;
