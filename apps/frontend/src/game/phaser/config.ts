@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import { BootScene } from "../scenes/BootScene";
-import { OfficeScene } from "../scenes/OfficeScene";
 import { PreloadScene } from "../scenes/PreloadScene";
 import { WorldScene } from "../scenes/WorldScene";
 
@@ -13,7 +12,7 @@ export function createPhaserConfig(
     backgroundColor: "#111827",
     width: 1280,
     height: 720,
-    scene: [BootScene, PreloadScene, WorldScene, OfficeScene],
+    scene: [BootScene, PreloadScene, WorldScene],
     scale: {
       mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH,
