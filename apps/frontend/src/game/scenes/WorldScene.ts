@@ -45,7 +45,7 @@ import {
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
-import { loadTownLayout, worldToOfficeCell } from "../town/layout";
+import { loadTownOfficeRegion, worldToOfficeCell } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
 import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../office/officeFurniturePalette";
@@ -309,19 +309,19 @@ export class WorldScene extends Phaser.Scene {
     this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
     this.terrainSystem = new TerrainSystem(this);
-    const townLayout = loadTownLayout();
+    const officeRegion = loadTownOfficeRegion();
     const collisionGrid = new TownCollisionGrid(
       this.terrainSystem.getGameplayGrid(),
-      townLayout.office,
+      officeRegion,
     );
     this.navigation = createTerrainNavigationService(
       this.terrainSystem.getGameplayGrid(),
       collisionGrid,
     );
 
-    if (townLayout.office) {
-      const { anchorX16, anchorY16, layout } = townLayout.office;
-      this.officeRegion = townLayout.office;
+    {
+      const { anchorX16, anchorY16, layout } = officeRegion;
+      this.officeRegion = officeRegion;
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * 16,
         worldOffsetY: anchorY16 * 16,
@@ -597,7 +597,6 @@ export class WorldScene extends Phaser.Scene {
     const tool = this.activeOfficeTool;
     if (!region || !tool) return false;
 
-    const { worldToOfficeCell } = (this.constructor as typeof WorldScene)._officeHelpers;
     const cell = worldToOfficeCell(worldX, worldY, region);
     if (!cell) return false;
 
