@@ -188,6 +188,14 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.isOfficePainting = value;
   }
 
+  private get officeDirty(): boolean {
+    return this.runtimeState.officeDirty;
+  }
+
+  private set officeDirty(value: boolean) {
+    this.runtimeState.officeDirty = value;
+  }
+
   private get navigation(): WorldNavigationService | null {
     return this.runtimeState.navigation;
   }
@@ -436,6 +444,11 @@ export class WorldScene extends Phaser.Scene {
       this.game.events.emit(RUNTIME_PERF_EVENT, payload);
       runtimeState.lastPerfEmitAtMs = now;
     }
+
+    if (runtimeState.officeDirty) {
+      this.rerenderOffice();
+      runtimeState.officeDirty = false;
+    }
   }
 
   private selectEntity(entity: WorldEntity | null): void {
@@ -590,7 +603,10 @@ export class WorldScene extends Phaser.Scene {
 
   /**
    * Applies the active office editor tool at a world-pixel position.
-   * Returns true if the point was inside the office region and the tool was applied.
+   * Returns true if the point is inside the office region (event consumed),
+   * regardless of whether a mutation occurred — this prevents terrain tools
+   * from firing through the office floor on the same click.
+   * Returns false when the point is outside the office or no region/tool is set.
    */
   private applyOfficeTool(worldX: number, worldY: number): boolean {
     const region = this.officeRegion;
@@ -611,7 +627,7 @@ export class WorldScene extends Phaser.Scene {
         if (tile.kind === "floor" && tile.tint === tint) return true;
         tile.kind = "floor";
         tile.tint = tint;
-        this.rerenderOffice();
+        this.officeDirty = true;
         return true;
       }
       case "wall": {
@@ -620,7 +636,7 @@ export class WorldScene extends Phaser.Scene {
         if (tile.kind === "wall") return true;
         tile.kind = "wall";
         delete tile.tint;
-        this.rerenderOffice();
+        this.officeDirty = true;
         return true;
       }
       case "erase": {
@@ -628,14 +644,13 @@ export class WorldScene extends Phaser.Scene {
         if (!tile || tile.kind === "void") return true;
         tile.kind = "void";
         delete tile.tint;
-        this.rerenderOffice();
+        this.officeDirty = true;
         return true;
       }
       case "furniture": {
         const furnitureId = this.activeFurnitureId;
         if (!furnitureId) return true;
-        const paletteItems = FURNITURE_PALETTE_ITEMS;
-        const paletteItem = paletteItems.find((item) => item.id === furnitureId);
+        const paletteItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === furnitureId);
         if (!paletteItem) return true;
 
         if (cell.col + paletteItem.footprintW > layout.cols || cell.row + paletteItem.footprintH > layout.rows) {
@@ -657,7 +672,7 @@ export class WorldScene extends Phaser.Scene {
         };
 
         layout.furniture.push(newFurniture);
-        this.rerenderOffice();
+        this.officeDirty = true;
         return true;
       }
     }
