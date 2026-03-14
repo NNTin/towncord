@@ -14,6 +14,16 @@ export const RUNTIME_PERF_EVENT = "runtimePerf";
 export const ZOOM_CHANGED_EVENT = "zoomChanged";
 export const SET_ZOOM_EVENT = "setZoom";
 
+export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
+
+export type OfficeEditorToolId = "floor" | "wall" | "erase" | "furniture";
+
+export type OfficeSetEditorToolPayload = {
+  tool: OfficeEditorToolId | null;
+  tileColor: string | null;
+  furnitureId: string | null;
+};
+
 export type ZoomChangedPayload = { zoom: number; minZoom: number; maxZoom: number };
 export type SetZoomPayload = { zoom: number };
 
