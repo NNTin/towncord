@@ -20,9 +20,9 @@ const FURNITURE_PALETTE_MAP = new Map<string, FurniturePaletteItem>(
   FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
 );
 
-export type OfficeRenderableTargetKind = "furniture" | "character";
+type OfficeRenderableTargetKind = "furniture" | "character";
 
-export type OfficeRenderableTarget = {
+type OfficeRenderableTarget = {
   kind: OfficeRenderableTargetKind;
   id: string;
   label: string;
@@ -39,7 +39,7 @@ export type OfficeLayoutRenderable = {
   destroy(): void;
 };
 
-export type RenderOfficeLayoutOptions = {
+type RenderOfficeLayoutOptions = {
   /** World-space X offset applied to all game objects (default: 0). */
   worldOffsetX?: number;
   /** World-space Y offset applied to all game objects (default: 0). */

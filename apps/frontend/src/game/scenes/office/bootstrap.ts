@@ -1,5 +1,6 @@
 import officeLayoutData from "../../../../../../packages/donarg-office-assets/assets/default-layout.json";
 import furnitureCatalogData from "../../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
+import { fallbackFootprintFromPixels } from "../../office/officeFurniturePalette";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 
@@ -112,7 +113,7 @@ export type OfficeSceneLayout = {
   characters: OfficeSceneCharacter[];
 };
 
-export type OfficeSceneBootstrap = {
+type OfficeSceneBootstrap = {
   layout: OfficeSceneLayout;
 };
 
@@ -203,14 +204,6 @@ function mapFurnitureEntry(
     ...(sourceAsset?.orientation ? { orientation: sourceAsset.orientation } : {}),
     ...(sourceAsset?.groupId ? { groupId: sourceAsset.groupId } : {}),
   };
-}
-
-function fallbackFootprintFromPixels(pixels?: number): number {
-  if (!Number.isFinite(pixels)) {
-    return 1;
-  }
-
-  return Math.max(1, Math.ceil((pixels as number) / DONARG_TILE_WORLD_SIZE));
 }
 
 function normalizeFurnitureCategory(
