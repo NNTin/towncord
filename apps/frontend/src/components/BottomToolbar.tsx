@@ -8,6 +8,14 @@ import {
   FURNITURE_PALETTE_ITEMS,
   type FurniturePaletteItem,
 } from "../game/office/officeFurniturePalette";
+import {
+  ENVIRONMENT_ATLAS_IMAGE_URL,
+  ENVIRONMENT_ATLAS_W,
+  ENVIRONMENT_ATLAS_H,
+  ENVIRONMENT_ATLAS_FRAMES,
+  FLOOR_PATTERN_ITEMS,
+  type FloorPatternItem,
+} from "../game/office/officeTilePalette";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -20,6 +28,8 @@ type BottomToolbarProps = {
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeTileColor?: OfficeTileColor | null;
   onSelectTileColor?: (color: OfficeTileColor) => void;
+  activeFloorPattern?: string | null;
+  onSelectFloorPattern?: (id: string) => void;
   activeFurnitureId?: string | null;
   onSelectFurnitureId?: (id: string) => void;
   onResetLayout?: () => void;
@@ -91,17 +101,17 @@ const divider: React.CSSProperties = {
   margin: "2px 2px",
 };
 
-// ─── Tile color swatches ──────────────────────────────────────────────────────
+// ─── Tile color tints ─────────────────────────────────────────────────────────
 
-const TILE_COLOR_CSS: Record<OfficeTileColor, string> = {
-  neutral: "#475569",
-  blue: "#2563eb",
-  green: "#059669",
-  yellow: "#d97706",
-  orange: "#ea580c",
-  red: "#dc2626",
-  pink: "#db2777",
-  purple: "#7c3aed",
+const TILE_COLOR_TINT_CSS: Record<OfficeTileColor, string> = {
+  neutral: "rgba(71,85,105,0.45)",
+  blue: "rgba(37,99,235,0.45)",
+  green: "rgba(5,150,105,0.45)",
+  yellow: "rgba(217,119,6,0.45)",
+  orange: "rgba(234,88,12,0.45)",
+  red: "rgba(220,38,38,0.45)",
+  pink: "rgba(219,39,119,0.45)",
+  purple: "rgba(124,58,237,0.45)",
 };
 
 // ─── Furniture sprite ─────────────────────────────────────────────────────────
@@ -125,17 +135,88 @@ function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element 
 
 // ─── Sub-panels ───────────────────────────────────────────────────────────────
 
+function FloorTilePreview({ color }: { color: OfficeTileColor }): JSX.Element {
+  const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"];
+  if (!defaultFrame) {
+    return <div style={{ width: 32, height: 32, background: TILE_COLOR_TINT_CSS[color].replace("0.45", "1") }} />;
+  }
+  const { x, y, w, h } = defaultFrame.frame;
+  const ENV_SCALE = 2;
+  return (
+    <div style={{ position: "relative", width: w * ENV_SCALE, height: h * ENV_SCALE, overflow: "hidden", flexShrink: 0 }}>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
+          backgroundPosition: `${-x * ENV_SCALE}px ${-y * ENV_SCALE}px`,
+          backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
+          imageRendering: "pixelated",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: TILE_COLOR_TINT_CSS[color],
+          mixBlendMode: "multiply",
+        }}
+      />
+    </div>
+  );
+}
+
 function FloorSubPanel({
   activeTileColor,
   onSelectTileColor,
+  activeFloorPattern,
+  onSelectFloorPattern,
 }: {
   activeTileColor: OfficeTileColor | null | undefined;
   onSelectTileColor: ((c: OfficeTileColor) => void) | undefined;
+  activeFloorPattern: string | null | undefined;
+  onSelectFloorPattern: ((id: string) => void) | undefined;
 }): JSX.Element {
   return (
     <div style={subPanel}>
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
-        Tile Color
+        Pattern
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {FLOOR_PATTERN_ITEMS.map((item) => {
+          const { x, y, w, h } = item.atlasFrame;
+          const ENV_SCALE = 2;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              title={item.id}
+              onClick={() => onSelectFloorPattern?.(item.id)}
+              style={{
+                padding: 2,
+                background: activeFloorPattern === item.id ? "var(--pixel-active-bg)" : "var(--pixel-btn-bg)",
+                border: activeFloorPattern === item.id ? "2px solid var(--pixel-accent)" : "2px solid transparent",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  width: w * ENV_SCALE,
+                  height: h * ENV_SCALE,
+                  backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
+                  backgroundPosition: `${-x * ENV_SCALE}px ${-y * ENV_SCALE}px`,
+                  backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
+                  imageRendering: "pixelated",
+                  flexShrink: 0,
+                }}
+              />
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
+        Tint
       </div>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
         {OFFICE_TILE_COLORS.map((color) => (
@@ -145,16 +226,41 @@ function FloorSubPanel({
             title={color}
             onClick={() => onSelectTileColor?.(color)}
             style={{
-              width: 24,
-              height: 24,
-              background: TILE_COLOR_CSS[color],
-              border: activeTileColor === color ? "2px solid var(--pixel-accent)" : "2px solid var(--pixel-border)",
+              padding: 2,
+              background: activeTileColor === color ? "var(--pixel-active-bg)" : "var(--pixel-btn-bg)",
+              border: activeTileColor === color ? "2px solid var(--pixel-accent)" : "2px solid transparent",
               cursor: "pointer",
-              padding: 0,
             }}
-          />
+          >
+            <FloorTilePreview color={color} />
+          </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+function WallSubPanel(): JSX.Element {
+  const previewFrame = ENVIRONMENT_ATLAS_FRAMES["environment.walls.mask-00#0"];
+  const ENV_SCALE = 2;
+  return (
+    <div style={subPanel}>
+      <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
+        Wall
+      </div>
+      {previewFrame ? (
+        <div
+          style={{
+            width: previewFrame.frame.w * ENV_SCALE,
+            height: previewFrame.frame.h * ENV_SCALE,
+            backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
+            backgroundPosition: `${-previewFrame.frame.x * ENV_SCALE}px ${-previewFrame.frame.y * ENV_SCALE}px`,
+            backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
+            imageRendering: "pixelated",
+            flexShrink: 0,
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -246,6 +352,8 @@ export function BottomToolbar({
   onSelectTool,
   activeTileColor,
   onSelectTileColor,
+  activeFloorPattern,
+  onSelectFloorPattern,
   activeFurnitureId,
   onSelectFurnitureId,
   onResetLayout,
@@ -280,8 +388,14 @@ export function BottomToolbar({
     <div style={outerContainer}>
       {/* Sub-panels (appear above button row) */}
       {isLayoutMode && activeTool === "floor" && (
-        <FloorSubPanel activeTileColor={activeTileColor} onSelectTileColor={onSelectTileColor} />
+        <FloorSubPanel
+          activeTileColor={activeTileColor}
+          onSelectTileColor={onSelectTileColor}
+          activeFloorPattern={activeFloorPattern}
+          onSelectFloorPattern={onSelectFloorPattern}
+        />
       )}
+      {isLayoutMode && activeTool === "wall" && <WallSubPanel />}
       {isLayoutMode && activeTool === "furniture" && (
         <FurnitureSubPanel activeFurnitureId={activeFurnitureId} onSelectFurnitureId={onSelectFurnitureId} />
       )}

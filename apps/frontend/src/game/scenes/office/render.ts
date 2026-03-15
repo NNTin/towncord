@@ -3,18 +3,18 @@ import type {
   OfficeSceneCharacter,
   OfficeSceneFurniture,
   OfficeSceneLayout,
+  OfficeSceneTile,
 } from "./bootstrap";
-import { resolveOfficeTileFill } from "./colors";
-import { FURNITURE_PALETTE_ITEMS, type FurniturePaletteItem } from "../../office/officeFurniturePalette";
+import { FURNITURE_ALL_ITEMS, type FurniturePaletteItem } from "../../office/officeFurniturePalette";
 
 const GRID_LINE_COLOR = 0x0f172a;
 const VOID_TILE_COLOR = 0x020617;
-const FLOOR_INSET_ALPHA = 0.18;
-const WALL_INSET_ALPHA = 0.28;
 const SHADOW_COLOR = 0x020617;
 const LABEL_TEXT_COLOR = "#f8fafc";
 const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
 const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
+const DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY = "donarg.office.environment";
+const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
 
 /**
  * Depth encoding: depth = bottomRow * DEPTH_ROWS_PER_SLOT + layer.
@@ -26,7 +26,7 @@ const DEPTH_LAYER_FLOOR_FURNITURE = 18;
 const DEPTH_LAYER_CHARACTER = 34;
 
 const FURNITURE_PALETTE_MAP = new Map<string, FurniturePaletteItem>(
-  FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
+  FURNITURE_ALL_ITEMS.map((item) => [item.id, item]),
 );
 
 type OfficeRenderableTargetKind = "furniture" | "character";
@@ -100,8 +100,8 @@ export function renderOfficeLayout(
   const officeContainer = scene.add.container(worldOffsetX, worldOffsetY);
 
   // Children use local (container-relative) coordinates — no worldOffset needed.
-  const tilesGraphics = renderTiles(scene, layout, 0, 0, tileDepth);
-  officeContainer.add(tilesGraphics);
+  const tileLayer = renderTiles(scene, layout, 0, 0, tileDepth);
+  officeContainer.add(tileLayer);
 
   const furnitureEntries = layout.furniture.map((item) => {
     const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
@@ -136,9 +136,9 @@ export function renderOfficeLayout(
     renderIndex: buildRenderIndex(),
 
     partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex {
-      // --- Tile layer: clear and redraw in one pass (no container ops) ---
-      tilesGraphics.clear();
-      drawTiles(tilesGraphics, newLayout);
+      // --- Tile layer: remove all children and rebuild ---
+      tileLayer.removeAll(true);
+      buildTileObjects(scene, tileLayer, newLayout);
 
       // --- Furniture: diff by id ---
       const newFurnitureIds = new Set(newLayout.furniture.map((f) => f.id));
@@ -195,51 +195,69 @@ function renderTiles(
   worldOffsetX: number,
   worldOffsetY: number,
   tileDepth: number,
-): Phaser.GameObjects.Graphics {
-  const graphics = scene.add.graphics();
-  graphics.setPosition(worldOffsetX, worldOffsetY);
-  graphics.setDepth(tileDepth);
-  drawTiles(graphics, layout);
-  return graphics;
+): Phaser.GameObjects.Container {
+  const container = scene.add.container(worldOffsetX, worldOffsetY);
+  container.setDepth(tileDepth);
+  buildTileObjects(scene, container, layout);
+  return container;
 }
 
-function drawTiles(graphics: Phaser.GameObjects.Graphics, layout: OfficeSceneLayout): void {
+function buildTileObjects(
+  scene: Phaser.Scene,
+  container: Phaser.GameObjects.Container,
+  layout: OfficeSceneLayout,
+): void {
   const { cols, rows, cellSize, tiles } = layout;
+  const half = cellSize / 2;
 
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
+  // Base graphics for void tiles
+  const baseGraphics = scene.add.graphics();
+  container.add(baseGraphics);
+
+  // Pass 1: tile base sprites (floor sprites, wall sprites, void rects)
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
       const tile = tiles[row * cols + col];
-      if (!tile) {
+      const x = col * cellSize;
+      const y = row * cellSize;
+
+      if (!tile || tile.kind === "void") {
+        baseGraphics.fillStyle(VOID_TILE_COLOR, 0.55);
+        baseGraphics.fillRect(x, y, cellSize, cellSize);
         continue;
       }
 
-      const x = col * cellSize;
-      const y = row * cellSize;
-      const fill = tile.kind === "void" ? VOID_TILE_COLOR : resolveOfficeTileFill(tile.kind, tile.tint);
-      const strokeAlpha = tile.kind === "wall" ? 0.45 : 0.22;
-      const insetAlpha = tile.kind === "wall" ? WALL_INSET_ALPHA : FLOOR_INSET_ALPHA;
-
-      graphics.fillStyle(fill, tile.kind === "void" ? 0.55 : 1);
-      graphics.fillRect(x, y, cellSize, cellSize);
-      graphics.lineStyle(1, GRID_LINE_COLOR, strokeAlpha);
-      graphics.strokeRect(x, y, cellSize, cellSize);
-
-      if (tile.kind !== "void") {
-        graphics.fillStyle(0xffffff, insetAlpha);
-        graphics.fillRect(x + 2, y + 2, cellSize - 4, Math.max(2, Math.floor(cellSize * 0.14)));
-      }
-
-      if (tile.kind === "wall") {
-        graphics.fillStyle(SHADOW_COLOR, 0.22);
-        graphics.fillRect(
-          x,
-          y + cellSize - Math.max(4, Math.floor(cellSize * 0.18)),
-          cellSize,
-          Math.max(4, Math.floor(cellSize * 0.18)),
-        );
+      if (tile.kind === "floor") {
+        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, FLOOR_PATTERN_FRAME);
+        img.setDisplaySize(cellSize, cellSize);
+        if (typeof tile.tint === "number") {
+          img.setTint(tile.tint);
+        }
+        container.add(img);
+      } else if (tile.kind === "wall") {
+        const bitmask = computeWallBitmask(tiles, cols, rows, col, row);
+        const maskId = String(bitmask).padStart(2, "0");
+        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, `environment.walls.mask-${maskId}#0`);
+        img.setDisplaySize(cellSize, cellSize);
+        container.add(img);
       }
     }
   }
+
+  // Pass 2: grid lines on top of everything
+  const gridGraphics = scene.add.graphics();
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const tile = tiles[row * cols + col];
+      if (!tile || tile.kind === "void") continue;
+      const x = col * cellSize;
+      const y = row * cellSize;
+      const strokeAlpha = tile.kind === "wall" ? 0.45 : 0.22;
+      gridGraphics.lineStyle(1, GRID_LINE_COLOR, strokeAlpha);
+      gridGraphics.strokeRect(x, y, cellSize, cellSize);
+    }
+  }
+  container.add(gridGraphics);
 }
 
 function renderFurniture(
@@ -431,6 +449,25 @@ function renderCharacter(
 // Note: this depth space overlaps with the world-entity depth space, which has no y-sort.
 function resolveRenderableDepth(bottomRow: number, layer: number): number {
   return bottomRow * DEPTH_ROWS_PER_SLOT + layer;
+}
+
+function computeWallBitmask(
+  tiles: OfficeSceneTile[],
+  cols: number,
+  rows: number,
+  col: number,
+  row: number,
+): number {
+  const isWall = (c: number, r: number): boolean => {
+    if (c < 0 || r < 0 || c >= cols || r >= rows) return false;
+    return tiles[r * cols + c]?.kind === "wall";
+  };
+  let mask = 0;
+  if (isWall(col, row - 1)) mask |= 1;  // North
+  if (isWall(col + 1, row)) mask |= 2;  // East
+  if (isWall(col, row + 1)) mask |= 4;  // South
+  if (isWall(col - 1, row)) mask |= 8;  // West
+  return mask;
 }
 
 function shortenLabel(label: string, maxLength: number): string {
