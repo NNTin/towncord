@@ -101,16 +101,40 @@ jobs:
         run: npm ci
 
       - name: Find unused dependencies, exports, and files
+        id: knip
+        continue-on-error: true
         run: npm run knip
 
       - name: Find duplicated code
+        id: jscpd
+        continue-on-error: true
         run: npm run jscpd
 
       - name: Typecheck frontend
+        id: typecheck
+        continue-on-error: true
         run: npm run typecheck:frontend
 
       - name: Run frontend tests
+        id: tests
+        continue-on-error: true
         run: npm -w @towncord/frontend test
 
       - name: Build frontend
+        id: build
+        continue-on-error: true
         run: npm run build:frontend
+
+      - name: Check all steps passed
+        if: always()
+        run: |
+          failed=()
+          [[ "${{ steps.knip.outcome }}"     == "failure" ]] && failed+=("knip")
+          [[ "${{ steps.jscpd.outcome }}"    == "failure" ]] && failed+=("jscpd")
+          [[ "${{ steps.typecheck.outcome }}" == "failure" ]] && failed+=("typecheck")
+          [[ "${{ steps.tests.outcome }}"    == "failure" ]] && failed+=("tests")
+          [[ "${{ steps.build.outcome }}"    == "failure" ]] && failed+=("build")
+          if [[ ${#failed[@]} -gt 0 ]]; then
+            echo "Failed steps: ${failed[*]}"
+            exit 1
+          fi
