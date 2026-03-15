@@ -3,6 +3,7 @@ import {
   BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
   getBloomseedWorldBootstrap,
 } from "../application/gameComposition";
+import { RENDER_LAYERS } from "../renderLayers";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
@@ -55,14 +56,6 @@ const MAX_ZOOM = 4;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
-// TODO(architecture-review): Depth constants are scattered magic numbers with no named layer
-// taxonomy. Centralize render-layers module (e.g. src/game/renderLayers.ts)
-// that exports a plain const-asserted object: RENDER_LAYERS = { TERRAIN_STATIC: -1000,
-// TERRAIN_ANIMATED: -999, OFFICE_FLOOR: -500, ENTITIES: <y-sorted>, EFFECTS: 5000,
-// UI_OVERLAY: 10000 }. Migrate incrementally by replacing one layer at a time.
-/** Depth for the office tile layer. Sits above terrain (TERRAIN_RENDER_DEPTH = -1000) and below entities. */
-const OFFICE_TILE_DEPTH = -500;
-const TERRAIN_BRUSH_PREVIEW_DEPTH = 9_000;
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
 const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;
@@ -70,8 +63,6 @@ const TERRAIN_BRUSH_PREVIEW_READY_STROKE = 0xe0f2fe;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
 const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
-
-const OFFICE_CELL_HIGHLIGHT_DEPTH = 8_000;
 const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
 const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
@@ -351,7 +342,7 @@ export class WorldScene extends Phaser.Scene {
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
-        tileDepth: OFFICE_TILE_DEPTH,
+        tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
         depthAnchorRow: Math.round(anchorY16 / 3),
       });
     }
@@ -422,7 +413,7 @@ export class WorldScene extends Phaser.Scene {
 
     const badge = this.add.sprite(0, 0, firstFrame.textureKey, firstFrame.textureFrame);
     badge.setScale(SELECTED_BADGE_SCALE);
-    badge.setDepth(10_000);
+    badge.setDepth(RENDER_LAYERS.UI_OVERLAY);
     badge.setVisible(false);
     this.selectionBadge = badge;
   }
@@ -437,7 +428,7 @@ export class WorldScene extends Phaser.Scene {
       TERRAIN_BRUSH_PREVIEW_ALPHA,
     );
     preview.setOrigin(0, 0);
-    preview.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH);
+    preview.setDepth(RENDER_LAYERS.TERRAIN_BRUSH_PREVIEW);
     preview.setStrokeStyle(
       TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
       TERRAIN_BRUSH_PREVIEW_READY_STROKE,
@@ -458,7 +449,7 @@ export class WorldScene extends Phaser.Scene {
       OFFICE_CELL_HIGHLIGHT_ALPHA,
     );
     highlight.setOrigin(0, 0);
-    highlight.setDepth(OFFICE_CELL_HIGHLIGHT_DEPTH);
+    highlight.setDepth(RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT);
     highlight.setStrokeStyle(OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH, OFFICE_CELL_HIGHLIGHT_STROKE, 0.9);
     highlight.setVisible(false);
     this.officeCellHighlight = highlight;
@@ -506,7 +497,7 @@ export class WorldScene extends Phaser.Scene {
 
     const image = this.add.image(0, 0, TERRAIN_TEXTURE_KEY);
     image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
-    image.setDepth(TERRAIN_BRUSH_PREVIEW_DEPTH - 1);
+    image.setDepth(RENDER_LAYERS.TERRAIN_BRUSH_PREVIEW - 1);
     image.setVisible(false);
     this.terrainBrushRenderPreviewImages[index] = image;
     return image;
@@ -634,7 +625,7 @@ export class WorldScene extends Phaser.Scene {
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
-        tileDepth: OFFICE_TILE_DEPTH,
+        tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
         depthAnchorRow: Math.round(anchorY16 / 3),
       });
     }

@@ -70,7 +70,7 @@ type RenderOfficeLayoutOptions = {
   /**
    * Depth assigned to the floor/wall tile graphics layer.
    * Default: 0 (suitable for standalone OfficeScene).
-   * Use -500 when rendering inside WorldScene above terrain.
+   * Use `RENDER_LAYERS.OFFICE_FLOOR` (-500) when rendering inside WorldScene above terrain.
    */
   tileDepth?: number;
   /**
