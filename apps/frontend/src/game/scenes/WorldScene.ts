@@ -12,7 +12,6 @@ import {
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
-  PLAYER_STATE_CHANGED_EVENT,
   RUNTIME_PERF_EVENT,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
@@ -22,7 +21,6 @@ import {
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
   type PlayerPlacedPayload,
-  type PlayerStateChangedPayload,
   type RuntimePerfPayload,
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
@@ -38,32 +36,20 @@ import {
   type TerrainCellCoord,
   type TerrainRenderTile,
 } from "../terrain";
-import { playEntityAnimation } from "./world/animationSystem";
-import {
-  AUTONOMY_IDLE_DELAY_MS,
-  resetEntityAutonomy,
-  updateEntityAutonomy,
-} from "./world/autonomySystem";
-import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
 import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
-import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
-import { FURNITURE_PALETTE_ITEMS } from "../office/officeFurniturePalette";
-import type { OfficeSceneFurniture, OfficeSceneFurnitureCategory } from "./office/bootstrap";
 import type { TownOfficeRegion } from "../town/layout";
 import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
-import { updateEntityMovement, type MovementInput } from "./world/movementSystem";
-import type { WorldEntity, WorldPoint, WorldSelectableActor } from "./world/types";
+import type { MovementInput } from "./world/movementSystem";
+import type { WorldEntity, WorldSelectableActor } from "./world/types";
+import { EntitySystem } from "./world/entitySystem";
+import { OfficeEditorSystem } from "./world/officeEditorSystem";
 
 export const WORLD_SCENE_KEY = "world";
 
-// Monotonic counter to ensure unique IDs for placed office furniture.
-let nextFurniturePlacementId = 1;
-
-const SPRITE_SCALE = 4;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
@@ -91,16 +77,14 @@ const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
-// TODO(architecture-review): WorldScene is a god class (~1080 lines) that owns terrain,
-// office layout, entity lifecycle, navigation, input handling, camera, selection UI, and
-// brush preview all in one place. Recommended refactoring order: (1) extract EntitySystem
-// (stateful class wrapping the entity array, movement, animation, y-sort) to unblock
-// independent unit tests; (2) extract OfficeEditorSystem (stateful, owns layout mutations
-// and dirty flag); (3) extract CameraSystem (pure-functional helpers for pan/zoom). Each
-// system should be a stateful class injected into WorldScene, not a pure-function module,
-// because they require access to Phaser game objects across multiple frames.
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
+
+  /** Dedicated system for all per-entity updates (autonomy, movement, animation, position sync). */
+  private entitySystem: EntitySystem | null = null;
+
+  /** Dedicated system for office editor tool dispatch (floor/wall/furniture/erase). */
+  private readonly officeEditorSystem = new OfficeEditorSystem();
 
   private get catalog(): AnimationCatalog | null {
     return this.runtimeState.catalog;
@@ -118,6 +102,11 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.entityRegistry = value;
   }
 
+  /**
+   * Provides direct access to the entity array for test harnesses that need to
+   * inject mock entities (e.g. to simulate occupied terrain cells).  In
+   * production code, the entity lifecycle is managed by EntitySystem.
+   */
   private get entities(): WorldEntity[] {
     return this.runtimeState.entities;
   }
@@ -238,14 +227,6 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.navigation = value;
   }
 
-  private get nextId(): number {
-    return this.runtimeState.nextId;
-  }
-
-  private set nextId(value: number) {
-    this.runtimeState.nextId = value;
-  }
-
   private get wasd(): WorldSceneMovementKeys | null {
     return this.runtimeState.wasd;
   }
@@ -326,14 +307,6 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.lastPerfEmitAtMs = value;
   }
 
-  private get directInputIdleMs(): number {
-    return this.runtimeState.directInputIdleMs;
-  }
-
-  private set directInputIdleMs(value: number) {
-    this.runtimeState.directInputIdleMs = value;
-  }
-
   constructor() {
     super(WORLD_SCENE_KEY);
   }
@@ -356,10 +329,21 @@ export class WorldScene extends Phaser.Scene {
       this.terrainSystem.getGameplayGrid(),
       officeRegion,
     );
-    this.navigation = createTerrainNavigationService(
+    const navigation = createTerrainNavigationService(
       this.terrainSystem.getGameplayGrid(),
       collisionGrid,
     );
+    this.navigation = navigation;
+
+    if (this.catalog) {
+      this.entitySystem = new EntitySystem({
+        scene: this,
+        catalog: this.catalog,
+        navigation,
+        emitGameEvent: (event, payload) => this.game.events.emit(event, payload),
+        onSelectedEntityUpdated: (entity) => this.syncSelectionBadgePosition(entity),
+      });
+    }
 
     {
       const { anchorX16, anchorY16, layout } = officeRegion;
@@ -393,81 +377,10 @@ export class WorldScene extends Phaser.Scene {
     terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    const { catalog, navigation, shiftKey, wasd } = runtimeState;
-    if (wasd && shiftKey && catalog && navigation) {
-      const dt = delta / 1000;
+    const { shiftKey, wasd } = runtimeState;
+    if (wasd && shiftKey && this.entitySystem) {
       const directInput = this.resolveDirectMovementInput(wasd, shiftKey);
-      const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
-      const directInputIdleMs = hasDirectMovement ? 0 : runtimeState.directInputIdleMs + delta;
-      runtimeState.directInputIdleMs = directInputIdleMs;
-      const autoplayEnabled = directInputIdleMs >= AUTONOMY_IDLE_DELAY_MS;
-      const entities = runtimeState.entities;
-      const selectedEntity = runtimeState.selectedEntity;
-
-      // TODO(architecture-review): Entity update (autonomy, movement, animation, position
-      // sync) is inlined directly inside WorldScene.update(). This logic should live in a
-      // dedicated EntitySystem.update() method so the per-entity pipeline is independently
-      // testable and WorldScene.update() becomes a thin coordinator.
-      for (const entity of entities) {
-        const prevState = entity.state;
-        const prevFacing = entity.facing;
-        const prevAnimationAction = entity.animationAction;
-        const isSelected = entity === selectedEntity;
-
-        const movementInput =
-          isSelected && hasDirectMovement
-            ? directInput
-            : updateEntityAutonomy(entity, delta, {
-                autoplayEnabled,
-                navigation,
-              });
-
-        if (isSelected && hasDirectMovement) {
-          resetEntityAutonomy(entity);
-        }
-
-        updateEntityMovement(entity, dt, movementInput);
-        if (!entity.autonomy.currentAmbientAction) {
-          entity.animationAction = entity.state;
-        }
-
-        const nextPosition = {
-          x: entity.position.x + entity.velocity.x * dt,
-          y: entity.position.y + entity.velocity.y * dt,
-        };
-        const resolvedPosition = this.resolveEntityPosition(entity.position, nextPosition, navigation);
-        entity.position.x = resolvedPosition.x;
-        entity.position.y = resolvedPosition.y;
-        if (resolvedPosition.x !== nextPosition.x) {
-          entity.velocity.x = 0;
-        }
-        if (resolvedPosition.y !== nextPosition.y) {
-          entity.velocity.y = 0;
-        }
-        entity.sprite.setPosition(entity.position.x, entity.position.y);
-        entity.sprite.setDepth(entity.position.y);
-        if (entity.velocity.x === 0 && entity.velocity.y === 0 && entity.state !== "idle") {
-          entity.state = "idle";
-          if (!entity.autonomy.currentAmbientAction) {
-            entity.animationAction = entity.state;
-          }
-        }
-
-        const stateChanged = entity.state !== prevState;
-        const dirChanged = entity.state !== "idle" && entity.facing !== prevFacing;
-        const animationChanged = entity.animationAction !== prevAnimationAction;
-        if (stateChanged || dirChanged || animationChanged) {
-          playEntityAnimation(entity, catalog);
-          if (isSelected && stateChanged && entity.definition.kind === "player") {
-            const payload: PlayerStateChangedPayload = { state: entity.state };
-            this.game.events.emit(PLAYER_STATE_CHANGED_EVENT, payload);
-          }
-        }
-
-        if (isSelected) {
-          this.syncSelectionBadgePosition(entity);
-        }
-      }
+      this.entitySystem.update(delta, directInput);
     }
 
     const now = performance.now();
@@ -498,6 +411,7 @@ export class WorldScene extends Phaser.Scene {
   private selectEntity(entity: WorldEntity | null): void {
     if (this.selectedEntity === entity) return;
     this.selectedEntity = entity;
+    this.entitySystem?.select(entity);
     this.setSelectionBadgeVisible(Boolean(entity));
     if (entity) this.syncSelectionBadgePosition(entity);
   }
@@ -622,13 +536,13 @@ export class WorldScene extends Phaser.Scene {
     this.selectionBadge.setPosition(
       entity.position.x,
       entity.position.y -
-        entity.sprite.displayHeight * WORLD_ENTITY_SPRITE_ORIGIN_Y -
+        entity.sprite.displayHeight * EntitySystem.spriteOriginY -
         SELECTED_BADGE_VERTICAL_OFFSET,
     );
   }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (!this.catalog || !this.entityRegistry || !this.terrainSystem) return;
+    if (!this.catalog || !this.entityRegistry || !this.terrainSystem || !this.entitySystem) return;
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
     const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
@@ -641,19 +555,9 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    const entity = createWorldEntity({
-      scene: this,
-      catalog: this.catalog,
-      runtime,
-      nextId: this.nextId,
-      worldX: clamped.worldX,
-      worldY: clamped.worldY,
-      spriteScale: SPRITE_SCALE,
-    });
+    const entity = this.entitySystem.addEntity(runtime, clamped.worldX, clamped.worldY);
     if (!entity) return;
 
-    this.nextId += 1;
-    this.entities.push(entity);
     this.selectEntity(entity);
 
     if (definition.kind === "player") {
@@ -688,11 +592,6 @@ export class WorldScene extends Phaser.Scene {
    * from firing through the office floor on the same click.
    * Returns false when the point is outside the office or no region/tool is set.
    */
-  // TODO(architecture-review): Office editor tool logic (floor paint, wall paint, furniture
-  // placement, erase) is implemented directly inside WorldScene as a large switch statement.
-  // This should be extracted into a dedicated OfficeEditorSystem that accepts a command and
-  // a layout document and returns a new document (or a mutation). WorldScene would then
-  // dispatch commands to the system rather than performing mutations itself.
   private applyOfficeTool(worldX: number, worldY: number): boolean {
     const region = this.officeRegion;
     const tool = this.activeOfficeTool;
@@ -701,102 +600,44 @@ export class WorldScene extends Phaser.Scene {
     const cell = worldToOfficeCell(worldX, worldY, region);
     if (!cell) return false;
 
-    const layout = region.layout;
-    const idx = cell.row * layout.cols + cell.col;
+    const changed = this.officeEditorSystem.applyCommand(region.layout, {
+      tool,
+      cell,
+      tileColor: this.activeTileColor,
+      furnitureId: this.activeFurnitureId,
+    });
 
-    switch (tool) {
-      case "floor": {
-        const tile = layout.tiles[idx];
-        if (!tile) return true;
-        const tint = OFFICE_TILE_COLOR_TINTS[this.activeTileColor] ?? OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
-        if (tile.kind === "floor" && tile.tint === tint) return true;
-        tile.kind = "floor";
-        tile.tint = tint;
-        this.officeDirty = true;
-        return true;
-      }
-      case "wall": {
-        const tile = layout.tiles[idx];
-        if (!tile) return true;
-        if (tile.kind === "wall") return true;
-        tile.kind = "wall";
-        delete tile.tint;
-        this.officeDirty = true;
-        return true;
-      }
-      case "erase": {
-        const tile = layout.tiles[idx];
-        const furnitureAtCell = layout.furniture.filter(
-          (f) => cell.col >= f.col && cell.col < f.col + f.width &&
-                 cell.row >= f.row && cell.row < f.row + f.height,
-        );
-        if ((tile?.kind === "void" || !tile) && furnitureAtCell.length === 0) return true;
-        if (tile) { tile.kind = "void"; delete tile.tint; }
-        if (furnitureAtCell.length > 0) {
-          const removeIds = new Set(furnitureAtCell.map((f) => f.id));
-          layout.furniture = layout.furniture.filter((f) => !removeIds.has(f.id));
-        }
-        this.officeDirty = true;
-        return true;
-      }
-      case "furniture": {
-        const furnitureId = this.activeFurnitureId;
-        if (!furnitureId) return true;
-        const paletteItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === furnitureId);
-        if (!paletteItem) return true;
-
-        if (cell.col + paletteItem.footprintW > layout.cols || cell.row + paletteItem.footprintH > layout.rows) {
-          return true;
-        }
-
-        // Remove existing furniture that overlaps the new placement footprint.
-        const newRight = cell.col + paletteItem.footprintW;
-        const newBottom = cell.row + paletteItem.footprintH;
-        layout.furniture = layout.furniture.filter(
-          (f) => f.col >= newRight || f.col + f.width <= cell.col ||
-                 f.row >= newBottom || f.row + f.height <= cell.row,
-        );
-
-        const newFurniture: OfficeSceneFurniture = {
-          id: `placed-${furnitureId}-${nextFurniturePlacementId++}`,
-          assetId: furnitureId,
-          label: paletteItem.label,
-          category: paletteItem.category as OfficeSceneFurnitureCategory,
-          placement: paletteItem.placement,
-          col: cell.col,
-          row: cell.row,
-          width: paletteItem.footprintW,
-          height: paletteItem.footprintH,
-          color: paletteItem.color,
-          accentColor: paletteItem.accentColor,
-        };
-
-        layout.furniture.push(newFurniture);
-        this.officeDirty = true;
-        return true;
-      }
+    if (changed) {
+      this.officeDirty = true;
     }
 
-    return false;
+    return true;
   }
 
-  // TODO(architecture-review): rerenderOffice() fully destroys and recreates every office
-  // game object on each dirty frame. For larger layouts this is expensive. Make a
-  // partial update strategy: keep the tile Graphics layer and furniture containers alive,
-  // and only re-draw changed tiles or re-position affected furniture instances rather than
-  // rebuilding the entire scene graph from scratch.
+  /**
+   * Applies a partial update to the rendered office, keeping game objects alive
+   * where possible and only creating/destroying what actually changed.
+   *
+   * - Tile graphics: cleared and redrawn in a single Graphics pass.
+   * - Furniture: diffed by id — unchanged containers are kept; removed items are
+   *   destroyed; new items are created.
+   * - Characters: rebuilt (derived data, infrequent change).
+   */
   private rerenderOffice(): void {
     const region = this.officeRegion;
     if (!region) return;
 
-    this.officeRenderable?.destroy();
-    const { anchorX16, anchorY16, layout } = region;
-    this.officeRenderable = renderOfficeLayout(this, layout, {
-      worldOffsetX: anchorX16 * TOWN_BASE_PX,
-      worldOffsetY: anchorY16 * TOWN_BASE_PX,
-      tileDepth: -500,
-      depthAnchorRow: Math.round(anchorY16 / 3),
-    });
+    if (this.officeRenderable) {
+      this.officeRenderable.partialUpdate(region.layout);
+    } else {
+      const { anchorX16, anchorY16, layout } = region;
+      this.officeRenderable = renderOfficeLayout(this, layout, {
+        worldOffsetX: anchorX16 * TOWN_BASE_PX,
+        worldOffsetY: anchorY16 * TOWN_BASE_PX,
+        tileDepth: OFFICE_TILE_DEPTH,
+        depthAnchorRow: Math.round(anchorY16 / 3),
+      });
+    }
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
@@ -827,7 +668,7 @@ export class WorldScene extends Phaser.Scene {
       const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
 
       for (const target of hits) {
-        const entity = this.entities.find((candidate) => candidate.sprite === target);
+        const entity = this.entitySystem?.findBySpriteTarget(target) ?? null;
         if (entity) {
           hit = entity;
           break;
@@ -1026,7 +867,12 @@ export class WorldScene extends Phaser.Scene {
     if (!this.terrainSystem) return false;
 
     const grid = this.terrainSystem.getGameplayGrid();
-    return this.entities.some((entity) => {
+    // Prefer EntitySystem-managed entities; fall back to runtimeState.entities
+    // for test harnesses that inject mock entity positions directly.
+    const entities = this.entitySystem?.getAll().length
+      ? this.entitySystem.getAll()
+      : this.runtimeState.entities;
+    return entities.some((entity) => {
       const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
       return entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY;
     });
@@ -1049,31 +895,6 @@ export class WorldScene extends Phaser.Scene {
       moveY: (wasd.S.isDown ? 1 : 0) - (wasd.W.isDown ? 1 : 0),
       isRunModifier: shiftKey.isDown,
     };
-  }
-
-  private resolveEntityPosition(
-    current: WorldPoint,
-    next: WorldPoint,
-    navigation: WorldNavigationService | null = this.navigation,
-  ): WorldPoint {
-    if (!navigation) return next;
-
-    const clampedNext = navigation.clampToBounds(next);
-    if (navigation.isWalkable(clampedNext)) {
-      return clampedNext;
-    }
-
-    const xOnly = navigation.clampToBounds({ x: clampedNext.x, y: current.y });
-    if (navigation.isWalkable(xOnly)) {
-      return xOnly;
-    }
-
-    const yOnly = navigation.clampToBounds({ x: current.x, y: clampedNext.y });
-    if (navigation.isWalkable(yOnly)) {
-      return yOnly;
-    }
-
-    return current;
   }
 
   private bindSceneEvents(): void {
@@ -1105,6 +926,8 @@ export class WorldScene extends Phaser.Scene {
 
   private handleShutdown(): void {
     this.unbindSceneEvents();
+    this.entitySystem?.dispose();
+    this.entitySystem = null;
     this.runtimeState.dispose();
   }
 }
