@@ -31,19 +31,15 @@ type RegisterPublicAnimationsOptions = {
   overrides?: Record<string, PublicAnimationOverride>;
 };
 
-type RegisterBloomseedAnimationsOptions = Omit<
+type RegisterNamedAnimationsOptions = Omit<
   RegisterPublicAnimationsOptions,
   "manifestKey" | "sourceLabel"
 > & {
   manifestKey?: string;
 };
 
-type RegisterDonargOfficeAnimationsOptions = Omit<
-  RegisterPublicAnimationsOptions,
-  "manifestKey" | "sourceLabel"
-> & {
-  manifestKey?: string;
-};
+type RegisterBloomseedAnimationsOptions = RegisterNamedAnimationsOptions;
+type RegisterDonargOfficeAnimationsOptions = RegisterNamedAnimationsOptions;
 
 type RegisterAnimationsFromManifestOptions = Omit<
   RegisterPublicAnimationsOptions,
@@ -60,7 +56,7 @@ type PreloadAnimationRegistration = {
  * Registers animations from any public animations manifest loaded into Phaser's JSON cache.
  * Returns animation keys that were created during this call.
  */
-export function registerPublicAnimations(
+function registerPublicAnimations(
   scene: Phaser.Scene,
   options: RegisterPublicAnimationsOptions,
 ): string[] {
@@ -153,6 +149,21 @@ function registerAnimationsFromManifest(
   return created;
 }
 
+function buildPublicAnimationOptions(
+  options: RegisterNamedAnimationsOptions,
+  defaultManifestKey: string,
+  sourceLabel: string,
+): RegisterPublicAnimationsOptions {
+  return {
+    manifestKey: options.manifestKey ?? defaultManifestKey,
+    sourceLabel,
+    defaultRepeat: options.defaultRepeat ?? -1,
+    onMissingAtlas: options.onMissingAtlas ?? "skip",
+    ...(options.filter ? { filter: options.filter } : {}),
+    ...(options.overrides ? { overrides: options.overrides } : {}),
+  };
+}
+
 /**
  * Registers animations from `assets/bloomseed/animations.json` in Phaser.
  * Returns animation keys that were created during this call.
@@ -161,14 +172,7 @@ export function registerBloomseedAnimations(
   scene: Phaser.Scene,
   options: RegisterBloomseedAnimationsOptions = {},
 ): string[] {
-  return registerPublicAnimations(scene, {
-    manifestKey: options.manifestKey ?? BLOOMSEED_ANIMATIONS_JSON_KEY,
-    sourceLabel: "Bloomseed",
-    defaultRepeat: options.defaultRepeat ?? -1,
-    onMissingAtlas: options.onMissingAtlas ?? "skip",
-    ...(options.filter ? { filter: options.filter } : {}),
-    ...(options.overrides ? { overrides: options.overrides } : {}),
-  });
+  return registerPublicAnimations(scene, buildPublicAnimationOptions(options, BLOOMSEED_ANIMATIONS_JSON_KEY, "Bloomseed"));
 }
 
 /**
@@ -179,14 +183,7 @@ export function registerDonargOfficeAnimations(
   scene: Phaser.Scene,
   options: RegisterDonargOfficeAnimationsOptions = {},
 ): string[] {
-  return registerPublicAnimations(scene, {
-    manifestKey: options.manifestKey ?? DONARG_OFFICE_ANIMATIONS_JSON_KEY,
-    sourceLabel: "Donarg office",
-    defaultRepeat: options.defaultRepeat ?? -1,
-    onMissingAtlas: options.onMissingAtlas ?? "skip",
-    ...(options.filter ? { filter: options.filter } : {}),
-    ...(options.overrides ? { overrides: options.overrides } : {}),
-  });
+  return registerPublicAnimations(scene, buildPublicAnimationOptions(options, DONARG_OFFICE_ANIMATIONS_JSON_KEY, "Donarg office"));
 }
 
 /**

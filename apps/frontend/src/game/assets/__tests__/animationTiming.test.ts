@@ -174,16 +174,15 @@ describe("registerBloomseedAnimations timing", () => {
       [DONARG_OFFICE_ANIMATIONS_JSON_KEY]: {
         namespace: "donarg.office",
         animations: {
-          "characters.palette-0.office-worker.walk-right": {
-            atlasKey: "donarg.office.characters",
-            frames: ["walk-right#0", "walk-right#1"],
-            durationsMs: [100, 100],
-            phaseDurationsMs: [100, 100],
-            category: "characters",
-            frameCount: 2,
-            frameSize: { w: 16, h: 32 },
-            sourceFile: "aseprite/characters/office-worker.aseprite",
-            paletteVariant: "palette-0",
+          "environment.carpet.variant-a": {
+            atlasKey: "donarg.office.environment",
+            frames: ["variant-a#0"],
+            durationsMs: [200],
+            phaseDurationsMs: [200],
+            category: "environment",
+            frameCount: 1,
+            frameSize: { w: 48, h: 48 },
+            sourceFile: "aseprite/environment/carpet.aseprite",
           },
         },
       },
@@ -194,10 +193,9 @@ describe("registerBloomseedAnimations timing", () => {
     expect(create).toHaveBeenCalledTimes(1);
     expect(create).toHaveBeenCalledWith(
       expect.objectContaining({
-        key: "characters.palette-0.office-worker.walk-right",
+        key: "environment.carpet.variant-a",
         frames: [
-          { key: "donarg.office.characters", frame: "walk-right#0", duration: 100 },
-          { key: "donarg.office.characters", frame: "walk-right#1", duration: 100 },
+          { key: "donarg.office.environment", frame: "variant-a#0", duration: 200 },
         ],
       }),
     );

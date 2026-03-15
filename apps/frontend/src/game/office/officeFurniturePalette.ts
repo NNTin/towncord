@@ -1,5 +1,5 @@
 import furnitureCatalogData from "../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
-import atlasData from "../../../../../apps/frontend/public/assets/donarg-office/atlas.json";
+import atlasData from "../../../public/assets/donarg-office/atlas.json";
 
 export type FurniturePalettePlacement = "floor" | "wall" | "surface";
 
@@ -31,7 +31,7 @@ function filePathToAtlasKey(filePath: string): string {
   return `furniture.${category}.${name}#0`;
 }
 
-function fallbackFootprintFromPixels(pixels?: number): number {
+export function fallbackFootprintFromPixels(pixels?: number): number {
   if (!Number.isFinite(pixels)) {
     return 1;
   }

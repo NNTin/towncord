@@ -4,6 +4,7 @@ import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
+  OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
@@ -12,6 +13,7 @@ import {
   TERRAIN_TILE_INSPECTED_EVENT,
   ZOOM_CHANGED_EVENT,
   SET_ZOOM_EVENT,
+  type OfficeLayoutChangedPayload,
   type OfficeSetEditorToolPayload,
   type ZoomChangedPayload,
   type PlaceObjectDropPayload,
@@ -22,6 +24,7 @@ import {
   parsePlaceDragPayload,
   toPlaceDropPayload,
 } from "../events";
+import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import { createGame } from "../phaser/createGame";
 import {
   BLOOMSEED_READY_EVENT,
@@ -78,15 +81,22 @@ function parseRawPlaceDragPayload(rawPayload: string) {
   }
 }
 
-export function useBloomseedUiBridge(): BloomseedUiBridge {
+export function useBloomseedUiBridge(options?: {
+  onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
+}): BloomseedUiBridge {
   const gameRootRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
+  const layoutChangedRef = useRef(options?.onOfficeLayoutChanged);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
   const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
+
+  useEffect(() => {
+    layoutChangedRef.current = options?.onOfficeLayoutChanged;
+  }, [options?.onOfficeLayoutChanged]);
 
   useEffect(() => {
     const container = gameRootRef.current;
@@ -112,15 +122,21 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
       setZoomState(payload);
     }
 
+    function handleOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
+      layoutChangedRef.current?.(payload.layout);
+    }
+
     game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
     game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
     game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
     game.events.on(ZOOM_CHANGED_EVENT, handleZoomChanged);
+    game.events.on(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
 
     return () => {
       game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
       game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
       game.events.off(ZOOM_CHANGED_EVENT, handleZoomChanged);
+      game.events.off(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
       game.destroy(true);
       gameRef.current = null;
       setCatalog(null);
