@@ -70,7 +70,7 @@ const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
 // TODO(architecture-review): Depth constants are scattered magic numbers with no named layer
-// taxonomy. Consider a centralized render-layers module (e.g. src/game/renderLayers.ts)
+// taxonomy. Centralized render-layers module (e.g. src/game/renderLayers.ts)
 // that exports a plain const-asserted object: RENDER_LAYERS = { TERRAIN_STATIC: -1000,
 // TERRAIN_ANIMATED: -999, OFFICE_FLOOR: -500, ENTITIES: <y-sorted>, EFFECTS: 5000,
 // UI_OVERLAY: 10000 }. Migrate incrementally by replacing one layer at a time, starting
@@ -788,7 +788,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   // TODO(architecture-review): rerenderOffice() fully destroys and recreates every office
-  // game object on each dirty frame. For larger layouts this is expensive. Consider a
+  // game object on each dirty frame. For larger layouts this is expensive. Make a
   // partial update strategy: keep the tile Graphics layer and furniture containers alive,
   // and only re-draw changed tiles or re-position affected furniture instances rather than
   // rebuilding the entire scene graph from scratch.
