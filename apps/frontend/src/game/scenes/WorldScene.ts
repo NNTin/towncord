@@ -8,6 +8,7 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
 import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
+  OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
@@ -16,6 +17,7 @@ import {
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
   type OfficeEditorToolId,
+  type OfficeLayoutChangedPayload,
   type OfficeSetEditorToolPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
@@ -45,7 +47,7 @@ import {
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
-import { loadTownOfficeRegion, worldToOfficeCell } from "../town/layout";
+import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
 import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../office/officeFurniturePalette";
@@ -72,6 +74,12 @@ const TERRAIN_BRUSH_PREVIEW_READY_STROKE = 0xe0f2fe;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
 const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
+
+const OFFICE_CELL_HIGHLIGHT_DEPTH = 8_000;
+const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
+const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
+const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
+const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
@@ -122,6 +130,14 @@ export class WorldScene extends Phaser.Scene {
 
   private set terrainBrushPreview(value: Phaser.GameObjects.Rectangle | null) {
     this.runtimeState.terrainBrushPreview = value;
+  }
+
+  private get officeCellHighlight(): Phaser.GameObjects.Rectangle | null {
+    return this.runtimeState.officeCellHighlight;
+  }
+
+  private set officeCellHighlight(value: Phaser.GameObjects.Rectangle | null) {
+    this.runtimeState.officeCellHighlight = value;
   }
 
   private get terrainBrushRenderPreviewImages(): Phaser.GameObjects.Image[] {
@@ -341,6 +357,7 @@ export class WorldScene extends Phaser.Scene {
 
     this.createSelectionBadge();
     this.createTerrainBrushPreview();
+    this.createOfficeCellHighlight();
 
     this.game.events.emit(ZOOM_CHANGED_EVENT, {
       zoom: this.cameras.main.zoom,
@@ -448,6 +465,10 @@ export class WorldScene extends Phaser.Scene {
     if (runtimeState.officeDirty) {
       this.rerenderOffice();
       runtimeState.officeDirty = false;
+      if (this.officeRegion) {
+        const payload: OfficeLayoutChangedPayload = { layout: this.officeRegion.layout };
+        this.game.events.emit(OFFICE_LAYOUT_CHANGED_EVENT, payload);
+      }
     }
   }
 
@@ -487,6 +508,40 @@ export class WorldScene extends Phaser.Scene {
     );
     preview.setVisible(false);
     this.terrainBrushPreview = preview;
+  }
+
+  private createOfficeCellHighlight(): void {
+    const highlight = this.add.rectangle(
+      0,
+      0,
+      48,
+      48,
+      OFFICE_CELL_HIGHLIGHT_FILL,
+      OFFICE_CELL_HIGHLIGHT_ALPHA,
+    );
+    highlight.setOrigin(0, 0);
+    highlight.setDepth(OFFICE_CELL_HIGHLIGHT_DEPTH);
+    highlight.setStrokeStyle(OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH, OFFICE_CELL_HIGHLIGHT_STROKE, 0.9);
+    highlight.setVisible(false);
+    this.officeCellHighlight = highlight;
+  }
+
+  private syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
+    if (!pointer || !this.activeOfficeTool || !this.officeRegion) {
+      this.officeCellHighlight?.setVisible(false);
+      return;
+    }
+
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToOfficeCell(worldPoint.x, worldPoint.y, this.officeRegion);
+    if (!cell) {
+      this.officeCellHighlight?.setVisible(false);
+      return;
+    }
+
+    const { worldX, worldY } = officeCellToWorldPixel(cell.col, cell.row, this.officeRegion);
+    this.officeCellHighlight?.setPosition(worldX, worldY);
+    this.officeCellHighlight?.setVisible(true);
   }
 
   private setSelectionBadgeVisible(visible: boolean): void {
@@ -599,6 +654,7 @@ export class WorldScene extends Phaser.Scene {
     this.activeOfficeTool = payload.tool;
     this.activeTileColor = payload.tileColor ?? "neutral";
     this.activeFurnitureId = payload.furnitureId;
+    this.syncOfficeCellHighlight(this.input.activePointer);
   }
 
   /**
@@ -764,10 +820,12 @@ export class WorldScene extends Phaser.Scene {
       const dy = (pointer.y - this.panStartY) / zoom;
       this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
       this.syncTerrainBrushPreviewFromPointer(pointer);
+      this.syncOfficeCellHighlight(pointer);
       return;
     }
 
     this.syncTerrainBrushPreviewFromPointer(pointer);
+    this.syncOfficeCellHighlight(pointer);
 
     if (this.isOfficePainting && this.activeOfficeTool && pointer.isDown) {
       const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
