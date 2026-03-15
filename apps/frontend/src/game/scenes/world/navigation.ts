@@ -47,8 +47,13 @@ const DEFAULT_WANDER_RADIUS_CELLS = 5;
 const REACHED_DISTANCE = 8;
 const WANDER_ATTEMPTS = 16;
 
+type WalkabilityOverride = {
+  isWorldWalkable(worldX: number, worldY: number): boolean;
+};
+
 export function createTerrainNavigationService(
   grid: TerrainGameplayGrid,
+  collisionOverride?: WalkabilityOverride,
 ): WorldNavigationService {
   return {
     pickWanderTarget(subject, rng) {
@@ -127,7 +132,9 @@ export function createTerrainNavigationService(
     },
 
     isWalkable(point) {
-      return grid.isWorldWalkable(point.x, point.y);
+      return collisionOverride
+        ? collisionOverride.isWorldWalkable(point.x, point.y)
+        : grid.isWorldWalkable(point.x, point.y);
     },
   };
 }

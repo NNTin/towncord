@@ -3,6 +3,9 @@ import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { EntityRegistry } from "../../domain/entityRegistry";
 import type { SelectedTerrainToolPayload } from "../../events";
 import type { TerrainSystem } from "../../terrain";
+import type { OfficeLayoutRenderable } from "../../scenes/office/render";
+import type { OfficeEditorToolId } from "../../events";
+import type { TownOfficeRegion } from "../../town/layout";
 import type { WorldNavigationService } from "./navigation";
 import { TerrainPaintSession } from "./terrainPaintSession";
 import type { WorldEntity } from "./types";
@@ -38,9 +41,17 @@ export class WorldSceneRuntime {
   public selectedEntity: WorldEntity | null = null;
   public selectionBadge: Phaser.GameObjects.Sprite | null = null;
   public terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
+  public officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
   public terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
   public terrainSystem: TerrainSystem | null = null;
   public navigation: WorldNavigationService | null = null;
+  public officeRenderable: OfficeLayoutRenderable | null = null;
+  public officeRegion: TownOfficeRegion | null = null;
+  public activeOfficeTool: OfficeEditorToolId | null = null;
+  public activeTileColor = "neutral";
+  public activeFurnitureId: string | null = null;
+  public isOfficePainting = false;
+  public officeDirty = false;
   public nextId = 0;
 
   public wasd: WorldSceneMovementKeys | null = null;
@@ -64,9 +75,17 @@ export class WorldSceneRuntime {
     this.selectedEntity = null;
     this.selectionBadge = null;
     this.terrainBrushPreview = null;
+    this.officeCellHighlight = null;
     this.terrainBrushRenderPreviewImages = [];
     this.terrainSystem = null;
     this.navigation = null;
+    this.officeRenderable = null;
+    this.officeRegion = null;
+    this.activeOfficeTool = null;
+    this.activeTileColor = "neutral";
+    this.activeFurnitureId = null;
+    this.isOfficePainting = false;
+    this.officeDirty = false;
     this.nextId = 0;
 
     this.wasd = null;
@@ -85,9 +104,11 @@ export class WorldSceneRuntime {
 
   public dispose(): void {
     this.terrainSystem?.destroy();
+    this.officeRenderable?.destroy();
     destroyGameObjects(this.entities.map((entity) => entity.sprite));
     destroyGameObject(this.selectionBadge);
     destroyGameObject(this.terrainBrushPreview);
+    destroyGameObject(this.officeCellHighlight);
     destroyGameObjects(this.terrainBrushRenderPreviewImages);
     this.reset();
   }

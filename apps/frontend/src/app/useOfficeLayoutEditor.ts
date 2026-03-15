@@ -5,6 +5,7 @@ import {
   type OfficeLayoutApiResponse,
   type OfficeLayoutDocument,
 } from "./officeLayoutApi";
+import type { OfficeSceneLayout } from "../game/scenes/office/bootstrap";
 
 type ParsedState = {
   document: OfficeLayoutDocument | null;
@@ -31,6 +32,7 @@ export type OfficeLayoutEditorState = {
   reload: () => Promise<void>;
   reset: () => void;
   save: () => Promise<void>;
+  syncFromPhaser: (layout: OfficeSceneLayout) => void;
 };
 
 function formatOfficeLayout(layout: OfficeLayoutDocument): string {
@@ -141,6 +143,19 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
     setError(null);
   }, [savedText]);
 
+  const syncFromPhaser = useCallback((layout: OfficeSceneLayout): void => {
+    const doc: OfficeLayoutDocument = {
+      version: 2,
+      cols: layout.cols,
+      rows: layout.rows,
+      cellSize: layout.cellSize,
+      tiles: layout.tiles,
+      furniture: layout.furniture,
+      characters: layout.characters,
+    };
+    setJsonText(formatOfficeLayout(doc));
+  }, []);
+
   const save = useCallback(async () => {
     if (!isAvailable || !parsed.document) return;
 
@@ -185,5 +200,6 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
     reload,
     reset,
     save,
+    syncFromPhaser,
   };
 }

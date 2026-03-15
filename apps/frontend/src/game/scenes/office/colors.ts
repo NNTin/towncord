@@ -1,6 +1,17 @@
 import Phaser from "phaser";
 import type { OfficeSceneTileKind } from "./bootstrap";
 
+export const OFFICE_TILE_COLOR_TINTS: Record<string, number> = {
+  neutral: 0x475569,
+  blue: 0x2563eb,
+  green: 0x059669,
+  yellow: 0xd97706,
+  orange: 0xea580c,
+  red: 0xdc2626,
+  pink: 0xdb2777,
+  purple: 0x7c3aed,
+};
+
 const FLOOR_HUE = 0.48;
 const FLOOR_SATURATION = 0.55;
 const FLOOR_LIGHTNESS = 0.19;
