@@ -129,7 +129,7 @@ const OFFICE_SCENE_BOOTSTRAP = buildOfficeSceneBootstrap(
 );
 
 export function createOfficeSceneBootstrap(): OfficeSceneBootstrap {
-  return OFFICE_SCENE_BOOTSTRAP;
+  return { layout: structuredClone(OFFICE_SCENE_BOOTSTRAP.layout) };
 }
 
 function buildOfficeSceneBootstrap(

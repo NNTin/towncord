@@ -16,6 +16,15 @@ const LABEL_TEXT_COLOR = "#f8fafc";
 const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
 const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 
+/**
+ * Depth encoding: depth = bottomRow * DEPTH_ROWS_PER_SLOT + layer.
+ * Max budget: ~100 rows × 100 slots = 10 000 depth units per office.
+ */
+const DEPTH_ROWS_PER_SLOT = 100;
+const DEPTH_LAYER_WALL_FURNITURE = 6;
+const DEPTH_LAYER_FLOOR_FURNITURE = 18;
+const DEPTH_LAYER_CHARACTER = 34;
+
 const FURNITURE_PALETTE_MAP = new Map<string, FurniturePaletteItem>(
   FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
 );
@@ -35,19 +44,33 @@ export type OfficeSceneRenderIndex = {
 };
 
 export type OfficeLayoutRenderable = {
+  /** Top-level Container wrapping all office game objects. Use this to move, cull, or toggle the whole office as a unit. */
+  container: Phaser.GameObjects.Container;
   renderIndex: OfficeSceneRenderIndex;
+  /**
+   * Performs a partial update of the rendered office to match `newLayout`.
+   *
+   * - Tile graphics: cleared and redrawn in a single Graphics pass (no container
+   *   destruction — far cheaper than a full rebuild for large layouts).
+   * - Furniture: diffed by `id`.  Unchanged furniture containers are kept alive;
+   *   removed items are destroyed; new items are created.  Characters are always
+   *   rebuilt because they are derived data and rarely change.
+   *
+   * Returns the updated `renderIndex`.
+   */
+  partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex;
   destroy(): void;
 };
 
 type RenderOfficeLayoutOptions = {
-  /** World-space X offset applied to all game objects (default: 0). */
+  /** World-space X offset applied to the top-level office Container (default: 0). */
   worldOffsetX?: number;
-  /** World-space Y offset applied to all game objects (default: 0). */
+  /** World-space Y offset applied to the top-level office Container (default: 0). */
   worldOffsetY?: number;
   /**
    * Depth assigned to the floor/wall tile graphics layer.
    * Default: 0 (suitable for standalone OfficeScene).
-   * Use -500 when rendering inside WorldScene above terrain.
+   * Use `RENDER_LAYERS.OFFICE_FLOOR` (-500) when rendering inside WorldScene above terrain.
    */
   tileDepth?: number;
   /**
@@ -71,36 +94,99 @@ export function renderOfficeLayout(
     depthAnchorRow = 0,
   } = options;
 
-  const tilesGraphics = renderTiles(scene, layout, worldOffsetX, worldOffsetY, tileDepth);
+  // Single top-level container for the entire office. All child objects are
+  // positioned relative to this container, so translating the container moves
+  // the whole office in one call and frustum-culling can target it directly.
+  const officeContainer = scene.add.container(worldOffsetX, worldOffsetY);
+
+  // Children use local (container-relative) coordinates — no worldOffset needed.
+  const tilesGraphics = renderTiles(scene, layout, 0, 0, tileDepth);
+  officeContainer.add(tilesGraphics);
 
   const furnitureEntries = layout.furniture.map((item) => {
     const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
-    const { target, container } = renderFurniture(scene, layout, item, paletteItem, worldOffsetX, worldOffsetY, depthAnchorRow);
-    return { target, container };
+    const { target, container } = renderFurniture(scene, layout, item, paletteItem, 0, 0, depthAnchorRow);
+    officeContainer.add(container);
+    // bounds must be in world space so callers can hit-test against world coordinates
+    target.bounds.x += worldOffsetX;
+    target.bounds.y += worldOffsetY;
+    return { id: item.id, target, container };
   });
 
   const characterEntries = layout.characters.map((actor) => {
-    const { target, container } = renderCharacter(scene, layout, actor, worldOffsetX, worldOffsetY, depthAnchorRow);
+    const { target, container } = renderCharacter(scene, layout, actor, 0, 0, depthAnchorRow);
+    officeContainer.add(container);
+    target.bounds.x += worldOffsetX;
+    target.bounds.y += worldOffsetY;
     return { target, container };
   });
 
-  const renderIndex: OfficeSceneRenderIndex = {
-    furniture: furnitureEntries.map((e) => e.target),
-    characters: characterEntries.map((e) => e.target),
-  };
+  // Live furniture map: id → { target, container } for O(1) diff lookups.
+  const furnitureMap = new Map(furnitureEntries.map((e) => [e.id, { target: e.target, container: e.container }]));
 
-  return {
-    renderIndex,
+  function buildRenderIndex(): OfficeSceneRenderIndex {
+    return {
+      furniture: [...furnitureMap.values()].map((e) => e.target),
+      characters: characterEntries.map((e) => e.target),
+    };
+  }
+
+  const renderable: OfficeLayoutRenderable = {
+    container: officeContainer,
+    renderIndex: buildRenderIndex(),
+
+    partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex {
+      // --- Tile layer: clear and redraw in one pass (no container ops) ---
+      tilesGraphics.clear();
+      drawTiles(tilesGraphics, newLayout);
+
+      // --- Furniture: diff by id ---
+      const newFurnitureIds = new Set(newLayout.furniture.map((f) => f.id));
+
+      // Remove stale furniture containers.
+      for (const [id, entry] of furnitureMap) {
+        if (!newFurnitureIds.has(id)) {
+          officeContainer.remove(entry.container, true);
+          furnitureMap.delete(id);
+        }
+      }
+
+      // Add new furniture containers.
+      for (const item of newLayout.furniture) {
+        if (!furnitureMap.has(item.id)) {
+          const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
+          const { target, container } = renderFurniture(scene, newLayout, item, paletteItem, 0, 0, depthAnchorRow);
+          officeContainer.add(container);
+          target.bounds.x += worldOffsetX;
+          target.bounds.y += worldOffsetY;
+          furnitureMap.set(item.id, { target, container });
+        }
+      }
+
+      // --- Characters: always rebuild (derived, rarely changes) ---
+      for (const entry of characterEntries) {
+        officeContainer.remove(entry.container, true);
+      }
+      characterEntries.length = 0;
+      for (const actor of newLayout.characters) {
+        const { target, container } = renderCharacter(scene, newLayout, actor, 0, 0, depthAnchorRow);
+        officeContainer.add(container);
+        target.bounds.x += worldOffsetX;
+        target.bounds.y += worldOffsetY;
+        characterEntries.push({ target, container });
+      }
+
+      renderable.renderIndex = buildRenderIndex();
+      return renderable.renderIndex;
+    },
+
     destroy() {
-      tilesGraphics.destroy();
-      for (const e of furnitureEntries) {
-        e.container.destroy(true);
-      }
-      for (const e of characterEntries) {
-        e.container.destroy(true);
-      }
+      // Destroying the top-level container also destroys all its children.
+      officeContainer.destroy(true);
     },
   };
+
+  return renderable;
 }
 
 function renderTiles(
@@ -113,6 +199,11 @@ function renderTiles(
   const graphics = scene.add.graphics();
   graphics.setPosition(worldOffsetX, worldOffsetY);
   graphics.setDepth(tileDepth);
+  drawTiles(graphics, layout);
+  return graphics;
+}
+
+function drawTiles(graphics: Phaser.GameObjects.Graphics, layout: OfficeSceneLayout): void {
   const { cols, rows, cellSize, tiles } = layout;
 
   for (let row = 0; row < rows; row += 1) {
@@ -149,8 +240,6 @@ function renderTiles(
       }
     }
   }
-
-  return graphics;
 }
 
 function renderFurniture(
@@ -174,7 +263,7 @@ function renderFurniture(
     renderFurnitureFallback(scene, container, layout, item, width, height);
   }
 
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? 6 : 18));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? DEPTH_LAYER_WALL_FURNITURE : DEPTH_LAYER_FLOOR_FURNITURE));
 
   const target: OfficeRenderableTarget = {
     kind: "furniture",
@@ -327,7 +416,7 @@ function renderCharacter(
   badge.setOrigin(0.5);
 
   container.add([shadow, body, head, badge]);
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, 34));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, DEPTH_LAYER_CHARACTER));
 
   const target: OfficeRenderableTarget = {
     kind: "character",
@@ -339,8 +428,9 @@ function renderCharacter(
   return { target, container };
 }
 
+// Note: this depth space overlaps with the world-entity depth space, which has no y-sort.
 function resolveRenderableDepth(bottomRow: number, layer: number): number {
-  return bottomRow * 100 + layer;
+  return bottomRow * DEPTH_ROWS_PER_SLOT + layer;
 }
 
 function shortenLabel(label: string, maxLength: number): string {

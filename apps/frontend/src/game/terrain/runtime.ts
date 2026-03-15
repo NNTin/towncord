@@ -1,4 +1,3 @@
-import type Phaser from "phaser";
 import {
   collectPhaseDurationsByAnimationId,
   readOptionalAnimationManifest,
@@ -17,6 +16,7 @@ import { TERRAIN_TEXTURE_KEY } from "./contracts";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainQueries } from "./queries";
 import { TerrainRenderer } from "./renderer";
+import type { TerrainRenderSurface } from "./renderSurface";
 import { TerrainMapStore } from "./store";
 import { TerrainTileResolver } from "./tileResolver";
 import { TerrainVisibleChunkResolver } from "./visibleChunkResolver";
@@ -30,10 +30,10 @@ type TerrainRuntime = {
   visibleChunks: TerrainVisibleChunkResolver;
 };
 
-export function createTerrainRuntime(scene: Phaser.Scene): TerrainRuntime {
+export function createTerrainRuntime(scene: TerrainRenderSurface): TerrainRuntime {
   const bootstrap = loadTerrainBootstrap();
   validateTerrainBootstrap(scene, bootstrap);
-  const debugAnimationManifest = readOptionalAnimationManifest(scene, DEBUG_ANIMATIONS_JSON_KEY);
+  const debugAnimationManifest = readOptionalAnimationManifest(scene as unknown as Record<string, unknown>, DEBUG_ANIMATIONS_JSON_KEY);
   const phaseDurationsByAnimationId = collectPhaseDurationsByAnimationId(debugAnimationManifest);
 
   const store = new TerrainMapStore(bootstrap.gridSpec);
