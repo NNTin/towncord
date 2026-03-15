@@ -20,6 +20,20 @@ For any implementation task on a branch, agents must create or enter a worktree 
 - Use the repository root checkout only to determine the current base branch and to open the parent-repo pull request after the worktree branch is pushed.
 - If a user tells you to read or follow this README, treat these instructions as required workflow, not optional guidance.
 - If you accidentally start in the repository root checkout, stop, create or enter the correct worktree, clean up the root checkout, and continue only inside the worktree.
+- If a user or coordinating agent assigns you a specific worktree path or branch, use that exact worktree and branch. Do not switch to a different branch or worktree unless explicitly reassigned.
+- Before editing files, installing dependencies, running tests, committing, or pushing, verify both `pwd` and `git branch --show-current` and confirm they match the assigned worktree and branch.
+- If the assigned worktree or branch does not exist, create exactly that worktree and branch. Do not create an alternative name unless explicitly approved.
+
+## Branch Isolation
+
+Every implementation agent owns exactly one branch and one worktree unless explicitly told otherwise.
+
+- Stay inside your assigned worktree for the entire task.
+- Commit only to your assigned branch.
+- Do not "help" by committing to an integration branch, another agent's branch, or the repository root checkout.
+- Do not merge, rebase, or cherry-pick other branches into your branch unless the user or coordinating agent explicitly assigns that integration work to you.
+- If you discover that another branch already contains overlapping work, stop and report it instead of redirecting your own work there.
+- If you need read-only context from another branch, inspect it without changing your current branch or worktree.
 
 ## Naming
 
@@ -85,16 +99,47 @@ git -C packages/debug-assets switch feat/my-change
 - Prefer one branch per worktree.
 - Create the worktree from the branch currently checked out at the repository root.
 - After creating or entering a worktree, initialize submodules with `git submodule update --init --recursive`.
+- After entering the worktree, verify `pwd` and `git branch --show-current` before doing any substantive work.
 - Do not do branch implementation work in the repository root checkout.
 - Do not run `npm install`, `npm ci`, file edits, commits, or pushes for branch work from the repository root checkout.
 - Do not create submodule branches as part of routine worktree setup.
 - Create or switch to a branch inside a submodule only when you will actually change files in that submodule.
 - If submodule code changes, push the submodule branch before pushing the parent worktree branch.
 - When working inside `.worktree/`, agents should commit their changes and push the worktree branch automatically.
+- Do not switch your worktree to a different branch after setup. If the assigned branch is wrong, stop and ask for reassignment.
 - After pushing the worktree branch, create a parent-repo pull request with `gh` from the worktree branch to the branch currently checked out at the repository root outside `.worktree/`.
 - Do not store notes, artifacts, or unrelated files in `.worktree/`.
 - Assume `.worktree/` contents are disposable except for this README.
 - Coordinate branch names clearly when multiple agents are active.
+
+## Merge Strategy
+
+When combining work across feature branches, the merge strategy is merge only.
+
+- Use `git merge`.
+- Do not use squash merges.
+- Do not use rebases to combine feature branches.
+- Do not rewrite published branch history to make branches "cleaner".
+- Preserve each worker branch's commit history when integrating.
+
+If a dedicated integration branch is used:
+
+1. Create or enter the integration worktree.
+2. Merge each completed feature branch into the integration branch with a regular merge commit.
+3. Resolve conflicts in the integration branch only.
+4. Push the integration branch.
+
+Example:
+
+```bash
+git switch feat/integration-branch
+git merge --no-ff feat/worker-a
+git merge --no-ff feat/worker-b
+git merge --no-ff feat/worker-c
+git push -u origin feat/integration-branch
+```
+
+Do not squash worker branches into the integration branch. Do not rebase worker branches onto the integration branch as a substitute for merging.
 
 ## If You Started In The Wrong Place
 
@@ -114,6 +159,14 @@ Required close-out sequence:
 1. Inside the worktree, push every changed submodule branch first.
 2. Commit the parent repository changes in the worktree, including updated submodule pointers, and push the worktree branch.
 3. From the repository root checkout outside `.worktree/`, create the parent-repo pull request against the branch currently checked out there.
+
+If multiple feature branches are being combined before the final PR:
+
+1. Push each worker branch from its own worktree.
+2. Enter the dedicated integration worktree.
+3. Merge worker branches into the integration branch with regular merge commits.
+4. Push the integration branch.
+5. Open the PR from the integration branch.
 
 Inside the worktree, push every changed submodule branch first:
 
