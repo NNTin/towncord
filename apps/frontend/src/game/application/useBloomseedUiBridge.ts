@@ -96,7 +96,7 @@ export function useBloomseedUiBridge(options?: {
 
   useEffect(() => {
     layoutChangedRef.current = options?.onOfficeLayoutChanged;
-  });
+  }, [options?.onOfficeLayoutChanged]);
 
   useEffect(() => {
     const container = gameRootRef.current;

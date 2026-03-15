@@ -156,9 +156,17 @@ function buildOfficeSceneBootstrap(
 
   const sourceWithChars = sourceLayout as DonargOfficeLayoutSource & { characters?: unknown[] };
   const charactersRaw = sourceWithChars.characters ?? [];
+  const normalizedLayoutForCharacters =
+    Array.isArray(sourceLayout.tiles) && (sourceLayout.tiles as unknown[]).length > 0 && typeof (sourceLayout.tiles as unknown[])[0] === "number"
+      ? sourceLayout
+      : ({
+          ...sourceLayout,
+          // Ensure tiles is always a number[] for character derivation.
+          tiles: tiles.map((t: any) => (typeof t.tileId === "number" ? t.tileId : 0)),
+        } as DonargOfficeLayoutSource);
   const characters: OfficeSceneCharacter[] = charactersRaw.length > 0 && isCharacterRecord(charactersRaw[0])
     ? charactersRaw.filter(isCharacterRecord)
-    : createDerivedCharacters(sourceLayout, furniture);
+    : createDerivedCharacters(normalizedLayoutForCharacters, furniture);
 
   return {
     layout: {

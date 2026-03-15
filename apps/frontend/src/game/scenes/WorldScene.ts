@@ -60,6 +60,9 @@ import type { WorldEntity, WorldPoint, WorldSelectableActor } from "./world/type
 
 export const WORLD_SCENE_KEY = "world";
 
+// Monotonic counter to ensure unique IDs for placed office furniture.
+let nextFurniturePlacementId = 1;
+
 const SPRITE_SCALE = 4;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
@@ -730,7 +733,7 @@ export class WorldScene extends Phaser.Scene {
         );
 
         const newFurniture: OfficeSceneFurniture = {
-          id: `placed-${furnitureId}-${Date.now()}`,
+          id: `placed-${furnitureId}-${nextFurniturePlacementId++}`,
           assetId: furnitureId,
           label: paletteItem.label,
           category: paletteItem.category as OfficeSceneFurnitureCategory,
