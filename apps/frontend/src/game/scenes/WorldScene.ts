@@ -69,6 +69,12 @@ const MAX_ZOOM = 4;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
+// TODO(architecture-review): Depth constants are scattered magic numbers with no named layer
+// taxonomy. Consider a centralized render-layers module (e.g. src/game/renderLayers.ts)
+// that exports a plain const-asserted object: RENDER_LAYERS = { TERRAIN_STATIC: -1000,
+// TERRAIN_ANIMATED: -999, OFFICE_FLOOR: -500, ENTITIES: <y-sorted>, EFFECTS: 5000,
+// UI_OVERLAY: 10000 }. Migrate incrementally by replacing one layer at a time, starting
+// with the terrain/office boundary constants which already have JSDoc comments.
 const TERRAIN_BRUSH_PREVIEW_DEPTH = 9_000;
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
@@ -84,6 +90,14 @@ const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
+// TODO(architecture-review): WorldScene is a god class (~1080 lines) that owns terrain,
+// office layout, entity lifecycle, navigation, input handling, camera, selection UI, and
+// brush preview all in one place. Recommended refactoring order: (1) extract EntitySystem
+// (stateful class wrapping the entity array, movement, animation, y-sort) to unblock
+// independent unit tests; (2) extract OfficeEditorSystem (stateful, owns layout mutations
+// and dirty flag); (3) extract CameraSystem (pure-functional helpers for pan/zoom). Each
+// system should be a stateful class injected into WorldScene, not a pure-function module,
+// because they require access to Phaser game objects across multiple frames.
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
 
@@ -349,6 +363,10 @@ export class WorldScene extends Phaser.Scene {
     {
       const { anchorX16, anchorY16, layout } = officeRegion;
       this.officeRegion = officeRegion;
+      // TODO(architecture-review): The office is rendered inline inside create() with a
+      // hardcoded tileDepth of -500. This magic number should be a named constant (e.g.
+      // OFFICE_TILE_DEPTH) defined alongside TERRAIN_RENDER_DEPTH so the relationship
+      // between the two layers is explicit.
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
@@ -389,6 +407,10 @@ export class WorldScene extends Phaser.Scene {
       const entities = runtimeState.entities;
       const selectedEntity = runtimeState.selectedEntity;
 
+      // TODO(architecture-review): Entity update (autonomy, movement, animation, position
+      // sync) is inlined directly inside WorldScene.update(). This logic should live in a
+      // dedicated EntitySystem.update() method so the per-entity pipeline is independently
+      // testable and WorldScene.update() becomes a thin coordinator.
       for (const entity of entities) {
         const prevState = entity.state;
         const prevFacing = entity.facing;
@@ -426,6 +448,11 @@ export class WorldScene extends Phaser.Scene {
           entity.velocity.y = 0;
         }
         entity.sprite.setPosition(entity.position.x, entity.position.y);
+        // TODO(architecture-review): World entity sprites have no y-sort depth applied —
+        // their Phaser depth is fixed at creation time. Office furniture IS y-sorted via
+        // resolveRenderableDepth(), but bloomseed entities are not, so an entity standing
+        // behind a piece of furniture will incorrectly appear in front of it. A y-sort
+        // pass (entity.sprite.setDepth(entity.position.y)) should be applied here.
         if (entity.velocity.x === 0 && entity.velocity.y === 0 && entity.state !== "idle") {
           entity.state = "idle";
           if (!entity.autonomy.currentAmbientAction) {
@@ -668,6 +695,11 @@ export class WorldScene extends Phaser.Scene {
    * from firing through the office floor on the same click.
    * Returns false when the point is outside the office or no region/tool is set.
    */
+  // TODO(architecture-review): Office editor tool logic (floor paint, wall paint, furniture
+  // placement, erase) is implemented directly inside WorldScene as a large switch statement.
+  // This should be extracted into a dedicated OfficeEditorSystem that accepts a command and
+  // a layout document and returns a new document (or a mutation). WorldScene would then
+  // dispatch commands to the system rather than performing mutations itself.
   private applyOfficeTool(worldX: number, worldY: number): boolean {
     const region = this.officeRegion;
     const tool = this.activeOfficeTool;
@@ -755,6 +787,11 @@ export class WorldScene extends Phaser.Scene {
     return false;
   }
 
+  // TODO(architecture-review): rerenderOffice() fully destroys and recreates every office
+  // game object on each dirty frame. For larger layouts this is expensive. Consider a
+  // partial update strategy: keep the tile Graphics layer and furniture containers alive,
+  // and only re-draw changed tiles or re-position affected furniture instances rather than
+  // rebuilding the entire scene graph from scratch.
   private rerenderOffice(): void {
     const region = this.officeRegion;
     if (!region) return;

@@ -59,6 +59,12 @@ type RenderOfficeLayoutOptions = {
   depthAnchorRow?: number;
 };
 
+// TODO(architecture-review): renderOfficeLayout() creates individual game objects (Graphics,
+// Containers) and adds them directly to the passed scene. There is no parent Phaser Group or
+// Container wrapping the entire office. This makes it impossible to move, cull, or toggle
+// the whole office as a unit. Wrapping all child objects in a single top-level Container
+// would simplify translation (worldOffsetX/Y) and enable frustum-culling the office in one
+// call.
 export function renderOfficeLayout(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
@@ -339,6 +345,13 @@ function renderCharacter(
   return { target, container };
 }
 
+// TODO(architecture-review): resolveRenderableDepth() encodes both spatial (row) and
+// categorical (layer) concerns into a single depth integer using the formula
+// `bottomRow * 100 + layer`. The multiplier 100 and the layer slot values (6 for wall
+// furniture, 18 for floor furniture, 34 for characters) are undocumented magic numbers.
+// Document the layer budget (e.g. max ~100 rows × 100 = 10 000 depth units) and give each
+// slot a named constant so the intended draw order is explicit. Also note that this depth
+// space overlaps with the world-entity depth space, which has no y-sort at all.
 function resolveRenderableDepth(bottomRow: number, layer: number): number {
   return bottomRow * 100 + layer;
 }

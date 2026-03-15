@@ -20,6 +20,14 @@ function compareChunkStates(a: TerrainChunkState, b: TerrainChunkState): number 
   return a.chunkX - b.chunkX;
 }
 
+// TODO(architecture-review): TerrainMapStore stores cell data as a string array
+// (TerrainMaterialId[]). For large maps this is memory-inefficient — each string reference
+// occupies 8 bytes on a 64-bit heap plus the string object itself, vs. 1–2 bytes for a
+// typed integer ID. Consider assigning numeric IDs to materials and backing the cells array
+// with a Uint8Array or Uint16Array for better cache performance and lower GC pressure.
+// Additionally, the store supports only one material per cell (single terrain layer). If
+// the game ever needs layered terrain (e.g. a ground layer + a detail/decal layer), the
+// data model will need to be extended before the rendering pipeline can support it.
 export class TerrainMapStore {
   public readonly width: number;
   public readonly height: number;

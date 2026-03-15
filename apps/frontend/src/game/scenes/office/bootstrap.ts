@@ -123,6 +123,13 @@ type MappedFurnitureEntry = OfficeSceneFurniture & {
   groupId?: string;
 };
 
+// TODO(architecture-review): OFFICE_SCENE_BOOTSTRAP is a module-level singleton whose
+// `layout` object is directly mutated by WorldScene (tile kinds, furniture array) during
+// editor interaction. This means repeated calls to createOfficeSceneBootstrap() after an
+// edit return the already-modified object, and there is no way to reset to the canonical
+// source state without a full page reload. Consider either (a) deep-cloning the layout on
+// each call to createOfficeSceneBootstrap(), or (b) treating the source data as immutable
+// and maintaining editor state as a separate delta/patch layer.
 const OFFICE_SCENE_BOOTSTRAP = buildOfficeSceneBootstrap(
   officeLayoutData as DonargOfficeLayoutSource,
   furnitureCatalogData as DonargFurnitureCatalogSource,
