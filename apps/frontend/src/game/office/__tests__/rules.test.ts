@@ -10,6 +10,13 @@ import {
   type OfficePlacedCharacter,
 } from "../index";
 
+function placeDesk(): OfficeLayoutDocument {
+  const result = placeOfficeFurniture(createLayout(), createDesk("desk-1", 1, 1));
+  expect(result.ok).toBe(true);
+  if (!result.ok) throw new Error("expected desk placement to succeed");
+  return result.value;
+}
+
 function createLayout(): OfficeLayoutDocument {
   return createOfficeLayoutDocument({
     columns: 5,
@@ -179,17 +186,14 @@ describe("office layout rules", () => {
   });
 
   test("blocks overlapping floor furniture and supports move/rotate/toggle", () => {
-    const layout = createLayout();
-    const withDesk = placeOfficeFurniture(layout, createDesk("desk-1", 1, 1));
-    expect(withDesk.ok).toBe(true);
-    if (!withDesk.ok) return;
+    const withDesk = placeDesk();
 
-    const blockedLocker = placeOfficeFurniture(withDesk.value, createLocker("locker-1", 1, 1));
+    const blockedLocker = placeOfficeFurniture(withDesk, createLocker("locker-1", 1, 1));
     expect(blockedLocker.ok).toBe(false);
     if (blockedLocker.ok) return;
     expect(blockedLocker.error.code).toBe("furniture-placement-blocked");
 
-    const moved = applyOfficeLayoutAction(withDesk.value, {
+    const moved = applyOfficeLayoutAction(withDesk, {
       type: "moveFurniture",
       furnitureId: "desk-1",
       anchor: {
@@ -254,12 +258,9 @@ describe("office layout rules", () => {
   });
 
   test("supports desk-surface placement and cascades child removal", () => {
-    const layout = createLayout();
-    const withDesk = placeOfficeFurniture(layout, createDesk("desk-1", 1, 1));
-    expect(withDesk.ok).toBe(true);
-    if (!withDesk.ok) return;
+    const withDesk = placeDesk();
 
-    const withLaptop = placeOfficeFurniture(withDesk.value, createDeskItem("laptop", "desk-1", 0.2, 0.2));
+    const withLaptop = placeOfficeFurniture(withDesk, createDeskItem("laptop", "desk-1", 0.2, 0.2));
     expect(withLaptop.ok).toBe(true);
     if (!withLaptop.ok) return;
 

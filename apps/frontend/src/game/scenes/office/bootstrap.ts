@@ -1,5 +1,6 @@
 import officeLayoutData from "../../../../../../packages/donarg-office-assets/assets/default-layout.json";
 import furnitureCatalogData from "../../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
+import { fallbackFootprintFromPixels } from "../../office/officeFurniturePalette";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 
@@ -36,7 +37,7 @@ type DonargOfficeLayoutSource = {
   cols: number;
   rows: number;
   tiles: number[];
-  tileColors: Array<DonargLayoutColor | null>;
+  tileColors?: Array<DonargLayoutColor | null>;
   furniture: DonargLayoutPlacement[];
 };
 
@@ -112,7 +113,7 @@ export type OfficeSceneLayout = {
   characters: OfficeSceneCharacter[];
 };
 
-export type OfficeSceneBootstrap = {
+type OfficeSceneBootstrap = {
   layout: OfficeSceneLayout;
 };
 
@@ -136,25 +137,36 @@ function buildOfficeSceneBootstrap(
   sourceCatalog: DonargFurnitureCatalogSource,
 ): OfficeSceneBootstrap {
   const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
-  const tiles = sourceLayout.tiles.map((tileId, index) => {
-    const kind = toTileKind(tileId);
-    const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors[index] ?? null);
 
-    return typeof tint === "number"
-      ? {
-          kind,
-          tileId,
-          tint,
-        }
-      : {
-          kind,
-          tileId,
-        };
-  });
+  const tilesRaw = sourceLayout.tiles as unknown[];
+  const tiles: OfficeSceneTile[] = tilesRaw.length > 0 && isTileRecord(tilesRaw[0])
+    ? tilesRaw.filter(isTileRecord)
+    : (sourceLayout.tiles as number[]).map((tileId, index) => {
+        const kind = toTileKind(tileId);
+        const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors?.[index] ?? null);
+        return typeof tint === "number" ? { kind, tileId, tint } : { kind, tileId };
+      });
 
-  const furniture = sourceLayout.furniture.map((entry, index) =>
-    mapFurnitureEntry(entry, catalog.get(entry.type), index),
-  );
+  const furnitureRaw = (sourceLayout.furniture as unknown[]);
+  const furniture: MappedFurnitureEntry[] = furnitureRaw.length > 0 && isFurnitureRecord(furnitureRaw[0])
+    ? furnitureRaw.filter(isFurnitureRecord).map((f, i) => ({ ...f, sourceOrder: i }))
+    : (sourceLayout.furniture as DonargLayoutPlacement[]).map((entry, index) =>
+        mapFurnitureEntry(entry, catalog.get(entry.type), index),
+      );
+
+  const sourceWithChars = sourceLayout as DonargOfficeLayoutSource & { characters?: unknown[] };
+  const charactersRaw = sourceWithChars.characters ?? [];
+  const normalizedLayoutForCharacters =
+    Array.isArray(sourceLayout.tiles) && (sourceLayout.tiles as unknown[]).length > 0 && typeof (sourceLayout.tiles as unknown[])[0] === "number"
+      ? sourceLayout
+      : ({
+          ...sourceLayout,
+          // Ensure tiles is always a number[] for character derivation.
+          tiles: tiles.map((t: any) => (typeof t.tileId === "number" ? t.tileId : 0)),
+        } as DonargOfficeLayoutSource);
+  const characters: OfficeSceneCharacter[] = charactersRaw.length > 0 && isCharacterRecord(charactersRaw[0])
+    ? charactersRaw.filter(isCharacterRecord)
+    : createDerivedCharacters(normalizedLayoutForCharacters, furniture);
 
   return {
     layout: {
@@ -163,7 +175,7 @@ function buildOfficeSceneBootstrap(
       cellSize: DONARG_TILE_WORLD_SIZE * 3,
       tiles,
       furniture,
-      characters: createDerivedCharacters(sourceLayout, furniture),
+      characters,
     },
   };
 }
@@ -200,14 +212,6 @@ function mapFurnitureEntry(
     ...(sourceAsset?.orientation ? { orientation: sourceAsset.orientation } : {}),
     ...(sourceAsset?.groupId ? { groupId: sourceAsset.groupId } : {}),
   };
-}
-
-function fallbackFootprintFromPixels(pixels?: number): number {
-  if (!Number.isFinite(pixels)) {
-    return 1;
-  }
-
-  return Math.max(1, Math.ceil((pixels as number) / DONARG_TILE_WORLD_SIZE));
 }
 
 function normalizeFurnitureCategory(
