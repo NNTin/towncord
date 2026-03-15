@@ -47,7 +47,7 @@ import {
 import { createWorldEntity, WORLD_ENTITY_SPRITE_ORIGIN_Y } from "./world/entityFactory";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { TownCollisionGrid } from "../town/collisionGrid";
-import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel } from "../town/layout";
+import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
 import { OFFICE_TILE_COLOR_TINTS } from "./office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../office/officeFurniturePalette";
@@ -347,8 +347,8 @@ export class WorldScene extends Phaser.Scene {
       const { anchorX16, anchorY16, layout } = officeRegion;
       this.officeRegion = officeRegion;
       this.officeRenderable = renderOfficeLayout(this, layout, {
-        worldOffsetX: anchorX16 * 16,
-        worldOffsetY: anchorY16 * 16,
+        worldOffsetX: anchorX16 * TOWN_BASE_PX,
+        worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: -500,
         depthAnchorRow: Math.round(anchorY16 / 3),
       });
@@ -511,11 +511,12 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createOfficeCellHighlight(): void {
+    const cellSize = this.officeRegion?.layout.cellSize ?? 48;
     const highlight = this.add.rectangle(
       0,
       0,
-      48,
-      48,
+      cellSize,
+      cellSize,
       OFFICE_CELL_HIGHLIGHT_FILL,
       OFFICE_CELL_HIGHLIGHT_ALPHA,
     );
@@ -758,8 +759,8 @@ export class WorldScene extends Phaser.Scene {
     this.officeRenderable?.destroy();
     const { anchorX16, anchorY16, layout } = region;
     this.officeRenderable = renderOfficeLayout(this, layout, {
-      worldOffsetX: anchorX16 * 16,
-      worldOffsetY: anchorY16 * 16,
+      worldOffsetX: anchorX16 * TOWN_BASE_PX,
+      worldOffsetY: anchorY16 * TOWN_BASE_PX,
       tileDepth: -500,
       depthAnchorRow: Math.round(anchorY16 / 3),
     });

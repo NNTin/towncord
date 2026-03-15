@@ -146,7 +146,7 @@ jobs:
           fi
 
       - name: Post CI report
-        if: always() && github.event_name == 'pull_request'
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           KNIP_OUTCOME: ${{ steps.knip.outcome }}
