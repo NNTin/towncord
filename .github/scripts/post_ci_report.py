@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import sys
+from datetime import datetime, timezone
 
 MARKER = "<!-- ci-report -->"
 
@@ -183,9 +184,10 @@ def compose_comment(outcomes: dict[str, str], run_url: str) -> str:
     any_failure = any(v == "failure" for v in outcomes.values())
     overall = "❌" if any_failure else "✅"
 
+    timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     parts = [
         MARKER,
-        f"## CI Report {overall}  ·  [View run →]({run_url})",
+        f"## CI Report {overall}  ·  [View run →]({run_url})  ·  *{timestamp}*",
         "",
         "| Check | Status |",
         "|-------|--------|",
