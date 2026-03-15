@@ -171,8 +171,8 @@ export class TerrainRenderer {
 
   // TODO(architecture-review): drawTiles() takes an `animatedPhase` boolean flag to decide
   // whether to resolve animated frame variants. This dual behaviour in one method makes the
-  // intent harder to follow. Consider splitting into drawStaticTiles() and
-  // drawAnimatedTiles() to make each call-site's purpose explicit.
+  // intent harder to follow. Split into drawStaticTiles() and drawAnimatedTiles() to make 
+  // each call-site's purpose explicit.
   private drawTiles(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
