@@ -44,14 +44,28 @@ export type OfficeSceneRenderIndex = {
 };
 
 export type OfficeLayoutRenderable = {
+  /** Top-level Container wrapping all office game objects. Use this to move, cull, or toggle the whole office as a unit. */
+  container: Phaser.GameObjects.Container;
   renderIndex: OfficeSceneRenderIndex;
+  /**
+   * Performs a partial update of the rendered office to match `newLayout`.
+   *
+   * - Tile graphics: cleared and redrawn in a single Graphics pass (no container
+   *   destruction — far cheaper than a full rebuild for large layouts).
+   * - Furniture: diffed by `id`.  Unchanged furniture containers are kept alive;
+   *   removed items are destroyed; new items are created.  Characters are always
+   *   rebuilt because they are derived data and rarely change.
+   *
+   * Returns the updated `renderIndex`.
+   */
+  partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex;
   destroy(): void;
 };
 
 type RenderOfficeLayoutOptions = {
-  /** World-space X offset applied to all game objects (default: 0). */
+  /** World-space X offset applied to the top-level office Container (default: 0). */
   worldOffsetX?: number;
-  /** World-space Y offset applied to all game objects (default: 0). */
+  /** World-space Y offset applied to the top-level office Container (default: 0). */
   worldOffsetY?: number;
   /**
    * Depth assigned to the floor/wall tile graphics layer.
@@ -68,12 +82,6 @@ type RenderOfficeLayoutOptions = {
   depthAnchorRow?: number;
 };
 
-// TODO(architecture-review): renderOfficeLayout() creates individual game objects (Graphics,
-// Containers) and adds them directly to the passed scene. There is no parent Phaser Group or
-// Container wrapping the entire office. This makes it impossible to move, cull, or toggle
-// the whole office as a unit. Wrapping all child objects in a single top-level Container
-// would simplify translation (worldOffsetX/Y) and enable frustum-culling the office in one
-// call.
 export function renderOfficeLayout(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,
@@ -86,36 +94,99 @@ export function renderOfficeLayout(
     depthAnchorRow = 0,
   } = options;
 
-  const tilesGraphics = renderTiles(scene, layout, worldOffsetX, worldOffsetY, tileDepth);
+  // Single top-level container for the entire office. All child objects are
+  // positioned relative to this container, so translating the container moves
+  // the whole office in one call and frustum-culling can target it directly.
+  const officeContainer = scene.add.container(worldOffsetX, worldOffsetY);
+
+  // Children use local (container-relative) coordinates — no worldOffset needed.
+  const tilesGraphics = renderTiles(scene, layout, 0, 0, tileDepth);
+  officeContainer.add(tilesGraphics);
 
   const furnitureEntries = layout.furniture.map((item) => {
     const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
-    const { target, container } = renderFurniture(scene, layout, item, paletteItem, worldOffsetX, worldOffsetY, depthAnchorRow);
-    return { target, container };
+    const { target, container } = renderFurniture(scene, layout, item, paletteItem, 0, 0, depthAnchorRow);
+    officeContainer.add(container);
+    // bounds must be in world space so callers can hit-test against world coordinates
+    target.bounds.x += worldOffsetX;
+    target.bounds.y += worldOffsetY;
+    return { id: item.id, target, container };
   });
 
   const characterEntries = layout.characters.map((actor) => {
-    const { target, container } = renderCharacter(scene, layout, actor, worldOffsetX, worldOffsetY, depthAnchorRow);
+    const { target, container } = renderCharacter(scene, layout, actor, 0, 0, depthAnchorRow);
+    officeContainer.add(container);
+    target.bounds.x += worldOffsetX;
+    target.bounds.y += worldOffsetY;
     return { target, container };
   });
 
-  const renderIndex: OfficeSceneRenderIndex = {
-    furniture: furnitureEntries.map((e) => e.target),
-    characters: characterEntries.map((e) => e.target),
-  };
+  // Live furniture map: id → { target, container } for O(1) diff lookups.
+  const furnitureMap = new Map(furnitureEntries.map((e) => [e.id, { target: e.target, container: e.container }]));
 
-  return {
-    renderIndex,
+  function buildRenderIndex(): OfficeSceneRenderIndex {
+    return {
+      furniture: [...furnitureMap.values()].map((e) => e.target),
+      characters: characterEntries.map((e) => e.target),
+    };
+  }
+
+  const renderable: OfficeLayoutRenderable = {
+    container: officeContainer,
+    renderIndex: buildRenderIndex(),
+
+    partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex {
+      // --- Tile layer: clear and redraw in one pass (no container ops) ---
+      tilesGraphics.clear();
+      drawTiles(tilesGraphics, newLayout);
+
+      // --- Furniture: diff by id ---
+      const newFurnitureIds = new Set(newLayout.furniture.map((f) => f.id));
+
+      // Remove stale furniture containers.
+      for (const [id, entry] of furnitureMap) {
+        if (!newFurnitureIds.has(id)) {
+          officeContainer.remove(entry.container, true);
+          furnitureMap.delete(id);
+        }
+      }
+
+      // Add new furniture containers.
+      for (const item of newLayout.furniture) {
+        if (!furnitureMap.has(item.id)) {
+          const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
+          const { target, container } = renderFurniture(scene, newLayout, item, paletteItem, 0, 0, depthAnchorRow);
+          officeContainer.add(container);
+          target.bounds.x += worldOffsetX;
+          target.bounds.y += worldOffsetY;
+          furnitureMap.set(item.id, { target, container });
+        }
+      }
+
+      // --- Characters: always rebuild (derived, rarely changes) ---
+      for (const entry of characterEntries) {
+        officeContainer.remove(entry.container, true);
+      }
+      characterEntries.length = 0;
+      for (const actor of newLayout.characters) {
+        const { target, container } = renderCharacter(scene, newLayout, actor, 0, 0, depthAnchorRow);
+        officeContainer.add(container);
+        target.bounds.x += worldOffsetX;
+        target.bounds.y += worldOffsetY;
+        characterEntries.push({ target, container });
+      }
+
+      renderable.renderIndex = buildRenderIndex();
+      return renderable.renderIndex;
+    },
+
     destroy() {
-      tilesGraphics.destroy();
-      for (const e of furnitureEntries) {
-        e.container.destroy(true);
-      }
-      for (const e of characterEntries) {
-        e.container.destroy(true);
-      }
+      // Destroying the top-level container also destroys all its children.
+      officeContainer.destroy(true);
     },
   };
+
+  return renderable;
 }
 
 function renderTiles(
@@ -128,6 +199,11 @@ function renderTiles(
   const graphics = scene.add.graphics();
   graphics.setPosition(worldOffsetX, worldOffsetY);
   graphics.setDepth(tileDepth);
+  drawTiles(graphics, layout);
+  return graphics;
+}
+
+function drawTiles(graphics: Phaser.GameObjects.Graphics, layout: OfficeSceneLayout): void {
   const { cols, rows, cellSize, tiles } = layout;
 
   for (let row = 0; row < rows; row += 1) {
@@ -164,8 +240,6 @@ function renderTiles(
       }
     }
   }
-
-  return graphics;
 }
 
 function renderFurniture(
