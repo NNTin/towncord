@@ -75,6 +75,11 @@ export function resolveTerrainPhaseIndex(
   return durationsMs.length - 1;
 }
 
+// TODO(architecture-review): TerrainRenderer carries two distinct responsibilities: (1)
+// managing RenderTexture lifecycle per chunk, and (2) tracking animation phase state
+// (currentPhaseByAnimationId, animationPhaseDurationsById). The animation clock logic
+// (resolveTerrainPhaseIndex, normalizeTerrainPhaseDurations) should be extracted into a
+// separate TerrainAnimationClock class so the renderer only concerns itself with drawing.
 export class TerrainRenderer {
   private readonly chunkStates = new Map<TerrainChunkId, ChunkRenderState>();
   private readonly animatedFrameVariantsByBase = new Map<string, string[]>();
@@ -164,6 +169,10 @@ export class TerrainRenderer {
     return variants[index] ?? baseFrame;
   }
 
+  // TODO(architecture-review): drawTiles() takes an `animatedPhase` boolean flag to decide
+  // whether to resolve animated frame variants. This dual behaviour in one method makes the
+  // intent harder to follow. Consider splitting into drawStaticTiles() and
+  // drawAnimatedTiles() to make each call-site's purpose explicit.
   private drawTiles(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
@@ -296,6 +305,11 @@ export class TerrainRenderer {
     state.staticTiles = staticTiles;
     state.animatedTiles = animatedTiles;
 
+    // TODO(architecture-review): The static RT sits at TERRAIN_RENDER_DEPTH and the animated
+    // RT at TERRAIN_RENDER_DEPTH + 1. These sub-layer offsets are implicit (+1 in code).
+    // They should be named constants (e.g. TERRAIN_STATIC_DEPTH / TERRAIN_ANIMATED_DEPTH)
+    // so it is clear that both belong to the terrain layer and that animated tiles are always
+    // rendered on top of static tiles within the same chunk.
     if (state.animatedTiles.length > 0) {
       if (!state.animatedRT) {
         state.animatedRT = this.createRenderTexture(

@@ -103,6 +103,12 @@ export function officeCellToWorldPixel(
  * anchorX16=20, anchorY16=20 → worldX=320, worldY=320.
  * The office must be at least one terrain cell (4 × 16px) from the terrain boundary.
  */
+// TODO(architecture-review): The office anchor is a hardcoded constant that assumes a
+// single office always at (20, 20) in 16px units. If the game ever supports multiple
+// buildings, a movable office, or loading anchor coordinates from level data, this must
+// be replaced with a data-driven approach (e.g. loaded from a level JSON alongside the
+// terrain seed). The `loadTownOfficeRegion()` function should accept an anchor parameter
+// rather than reading a module constant.
 const DEFAULT_OFFICE_ANCHOR_X16 = 20;
 const DEFAULT_OFFICE_ANCHOR_Y16 = 20;
 
