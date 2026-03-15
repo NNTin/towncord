@@ -445,11 +445,7 @@ export class WorldScene extends Phaser.Scene {
           entity.velocity.y = 0;
         }
         entity.sprite.setPosition(entity.position.x, entity.position.y);
-        // TODO(architecture-review): World entity sprites have no y-sort depth applied —
-        // their Phaser depth is fixed at creation time. Office furniture IS y-sorted via
-        // resolveRenderableDepth(), but bloomseed entities are not, so an entity standing
-        // behind a piece of furniture will incorrectly appear in front of it. A y-sort
-        // pass (entity.sprite.setDepth(entity.position.y)) should be applied here.
+        entity.sprite.setDepth(entity.position.y);
         if (entity.velocity.x === 0 && entity.velocity.y === 0 && entity.state !== "idle") {
           entity.state = "idle";
           if (!entity.autonomy.currentAmbientAction) {
