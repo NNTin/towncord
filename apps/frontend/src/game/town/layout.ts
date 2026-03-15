@@ -99,29 +99,35 @@ export function officeCellToWorldPixel(
 }
 
 /**
- * Hardcoded anchor for the single office.
- * anchorX16=20, anchorY16=20 → worldX=320, worldY=320.
+ * Default anchor for the single office: (20, 20) in 16px units → worldX=320, worldY=320.
  * The office must be at least one terrain cell (4 × 16px) from the terrain boundary.
+ *
+ * These are intentionally kept as named constants so `loadTownOfficeRegion()` can be
+ * called without arguments and callers that load anchor coordinates from level data can
+ * pass them explicitly instead.
  */
-// TODO(architecture-review): The office anchor is a hardcoded constant that assumes a
-// single office always at (20, 20) in 16px units. If the game ever supports multiple
-// buildings, a movable office, or loading anchor coordinates from level data, this must
-// be replaced with a data-driven approach (e.g. loaded from a level JSON alongside the
-// terrain seed). The `loadTownOfficeRegion()` function should accept an anchor parameter
-// rather than reading a module constant.
-const DEFAULT_OFFICE_ANCHOR_X16 = 20;
-const DEFAULT_OFFICE_ANCHOR_Y16 = 20;
+export const DEFAULT_OFFICE_ANCHOR_X16 = 20;
+export const DEFAULT_OFFICE_ANCHOR_Y16 = 20;
 
 /**
- * Returns the office region with its hardcoded anchor position.
- * Does not load terrain data; prefer this over `loadTownLayout` when
- * only the office region is needed.
+ * Returns the office region for the given anchor position (in 16px base units).
+ * Defaults to `DEFAULT_OFFICE_ANCHOR_X16` / `DEFAULT_OFFICE_ANCHOR_Y16` so existing
+ * call sites that do not supply an anchor continue to work unchanged.
+ *
+ * Pass explicit `anchorX16` / `anchorY16` values when loading anchor coordinates from
+ * level data or when supporting multiple buildings.
+ *
+ * Does not load terrain data; prefer this over `loadTownLayout` when only the office
+ * region is needed.
  */
-export function loadTownOfficeRegion(): TownOfficeRegion {
+export function loadTownOfficeRegion(
+  anchorX16: number = DEFAULT_OFFICE_ANCHOR_X16,
+  anchorY16: number = DEFAULT_OFFICE_ANCHOR_Y16,
+): TownOfficeRegion {
   const { layout } = createOfficeSceneBootstrap();
   return {
-    anchorX16: DEFAULT_OFFICE_ANCHOR_X16,
-    anchorY16: DEFAULT_OFFICE_ANCHOR_Y16,
+    anchorX16,
+    anchorY16,
     layout,
   };
 }
