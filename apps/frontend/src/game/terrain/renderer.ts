@@ -150,33 +150,7 @@ export class TerrainRenderer {
     chunkStartX: number,
     chunkStartY: number,
   ): void {
-    if (tiles.length === 0) {
-      rt.clear();
-      return;
-    }
-
-    const texture = this.scene.textures.get(this.textureKey);
-    const scratch = this.getScratchImage();
-
-    rt.clear();
-    rt.beginDraw();
-    for (const tile of tiles) {
-      const localCellX = tile.cellX - chunkStartX;
-      const localCellY = tile.cellY - chunkStartY;
-      const resolvedFrame = texture.has(tile.frame) ? tile.frame : tile.frame;
-
-      scratch.setTexture(this.textureKey, resolvedFrame);
-      scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
-      scratch.setRotation(tile.rotate90 * (Math.PI / 2));
-      scratch.setFlip(tile.flipX, tile.flipY);
-      scratch.setPosition(
-        localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
-        localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
-      );
-
-      rt.batchDraw(scratch);
-    }
-    rt.endDraw();
+    this.renderTilesToRT(rt, tiles, chunkStartX, chunkStartY, (frame) => frame);
   }
 
   private drawAnimatedTiles(
@@ -184,6 +158,16 @@ export class TerrainRenderer {
     tiles: TerrainRenderTile[],
     chunkStartX: number,
     chunkStartY: number,
+  ): void {
+    this.renderTilesToRT(rt, tiles, chunkStartX, chunkStartY, (frame) => this.resolveFrameForCurrentPhase(frame));
+  }
+
+  private renderTilesToRT(
+    rt: Phaser.GameObjects.RenderTexture,
+    tiles: TerrainRenderTile[],
+    chunkStartX: number,
+    chunkStartY: number,
+    resolveFrame: (baseFrame: string) => string,
   ): void {
     if (tiles.length === 0) {
       rt.clear();
@@ -198,7 +182,7 @@ export class TerrainRenderer {
     for (const tile of tiles) {
       const localCellX = tile.cellX - chunkStartX;
       const localCellY = tile.cellY - chunkStartY;
-      const frame = this.resolveFrameForCurrentPhase(tile.frame);
+      const frame = resolveFrame(tile.frame);
       const resolvedFrame = texture.has(frame) ? frame : tile.frame;
 
       scratch.setTexture(this.textureKey, resolvedFrame);
