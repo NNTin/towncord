@@ -1,3 +1,4 @@
+export * from "./animationClock";
 export * from "./bootstrap";
 export * from "./caseMapper";
 export * from "./chunkBuilder";
@@ -9,6 +10,7 @@ export * from "./gameplayGrid";
 export * from "./marchingSquaresKernel";
 export * from "./placeables";
 export * from "./queries";
+export * from "./renderSurface";
 export * from "./renderer";
 export * from "./ruleset";
 export * from "./runtime";

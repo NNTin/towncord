@@ -1,10 +1,10 @@
-import type Phaser from "phaser";
 import {
   TERRAIN_CHUNK_SIZE,
   TERRAIN_TEXTURE_KEY,
   type TerrainGridSpec,
   type TerrainMaterialId,
 } from "./contracts";
+import type { TerrainRenderSurface } from "./renderSurface";
 import type { TerrainRulesetFile, TerrainTransitionRuleset } from "./ruleset";
 import rulesetFixture from "./data/ruleset.phase1.json";
 import seedFixture from "./data/seed.phase1.json";
@@ -76,7 +76,7 @@ export function loadTerrainBootstrap(): TerrainBootstrap {
 }
 
 export function validateTerrainBootstrap(
-  scene: Phaser.Scene,
+  scene: TerrainRenderSurface,
   bootstrap: TerrainBootstrap,
   textureKey: string = TERRAIN_TEXTURE_KEY,
 ): void {

@@ -1,4 +1,3 @@
-import type Phaser from "phaser";
 import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../events";
 import type { TerrainRenderTile } from "./contracts";
 import { TerrainChunkBuilder } from "./chunkBuilder";
@@ -6,15 +5,11 @@ import { TerrainCommands } from "./commands";
 import { TerrainGameplayGrid } from "./gameplayGrid";
 import { TerrainQueries } from "./queries";
 import { TerrainRenderer } from "./renderer";
+import type { TerrainRenderSurface } from "./renderSurface";
 import { createTerrainRuntime } from "./runtime";
 import { TerrainMapStore } from "./store";
 import { TerrainVisibleChunkResolver } from "./visibleChunkResolver";
 
-// TODO(architecture-review): TerrainSystem accepts a Phaser.Scene directly in its
-// constructor and passes it to TerrainRenderer. This couples the terrain domain to the
-// Phaser rendering API, making it impossible to unit-test the full system without a Phaser
-// context. Create an interface (e.g. TerrainRenderSurface) that exposes only what the
-// renderer needs, so the system can be constructed with a test double in unit tests.
 export class TerrainSystem {
   private readonly store: TerrainMapStore;
   private readonly chunkBuilder: TerrainChunkBuilder;
@@ -23,7 +18,7 @@ export class TerrainSystem {
   private readonly queries: TerrainQueries;
   private readonly visibleChunks: TerrainVisibleChunkResolver;
 
-  constructor(private readonly scene: Phaser.Scene) {
+  constructor(private readonly scene: TerrainRenderSurface) {
     const runtime = createTerrainRuntime(this.scene);
     this.store = runtime.store;
     this.chunkBuilder = runtime.chunkBuilder;
