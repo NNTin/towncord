@@ -36,7 +36,7 @@ type DonargOfficeLayoutSource = {
   cols: number;
   rows: number;
   tiles: number[];
-  tileColors: Array<DonargLayoutColor | null>;
+  tileColors?: Array<DonargLayoutColor | null>;
   furniture: DonargLayoutPlacement[];
 };
 
@@ -136,25 +136,28 @@ function buildOfficeSceneBootstrap(
   sourceCatalog: DonargFurnitureCatalogSource,
 ): OfficeSceneBootstrap {
   const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
-  const tiles = sourceLayout.tiles.map((tileId, index) => {
-    const kind = toTileKind(tileId);
-    const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors[index] ?? null);
 
-    return typeof tint === "number"
-      ? {
-          kind,
-          tileId,
-          tint,
-        }
-      : {
-          kind,
-          tileId,
-        };
-  });
+  const tilesRaw = sourceLayout.tiles as unknown[];
+  const tiles: OfficeSceneTile[] = tilesRaw.length > 0 && isTileRecord(tilesRaw[0])
+    ? tilesRaw.filter(isTileRecord)
+    : (sourceLayout.tiles as number[]).map((tileId, index) => {
+        const kind = toTileKind(tileId);
+        const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors?.[index] ?? null);
+        return typeof tint === "number" ? { kind, tileId, tint } : { kind, tileId };
+      });
 
-  const furniture = sourceLayout.furniture.map((entry, index) =>
-    mapFurnitureEntry(entry, catalog.get(entry.type), index),
-  );
+  const furnitureRaw = (sourceLayout.furniture as unknown[]);
+  const furniture: MappedFurnitureEntry[] = furnitureRaw.length > 0 && isFurnitureRecord(furnitureRaw[0])
+    ? furnitureRaw.filter(isFurnitureRecord).map((f, i) => ({ ...f, sourceOrder: i }))
+    : (sourceLayout.furniture as DonargLayoutPlacement[]).map((entry, index) =>
+        mapFurnitureEntry(entry, catalog.get(entry.type), index),
+      );
+
+  const sourceWithChars = sourceLayout as DonargOfficeLayoutSource & { characters?: unknown[] };
+  const charactersRaw = sourceWithChars.characters ?? [];
+  const characters: OfficeSceneCharacter[] = charactersRaw.length > 0 && isCharacterRecord(charactersRaw[0])
+    ? charactersRaw.filter(isCharacterRecord)
+    : createDerivedCharacters(sourceLayout, furniture);
 
   return {
     layout: {
@@ -163,7 +166,7 @@ function buildOfficeSceneBootstrap(
       cellSize: DONARG_TILE_WORLD_SIZE * 3,
       tiles,
       furniture,
-      characters: createDerivedCharacters(sourceLayout, furniture),
+      characters,
     },
   };
 }

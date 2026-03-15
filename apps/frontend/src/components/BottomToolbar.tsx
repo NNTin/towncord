@@ -14,6 +14,8 @@ export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 type BottomToolbarProps = {
   isLayoutMode: boolean;
   onToggleLayoutMode: () => void;
+  isJsonEditorOpen?: boolean;
+  onToggleJsonEditor?: () => void;
   activeTool?: OfficeLayoutTool | null;
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeTileColor?: OfficeTileColor | null;
@@ -238,6 +240,8 @@ const LAYOUT_TOOLS: { key: OfficeLayoutTool; label: string }[] = [
 export function BottomToolbar({
   isLayoutMode,
   onToggleLayoutMode,
+  isJsonEditorOpen = false,
+  onToggleJsonEditor,
   activeTool = null,
   onSelectTool,
   activeTileColor,
@@ -333,6 +337,16 @@ export function BottomToolbar({
               title="Reset unsaved office layout changes"
             >
               Reset
+            </button>
+            <button
+              type="button"
+              onClick={onToggleJsonEditor}
+              onMouseEnter={() => setHovered("json")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("json", { active: isJsonEditorOpen })}
+              title="Toggle JSON editor"
+            >
+              JSON
             </button>
 
             {layoutStatusText ? (

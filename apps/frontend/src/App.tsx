@@ -7,6 +7,7 @@ import { useOfficeLayoutEditor } from "./app/useOfficeLayoutEditor";
 import { useBloomseedUiBridge } from "./game/application/useBloomseedUiBridge";
 
 function App(): JSX.Element {
+  const officeEditor = useOfficeLayoutEditor();
   const {
     gameRootRef,
     onGameRootDragOver,
@@ -14,20 +15,22 @@ function App(): JSX.Element {
     sidebarProps,
     zoomProps,
     emitOfficeEditorTool,
-  } = useBloomseedUiBridge();
-  const officeEditor = useOfficeLayoutEditor();
+  } = useBloomseedUiBridge({ onOfficeLayoutChanged: officeEditor.syncFromPhaser });
+
+  // isLayoutPaintMode controls the paint toolbar; the JSON drawer is a
+  // separate toggle so they don't force each other open.
+  const [isLayoutPaintMode, setIsLayoutPaintMode] = useState(false);
   const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
   const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
   const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
 
   // Clear active tool when layout mode is closed so Phaser doesn't retain a
   // stale tool between layout mode sessions.
-  const isLayoutMode = officeEditor.isOpen;
   useEffect(() => {
-    if (!isLayoutMode) {
+    if (!isLayoutPaintMode) {
       setActiveTool(null);
     }
-  }, [isLayoutMode]);
+  }, [isLayoutPaintMode]);
 
   // Sync tool state to the Phaser scene whenever it changes
   useEffect(() => {
@@ -41,7 +44,7 @@ function App(): JSX.Element {
   return (
     <main className="app">
       {sidebarProps ? <SidebarAccordion {...sidebarProps} /> : null}
-      {isLayoutMode ? (
+      {officeEditor.isOpen ? (
         <OfficeEditorDrawer
           canReload={officeEditor.isAvailable && !officeEditor.isLoading && !officeEditor.isSaving}
           canReset={officeEditor.canReset}
@@ -63,8 +66,10 @@ function App(): JSX.Element {
       ) : null}
       {zoomProps ? <ZoomControls {...zoomProps} /> : null}
       <BottomToolbar
-        isLayoutMode={isLayoutMode}
-        onToggleLayoutMode={officeEditor.toggleOpen}
+        isLayoutMode={isLayoutPaintMode}
+        onToggleLayoutMode={() => setIsLayoutPaintMode((v) => !v)}
+        isJsonEditorOpen={officeEditor.isOpen}
+        onToggleJsonEditor={officeEditor.toggleOpen}
         activeTool={activeTool}
         onSelectTool={setActiveTool}
         activeTileColor={activeTileColor}

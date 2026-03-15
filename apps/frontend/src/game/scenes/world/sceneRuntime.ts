@@ -41,6 +41,7 @@ export class WorldSceneRuntime {
   public selectedEntity: WorldEntity | null = null;
   public selectionBadge: Phaser.GameObjects.Sprite | null = null;
   public terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
+  public officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
   public terrainBrushRenderPreviewImages: Phaser.GameObjects.Image[] = [];
   public terrainSystem: TerrainSystem | null = null;
   public navigation: WorldNavigationService | null = null;
@@ -74,6 +75,7 @@ export class WorldSceneRuntime {
     this.selectedEntity = null;
     this.selectionBadge = null;
     this.terrainBrushPreview = null;
+    this.officeCellHighlight = null;
     this.terrainBrushRenderPreviewImages = [];
     this.terrainSystem = null;
     this.navigation = null;
@@ -106,6 +108,7 @@ export class WorldSceneRuntime {
     destroyGameObjects(this.entities.map((entity) => entity.sprite));
     destroyGameObject(this.selectionBadge);
     destroyGameObject(this.terrainBrushPreview);
+    destroyGameObject(this.officeCellHighlight);
     destroyGameObjects(this.terrainBrushRenderPreviewImages);
     this.reset();
   }
