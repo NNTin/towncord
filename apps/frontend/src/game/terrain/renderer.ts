@@ -2,7 +2,8 @@ import Phaser from "phaser";
 import {
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   TERRAIN_CELL_WORLD_SIZE,
-  TERRAIN_RENDER_DEPTH,
+  TERRAIN_ANIMATED_DEPTH,
+  TERRAIN_STATIC_DEPTH,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
   TERRAIN_TEXTURE_KEY,
   type TerrainChunkId,
@@ -247,7 +248,7 @@ export class TerrainRenderer {
       chunkId: payload.id,
       chunkStartX,
       chunkStartY,
-      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_RENDER_DEPTH),
+      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_STATIC_DEPTH),
       animatedRT: null,
       staticTiles: [],
       animatedTiles: [],
@@ -305,17 +306,12 @@ export class TerrainRenderer {
     state.staticTiles = staticTiles;
     state.animatedTiles = animatedTiles;
 
-    // TODO(architecture-review): The static RT sits at TERRAIN_RENDER_DEPTH and the animated
-    // RT at TERRAIN_RENDER_DEPTH + 1. These sub-layer offsets are implicit (+1 in code).
-    // They should be named constants (e.g. TERRAIN_STATIC_DEPTH / TERRAIN_ANIMATED_DEPTH)
-    // so it is clear that both belong to the terrain layer and that animated tiles are always
-    // rendered on top of static tiles within the same chunk.
     if (state.animatedTiles.length > 0) {
       if (!state.animatedRT) {
         state.animatedRT = this.createRenderTexture(
           state.chunkStartX,
           state.chunkStartY,
-          TERRAIN_RENDER_DEPTH + 1,
+          TERRAIN_ANIMATED_DEPTH,
         );
       }
     } else if (state.animatedRT) {

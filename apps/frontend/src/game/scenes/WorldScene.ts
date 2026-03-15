@@ -70,11 +70,12 @@ const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 2;
 const SELECTED_BADGE_VERTICAL_OFFSET = 12;
 // TODO(architecture-review): Depth constants are scattered magic numbers with no named layer
-// taxonomy. Centralized render-layers module (e.g. src/game/renderLayers.ts)
+// taxonomy. Centralize render-layers module (e.g. src/game/renderLayers.ts)
 // that exports a plain const-asserted object: RENDER_LAYERS = { TERRAIN_STATIC: -1000,
 // TERRAIN_ANIMATED: -999, OFFICE_FLOOR: -500, ENTITIES: <y-sorted>, EFFECTS: 5000,
-// UI_OVERLAY: 10000 }. Migrate incrementally by replacing one layer at a time, starting
-// with the terrain/office boundary constants which already have JSDoc comments.
+// UI_OVERLAY: 10000 }. Migrate incrementally by replacing one layer at a time.
+/** Depth for the office tile layer. Sits above terrain (TERRAIN_RENDER_DEPTH = -1000) and below entities. */
+const OFFICE_TILE_DEPTH = -500;
 const TERRAIN_BRUSH_PREVIEW_DEPTH = 9_000;
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
@@ -363,14 +364,10 @@ export class WorldScene extends Phaser.Scene {
     {
       const { anchorX16, anchorY16, layout } = officeRegion;
       this.officeRegion = officeRegion;
-      // TODO(architecture-review): The office is rendered inline inside create() with a
-      // hardcoded tileDepth of -500. This magic number should be a named constant (e.g.
-      // OFFICE_TILE_DEPTH) defined alongside TERRAIN_RENDER_DEPTH so the relationship
-      // between the two layers is explicit.
       this.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
-        tileDepth: -500,
+        tileDepth: OFFICE_TILE_DEPTH,
         depthAnchorRow: Math.round(anchorY16 / 3),
       });
     }
