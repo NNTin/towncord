@@ -135,11 +135,11 @@ jobs:
         if: always()
         run: |
           failed=()
-          [[ "${{ steps.knip.outcome }}"     == "failure" ]] && failed+=("knip")
-          [[ "${{ steps.jscpd.outcome }}"    == "failure" ]] && failed+=("jscpd")
-          [[ "${{ steps.typecheck.outcome }}" == "failure" ]] && failed+=("typecheck")
-          [[ "${{ steps.tests.outcome }}"    == "failure" ]] && failed+=("tests")
-          [[ "${{ steps.build.outcome }}"    == "failure" ]] && failed+=("build")
+          [[ "${{ steps.knip.outcome }}"      != "success" ]] && failed+=("knip")
+          [[ "${{ steps.jscpd.outcome }}"     != "success" ]] && failed+=("jscpd")
+          [[ "${{ steps.typecheck.outcome }}" != "success" ]] && failed+=("typecheck")
+          [[ "${{ steps.tests.outcome }}"     != "success" ]] && failed+=("tests")
+          [[ "${{ steps.build.outcome }}"     != "success" ]] && failed+=("build")
           if [[ ${#failed[@]} -gt 0 ]]; then
             echo "Failed steps: ${failed[*]}"
             exit 1

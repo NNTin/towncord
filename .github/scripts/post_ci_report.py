@@ -29,6 +29,7 @@ LOG_FILES = {
 }
 
 ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+MAX_DETAIL_CHARS = 60000
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -36,6 +37,30 @@ ANSI_ESCAPE = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
 
 def strip_ansi(text: str) -> str:
     return ANSI_ESCAPE.sub("", text)
+
+
+def sanitize_detail(detail: str) -> str:
+    """Escape backticks and truncate overly large log detail for Markdown safety."""
+    if not detail:
+        return ""
+
+    # Prevent raw triple backticks from breaking the surrounding code fence.
+    safe = detail.replace("```", "`\u200b``")
+
+    if len(safe) <= MAX_DETAIL_CHARS:
+        return safe
+
+    # Keep head and tail with a clear truncation marker in the middle.
+    head_chars = MAX_DETAIL_CHARS // 2
+    tail_chars = MAX_DETAIL_CHARS - head_chars
+    head = safe[:head_chars]
+    tail = safe[-tail_chars:]
+    return (
+        f"{head}\n\n"
+        "…\n\n"
+        "[log truncated; showing head and tail]\n\n"
+        f"{tail}"
+    )
 
 
 def read_log(step: str) -> str:
@@ -203,12 +228,13 @@ def compose_comment(outcomes: dict[str, str], run_url: str) -> str:
         log = read_log(step)
         suffix, detail = EXTRACTORS[step](log)
         label = STEP_LABELS[step]
+        safe_detail = sanitize_detail(detail)
         parts += [
             "<details>",
             f"<summary><b>{label}</b> — {suffix}</summary>",
             "",
             "```",
-            detail,
+            safe_detail,
             "```",
             "",
             "</details>",
