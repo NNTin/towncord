@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}
@@ -103,27 +104,32 @@ jobs:
       - name: Find unused dependencies, exports, and files
         id: knip
         continue-on-error: true
-        run: npm run knip
+        shell: bash
+        run: npm run knip 2>&1 | tee /tmp/knip.log; exit ${PIPESTATUS[0]}
 
       - name: Find duplicated code
         id: jscpd
         continue-on-error: true
-        run: npm run jscpd
+        shell: bash
+        run: npm run jscpd 2>&1 | tee /tmp/jscpd.log; exit ${PIPESTATUS[0]}
 
       - name: Typecheck frontend
         id: typecheck
         continue-on-error: true
-        run: npm run typecheck:frontend
+        shell: bash
+        run: npm run typecheck:frontend 2>&1 | tee /tmp/typecheck.log; exit ${PIPESTATUS[0]}
 
       - name: Run frontend tests
         id: tests
         continue-on-error: true
-        run: npm -w @towncord/frontend test
+        shell: bash
+        run: npm -w @towncord/frontend test 2>&1 | tee /tmp/tests.log; exit ${PIPESTATUS[0]}
 
       - name: Build frontend
         id: build
         continue-on-error: true
-        run: npm run build:frontend
+        shell: bash
+        run: npm run build:frontend 2>&1 | tee /tmp/build.log; exit ${PIPESTATUS[0]}
 
       - name: Check all steps passed
         if: always()
@@ -138,3 +144,17 @@ jobs:
             echo "Failed steps: ${failed[*]}"
             exit 1
           fi
+
+      - name: Post CI report
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          KNIP_OUTCOME: ${{ steps.knip.outcome }}
+          JSCPD_OUTCOME: ${{ steps.jscpd.outcome }}
+          TYPECHECK_OUTCOME: ${{ steps.typecheck.outcome }}
+          TESTS_OUTCOME: ${{ steps.tests.outcome }}
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPO: ${{ github.repository }}
+        run: python3 .github/scripts/post_ci_report.py
