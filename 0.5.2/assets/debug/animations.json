@@ -1,0 +1,62 @@
+{
+  "generatedAt": "2026-03-15T17:14:19.642410+00:00",
+  "namespace": "debug",
+  "animations": {
+    "tilesets.debug.environment.autotile-15": {
+      "atlasKey": "debug.tilesets",
+      "frames": [
+        "tilesets.debug.environment.autotile-15#0",
+        "tilesets.debug.environment.autotile-15#1",
+        "tilesets.debug.environment.autotile-15#2",
+        "tilesets.debug.environment.autotile-15#3",
+        "tilesets.debug.environment.autotile-15#4",
+        "tilesets.debug.environment.autotile-15#5",
+        "tilesets.debug.environment.autotile-15#6",
+        "tilesets.debug.environment.autotile-15#7",
+        "tilesets.debug.environment.autotile-15#8",
+        "tilesets.debug.environment.autotile-15#9",
+        "tilesets.debug.environment.autotile-15#10",
+        "tilesets.debug.environment.autotile-15#11",
+        "tilesets.debug.environment.autotile-15#12",
+        "tilesets.debug.environment.autotile-15#13",
+        "tilesets.debug.environment.autotile-15#14",
+        "tilesets.debug.environment.autotile-15#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "category": "tilesets",
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/tileset.aseprite"
+    }
+  }
+}
