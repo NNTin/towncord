@@ -3,6 +3,8 @@ import type { DragEvent, MutableRefObject } from "react";
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
+  OFFICE_SET_EDITOR_TOOL_EVENT,
+  OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
@@ -11,6 +13,8 @@ import {
   TERRAIN_TILE_INSPECTED_EVENT,
   ZOOM_CHANGED_EVENT,
   SET_ZOOM_EVENT,
+  type OfficeLayoutChangedPayload,
+  type OfficeSetEditorToolPayload,
   type ZoomChangedPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
@@ -20,6 +24,7 @@ import {
   parsePlaceDragPayload,
   toPlaceDropPayload,
 } from "../events";
+import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import { createGame } from "../phaser/createGame";
 import {
   BLOOMSEED_READY_EVENT,
@@ -37,11 +42,6 @@ type BloomseedSidebarBridgeProps = {
   runtimePerf: RuntimePerfPayload | null;
 };
 
-type BottomToolbarBridgeProps = {
-  isLayoutMode: boolean;
-  onToggleLayoutMode: () => void;
-};
-
 type ZoomControlsProps = {
   zoom: number;
   minZoom: number;
@@ -55,8 +55,8 @@ type BloomseedUiBridge = {
   onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
-  bottomToolbarProps: BottomToolbarBridgeProps;
   zoomProps: ZoomControlsProps | null;
+  emitOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
 };
 
 function emitPlaceDrop(
@@ -81,16 +81,22 @@ function parseRawPlaceDragPayload(rawPayload: string) {
   }
 }
 
-export function useBloomseedUiBridge(): BloomseedUiBridge {
+export function useBloomseedUiBridge(options?: {
+  onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
+}): BloomseedUiBridge {
   const gameRootRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
+  const layoutChangedRef = useRef(options?.onOfficeLayoutChanged);
   const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
   const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
   const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
-  const [isLayoutMode, setIsLayoutMode] = useState(false);
   const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
+
+  useEffect(() => {
+    layoutChangedRef.current = options?.onOfficeLayoutChanged;
+  }, [options?.onOfficeLayoutChanged]);
 
   useEffect(() => {
     const container = gameRootRef.current;
@@ -116,15 +122,21 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
       setZoomState(payload);
     }
 
+    function handleOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
+      layoutChangedRef.current?.(payload.layout);
+    }
+
     game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
     game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
     game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
     game.events.on(ZOOM_CHANGED_EVENT, handleZoomChanged);
+    game.events.on(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
 
     return () => {
       game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
       game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
       game.events.off(ZOOM_CHANGED_EVENT, handleZoomChanged);
+      game.events.off(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
       game.destroy(true);
       gameRef.current = null;
       setCatalog(null);
@@ -178,10 +190,6 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     }
   }
 
-  const onToggleLayoutMode = useCallback(() => {
-    setIsLayoutMode((prev) => !prev);
-  }, []);
-
   const onZoomIn = useCallback(() => {
     if (!zoomState) return;
     gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 1.1 });
@@ -192,10 +200,15 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
     gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 0.9 });
   }, [zoomState]);
 
+  const emitOfficeEditorTool = useCallback((payload: OfficeSetEditorToolPayload) => {
+    gameRef.current?.events.emit(OFFICE_SET_EDITOR_TOOL_EVENT, payload);
+  }, []);
+
   return {
     gameRootRef,
     onGameRootDragOver,
     onGameRootDrop,
+    emitOfficeEditorTool,
     sidebarProps:
       catalog && placeables
         ? {
@@ -208,10 +221,6 @@ export function useBloomseedUiBridge(): BloomseedUiBridge {
             runtimePerf,
           }
         : null,
-    bottomToolbarProps: {
-      isLayoutMode,
-      onToggleLayoutMode,
-    },
     zoomProps: zoomState
       ? {
           zoom: zoomState.zoom,

@@ -1,4 +1,3 @@
-import type Phaser from "phaser";
 import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../events";
 import type { TerrainRenderTile } from "./contracts";
 import { TerrainChunkBuilder } from "./chunkBuilder";
@@ -6,6 +5,7 @@ import { TerrainCommands } from "./commands";
 import { TerrainGameplayGrid } from "./gameplayGrid";
 import { TerrainQueries } from "./queries";
 import { TerrainRenderer } from "./renderer";
+import type { TerrainRenderSurface } from "./renderSurface";
 import { createTerrainRuntime } from "./runtime";
 import { TerrainMapStore } from "./store";
 import { TerrainVisibleChunkResolver } from "./visibleChunkResolver";
@@ -18,7 +18,7 @@ export class TerrainSystem {
   private readonly queries: TerrainQueries;
   private readonly visibleChunks: TerrainVisibleChunkResolver;
 
-  constructor(private readonly scene: Phaser.Scene) {
+  constructor(private readonly scene: TerrainRenderSurface) {
     const runtime = createTerrainRuntime(this.scene);
     this.store = runtime.store;
     this.chunkBuilder = runtime.chunkBuilder;

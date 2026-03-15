@@ -5,9 +5,13 @@ import {
   type PublicAnimationDefinition,
   type PublicAnimationManifest,
 } from "@towncord/public-animation-contracts";
-import { BLOOMSEED_ANIMATIONS_JSON_KEY } from "./preload";
+import { listDonargOfficeCharacterAnimations } from "./donargOfficeManifest";
+import {
+  BLOOMSEED_ANIMATIONS_JSON_KEY,
+  DONARG_OFFICE_ANIMATIONS_JSON_KEY,
+} from "./preload";
 
-type BloomseedAnimationOverride = {
+type PublicAnimationOverride = {
   key?: string;
   frameRate?: number;
   repeat?: number;
@@ -18,24 +22,47 @@ type BloomseedAnimationOverride = {
   hideOnComplete?: boolean;
 };
 
-type RegisterBloomseedAnimationsOptions = {
-  manifestKey?: string;
+type RegisterPublicAnimationsOptions = {
+  manifestKey: string;
+  sourceLabel?: string;
   defaultRepeat?: number;
   onMissingAtlas?: "skip" | "throw";
   filter?: (animationId: string, definition: PublicAnimationDefinition) => boolean;
-  overrides?: Record<string, BloomseedAnimationOverride>;
+  overrides?: Record<string, PublicAnimationOverride>;
+};
+
+type RegisterNamedAnimationsOptions = Omit<
+  RegisterPublicAnimationsOptions,
+  "manifestKey" | "sourceLabel"
+> & {
+  manifestKey?: string;
+};
+
+type RegisterBloomseedAnimationsOptions = RegisterNamedAnimationsOptions;
+type RegisterDonargOfficeAnimationsOptions = RegisterNamedAnimationsOptions;
+
+type RegisterAnimationsFromManifestOptions = Omit<
+  RegisterPublicAnimationsOptions,
+  "manifestKey"
+>;
+
+type PreloadAnimationRegistration = {
+  bloomseedAnimationKeys: string[];
+  donargOfficeCharacterAnimationKeys: string[];
+  animationKeys: string[];
 };
 
 /**
- * Registers animations from `assets/bloomseed/animations.json` in Phaser.
+ * Registers animations from any public animations manifest loaded into Phaser's JSON cache.
  * Returns animation keys that were created during this call.
  */
-export function registerBloomseedAnimations(
+function registerPublicAnimations(
   scene: Phaser.Scene,
-  options: RegisterBloomseedAnimationsOptions = {},
+  options: RegisterPublicAnimationsOptions,
 ): string[] {
   const {
-    manifestKey = BLOOMSEED_ANIMATIONS_JSON_KEY,
+    manifestKey,
+    sourceLabel = "Public",
     defaultRepeat = -1,
     onMissingAtlas = "skip",
     filter,
@@ -43,6 +70,27 @@ export function registerBloomseedAnimations(
   } = options;
 
   const manifest = readAnimationManifest(scene, manifestKey);
+  return registerAnimationsFromManifest(scene, manifest, {
+    sourceLabel,
+    defaultRepeat,
+    onMissingAtlas,
+    ...(filter ? { filter } : {}),
+    overrides,
+  });
+}
+
+function registerAnimationsFromManifest(
+  scene: Phaser.Scene,
+  manifest: PublicAnimationManifest,
+  options: RegisterAnimationsFromManifestOptions,
+): string[] {
+  const {
+    sourceLabel = "Public",
+    defaultRepeat = -1,
+    onMissingAtlas = "skip",
+    filter,
+    overrides = {},
+  } = options;
   const created: string[] = [];
 
   for (const [animationId, definition] of Object.entries(manifest.animations)) {
@@ -60,7 +108,7 @@ export function registerBloomseedAnimations(
     if (!scene.textures.exists(definition.atlasKey)) {
       if (onMissingAtlas === "throw") {
         throw new Error(
-          `Bloomseed animation "${animationId}" references missing atlas "${definition.atlasKey}".`,
+          `${sourceLabel} animation "${animationId}" references missing atlas "${definition.atlasKey}".`,
         );
       }
       continue;
@@ -99,6 +147,97 @@ export function registerBloomseedAnimations(
   }
 
   return created;
+}
+
+function buildPublicAnimationOptions(
+  options: RegisterNamedAnimationsOptions,
+  defaultManifestKey: string,
+  sourceLabel: string,
+): RegisterPublicAnimationsOptions {
+  return {
+    manifestKey: options.manifestKey ?? defaultManifestKey,
+    sourceLabel,
+    defaultRepeat: options.defaultRepeat ?? -1,
+    onMissingAtlas: options.onMissingAtlas ?? "skip",
+    ...(options.filter ? { filter: options.filter } : {}),
+    ...(options.overrides ? { overrides: options.overrides } : {}),
+  };
+}
+
+/**
+ * Registers animations from `assets/bloomseed/animations.json` in Phaser.
+ * Returns animation keys that were created during this call.
+ */
+export function registerBloomseedAnimations(
+  scene: Phaser.Scene,
+  options: RegisterBloomseedAnimationsOptions = {},
+): string[] {
+  return registerPublicAnimations(scene, buildPublicAnimationOptions(options, BLOOMSEED_ANIMATIONS_JSON_KEY, "Bloomseed"));
+}
+
+/**
+ * Registers animations from `assets/donarg-office/animations.json` in Phaser.
+ * Returns animation keys that were created during this call.
+ */
+export function registerDonargOfficeAnimations(
+  scene: Phaser.Scene,
+  options: RegisterDonargOfficeAnimationsOptions = {},
+): string[] {
+  return registerPublicAnimations(scene, buildPublicAnimationOptions(options, DONARG_OFFICE_ANIMATIONS_JSON_KEY, "Donarg office"));
+}
+
+/**
+ * Registers only Donarg office character animations discovered from the public manifest.
+ * Returns animation keys that were created during this call.
+ */
+function registerDonargOfficeCharacterAnimations(
+  scene: Phaser.Scene,
+  options: RegisterDonargOfficeAnimationsOptions = {},
+): string[] {
+  const manifestKey = options.manifestKey ?? DONARG_OFFICE_ANIMATIONS_JSON_KEY;
+  const manifest = readAnimationManifest(scene, manifestKey);
+  const characterAnimationIds = new Set(
+    listDonargOfficeCharacterAnimations(manifest).map(
+      (animation) => animation.animationId,
+    ),
+  );
+
+  return registerAnimationsFromManifest(scene, manifest, {
+    sourceLabel: "Donarg office",
+    defaultRepeat: options.defaultRepeat ?? -1,
+    onMissingAtlas: options.onMissingAtlas ?? "skip",
+    filter: (animationId, definition) => {
+      if (!characterAnimationIds.has(animationId)) {
+        return false;
+      }
+
+      return options.filter ? options.filter(animationId, definition) : true;
+    },
+    ...(options.overrides ? { overrides: options.overrides } : {}),
+  });
+}
+
+/**
+ * Registers the animation set needed during frontend preload.
+ * Bloomseed keys continue to drive the existing world bootstrap, while Donarg
+ * office character animations are registered alongside them for later scenes.
+ */
+export function registerPreloadAnimations(
+  scene: Phaser.Scene,
+): PreloadAnimationRegistration {
+  const bloomseedAnimationKeys = registerBloomseedAnimations(scene);
+  const donargOfficeCharacterAnimationKeys = registerDonargOfficeCharacterAnimations(
+    scene,
+  );
+
+  return {
+    bloomseedAnimationKeys,
+    donargOfficeCharacterAnimationKeys,
+    animationKeys: [
+      ...bloomseedAnimationKeys,
+      ...donargOfficeCharacterAnimationKeys,
+    ],
+  };
 }
 
 function buildAnimationFrames(
@@ -169,10 +308,10 @@ function readAnimationManifest(
 }
 
 export function readOptionalAnimationManifest(
-  scene: Phaser.Scene,
+  scene: Record<string, unknown>,
   manifestKey: string,
 ): PublicAnimationManifest | null {
-  const cache = (scene.cache as Phaser.Scene["cache"] | undefined)?.json;
+  const cache = (scene["cache"] as Phaser.Scene["cache"] | undefined)?.json;
   if (!cache || typeof cache.exists !== "function" || typeof cache.get !== "function") {
     return null;
   }

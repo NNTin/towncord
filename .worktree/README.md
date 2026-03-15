@@ -188,6 +188,22 @@ BASE_BRANCH=$(git branch --show-current)
 gh pr create --base "$BASE_BRANCH" --head feat/my-change
 ```
 
+## Check CI After Opening A PR
+
+After creating a PR and pushing to GitHub, wait 10 seconds for the CI pipeline to register, then check the CI report:
+
+```bash
+sleep 10 && python3 .github/scripts/get_ci_report.py <PR number>
+```
+
+Exit codes:
+- `0` — CI report ready; content printed to stdout
+- `1` — no CI report yet (pipeline may not have run or all checks passed without failures)
+- `2` — error (check stderr)
+- `3` — pipeline is still in progress; wait and retry
+
+If exit code `3` is returned, the current step is printed. Wait and retry until exit code `0` or `1`.
+
 ## Remove A Worktree
 
 When the branch is merged or abandoned, remove the linked worktree:

@@ -1,3 +1,5 @@
+import { RENDER_LAYERS } from "../renderLayers";
+
 export const TERRAIN_CHUNK_SIZE = 32 as const;
 export const TERRAIN_TEXTURE_KEY = "debug.tilesets";
 const TERRAIN_TILE_FRAME_SIZE = 16;
@@ -5,7 +7,9 @@ const TERRAIN_TILE_SCALE = 4;
 export const DEFAULT_TERRAIN_ANIMATION_FRAME_MS = 120;
 export const TERRAIN_CELL_WORLD_SIZE = TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
 export const TERRAIN_RENDER_GRID_WORLD_OFFSET = TERRAIN_CELL_WORLD_SIZE * 0.5;
-export const TERRAIN_RENDER_DEPTH = -1_000;
+/** Static tiles sit at {@link RENDER_LAYERS}.TERRAIN_STATIC; animated tiles sit one slot above so they always draw on top within the same chunk. */
+export const TERRAIN_STATIC_DEPTH = RENDER_LAYERS.TERRAIN_STATIC;
+export const TERRAIN_ANIMATED_DEPTH = RENDER_LAYERS.TERRAIN_ANIMATED;
 
 export type TerrainChunkSize = typeof TERRAIN_CHUNK_SIZE;
 export type TerrainMaterialId = string;

@@ -48,3 +48,5 @@ Local prerequisites:
 This project uses art assets from 
 - [**Bloomseed** by Cocophany](https://cocophany.itch.io/bloomseed).
 - [**Office Interior Tileset** by Donarg](https://donarg.itch.io/officetileset)
+
+The office code was heavily inspired from [**Pixel Agents** by pablodelucca](https://github.com/pablodelucca/pixel-agents)

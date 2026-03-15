@@ -2,7 +2,8 @@ import Phaser from "phaser";
 import {
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   TERRAIN_CELL_WORLD_SIZE,
-  TERRAIN_RENDER_DEPTH,
+  TERRAIN_ANIMATED_DEPTH,
+  TERRAIN_STATIC_DEPTH,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
   TERRAIN_TEXTURE_KEY,
   type TerrainChunkId,
@@ -10,6 +11,8 @@ import {
   type TerrainGridSpec,
   type TerrainRenderTile,
 } from "./contracts";
+import { TerrainAnimationClock } from "./animationClock";
+import type { TerrainRenderSurface } from "./renderSurface";
 
 type ChunkRenderState = {
   chunkId: TerrainChunkId;
@@ -79,27 +82,21 @@ export class TerrainRenderer {
   private readonly chunkStates = new Map<TerrainChunkId, ChunkRenderState>();
   private readonly animatedFrameVariantsByBase = new Map<string, string[]>();
   private readonly animatedBaseFrameByName = new Map<string, boolean>();
-  private readonly animationPhaseDurationsById = new Map<string, number[]>();
-  private readonly currentPhaseByAnimationId = new Map<string, number>();
+  private readonly animationClock: TerrainAnimationClock;
   private visibleChunkIds = new Set<TerrainChunkId>();
   private scratchImage: Phaser.GameObjects.Image | null = null;
 
   constructor(
-    private readonly scene: Phaser.Scene,
+    private readonly scene: TerrainRenderSurface,
     private readonly grid: TerrainGridSpec,
     private readonly textureKey: string = TERRAIN_TEXTURE_KEY,
     animationPhaseDurationsById: Readonly<Record<string, readonly number[]>> = {},
-    private readonly fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+    fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ) {
-    for (const [animationId, durationsMs] of Object.entries(animationPhaseDurationsById)) {
-      if (
-        Array.isArray(durationsMs) &&
-        durationsMs.length > 0 &&
-        durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
-      ) {
-        this.animationPhaseDurationsById.set(animationId, [...durationsMs]);
-      }
-    }
+    this.animationClock = new TerrainAnimationClock(
+      animationPhaseDurationsById,
+      fallbackPhaseDurationMs,
+    );
   }
 
   private getScratchImage(): Phaser.GameObjects.Image {
@@ -142,34 +139,35 @@ export class TerrainRenderer {
     return isAnimated;
   }
 
-  private getPhaseDurationsForBaseFrame(
-    baseFrame: string,
-    variantCount: number,
-  ): number[] {
-    const animationId = getTerrainAnimationId(baseFrame);
-    const durationsMs = this.animationPhaseDurationsById.get(animationId);
-    return normalizeTerrainPhaseDurations(
-      durationsMs,
-      variantCount,
-      this.fallbackPhaseDurationMs,
-    );
-  }
-
   private resolveFrameForCurrentPhase(baseFrame: string): string {
     const variants = this.resolveFrameVariants(baseFrame);
-    if (variants.length <= 1) return baseFrame;
-
-    const animationId = getTerrainAnimationId(baseFrame);
-    const index = this.currentPhaseByAnimationId.get(animationId) ?? 0;
-    return variants[index] ?? baseFrame;
+    return this.animationClock.resolveFrame(baseFrame, variants);
   }
 
-  private drawTiles(
+  private drawStaticTiles(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
     chunkStartX: number,
     chunkStartY: number,
-    animatedPhase: boolean,
+  ): void {
+    this.renderTilesToRT(rt, tiles, chunkStartX, chunkStartY, (frame) => frame);
+  }
+
+  private drawAnimatedTiles(
+    rt: Phaser.GameObjects.RenderTexture,
+    tiles: TerrainRenderTile[],
+    chunkStartX: number,
+    chunkStartY: number,
+  ): void {
+    this.renderTilesToRT(rt, tiles, chunkStartX, chunkStartY, (frame) => this.resolveFrameForCurrentPhase(frame));
+  }
+
+  private renderTilesToRT(
+    rt: Phaser.GameObjects.RenderTexture,
+    tiles: TerrainRenderTile[],
+    chunkStartX: number,
+    chunkStartY: number,
+    resolveFrame: (baseFrame: string) => string,
   ): void {
     if (tiles.length === 0) {
       rt.clear();
@@ -184,7 +182,7 @@ export class TerrainRenderer {
     for (const tile of tiles) {
       const localCellX = tile.cellX - chunkStartX;
       const localCellY = tile.cellY - chunkStartY;
-      const frame = animatedPhase ? this.resolveFrameForCurrentPhase(tile.frame) : tile.frame;
+      const frame = resolveFrame(tile.frame);
       const resolvedFrame = texture.has(frame) ? frame : tile.frame;
 
       scratch.setTexture(this.textureKey, resolvedFrame);
@@ -238,7 +236,7 @@ export class TerrainRenderer {
       chunkId: payload.id,
       chunkStartX,
       chunkStartY,
-      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_RENDER_DEPTH),
+      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_STATIC_DEPTH),
       animatedRT: null,
       staticTiles: [],
       animatedTiles: [],
@@ -301,7 +299,7 @@ export class TerrainRenderer {
         state.animatedRT = this.createRenderTexture(
           state.chunkStartX,
           state.chunkStartY,
-          TERRAIN_RENDER_DEPTH + 1,
+          TERRAIN_ANIMATED_DEPTH,
         );
       }
     } else if (state.animatedRT) {
@@ -309,17 +307,17 @@ export class TerrainRenderer {
       state.animatedRT = null;
     }
 
-    this.drawTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY, false);
+    this.drawStaticTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY);
 
     if (state.animatedRT) {
-      this.drawTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY, true);
+      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
     }
 
     this.setChunkVisibility(state, this.visibleChunkIds.has(state.chunkId));
   }
 
   public updateAnimation(nowMs: number = this.scene.time.now): void {
-    const nextPhaseByAnimationId = new Map<string, number>();
+    const visibleAnimatedTileVariants: Array<{ baseFrame: string; variants: string[] }> = [];
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
@@ -329,42 +327,20 @@ export class TerrainRenderer {
         const variants = this.resolveFrameVariants(tile.frame);
         if (variants.length <= 1) continue;
 
-        const animationId = getTerrainAnimationId(tile.frame);
-        if (nextPhaseByAnimationId.has(animationId)) continue;
-
-        const durationsMs = this.getPhaseDurationsForBaseFrame(tile.frame, variants.length);
-        nextPhaseByAnimationId.set(
-          animationId,
-          resolveTerrainPhaseIndex(nowMs, durationsMs),
-        );
+        visibleAnimatedTileVariants.push({ baseFrame: tile.frame, variants });
       }
     }
 
-    if (nextPhaseByAnimationId.size === 0) {
+    const changed = this.animationClock.tick(nowMs, visibleAnimatedTileVariants);
+    if (!changed) {
       return;
-    }
-
-    let changed = false;
-    for (const [animationId, phaseIndex] of nextPhaseByAnimationId.entries()) {
-      if (this.currentPhaseByAnimationId.get(animationId) !== phaseIndex) {
-        changed = true;
-        break;
-      }
-    }
-    if (!changed && this.currentPhaseByAnimationId.size === nextPhaseByAnimationId.size) {
-      return;
-    }
-
-    this.currentPhaseByAnimationId.clear();
-    for (const [animationId, phaseIndex] of nextPhaseByAnimationId.entries()) {
-      this.currentPhaseByAnimationId.set(animationId, phaseIndex);
     }
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
       if (!state || !state.animatedRT || state.animatedTiles.length === 0) continue;
 
-      this.drawTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY, true);
+      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
     }
   }
 
@@ -377,8 +353,7 @@ export class TerrainRenderer {
     this.chunkStates.clear();
     this.animatedFrameVariantsByBase.clear();
     this.animatedBaseFrameByName.clear();
-    this.animationPhaseDurationsById.clear();
-    this.currentPhaseByAnimationId.clear();
+    this.animationClock.clear();
     this.visibleChunkIds.clear();
     this.scratchImage?.destroy();
     this.scratchImage = null;
