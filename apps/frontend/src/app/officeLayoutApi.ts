@@ -1,13 +1,5 @@
-export type OfficeLayoutDocument = {
-  version: number;
-  cols: number;
-  rows: number;
-  tiles: unknown[];
-  tileColors?: unknown[];
-  furniture?: unknown[];
-  characters?: unknown[];
-  [key: string]: unknown;
-};
+import { isOfficeLayoutDocument, type OfficeLayoutDocument } from "./officeLayoutDocument";
+export type { OfficeLayoutDocument };
 
 export type OfficeLayoutApiResponse = {
   path: string;
@@ -16,18 +8,6 @@ export type OfficeLayoutApiResponse = {
 };
 
 const OFFICE_LAYOUT_ROUTE = "/__office-layout";
-
-function isOfficeLayoutDocument(value: unknown): value is OfficeLayoutDocument {
-  if (typeof value !== "object" || value === null) return false;
-
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.version === "number" &&
-    typeof candidate.cols === "number" &&
-    typeof candidate.rows === "number" &&
-    Array.isArray(candidate.tiles)
-  );
-}
 
 async function readJsonResponse(response: Response): Promise<OfficeLayoutApiResponse> {
   const payload = (await response.json()) as unknown;

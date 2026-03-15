@@ -12,7 +12,7 @@ type ParsedState = {
   error: string | null;
 };
 
-export type OfficeLayoutEditorState = {
+type OfficeLayoutEditorState = {
   isOpen: boolean;
   toggleOpen: () => void;
   jsonText: string;

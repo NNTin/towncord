@@ -2,35 +2,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-
-type OfficeLayoutDocument = {
-  version: number;
-  cols: number;
-  rows: number;
-  tiles: unknown[];
-  tileColors?: unknown[];
-  furniture?: unknown[];
-  characters?: unknown[];
-  [key: string]: unknown;
-};
+import { isOfficeLayoutDocument, type OfficeLayoutDocument } from "./src/app/officeLayoutDocument";
 
 const OFFICE_LAYOUT_ROUTE = "/__office-layout";
 const OFFICE_LAYOUT_PATH = path.resolve(
   __dirname,
   "../../packages/donarg-office-assets/assets/default-layout.json",
 );
-
-function isOfficeLayoutDocument(value: unknown): value is OfficeLayoutDocument {
-  if (typeof value !== "object" || value === null) return false;
-
-  const candidate = value as Record<string, unknown>;
-  return (
-    typeof candidate.version === "number" &&
-    typeof candidate.cols === "number" &&
-    typeof candidate.rows === "number" &&
-    Array.isArray(candidate.tiles)
-  );
-}
 
 async function readOfficeLayout(): Promise<OfficeLayoutDocument> {
   const raw = await fs.readFile(OFFICE_LAYOUT_PATH, "utf8");

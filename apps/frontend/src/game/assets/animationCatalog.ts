@@ -71,6 +71,21 @@ function getOrCreate(
   return map.get(id)!;
 }
 
+function addUndirectedPropTrack(
+  pathTracks: Map<string, Map<string, AnimationTrack>>,
+  path: string,
+  variantId: string,
+  key: string,
+): void {
+  if (!pathTracks.has(path)) pathTracks.set(path, new Map());
+  const track = getOrCreate(pathTracks.get(path)!, variantId, {
+    label: variantId,
+    entityType: "props",
+    equipmentCompatible: [],
+  });
+  track.undirectedKey = key;
+}
+
 function parsePlayerKeys(
   keys: string[],
   pathTracks: Map<string, Map<string, AnimationTrack>>,
@@ -214,13 +229,7 @@ function parsePropKeys(
       variantId = parts[4]!;
     }
 
-    if (!pathTracks.has(path)) pathTracks.set(path, new Map());
-    const track = getOrCreate(pathTracks.get(path)!, variantId, {
-      label: variantId,
-      entityType: "props",
-      equipmentCompatible: [],
-    });
-    track.undirectedKey = key;
+    addUndirectedPropTrack(pathTracks, path, variantId, key);
   }
 }
 
@@ -305,13 +314,7 @@ function parseOfficeFurnitureKeys(
     const variantId = parts[2]!;
     const path = `office/furniture/${group}`;
 
-    if (!pathTracks.has(path)) pathTracks.set(path, new Map());
-    const track = getOrCreate(pathTracks.get(path)!, variantId, {
-      label: variantId,
-      entityType: "props",
-      equipmentCompatible: [],
-    });
-    track.undirectedKey = key;
+    addUndirectedPropTrack(pathTracks, path, variantId, key);
   }
 }
 

@@ -237,21 +237,17 @@ export function placeOfficeFurniture(
   });
 }
 
-function moveOfficeFurniture(
+function applyFurnitureMutation(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
-  anchor: OfficeFurnitureAnchor,
+  mutate: (current: OfficeFurnitureInstance) => OfficeFurnitureInstance,
 ): OfficeLayoutResult<OfficeLayoutDocument> {
   const current = layout.furniture[furnitureId];
   if (!current) {
     return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
   }
 
-  const candidate: OfficeFurnitureInstance = {
-    ...current,
-    anchor,
-  };
-
+  const candidate = mutate(current);
   const validation = validateFurniturePlacement(layout, candidate, furnitureId);
   if (!validation.ok) {
     return validation;
@@ -266,33 +262,23 @@ function moveOfficeFurniture(
   });
 }
 
+function moveOfficeFurniture(
+  layout: OfficeLayoutDocument,
+  furnitureId: OfficeFurnitureId,
+  anchor: OfficeFurnitureAnchor,
+): OfficeLayoutResult<OfficeLayoutDocument> {
+  return applyFurnitureMutation(layout, furnitureId, (current) => ({ ...current, anchor }));
+}
+
 function rotateOfficeFurniture(
   layout: OfficeLayoutDocument,
   furnitureId: OfficeFurnitureId,
   direction: "clockwise" | "counterclockwise" = "clockwise",
 ): OfficeLayoutResult<OfficeLayoutDocument> {
-  const current = layout.furniture[furnitureId];
-  if (!current) {
-    return failure("furniture-not-found", `Furniture "${furnitureId}" was not found.`);
-  }
-
-  const candidate: OfficeFurnitureInstance = {
+  return applyFurnitureMutation(layout, furnitureId, (current) => ({
     ...current,
     rotation: rotateOfficeRotation(current.rotation, direction),
-  };
-
-  const validation = validateFurniturePlacement(layout, candidate, furnitureId);
-  if (!validation.ok) {
-    return validation;
-  }
-
-  return success({
-    ...layout,
-    furniture: {
-      ...layout.furniture,
-      [furnitureId]: candidate,
-    },
-  });
+  }));
 }
 
 function toggleOfficeFurnitureState(

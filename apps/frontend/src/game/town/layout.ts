@@ -19,7 +19,7 @@ function officeCellUnits(region: TownOfficeRegion): number {
   return Math.round(region.layout.cellSize / TOWN_BASE_PX);
 }
 
-export type TownLayout = {
+type TownLayout = {
   terrain: TerrainGridSpec;
   office: TownOfficeRegion | null;
 };
@@ -124,7 +124,7 @@ export function loadTownOfficeRegion(): TownOfficeRegion {
  * Produces the unified TownLayout by merging the existing terrain spec and
  * the default office layout with a hardcoded anchor position.
  */
-export function loadTownLayout(): TownLayout {
+function loadTownLayout(): TownLayout {
   const { gridSpec } = loadTerrainBootstrap();
   return {
     terrain: gridSpec,
