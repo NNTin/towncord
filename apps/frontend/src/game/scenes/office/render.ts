@@ -16,6 +16,15 @@ const LABEL_TEXT_COLOR = "#f8fafc";
 const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
 const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 
+/**
+ * Depth encoding: depth = bottomRow * DEPTH_ROWS_PER_SLOT + layer.
+ * Max budget: ~100 rows × 100 slots = 10 000 depth units per office.
+ */
+const DEPTH_ROWS_PER_SLOT = 100;
+const DEPTH_LAYER_WALL_FURNITURE = 6;
+const DEPTH_LAYER_FLOOR_FURNITURE = 18;
+const DEPTH_LAYER_CHARACTER = 34;
+
 const FURNITURE_PALETTE_MAP = new Map<string, FurniturePaletteItem>(
   FURNITURE_PALETTE_ITEMS.map((item) => [item.id, item]),
 );
@@ -180,7 +189,7 @@ function renderFurniture(
     renderFurnitureFallback(scene, container, layout, item, width, height);
   }
 
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? 6 : 18));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? DEPTH_LAYER_WALL_FURNITURE : DEPTH_LAYER_FLOOR_FURNITURE));
 
   const target: OfficeRenderableTarget = {
     kind: "furniture",
@@ -333,7 +342,7 @@ function renderCharacter(
   badge.setOrigin(0.5);
 
   container.add([shadow, body, head, badge]);
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, 34));
+  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, DEPTH_LAYER_CHARACTER));
 
   const target: OfficeRenderableTarget = {
     kind: "character",
@@ -345,15 +354,9 @@ function renderCharacter(
   return { target, container };
 }
 
-// TODO(architecture-review): resolveRenderableDepth() encodes both spatial (row) and
-// categorical (layer) concerns into a single depth integer using the formula
-// `bottomRow * 100 + layer`. The multiplier 100 and the layer slot values (6 for wall
-// furniture, 18 for floor furniture, 34 for characters) are undocumented magic numbers.
-// Document the layer budget (e.g. max ~100 rows × 100 = 10 000 depth units) and give each
-// slot a named constant so the intended draw order is explicit. Also note that this depth
-// space overlaps with the world-entity depth space, which has no y-sort at all.
+// Note: this depth space overlaps with the world-entity depth space, which has no y-sort.
 function resolveRenderableDepth(bottomRow: number, layer: number): number {
-  return bottomRow * 100 + layer;
+  return bottomRow * DEPTH_ROWS_PER_SLOT + layer;
 }
 
 function shortenLabel(label: string, maxLength: number): string {
