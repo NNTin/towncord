@@ -170,16 +170,11 @@ export class TerrainRenderer {
     return variants[index] ?? baseFrame;
   }
 
-  // TODO(architecture-review): drawTiles() takes an `animatedPhase` boolean flag to decide
-  // whether to resolve animated frame variants. This dual behaviour in one method makes the
-  // intent harder to follow. Split into drawStaticTiles() and drawAnimatedTiles() to make 
-  // each call-site's purpose explicit.
-  private drawTiles(
+  private drawStaticTiles(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
     chunkStartX: number,
     chunkStartY: number,
-    animatedPhase: boolean,
   ): void {
     if (tiles.length === 0) {
       rt.clear();
@@ -194,7 +189,42 @@ export class TerrainRenderer {
     for (const tile of tiles) {
       const localCellX = tile.cellX - chunkStartX;
       const localCellY = tile.cellY - chunkStartY;
-      const frame = animatedPhase ? this.resolveFrameForCurrentPhase(tile.frame) : tile.frame;
+      const resolvedFrame = texture.has(tile.frame) ? tile.frame : tile.frame;
+
+      scratch.setTexture(this.textureKey, resolvedFrame);
+      scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
+      scratch.setRotation(tile.rotate90 * (Math.PI / 2));
+      scratch.setFlip(tile.flipX, tile.flipY);
+      scratch.setPosition(
+        localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+        localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+      );
+
+      rt.batchDraw(scratch);
+    }
+    rt.endDraw();
+  }
+
+  private drawAnimatedTiles(
+    rt: Phaser.GameObjects.RenderTexture,
+    tiles: TerrainRenderTile[],
+    chunkStartX: number,
+    chunkStartY: number,
+  ): void {
+    if (tiles.length === 0) {
+      rt.clear();
+      return;
+    }
+
+    const texture = this.scene.textures.get(this.textureKey);
+    const scratch = this.getScratchImage();
+
+    rt.clear();
+    rt.beginDraw();
+    for (const tile of tiles) {
+      const localCellX = tile.cellX - chunkStartX;
+      const localCellY = tile.cellY - chunkStartY;
+      const frame = this.resolveFrameForCurrentPhase(tile.frame);
       const resolvedFrame = texture.has(frame) ? frame : tile.frame;
 
       scratch.setTexture(this.textureKey, resolvedFrame);
@@ -319,10 +349,10 @@ export class TerrainRenderer {
       state.animatedRT = null;
     }
 
-    this.drawTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY, false);
+    this.drawStaticTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY);
 
     if (state.animatedRT) {
-      this.drawTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY, true);
+      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
     }
 
     this.setChunkVisibility(state, this.visibleChunkIds.has(state.chunkId));
@@ -374,7 +404,7 @@ export class TerrainRenderer {
       const state = this.chunkStates.get(chunkId);
       if (!state || !state.animatedRT || state.animatedTiles.length === 0) continue;
 
-      this.drawTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY, true);
+      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
     }
   }
 
