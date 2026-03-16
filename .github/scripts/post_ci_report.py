@@ -323,10 +323,6 @@ def main() -> None:
     pr_number = os.environ["PR_NUMBER"]
     repo = os.environ["REPO"]
 
-    if not any(v == "failure" for v in outcomes.values()):
-        print("All checks passed — no comment needed")
-        return
-
     comment = compose_comment(outcomes, run_url)
     post_comment(repo, pr_number, comment)
 
