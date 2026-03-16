@@ -29,16 +29,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: sarif
-          output: trivy-results.sarif
-          severity: HIGH,CRITICAL
-          # exit-code 0 so the SARIF file is always written before upload
-          exit-code: '0'
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Scan filesystem and generate SARIF report
+        run: trivy fs . --format sarif --output trivy-results.sarif --severity HIGH,CRITICAL --exit-code 0
 
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -46,10 +41,4 @@ jobs:
           sarif_file: trivy-results.sarif
 
       - name: Fail on HIGH/CRITICAL vulnerabilities
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: '1'
+        run: trivy fs . --format table --severity HIGH,CRITICAL --exit-code 1

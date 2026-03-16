@@ -111,13 +111,11 @@ jobs:
       - name: Prepare deployment
         run: bash .github/scripts/deploy.sh "${{ needs.resolve-version.outputs.version }}"
 
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
       - name: Generate SBOM
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: cyclonedx
-          output: sbom.cdx.json
+        run: trivy fs . --format cyclonedx --output sbom.cdx.json --exit-code 0
 
       - name: Attach SBOM to GitHub release
         env:
