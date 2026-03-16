@@ -22,6 +22,7 @@ function App(): JSX.Element {
   const [isLayoutPaintMode, setIsLayoutPaintMode] = useState(false);
   const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
   const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
+  const [activeFloorPattern, setActiveFloorPattern] = useState<string | null>(null);
   const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
 
   // Clear active tool when layout mode is closed so Phaser doesn't retain a
@@ -74,6 +75,8 @@ function App(): JSX.Element {
         onSelectTool={setActiveTool}
         activeTileColor={activeTileColor}
         onSelectTileColor={setActiveTileColor}
+        activeFloorPattern={activeFloorPattern}
+        onSelectFloorPattern={setActiveFloorPattern}
         activeFurnitureId={activeFurnitureId}
         onSelectFurnitureId={setActiveFurnitureId}
         onResetLayout={officeEditor.reset}

@@ -86,40 +86,11 @@ function resolveColors(asset: RawAsset): { color: number; accentColor: number } 
 
 type RawAsset = (typeof furnitureCatalogData.assets)[number];
 
-function buildVisibleItems(): FurniturePaletteItem[] {
-  const assets = furnitureCatalogData.assets as RawAsset[];
+function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
   const frames = atlasData.frames as Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
-
-  // Build orientation groups: groupId -> orientation -> id
-  // Only use "off" state (or no state) variants to determine the primary orientation
-  const orientationGroups = new Map<string, Map<string, string>>();
-  for (const asset of assets) {
-    if (!asset.groupId || !("orientation" in asset) || !asset.orientation) continue;
-    if ("state" in asset && asset.state && asset.state !== "off") continue;
-    const map = orientationGroups.get(asset.groupId) ?? new Map<string, string>();
-    map.set(asset.orientation, asset.id);
-    orientationGroups.set(asset.groupId, map);
-  }
-
-  const hidden = new Set<string>();
-
-  // Hide non-primary orientations in rotation groups
-  for (const orientMap of orientationGroups.values()) {
-    if (orientMap.size < 2) continue;
-    const primary = ORIENTATION_ORDER.find((o) => orientMap.has(o)) ?? [...orientMap.keys()][0]!;
-    for (const [orientation, id] of orientMap) {
-      if (orientation !== primary) hidden.add(id);
-    }
-  }
-
-  // Hide "on" state variants
-  for (const asset of assets) {
-    if ("state" in asset && asset.state === "on") hidden.add(asset.id);
-  }
-
   const result: FurniturePaletteItem[] = [];
+
   for (const asset of assets) {
-    if (hidden.has(asset.id)) continue;
     const atlasKey = filePathToAtlasKey(asset.file);
     const frameData = frames[atlasKey];
     if (!frameData) continue;
@@ -153,6 +124,45 @@ function buildVisibleItems(): FurniturePaletteItem[] {
   return result;
 }
 
+function buildAllItems(): FurniturePaletteItem[] {
+  return buildItemsFromAssets(furnitureCatalogData.assets as RawAsset[]);
+}
+
+function buildVisibleItems(): FurniturePaletteItem[] {
+  const assets = furnitureCatalogData.assets as RawAsset[];
+
+  // Build orientation groups: groupId -> orientation -> id
+  // Only use "off" state (or no state) variants to determine the primary orientation
+  const orientationGroups = new Map<string, Map<string, string>>();
+  for (const asset of assets) {
+    if (!asset.groupId || !("orientation" in asset) || !asset.orientation) continue;
+    if ("state" in asset && asset.state && asset.state !== "off") continue;
+    const map = orientationGroups.get(asset.groupId) ?? new Map<string, string>();
+    map.set(asset.orientation, asset.id);
+    orientationGroups.set(asset.groupId, map);
+  }
+
+  const hidden = new Set<string>();
+
+  // Hide non-primary orientations in rotation groups
+  for (const orientMap of orientationGroups.values()) {
+    if (orientMap.size < 2) continue;
+    const primary = ORIENTATION_ORDER.find((o) => orientMap.has(o)) ?? [...orientMap.keys()][0]!;
+    for (const [orientation, id] of orientMap) {
+      if (orientation !== primary) hidden.add(id);
+    }
+  }
+
+  // Hide "on" state variants
+  for (const asset of assets) {
+    if ("state" in asset && asset.state === "on") hidden.add(asset.id);
+  }
+
+  return buildItemsFromAssets(assets.filter((asset) => !hidden.has(asset.id)));
+}
+
+/** All furniture items with atlas frames, including non-primary orientations. Used for rendering placed furniture. */
+export const FURNITURE_ALL_ITEMS: FurniturePaletteItem[] = buildAllItems();
 export const FURNITURE_PALETTE_ITEMS: FurniturePaletteItem[] = buildVisibleItems();
 export const FURNITURE_PALETTE_CATEGORIES: string[] = [
   ...new Set(FURNITURE_PALETTE_ITEMS.map((i) => i.category)),

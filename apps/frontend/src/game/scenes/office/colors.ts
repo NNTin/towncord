@@ -19,7 +19,7 @@ const WALL_HUE = 0.61;
 const WALL_SATURATION = 0.24;
 const WALL_LIGHTNESS = 0.29;
 
-export function resolveOfficeTileFill(kind: OfficeSceneTileKind, tint?: number): number {
+function resolveOfficeTileFill(kind: OfficeSceneTileKind, tint?: number): number {
   if (typeof tint === "number") {
     return tint;
   }

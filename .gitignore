@@ -16,3 +16,6 @@ specs/
 *.generated.ts
 *.generated.js
 *.generated.d.ts
+
+agent-orchestrator.yaml
+.claude/
