@@ -28,11 +28,13 @@
     "knip": "knip --include files,dependencies,exports,types --include-entry-exports --reporter compact --treat-config-hints-as-errors",
     "lint:commits": "commitlint",
     "test": "echo \"Define workspace tests\"",
-    "test:automation": "node --test .github/scripts/__tests__/*.test.mjs"
+    "test:automation": "node --test .github/scripts/__tests__/*.test.mjs",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "20.4.4",
     "@commitlint/config-conventional": "20.4.4",
+    "husky": "^9.1.7",
     "jscpd": "4.0.8",
     "knip": "5.86.0"
   }

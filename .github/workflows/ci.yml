@@ -102,6 +102,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Audit dependencies for vulnerabilities
+        id: audit
+        continue-on-error: true
+        shell: bash
+        run: npm audit --audit-level=high 2>&1 | tee /tmp/audit.log; exit ${PIPESTATUS[0]}
+
       - name: Find unused dependencies, exports, and files
         id: knip
         continue-on-error: true
@@ -136,6 +142,7 @@ jobs:
         if: always()
         run: |
           failed=()
+          [[ "${{ steps.audit.outcome }}"     != "success" ]] && failed+=("audit")
           [[ "${{ steps.knip.outcome }}"      != "success" ]] && failed+=("knip")
           [[ "${{ steps.jscpd.outcome }}"     != "success" ]] && failed+=("jscpd")
           [[ "${{ steps.typecheck.outcome }}" != "success" ]] && failed+=("typecheck")
@@ -150,6 +157,7 @@ jobs:
         if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUDIT_OUTCOME: ${{ steps.audit.outcome }}
           KNIP_OUTCOME: ${{ steps.knip.outcome }}
           JSCPD_OUTCOME: ${{ steps.jscpd.outcome }}
           TYPECHECK_OUTCOME: ${{ steps.typecheck.outcome }}
