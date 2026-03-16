@@ -4,9 +4,6 @@ export const ENVIRONMENT_ATLAS_IMAGE_URL = "/assets/donarg-office/atlas.png";
 export const ENVIRONMENT_ATLAS_W = atlasData.meta.size.w;
 export const ENVIRONMENT_ATLAS_H = atlasData.meta.size.h;
 
-// The single default floor pattern frame key used for all floor tile rendering
-export const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
-
 // All environment frames keyed by frame name — used by UI components for CSS sprite rendering
 export const ENVIRONMENT_ATLAS_FRAMES = atlasData.frames as Record<
   string,

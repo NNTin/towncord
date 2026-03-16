@@ -14,7 +14,6 @@ import {
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_FRAMES,
   FLOOR_PATTERN_ITEMS,
-  type FloorPatternItem,
 } from "../game/office/officeTilePalette";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
@@ -133,6 +132,22 @@ function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element 
   );
 }
 
+function EnvironmentAtlasSprite({ x, y, w, h }: { x: number; y: number; w: number; h: number }): JSX.Element {
+  return (
+    <div
+      style={{
+        width: w * SCALE,
+        height: h * SCALE,
+        backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
+        backgroundPosition: `${-x * SCALE}px ${-y * SCALE}px`,
+        backgroundSize: `${ENVIRONMENT_ATLAS_W * SCALE}px ${ENVIRONMENT_ATLAS_H * SCALE}px`,
+        imageRendering: "pixelated",
+        flexShrink: 0,
+      }}
+    />
+  );
+}
+
 // ─── Sub-panels ───────────────────────────────────────────────────────────────
 
 function FloorTilePreview({ color }: { color: OfficeTileColor }): JSX.Element {
@@ -141,19 +156,9 @@ function FloorTilePreview({ color }: { color: OfficeTileColor }): JSX.Element {
     return <div style={{ width: 32, height: 32, background: TILE_COLOR_TINT_CSS[color].replace("0.45", "1") }} />;
   }
   const { x, y, w, h } = defaultFrame.frame;
-  const ENV_SCALE = 2;
   return (
-    <div style={{ position: "relative", width: w * ENV_SCALE, height: h * ENV_SCALE, overflow: "hidden", flexShrink: 0 }}>
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
-          backgroundPosition: `${-x * ENV_SCALE}px ${-y * ENV_SCALE}px`,
-          backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
-          imageRendering: "pixelated",
-        }}
-      />
+    <div style={{ position: "relative", width: w * SCALE, height: h * SCALE, overflow: "hidden", flexShrink: 0 }}>
+      <EnvironmentAtlasSprite x={x} y={y} w={w} h={h} />
       <div
         style={{
           position: "absolute",
@@ -185,7 +190,6 @@ function FloorSubPanel({
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
         {FLOOR_PATTERN_ITEMS.map((item) => {
           const { x, y, w, h } = item.atlasFrame;
-          const ENV_SCALE = 2;
           return (
             <button
               key={item.id}
@@ -200,17 +204,7 @@ function FloorSubPanel({
                 flexShrink: 0,
               }}
             >
-              <div
-                style={{
-                  width: w * ENV_SCALE,
-                  height: h * ENV_SCALE,
-                  backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
-                  backgroundPosition: `${-x * ENV_SCALE}px ${-y * ENV_SCALE}px`,
-                  backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
-                  imageRendering: "pixelated",
-                  flexShrink: 0,
-                }}
-              />
+              <EnvironmentAtlasSprite x={x} y={y} w={w} h={h} />
             </button>
           );
         })}
