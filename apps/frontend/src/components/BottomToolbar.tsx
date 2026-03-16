@@ -157,7 +157,7 @@ function FloorTilePreview({ color }: { color: OfficeTileColor }): JSX.Element {
   }
   const { x, y, w, h } = defaultFrame.frame;
   return (
-    <div style={{ position: "relative", width: w * SCALE, height: h * SCALE, overflow: "hidden", flexShrink: 0 }}>
+    <div style={{ position: "relative", width: w * SCALE, height: h * SCALE, overflow: "hidden", flexShrink: 0, isolation: "isolate" }}>
       <EnvironmentAtlasSprite x={x} y={y} w={w} h={h} />
       <div
         style={{
