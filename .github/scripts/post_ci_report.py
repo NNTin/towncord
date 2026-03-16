@@ -10,9 +10,10 @@ from datetime import datetime, timezone
 
 MARKER = "<!-- ci-report -->"
 
-STEP_ORDER = ["knip", "jscpd", "typecheck", "tests", "build"]
+STEP_ORDER = ["audit", "knip", "jscpd", "typecheck", "tests", "build"]
 
 STEP_LABELS = {
+    "audit": "npm audit (high/critical)",
     "knip": "unused deps/exports/files",
     "jscpd": "duplicated code",
     "typecheck": "typecheck",
@@ -21,6 +22,7 @@ STEP_LABELS = {
 }
 
 LOG_FILES = {
+    "audit": "/tmp/audit.log",
     "knip": "/tmp/knip.log",
     "jscpd": "/tmp/jscpd.log",
     "typecheck": "/tmp/typecheck.log",
@@ -178,6 +180,28 @@ def extract_tests(log: str) -> tuple[str, str]:
     return suffix, content
 
 
+def extract_audit(log: str) -> tuple[str, str]:
+    lines = log.splitlines()
+    # Look for the summary line: "N vulnerabilities (X high, Y critical)"
+    summary_match = re.search(
+        r"(\d+) vulnerabilit(?:y|ies)", log, re.IGNORECASE
+    )
+    sev_parts = re.findall(r"(\d+) (critical|high|moderate|low)", log, re.IGNORECASE)
+    if sev_parts:
+        sev_summary = ", ".join(f"{n} {s}" for n, s in sev_parts if s.lower() in ("critical", "high"))
+        suffix = sev_summary or (summary_match.group(0) if summary_match else "vulnerabilities found")
+    elif summary_match:
+        suffix = summary_match.group(0)
+    else:
+        suffix = "vulnerabilities found"
+    # Keep only advisory lines and the final summary
+    detail_lines = [
+        l for l in lines
+        if l.strip() and not l.startswith("npm warn") and not l.startswith(">")
+    ]
+    return suffix, "\n".join(detail_lines).strip()
+
+
 def extract_build(log: str) -> tuple[str, str]:
     lines = log.splitlines()
     error_lines = [
@@ -194,6 +218,7 @@ def extract_build(log: str) -> tuple[str, str]:
 
 
 EXTRACTORS = {
+    "audit": extract_audit,
     "knip": extract_knip,
     "jscpd": extract_jscpd,
     "typecheck": extract_typecheck,

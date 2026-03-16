@@ -111,6 +111,19 @@ jobs:
       - name: Prepare deployment
         run: bash .github/scripts/deploy.sh "${{ needs.resolve-version.outputs.version }}"
 
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+
+      - name: Generate SBOM
+        run: trivy fs . --format cyclonedx --output sbom.cdx.json --exit-code 0
+
+      - name: Attach SBOM to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && format('v{0}', needs.resolve-version.outputs.version) || github.ref_name }}"
+          gh release upload "$TAG" sbom.cdx.json --clobber
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
