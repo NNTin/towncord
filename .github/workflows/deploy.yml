@@ -111,6 +111,21 @@ jobs:
       - name: Prepare deployment
         run: bash .github/scripts/deploy.sh "${{ needs.resolve-version.outputs.version }}"
 
+      - name: Generate SBOM
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: cyclonedx
+          output: sbom.cdx.json
+
+      - name: Attach SBOM to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && format('v{0}', needs.resolve-version.outputs.version) || github.ref_name }}"
+          gh release upload "$TAG" sbom.cdx.json --clobber
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
