@@ -11,7 +11,7 @@ export const ENVIRONMENT_ATLAS_FRAMES = atlasData.frames as Record<
 >;
 
 // Floor palette: one entry per floor pattern in the atlas (pattern-01 through pattern-07)
-export type FloorPatternItem = {
+type FloorPatternItem = {
   id: string;            // e.g. "environment.floors.pattern-01"
   frameKey: string;      // e.g. "environment.floors.pattern-01#0"
   atlasFrame: { x: number; y: number; w: number; h: number };
