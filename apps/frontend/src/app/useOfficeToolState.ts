@@ -66,22 +66,29 @@ export function useOfficeToolState(): OfficeToolState {
   }, [activeTool]);
 
   const editorToolPayload = useMemo<OfficeSetEditorToolPayload>(
-    () => ({
-      tool: activeTool,
-      floorMode: activeTool === "floor" ? activeFloorMode : null,
-      tileColor: activeTool === "floor" ? activeTileColor : null,
-      floorColor: activeTool === "floor" ? activeFloorColor : null,
-      floorPattern: activeTool === "floor" ? activeFloorPattern : null,
-      furnitureId: activeFurnitureId,
-    }),
-    [
-      activeTool,
-      activeFloorMode,
-      activeTileColor,
-      activeFloorColor,
-      activeFloorPattern,
-      activeFurnitureId,
-    ],
+    () => {
+      switch (activeTool) {
+        case "floor":
+          return {
+            tool: "floor",
+            floorMode: activeFloorMode,
+            tileColor: activeTileColor,
+            floorColor: activeFloorColor,
+            floorPattern: activeFloorPattern,
+          };
+        case "furniture":
+          return {
+            tool: "furniture",
+            furnitureId: activeFurnitureId,
+          };
+        case "wall":
+        case "erase":
+          return { tool: activeTool };
+        default:
+          return { tool: null };
+      }
+    },
+    [activeTool, activeFloorMode, activeTileColor, activeFloorColor, activeFloorPattern, activeFurnitureId],
   );
 
   return {

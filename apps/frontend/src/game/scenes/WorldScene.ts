@@ -619,20 +619,42 @@ export class WorldScene extends Phaser.Scene {
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
-  // Review: One Way Data Flow — this handler manually destructures every field
-  // from the payload into individual runtimeState properties. Adding a new tool
-  // property requires changes in events.ts, App.tsx, useBloomseedUiBridge.ts,
-  // AND here. Store the payload as a single `activeEditorConfig` object on
-  // runtimeState and read fields from it when needed (e.g. in applyOfficeTool).
-  // This reduces the coupling surface to one producer (React) and one shape
-  // (OfficeSetEditorToolPayload).
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
-    this.activeOfficeTool = payload.tool;
-    this.activeTileColor = payload.tileColor ?? null;
-    this.activeFloorMode = payload.floorMode ?? "paint";
-    this.activeFloorColor = payload.floorColor ?? null;
-    this.activeFloorPattern = payload.floorPattern ?? null;
-    this.activeFurnitureId = payload.furnitureId;
+    switch (payload.tool) {
+      case "floor":
+        this.activeOfficeTool = "floor";
+        this.activeFloorMode = payload.floorMode;
+        this.activeTileColor = payload.tileColor;
+        this.activeFloorColor = payload.floorColor;
+        this.activeFloorPattern = payload.floorPattern;
+        this.activeFurnitureId = null;
+        break;
+      case "furniture":
+        this.activeOfficeTool = "furniture";
+        this.activeTileColor = null;
+        this.activeFloorMode = "paint";
+        this.activeFloorColor = null;
+        this.activeFloorPattern = null;
+        this.activeFurnitureId = payload.furnitureId;
+        break;
+      case "wall":
+      case "erase":
+        this.activeOfficeTool = payload.tool;
+        this.activeTileColor = null;
+        this.activeFloorMode = "paint";
+        this.activeFloorColor = null;
+        this.activeFloorPattern = null;
+        this.activeFurnitureId = null;
+        break;
+      default:
+        this.activeOfficeTool = null;
+        this.activeTileColor = null;
+        this.activeFloorMode = "paint";
+        this.activeFloorColor = null;
+        this.activeFloorPattern = null;
+        this.activeFurnitureId = null;
+        break;
+    }
     this.syncOfficeCellHighlight(this.input.activePointer);
   }
 

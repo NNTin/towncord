@@ -28,30 +28,37 @@ export type OfficeLayoutChangedPayload = {
   layout: import("./scenes/office/bootstrap").OfficeSceneLayout;
 };
 
-// Review: Interface Segregation Principle — this payload bundles every tool's
-// config into a single flat object. When tool === "furniture", the consumer
-// still receives floorMode, tileColor, floorColor, and floorPattern (all null).
-// When tool === "floor", furnitureId is carried but irrelevant.
-//
-// A discriminated union would make each tool's data requirements explicit:
-//   type OfficeSetEditorToolPayload =
-//     | { tool: "floor"; floorMode: OfficeFloorMode; tileColor: ...; floorColor: ...; floorPattern: ... }
-//     | { tool: "wall" }
-//     | { tool: "erase" }
-//     | { tool: "furniture"; furnitureId: string }
-//     | { tool: null }
-//
-// Benefits: (1) consumers can narrow on `tool` without null-checking irrelevant
-// fields, (2) adding a new tool's config won't bloat unrelated variants,
-// (3) TypeScript exhaustiveness checking catches missing handlers.
-export type OfficeSetEditorToolPayload = {
-  tool: OfficeEditorToolId | null;
-  floorMode: OfficeFloorMode | null;
+export type OfficeSetEditorToolNonePayload = {
+  tool: null;
+};
+
+export type OfficeSetEditorToolWallPayload = {
+  tool: "wall";
+};
+
+export type OfficeSetEditorToolErasePayload = {
+  tool: "erase";
+};
+
+export type OfficeSetEditorToolFurniturePayload = {
+  tool: "furniture";
+  furnitureId: string | null;
+};
+
+export type OfficeSetEditorToolFloorPayload = {
+  tool: "floor";
+  floorMode: OfficeFloorMode;
   tileColor: OfficeTileColor | null;
   floorColor: OfficeColorAdjust | null;
   floorPattern: string | null;
-  furnitureId: string | null;
 };
+
+export type OfficeSetEditorToolPayload =
+  | OfficeSetEditorToolNonePayload
+  | OfficeSetEditorToolWallPayload
+  | OfficeSetEditorToolErasePayload
+  | OfficeSetEditorToolFurniturePayload
+  | OfficeSetEditorToolFloorPayload;
 
 export type OfficeFloorPickedPayload = {
   floorColor: OfficeColorAdjust | null;
@@ -73,10 +80,7 @@ export type PlaceTerrainDragPayload = {
 };
 
 export type PlaceDragPayload = PlaceEntityDragPayload | PlaceTerrainDragPayload;
-
-
 export type PlaceEntityDropPayload = PlaceEntityDragPayload & {
-
   screenX: number;
   screenY: number;
 };
