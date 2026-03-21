@@ -1,0 +1,5 @@
+{
+  "installCommand": "git config --global url.\"https://${REPO_TOKEN}@github.com/\".insteadOf \"https://github.com/\" && git submodule update --init --recursive && npm install",
+  "buildCommand": "npm run build:frontend",
+  "outputDirectory": "apps/frontend/dist"
+}
