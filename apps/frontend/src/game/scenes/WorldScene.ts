@@ -42,6 +42,7 @@ import {
   type TerrainRenderTile,
 } from "../terrain";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
+import { WorldSceneInputRouter } from "./world/inputRouter";
 import { TownCollisionGrid } from "../town/collisionGrid";
 import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
@@ -73,17 +74,6 @@ const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
-// Review: Separation of Concerns — WorldScene is a God Object (~992 LOC). It
-// coordinates entity lifecycle, terrain brush previews, office editor tool
-// dispatch, camera panning, zoom handling, and all input routing. Each of these
-// is an independent concern. Extract them into dedicated systems that WorldScene
-// merely wires together in create() and delegates to in update():
-//   - InputRouter        (pointerdown/move/up/wheel dispatch)
-//   - CameraController   (pan, zoom, zoom-changed emit)
-//   - TerrainBrushPreviewSystem (preview rectangle + render preview images)
-//   - OfficePaintSession (cell highlight, apply-tool loop, dirty flag)
-// WorldScene should become a thin coordinator: ~100–150 LOC that creates systems
-// in create(), ticks them in update(), and tears them down in shutdown.
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
 
@@ -92,6 +82,7 @@ export class WorldScene extends Phaser.Scene {
 
   /** Dedicated system for office editor tool dispatch (floor/wall/furniture/erase). */
   private readonly officeEditorSystem = new OfficeEditorSystem();
+  private readonly inputRouter: WorldSceneInputRouter;
 
   private get rs(): WorldSceneRuntime {
     return this.runtimeState;
@@ -99,6 +90,22 @@ export class WorldScene extends Phaser.Scene {
 
   constructor() {
     super(WORLD_SCENE_KEY);
+    this.inputRouter = new WorldSceneInputRouter({
+      beginPan: (pointer) => this.beginPan(pointer),
+      tryHandleOfficePointerDown: (pointer) => this.tryHandleOfficePointerDown(pointer),
+      hasActiveTerrainTool: () => Boolean(this.rs.activeTerrainTool),
+      beginTerrainPaint: (pointer) => this.beginTerrainPaint(pointer),
+      handleSelectionAndInspect: (pointer) => this.handleSelectionAndInspect(pointer),
+      isPanning: () => this.rs.isPanning,
+      updatePan: (pointer) => this.updatePan(pointer),
+      syncHover: (pointer) => this.syncHover(pointer),
+      shouldContinueOfficePainting: (pointer) => this.shouldContinueOfficePainting(pointer),
+      continueOfficePainting: (pointer) => this.continueOfficePainting(pointer),
+      shouldContinueTerrainPainting: () => this.shouldContinueTerrainPainting(),
+      continueTerrainPainting: (pointer) => this.continueTerrainPainting(pointer),
+      endPan: (pointer) => this.endPan(pointer),
+      endPrimaryPointer: (pointer) => this.endPrimaryPointer(pointer),
+    });
   }
 
   public create(): void {
@@ -494,99 +501,117 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  // Review: Separation of Concerns — onPointerDown routes three unrelated
-  // concerns (camera pan, office tool application, terrain paint + entity
-  // selection) inside a single method with nested early returns. Extract an
-  // InputRouter system that dispatches pointer events to the active subsystem
-  // based on priority: pan → office tool → terrain tool → entity selection.
-  // Each subsystem would implement a common InputHandler interface with
-  // `onDown(worldPoint) → boolean` (consumed flag), making the dispatch chain
-  // explicit and independently testable.
-  private onPointerDown(pointer: Phaser.Input.Pointer): void {
-    if (pointer.button === 1) {
-      this.rs.isPanning = true;
-      this.rs.panStartX = pointer.x;
-      this.rs.panStartY = pointer.y;
-      this.rs.camStartX = this.cameras.main.scrollX;
-      this.rs.camStartY = this.cameras.main.scrollY;
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-    } else if (pointer.button === 0) {
-      if (this.rs.activeOfficeTool) {
-        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
-          return;
-        }
-        if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
-          this.rs.isOfficePainting = true;
-          return;
-        }
-      }
-
-      if (this.rs.activeTerrainTool) {
-        this.rs.terrainPaintSession.begin();
-        this.syncTerrainBrushPreviewFromPointer(pointer);
-        this.paintTerrainAtScreen(pointer.x, pointer.y);
-        return;
-      }
-
-      let hit: WorldEntity | null = null;
-      const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
-
-      for (const target of hits) {
-        const entity = this.entitySystem?.findBySpriteTarget(target) ?? null;
-        if (entity) {
-          hit = entity;
-          break;
-        }
-      }
-
-      this.selectEntity(hit);
-
-      if (this.rs.terrainSystem) {
-        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        const inspected = this.rs.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
-        if (inspected) {
-          const payload: TerrainTileInspectedPayload = inspected;
-          this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
-        }
-      }
-    }
+  private beginPan(pointer: Phaser.Input.Pointer): void {
+    this.rs.isPanning = true;
+    this.rs.panStartX = pointer.x;
+    this.rs.panStartY = pointer.y;
+    this.rs.camStartX = this.cameras.main.scrollX;
+    this.rs.camStartY = this.cameras.main.scrollY;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
   }
 
-  private onPointerMove(pointer: Phaser.Input.Pointer): void {
-    if (this.rs.isPanning) {
-      const zoom = this.cameras.main.zoom;
-      const dx = (pointer.x - this.rs.panStartX) / zoom;
-      const dy = (pointer.y - this.rs.panStartY) / zoom;
-      this.cameras.main.setScroll(this.rs.camStartX - dx, this.rs.camStartY - dy);
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-      this.syncOfficeCellHighlight(pointer);
-      return;
+  private tryHandleOfficePointerDown(pointer: Phaser.Input.Pointer): boolean {
+    if (!this.rs.activeOfficeTool) {
+      return false;
     }
 
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
+      return true;
+    }
+
+    if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
+      this.rs.isOfficePainting = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  private beginTerrainPaint(pointer: Phaser.Input.Pointer): void {
+    this.rs.terrainPaintSession.begin();
     this.syncTerrainBrushPreviewFromPointer(pointer);
-    this.syncOfficeCellHighlight(pointer);
-
-    if (this.rs.isOfficePainting && this.rs.activeOfficeTool && pointer.isDown) {
-      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-      this.applyOfficeTool(worldPoint.x, worldPoint.y);
-      return;
-    }
-
-    if (!this.rs.activeTerrainTool) return;
-    if (!this.rs.terrainPaintSession.isActive()) return;
     this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
-  private onPointerUp(pointer: Phaser.Input.Pointer): void {
-    if (pointer.button === 1) {
-      this.rs.isPanning = false;
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-    } else if (pointer.button === 0) {
-      this.rs.isOfficePainting = false;
-      this.rs.terrainPaintSession.end();
-      this.syncTerrainBrushPreviewFromPointer(pointer);
+  private handleSelectionAndInspect(pointer: Phaser.Input.Pointer): void {
+    let hit: WorldEntity | null = null;
+    const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
+
+    for (const target of hits) {
+      const entity = this.entitySystem?.findBySpriteTarget(target) ?? null;
+      if (entity) {
+        hit = entity;
+        break;
+      }
     }
+
+    this.selectEntity(hit);
+
+    if (!this.rs.terrainSystem) {
+      return;
+    }
+
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const inspected = this.rs.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
+    if (inspected) {
+      const payload: TerrainTileInspectedPayload = inspected;
+      this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
+    }
+  }
+
+  private updatePan(pointer: Phaser.Input.Pointer): void {
+    const zoom = this.cameras.main.zoom;
+    const dx = (pointer.x - this.rs.panStartX) / zoom;
+    const dy = (pointer.y - this.rs.panStartY) / zoom;
+    this.cameras.main.setScroll(this.rs.camStartX - dx, this.rs.camStartY - dy);
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    this.syncOfficeCellHighlight(pointer);
+  }
+
+  private syncHover(pointer: Phaser.Input.Pointer): void {
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    this.syncOfficeCellHighlight(pointer);
+  }
+
+  private shouldContinueOfficePainting(pointer: Phaser.Input.Pointer): boolean {
+    return Boolean(this.rs.isOfficePainting && this.rs.activeOfficeTool && pointer.isDown);
+  }
+
+  private continueOfficePainting(pointer: Phaser.Input.Pointer): void {
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    this.applyOfficeTool(worldPoint.x, worldPoint.y);
+  }
+
+  private shouldContinueTerrainPainting(): boolean {
+    return Boolean(this.rs.activeTerrainTool && this.rs.terrainPaintSession.isActive());
+  }
+
+  private continueTerrainPainting(pointer: Phaser.Input.Pointer): void {
+    this.paintTerrainAtScreen(pointer.x, pointer.y);
+  }
+
+  private endPan(pointer: Phaser.Input.Pointer): void {
+    this.rs.isPanning = false;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+  }
+
+  private endPrimaryPointer(pointer: Phaser.Input.Pointer): void {
+    this.rs.isOfficePainting = false;
+    this.rs.terrainPaintSession.end();
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+  }
+
+  private onPointerDown(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerDown(pointer);
+  }
+
+  private onPointerMove(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerMove(pointer);
+  }
+
+  private onPointerUp(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerUp(pointer);
   }
 
   private applyZoom(nextZoom: number): void {
