@@ -183,6 +183,20 @@ function beginBrushPaint(scene: Record<string, unknown>): void {
   paintTerrainAtPointer(scene);
 }
 
+function clickPrimaryPointer(scene: Record<string, unknown>): void {
+  (
+    scene.onPointerDown as (pointer: {
+      button: number;
+      x: number;
+      y: number;
+    }) => void
+  )({
+    button: 0,
+    x: 12,
+    y: 34,
+  });
+}
+
 describe("WorldScene terrain painting", () => {
   test("positions the selection badge above the anchored sprite top edge", () => {
     const scene = new WorldScene() as unknown as Record<string, unknown>;
@@ -467,17 +481,7 @@ describe("WorldScene terrain painting", () => {
   test("pick mode copies floor tile settings and switches back to paint mode", () => {
     const { emit, scene } = createOfficePickSceneHarness();
 
-    (
-      scene.onPointerDown as (pointer: {
-        button: number;
-        x: number;
-        y: number;
-      }) => void
-    )({
-      button: 0,
-      x: 12,
-      y: 34,
-    });
+    clickPrimaryPointer(scene);
 
     expect(emit).toHaveBeenCalledWith(OFFICE_FLOOR_PICKED_EVENT, {
       floorColor: { h: 214, s: 30, b: -100, c: -55 },
@@ -494,17 +498,7 @@ describe("WorldScene terrain painting", () => {
       tileId: 8,
     });
 
-    (
-      scene.onPointerDown as (pointer: {
-        button: number;
-        x: number;
-        y: number;
-      }) => void
-    )({
-      button: 0,
-      x: 12,
-      y: 34,
-    });
+    clickPrimaryPointer(scene);
 
     expect(emit).not.toHaveBeenCalled();
     expect(scene.activeFloorMode).toBe("pick");
