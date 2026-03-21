@@ -226,17 +226,18 @@ function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): 
 
 function FloorPatternPreview({
   patternId,
+  atlasFrame,
   colorAdjust,
   selected,
   onClick,
 }: {
   patternId: string;
+  atlasFrame?: { x: number; y: number; w: number; h: number };
   colorAdjust: OfficeColorAdjust;
   selected: boolean;
   onClick: () => void;
 }): JSX.Element {
-  const item = FLOOR_PATTERN_ITEMS.find((entry) => entry.id === patternId);
-  const frame = item?.atlasFrame ?? ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"]?.frame;
+  const frame = atlasFrame ?? ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"]?.frame;
   if (!frame) {
     return <button type="button" onClick={onClick} style={selected ? btnActive : btnBase}>{patternId}</button>;
   }
@@ -314,6 +315,7 @@ function FloorSubPanel({
             <FloorPatternPreview
               key={item.id}
               patternId={item.id}
+              atlasFrame={item.atlasFrame}
               colorAdjust={previewColor}
               selected={activeFloorPattern === item.id}
               onClick={() => onSelectFloorPattern?.(item.id)}

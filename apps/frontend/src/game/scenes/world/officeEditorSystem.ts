@@ -108,10 +108,15 @@ export class OfficeEditorSystem {
   private applyWall(layout: OfficeSceneLayout, idx: number): boolean {
     const tile = layout.tiles[idx];
     if (!tile) return false;
-    if (tile.kind === "wall") return false;
+    const hasFloorMetadata =
+      typeof tile.tint === "number" ||
+      tile.colorAdjust != null ||
+      typeof tile.pattern === "string";
+    if (tile.kind === "wall" && !hasFloorMetadata) return false;
     tile.kind = "wall";
     delete tile.tint;
     delete tile.colorAdjust;
+    delete tile.pattern;
     return true;
   }
 
@@ -121,11 +126,18 @@ export class OfficeEditorSystem {
       (f) => cell.col >= f.col && cell.col < f.col + f.width &&
              cell.row >= f.row && cell.row < f.row + f.height,
     );
-    if ((tile?.kind === "void" || !tile) && furnitureAtCell.length === 0) return false;
+    const tileNeedsClear = !!tile && (
+      tile.kind !== "void" ||
+      typeof tile.tint === "number" ||
+      tile.colorAdjust != null ||
+      typeof tile.pattern === "string"
+    );
+    if (!tileNeedsClear && furnitureAtCell.length === 0) return false;
     if (tile) {
       tile.kind = "void";
       delete tile.tint;
       delete tile.colorAdjust;
+      delete tile.pattern;
     }
     if (furnitureAtCell.length > 0) {
       const removeIds = new Set(furnitureAtCell.map((f) => f.id));

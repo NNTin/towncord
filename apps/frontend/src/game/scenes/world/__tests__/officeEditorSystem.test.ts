@@ -78,4 +78,82 @@ describe("OfficeEditorSystem floor editing", () => {
       }),
     ).toBe(false);
   });
+
+  test("clears floor-only metadata when converting a floor tile to a wall", () => {
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        {
+          kind: "floor",
+          tileId: 0,
+          tint: 0x445566,
+          colorAdjust: { h: 35, s: 30, b: 15, c: 0 },
+          pattern: "environment.floors.pattern-03",
+        },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "wall",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        floorPattern: null,
+        furnitureId: null,
+      }),
+    ).toBe(true);
+
+    expect(layout.tiles[0]).toMatchObject({
+      kind: "wall",
+      tileId: 0,
+    });
+    expect(layout.tiles[0]).not.toHaveProperty("tint");
+    expect(layout.tiles[0]).not.toHaveProperty("colorAdjust");
+    expect(layout.tiles[0]).not.toHaveProperty("pattern");
+  });
+
+  test("erase normalizes stale floor metadata from void tiles", () => {
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        {
+          kind: "void",
+          tileId: 0,
+          tint: 0x445566,
+          colorAdjust: { h: 35, s: 30, b: 15, c: 0 },
+          pattern: "environment.floors.pattern-03",
+        },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "erase",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        floorPattern: null,
+        furnitureId: null,
+      }),
+    ).toBe(true);
+
+    expect(layout.tiles[0]).toMatchObject({
+      kind: "void",
+      tileId: 0,
+    });
+    expect(layout.tiles[0]).not.toHaveProperty("tint");
+    expect(layout.tiles[0]).not.toHaveProperty("colorAdjust");
+    expect(layout.tiles[0]).not.toHaveProperty("pattern");
+  });
 });
