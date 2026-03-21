@@ -30,10 +30,10 @@ towncord/
 └── docker-compose.yml
 ```
 
-Initialize submodules after cloning:
+Initialize submodules and install dependencies after cloning:
 
 ```bash
-git submodule update --init --recursive
+npm run bootstrap
 ```
 
 CI note:
