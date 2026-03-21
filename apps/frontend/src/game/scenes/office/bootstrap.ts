@@ -174,7 +174,7 @@ function buildOfficeSceneBootstrap(
     layout: {
       cols: sourceLayout.cols,
       rows: sourceLayout.rows,
-      cellSize: DONARG_TILE_WORLD_SIZE * 3,
+      cellSize: DONARG_TILE_WORLD_SIZE,
       tiles,
       furniture,
       characters,

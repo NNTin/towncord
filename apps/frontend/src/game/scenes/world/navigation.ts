@@ -44,7 +44,7 @@ export type WorldNavigationService =
   CollisionMap;
 
 const DEFAULT_WANDER_RADIUS_CELLS = 5;
-const REACHED_DISTANCE = 8;
+const REACHED_DISTANCE = 2;
 const WANDER_ATTEMPTS = 16;
 
 type WalkabilityOverride = {

@@ -9,7 +9,7 @@ import {
 } from "../layout";
 import type { OfficeSceneLayout } from "../../scenes/office/bootstrap";
 
-const OFFICE_CELL_SIZE = 48; // 3 × 16px — kept here for readability in tests
+const OFFICE_CELL_SIZE = 16; // 1 × 16px — kept here for readability in tests
 
 function makeRegion(
   anchorX16: number,
@@ -41,19 +41,19 @@ describe("officeCellToWorldPixel", () => {
     });
   });
 
-  test("cell (1,0) is exactly one 48px cell to the right of the anchor", () => {
+  test("cell (1,0) is exactly one 16px cell to the right of the anchor", () => {
     const region = makeRegion(20, 20, 5, 5);
     const { worldX } = officeCellToWorldPixel(1, 0, region);
     expect(worldX).toBe(20 * TOWN_BASE_PX + OFFICE_CELL_SIZE);
   });
 
-  test("cell (0,1) is exactly one 48px cell below the anchor", () => {
+  test("cell (0,1) is exactly one 16px cell below the anchor", () => {
     const region = makeRegion(20, 20, 5, 5);
     const { worldY } = officeCellToWorldPixel(0, 1, region);
     expect(worldY).toBe(20 * TOWN_BASE_PX + OFFICE_CELL_SIZE);
   });
 
-  test("adjacent cells are 48px apart", () => {
+  test("adjacent cells are 16px apart", () => {
     const region = makeRegion(0, 0, 10, 10);
     const a = officeCellToWorldPixel(3, 2, region);
     const b = officeCellToWorldPixel(4, 2, region);
@@ -73,11 +73,11 @@ describe("officeCellToWorldPixel", () => {
 });
 
 describe("isInsideOffice", () => {
-  const region = makeRegion(20, 20, 3, 3); // 3×3 cells → 9×9 16px units → 144×144px
+  const region = makeRegion(20, 20, 3, 3); // 3×3 cells → 3×3 16px units → 48×48px
 
   test("center of the office is inside", () => {
     const { worldX, worldY } = officeCellToWorldPixel(1, 1, region);
-    expect(isInsideOffice(worldX + 24, worldY + 24, region)).toBe(true);
+    expect(isInsideOffice(worldX + 8, worldY + 8, region)).toBe(true);
   });
 
   test("top-left corner pixel is inside", () => {
@@ -93,18 +93,18 @@ describe("isInsideOffice", () => {
   });
 
   test("first pixel past the right edge is outside", () => {
-    // Right edge: (20 + 3*3) * 16 = (20 + 9) * 16 = 464
-    const rightEdge = (20 + 9) * TOWN_BASE_PX;
+    // Right edge: (20 + 3*1) * 16 = (20 + 3) * 16 = 368
+    const rightEdge = (20 + 3) * TOWN_BASE_PX;
     expect(isInsideOffice(rightEdge, 20 * TOWN_BASE_PX, region)).toBe(false);
   });
 
   test("first pixel past the bottom edge is outside", () => {
-    const bottomEdge = (20 + 9) * TOWN_BASE_PX;
+    const bottomEdge = (20 + 3) * TOWN_BASE_PX;
     expect(isInsideOffice(20 * TOWN_BASE_PX, bottomEdge, region)).toBe(false);
   });
 
   test("last pixel inside the bottom-right cell is inside", () => {
-    const rightEdge = (20 + 9) * TOWN_BASE_PX;
+    const rightEdge = (20 + 3) * TOWN_BASE_PX;
     expect(isInsideOffice(rightEdge - 1, rightEdge - 1, region)).toBe(true);
   });
 });
@@ -120,7 +120,7 @@ describe("worldToOfficeCell", () => {
   });
 
   test("last pixel of cell (0,0) maps to cell (0,0)", () => {
-    // Cell (0,0) spans [320, 368). Last pixel = 367.
+    // Cell (0,0) spans [320, 336). Last pixel = 335.
     const result = worldToOfficeCell(20 * TOWN_BASE_PX + OFFICE_CELL_SIZE - 1, 20 * TOWN_BASE_PX, region);
     expect(result).toEqual<OfficeCellCoord>({ col: 0, row: 0 });
   });
@@ -135,7 +135,7 @@ describe("worldToOfficeCell", () => {
   });
 
   test("right edge pixel returns null", () => {
-    const rightEdge = (20 + 4 * 3) * TOWN_BASE_PX;
+    const rightEdge = (20 + 4 * 1) * TOWN_BASE_PX;
     expect(worldToOfficeCell(rightEdge, 20 * TOWN_BASE_PX, region)).toBeNull();
   });
 

@@ -75,8 +75,8 @@ type RenderOfficeLayoutOptions = {
   tileDepth?: number;
   /**
    * Additional row offset added to furniture/character depth to place them
-   * correctly relative to world entities. Use Math.round(anchorY16 / 3) when
-   * embedding in WorldScene.
+   * correctly relative to world entities. Use anchorY16 when embedding in
+   * WorldScene (1:1 mapping since office cells are now 16px = 1 base unit).
    * Default: 0.
    */
   depthAnchorRow?: number;
@@ -316,6 +316,9 @@ function renderFurnitureFallback(
   width: number,
   height: number,
 ): void {
+  // TODO(tow-11): Furniture footprint — fallback dimensions are derived from cellSize
+  // proportions. At 16px cells the geometry may need revisiting. Investigate whether
+  // footprint cell counts (item.width / item.height) should change.
   const label = shortenLabel(item.label, Math.max(6, item.width * 6));
 
   if (item.placement === "wall") {
@@ -402,6 +405,10 @@ function renderCharacter(
   const x = actor.col * cellSize;
   const y = actor.row * cellSize;
   const container = scene.add.container(x + worldOffsetX, y + worldOffsetY);
+
+  // TODO(tow-11): Character sizing — proportions below are derived from cellSize (now 16px).
+  // All values will be sub-pixel at 16px cells. Needs a dedicated issue to decide the
+  // target character size and whether characters should span multiple cells.
   const shadow = scene.add.ellipse(
     cellSize / 2,
     cellSize * 0.88,

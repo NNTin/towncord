@@ -51,11 +51,11 @@ import { OfficeEditorSystem } from "./world/officeEditorSystem";
 
 export const WORLD_SCENE_KEY = "world";
 
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 4;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 16;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
-const SELECTED_BADGE_SCALE = 2;
-const SELECTED_BADGE_VERTICAL_OFFSET = 12;
+const SELECTED_BADGE_SCALE = 0.5;
+const SELECTED_BADGE_VERTICAL_OFFSET = 3;
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
 const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;
@@ -351,7 +351,7 @@ export class WorldScene extends Phaser.Scene {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-        depthAnchorRow: Math.round(anchorY16 / 3),
+        depthAnchorRow: anchorY16,
       });
     }
     this.bindSceneEvents();
@@ -447,7 +447,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createOfficeCellHighlight(): void {
-    const cellSize = this.officeRegion?.layout.cellSize ?? 48;
+    const cellSize = this.officeRegion?.layout.cellSize ?? 16;
     const highlight = this.add.rectangle(
       0,
       0,
@@ -636,7 +636,7 @@ export class WorldScene extends Phaser.Scene {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-        depthAnchorRow: Math.round(anchorY16 / 3),
+        depthAnchorRow: anchorY16,
       });
     }
   }
