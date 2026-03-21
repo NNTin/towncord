@@ -1,5 +1,5 @@
 {
   "installCommand": "git config --global url.\"https://${REPO_TOKEN}@github.com/\".insteadOf \"https://github.com/\" && git submodule update --init --recursive && npm install",
-  "buildCommand": "pip install pillow && npm run build:frontend",
+  "buildCommand": "pip install --break-system-packages pillow==10.3.0 && npm run build:frontend",
   "outputDirectory": "apps/frontend/dist"
 }
