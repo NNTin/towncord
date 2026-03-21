@@ -88,6 +88,27 @@ export function resolveOfficeTileColorAdjustPreset(
   return cloneOfficeColorAdjust(OFFICE_TILE_COLOR_ADJUSTS[key]);
 }
 
+export function resolveOfficeFloorAppearance(
+  floorColor: OfficeColorAdjust | null | undefined,
+  tileColor: OfficeTileColor | null | undefined,
+  fallbackTint: number | null = null,
+): { colorAdjust: OfficeColorAdjust; tint: number } {
+  const neutralTint = OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
+
+  if (floorColor) {
+    const colorAdjust = cloneOfficeColorAdjust(floorColor);
+    const tint = resolveOfficeTileTint(colorAdjust, fallbackTint ?? neutralTint) ?? neutralTint;
+    return { colorAdjust, tint };
+  }
+
+  const colorAdjust = resolveOfficeTileColorAdjustPreset(tileColor);
+  const tint = tileColor
+    ? OFFICE_TILE_COLOR_TINTS[tileColor] ?? neutralTint
+    : fallbackTint ?? neutralTint;
+
+  return { colorAdjust, tint };
+}
+
 export function findOfficeTileColorPreset(
   colorAdjust: OfficeColorAdjust | null | undefined,
 ): OfficeTileColor | null {

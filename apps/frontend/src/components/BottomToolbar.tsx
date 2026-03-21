@@ -19,8 +19,7 @@ import {
 import {
   DEFAULT_FLOOR_COLOR_ADJUST,
   cloneOfficeColorAdjust,
-  resolveOfficeTileColorAdjustPreset,
-  resolveOfficeTileTint,
+  resolveOfficeFloorAppearance,
   tintToHexCss,
   type OfficeColorAdjust,
 } from "../game/scenes/office/colors";
@@ -249,7 +248,7 @@ function ColorSlider({
 
 function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): JSX.Element {
   const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"];
-  const tint = resolveOfficeTileTint(colorAdjust, null);
+  const { tint } = resolveOfficeFloorAppearance(colorAdjust, null);
   if (!defaultFrame) {
     return (
       <div
@@ -282,7 +281,7 @@ function FloorPatternPreview({
     return <button type="button" onClick={onClick} style={selected ? btnActive : btnBase}>{patternId}</button>;
   }
 
-  const tint = resolveOfficeTileTint(colorAdjust, null);
+  const { tint } = resolveOfficeFloorAppearance(colorAdjust, null);
   return (
     <button
       type="button"
@@ -369,7 +368,7 @@ function FloorSubPanel({
               cursor: "pointer",
             }}
           >
-            <FloorTilePreview colorAdjust={resolveOfficeTileColorAdjustPreset(color)} />
+            <FloorTilePreview colorAdjust={resolveOfficeFloorAppearance(null, color).colorAdjust} />
           </button>
         ))}
       </div>
