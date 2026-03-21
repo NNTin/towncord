@@ -3,6 +3,7 @@ import {
   createOfficeSceneBootstrap,
   getOfficeSceneBootstrap,
 } from "../bootstrap";
+import { resolveOfficeTileTint } from "../colors";
 
 describe("createOfficeSceneBootstrap", () => {
   test("maps the checked-in Donarg office layout into scene data", () => {
@@ -33,11 +34,63 @@ describe("createOfficeSceneBootstrap", () => {
     expect(
       new Set(layout.characters.map((actor) => `${actor.col},${actor.row}`)).size,
     ).toBe(layout.characters.length);
+
+    const floorTile = layout.tiles.find((tile) => tile.kind === "floor");
+    expect(floorTile?.colorAdjust).toEqual({
+      h: 214,
+      s: 30,
+      b: -100,
+      c: -55,
+    });
+    expect(floorTile?.tint).toBe(resolveOfficeTileTint(floorTile?.colorAdjust ?? null, null));
   });
 
   test("accepts its own bootstrap shape through the registry parser", () => {
     const bootstrap = createOfficeSceneBootstrap();
 
     expect(getOfficeSceneBootstrap(bootstrap)).toEqual(bootstrap);
+  });
+
+  test("accepts expanded tile records with raw floor color metadata", () => {
+    const bootstrap = {
+      layout: {
+        cols: 1,
+        rows: 1,
+        cellSize: 16,
+        tiles: [
+          {
+            kind: "floor",
+            tileId: 0,
+            tint: 0x123456,
+            colorAdjust: { h: 214, s: 30, b: -100, c: -55 },
+            pattern: "environment.floors.pattern-01",
+          },
+        ],
+        furniture: [],
+        characters: [
+          {
+            id: "agent-1",
+            label: "Agent 1",
+            glyph: "A",
+            col: 0,
+            row: 0,
+            color: 0x123456,
+            accentColor: 0xffffff,
+          },
+        ],
+      },
+    };
+
+    const parsed = getOfficeSceneBootstrap(bootstrap);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.layout.tiles[0]).toMatchObject({
+      kind: "floor",
+      tileId: 0,
+      pattern: "environment.floors.pattern-01",
+      colorAdjust: { h: 214, s: 30, b: -100, c: -55 },
+    });
+    expect(parsed?.layout.tiles[0]?.tint).toBe(
+      resolveOfficeTileTint({ h: 214, s: 30, b: -100, c: -55 }, 0x123456),
+    );
   });
 });

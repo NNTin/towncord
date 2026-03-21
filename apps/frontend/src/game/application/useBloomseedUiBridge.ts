@@ -4,6 +4,7 @@ import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
+  OFFICE_FLOOR_PICKED_EVENT,
   OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_DRAG_MIME,
   PLACE_OBJECT_DROP_EVENT,
@@ -14,6 +15,7 @@ import {
   ZOOM_CHANGED_EVENT,
   SET_ZOOM_EVENT,
   type OfficeLayoutChangedPayload,
+  type OfficeFloorPickedPayload,
   type OfficeSetEditorToolPayload,
   type ZoomChangedPayload,
   type PlaceObjectDropPayload,
@@ -83,6 +85,7 @@ function parseRawPlaceDragPayload(rawPayload: string) {
 
 export function useBloomseedUiBridge(options?: {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
+  onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
 }): BloomseedUiBridge {
   const gameRootRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -93,10 +96,15 @@ export function useBloomseedUiBridge(options?: {
   const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
   const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
   const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
+  const floorPickedRef = useRef(options?.onOfficeFloorPicked);
 
   useEffect(() => {
     layoutChangedRef.current = options?.onOfficeLayoutChanged;
   }, [options?.onOfficeLayoutChanged]);
+
+  useEffect(() => {
+    floorPickedRef.current = options?.onOfficeFloorPicked;
+  }, [options?.onOfficeFloorPicked]);
 
   useEffect(() => {
     const container = gameRootRef.current;
@@ -126,17 +134,23 @@ export function useBloomseedUiBridge(options?: {
       layoutChangedRef.current?.(payload.layout);
     }
 
+    function handleOfficeFloorPicked(payload: OfficeFloorPickedPayload): void {
+      floorPickedRef.current?.(payload);
+    }
+
     game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
     game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
     game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
     game.events.on(ZOOM_CHANGED_EVENT, handleZoomChanged);
     game.events.on(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
+    game.events.on(OFFICE_FLOOR_PICKED_EVENT, handleOfficeFloorPicked);
 
     return () => {
       game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
       game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
       game.events.off(ZOOM_CHANGED_EVENT, handleZoomChanged);
       game.events.off(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
+      game.events.off(OFFICE_FLOOR_PICKED_EVENT, handleOfficeFloorPicked);
       game.destroy(true);
       gameRef.current = null;
       setCatalog(null);

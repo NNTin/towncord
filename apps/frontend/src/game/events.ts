@@ -1,5 +1,7 @@
 import type { EntityId } from "./domain/model";
+import type { OfficeTileColor } from "./office/model";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
+import type { OfficeColorAdjust } from "./scenes/office/colors";
 
 // Drag-and-drop placement: React → Phaser
 export const PLACE_DRAG_MIME = "application/json";
@@ -15,9 +17,11 @@ export const ZOOM_CHANGED_EVENT = "zoomChanged";
 export const SET_ZOOM_EVENT = "setZoom";
 
 export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
+export const OFFICE_FLOOR_PICKED_EVENT = "officeFloorPicked";
 export const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 
 export type OfficeEditorToolId = "floor" | "wall" | "erase" | "furniture";
+export type OfficeFloorMode = "paint" | "pick";
 
 export type OfficeLayoutChangedPayload = {
   layout: import("./scenes/office/bootstrap").OfficeSceneLayout;
@@ -25,9 +29,16 @@ export type OfficeLayoutChangedPayload = {
 
 export type OfficeSetEditorToolPayload = {
   tool: OfficeEditorToolId | null;
-  tileColor: string | null;
+  floorMode: OfficeFloorMode | null;
+  tileColor: OfficeTileColor | null;
+  floorColor: OfficeColorAdjust | null;
   floorPattern: string | null;
   furnitureId: string | null;
+};
+
+export type OfficeFloorPickedPayload = {
+  floorColor: OfficeColorAdjust | null;
+  floorPattern: string | null;
 };
 
 export type ZoomChangedPayload = { zoom: number; minZoom: number; maxZoom: number };

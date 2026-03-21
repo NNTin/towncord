@@ -1,6 +1,14 @@
+import type { OfficeTileColor } from "../../office/model";
 import type { OfficeCellCoord } from "../../town/layout";
 import type { OfficeSceneFurniture, OfficeSceneFurnitureCategory, OfficeSceneLayout } from "../office/bootstrap";
-import { OFFICE_TILE_COLOR_TINTS } from "../office/colors";
+import {
+  cloneOfficeColorAdjust,
+  officeColorAdjustEquals,
+  OFFICE_TILE_COLOR_TINTS,
+  resolveOfficeTileColorAdjustPreset,
+  resolveOfficeTileTint,
+  type OfficeColorAdjust,
+} from "../office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../../office/officeFurniturePalette";
 import type { OfficeEditorToolId } from "../../events";
 
@@ -12,7 +20,9 @@ type OfficeEditorCommand = {
   tool: OfficeEditorToolId;
   cell: OfficeCellCoord;
   /** Active tile-color key (only used by the "floor" tool). */
-  tileColor: string;
+  tileColor: OfficeTileColor | null;
+  /** Raw floor color-adjust data (only used by the "floor" tool when provided). */
+  floorColor: OfficeColorAdjust | null;
   /** Active floor pattern ID (only used by the "floor" tool), e.g. "environment.floors.pattern-02". */
   floorPattern: string | null;
   /** Active furniture asset ID (only used by the "furniture" tool). */
@@ -42,7 +52,7 @@ export class OfficeEditorSystem {
 
     switch (tool) {
       case "floor":
-        return this.applyFloor(layout, idx, command.tileColor, command.floorPattern);
+        return this.applyFloor(layout, idx, command.tileColor, command.floorColor, command.floorPattern);
 
       case "wall":
         return this.applyWall(layout, idx);
@@ -61,15 +71,37 @@ export class OfficeEditorSystem {
   // Tool handlers
   // -------------------------------------------------------------------------
 
-  private applyFloor(layout: OfficeSceneLayout, idx: number, tileColor: string, floorPattern: string | null): boolean {
+  private applyFloor(
+    layout: OfficeSceneLayout,
+    idx: number,
+    tileColor: OfficeTileColor | null,
+    floorColor: OfficeColorAdjust | null,
+    floorPattern: string | null,
+  ): boolean {
     const tile = layout.tiles[idx];
     if (!tile) return false;
-    const tint = OFFICE_TILE_COLOR_TINTS[tileColor] ?? OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
+    const neutralTint = OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
+    const colorAdjust = floorColor
+      ? cloneOfficeColorAdjust(floorColor)
+      : resolveOfficeTileColorAdjustPreset(tileColor);
+    const tint = floorColor
+      ? resolveOfficeTileTint(colorAdjust, neutralTint) ?? neutralTint
+      : tileColor
+        ? OFFICE_TILE_COLOR_TINTS[tileColor] ?? neutralTint
+        : neutralTint;
     const pattern = floorPattern ?? "environment.floors.pattern-01";
-    if (tile.kind === "floor" && tile.tint === tint && tile.pattern === pattern) return false;
+    if (
+      tile.kind === "floor" &&
+      tile.tint === tint &&
+      tile.pattern === pattern &&
+      officeColorAdjustEquals(tile.colorAdjust ?? null, colorAdjust)
+    ) {
+      return false;
+    }
     tile.kind = "floor";
     tile.tint = tint;
     tile.pattern = pattern;
+    tile.colorAdjust = colorAdjust;
     return true;
   }
 
@@ -79,6 +111,7 @@ export class OfficeEditorSystem {
     if (tile.kind === "wall") return false;
     tile.kind = "wall";
     delete tile.tint;
+    delete tile.colorAdjust;
     return true;
   }
 
@@ -89,7 +122,11 @@ export class OfficeEditorSystem {
              cell.row >= f.row && cell.row < f.row + f.height,
     );
     if ((tile?.kind === "void" || !tile) && furnitureAtCell.length === 0) return false;
-    if (tile) { tile.kind = "void"; delete tile.tint; }
+    if (tile) {
+      tile.kind = "void";
+      delete tile.tint;
+      delete tile.colorAdjust;
+    }
     if (furnitureAtCell.length > 0) {
       const removeIds = new Set(furnitureAtCell.map((f) => f.id));
       layout.furniture = layout.furniture.filter((f) => !removeIds.has(f.id));

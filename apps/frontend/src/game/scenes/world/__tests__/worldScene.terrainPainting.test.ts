@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { WorldScene } from "../../WorldScene";
 import { TerrainPaintSession } from "../terrainPaintSession";
+import { OFFICE_FLOOR_PICKED_EVENT } from "../../../events";
 
 vi.mock("phaser", () => {
   class Scene {
@@ -116,6 +117,58 @@ function createOccupiedSceneHarness() {
   return createSceneHarness({
     entityPositions: OCCUPIED_ENTITY_POSITIONS,
   });
+}
+
+function createOfficePickSceneHarness(
+  tile: Record<string, unknown> = {
+    kind: "floor",
+    tileId: 0,
+    pattern: "environment.floors.pattern-03",
+    colorAdjust: { h: 214, s: 30, b: -100, c: -55 },
+    tint: 0x123456,
+  },
+) {
+  const scene = new WorldScene() as unknown as Record<string, unknown>;
+  const emit = vi.fn();
+
+  scene.game = {
+    events: {
+      emit,
+    },
+  };
+  scene.cameras = {
+    main: {
+      getWorldPoint: vi.fn(() => ({ x: 0, y: 0 })),
+    },
+  };
+  scene.input = {
+    activePointer: {
+      withinGame: true,
+      x: 12,
+      y: 34,
+    },
+  };
+  scene.officeRegion = {
+    anchorX16: 0,
+    anchorY16: 0,
+    layout: {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [tile],
+      furniture: [],
+      characters: [],
+    },
+  };
+  scene.activeOfficeTool = "floor";
+  scene.activeFloorMode = "pick";
+  scene.activeFloorColor = { h: 35, s: 30, b: 15, c: 0 };
+  scene.activeFloorPattern = "environment.floors.pattern-01";
+  scene.activeFurnitureId = null;
+  scene.isOfficePainting = true;
+  scene.officeDirty = false;
+
+  return { emit, scene };
 }
 
 function paintTerrainAtPointer(scene: Record<string, unknown>): void {
@@ -409,5 +462,53 @@ describe("WorldScene terrain painting", () => {
 
     expect(terrainBrushPreview.setVisible).toHaveBeenCalledWith(false);
     expect(syncTerrainBrushPreviewAtScreen).not.toHaveBeenCalled();
+  });
+
+  test("pick mode copies floor tile settings and switches back to paint mode", () => {
+    const { emit, scene } = createOfficePickSceneHarness();
+
+    (
+      scene.onPointerDown as (pointer: {
+        button: number;
+        x: number;
+        y: number;
+      }) => void
+    )({
+      button: 0,
+      x: 12,
+      y: 34,
+    });
+
+    expect(emit).toHaveBeenCalledWith(OFFICE_FLOOR_PICKED_EVENT, {
+      floorColor: { h: 214, s: 30, b: -100, c: -55 },
+      floorPattern: "environment.floors.pattern-03",
+    });
+    expect(scene.activeFloorMode).toBe("paint");
+    expect(scene.isOfficePainting).toBe(false);
+    expect(scene.officeDirty).toBe(false);
+  });
+
+  test("pick mode clears painting state when a non-floor tile consumes the click", () => {
+    const { emit, scene } = createOfficePickSceneHarness({
+      kind: "wall",
+      tileId: 8,
+    });
+
+    (
+      scene.onPointerDown as (pointer: {
+        button: number;
+        x: number;
+        y: number;
+      }) => void
+    )({
+      button: 0,
+      x: 12,
+      y: 34,
+    });
+
+    expect(emit).not.toHaveBeenCalled();
+    expect(scene.activeFloorMode).toBe("pick");
+    expect(scene.isOfficePainting).toBe(false);
+    expect(scene.officeDirty).toBe(false);
   });
 });

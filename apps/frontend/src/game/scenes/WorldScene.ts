@@ -9,13 +9,16 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
 import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
+  OFFICE_FLOOR_PICKED_EVENT,
   OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_OBJECT_DROP_EVENT,
   PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
   RUNTIME_PERF_EVENT,
+  type OfficeFloorMode,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
+  type OfficeFloorPickedPayload,
   type OfficeEditorToolId,
   type OfficeLayoutChangedPayload,
   type OfficeSetEditorToolPayload,
@@ -29,6 +32,7 @@ import {
   SET_ZOOM_EVENT,
   type SetZoomPayload,
 } from "../events";
+import type { OfficeTileColor } from "../office/model";
 import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
@@ -48,6 +52,7 @@ import type { MovementInput } from "./world/movementSystem";
 import type { WorldEntity, WorldSelectableActor } from "./world/types";
 import { EntitySystem } from "./world/entitySystem";
 import { OfficeEditorSystem } from "./world/officeEditorSystem";
+import type { OfficeColorAdjust } from "./office/colors";
 
 export const WORLD_SCENE_KEY = "world";
 
@@ -178,16 +183,32 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.activeOfficeTool = value;
   }
 
-  private get activeTileColor(): string {
+  private get activeTileColor(): OfficeTileColor | null {
     return this.runtimeState.activeTileColor;
   }
 
-  private set activeTileColor(value: string) {
+  private set activeTileColor(value: OfficeTileColor | null) {
     this.runtimeState.activeTileColor = value;
+  }
+
+  private get activeFloorColor(): OfficeColorAdjust | null {
+    return this.runtimeState.activeFloorColor;
+  }
+
+  private set activeFloorColor(value: OfficeColorAdjust | null) {
+    this.runtimeState.activeFloorColor = value;
   }
 
   private get activeFloorPattern(): string | null {
     return this.runtimeState.activeFloorPattern;
+  }
+
+  private get activeFloorMode(): OfficeFloorMode {
+    return this.runtimeState.activeFloorMode;
+  }
+
+  private set activeFloorMode(value: OfficeFloorMode) {
+    this.runtimeState.activeFloorMode = value;
   }
 
   private set activeFloorPattern(value: string | null) {
@@ -579,10 +600,43 @@ export class WorldScene extends Phaser.Scene {
 
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.activeOfficeTool = payload.tool;
-    this.activeTileColor = payload.tileColor ?? "neutral";
+    this.activeTileColor = payload.tileColor ?? null;
+    this.activeFloorMode = payload.floorMode ?? "paint";
+    this.activeFloorColor = payload.floorColor ?? null;
     this.activeFloorPattern = payload.floorPattern ?? null;
     this.activeFurnitureId = payload.furnitureId;
     this.syncOfficeCellHighlight(this.input.activePointer);
+  }
+
+  private emitPickedOfficeFloor(payload: OfficeFloorPickedPayload): void {
+    this.game.events.emit(OFFICE_FLOOR_PICKED_EVENT, payload);
+  }
+
+  private pickOfficeFloor(worldX: number, worldY: number): boolean {
+    const region = this.officeRegion;
+    if (!region || this.activeOfficeTool !== "floor" || this.activeFloorMode !== "pick") {
+      return false;
+    }
+
+    const cell = worldToOfficeCell(worldX, worldY, region);
+    if (!cell) {
+      return false;
+    }
+
+    const tile = region.layout.tiles[cell.row * region.layout.cols + cell.col];
+    if (!tile || tile.kind !== "floor") {
+      this.isOfficePainting = false;
+      return true;
+    }
+
+    this.emitPickedOfficeFloor({
+      floorColor: tile.colorAdjust ? { ...tile.colorAdjust } : null,
+      floorPattern: tile.pattern ?? "environment.floors.pattern-01",
+    });
+
+    this.isOfficePainting = false;
+    this.activeFloorMode = "paint";
+    return true;
   }
 
   /**
@@ -604,6 +658,7 @@ export class WorldScene extends Phaser.Scene {
       tool,
       cell,
       tileColor: this.activeTileColor,
+      floorColor: this.activeFloorColor,
       floorPattern: this.activeFloorPattern,
       furnitureId: this.activeFurnitureId,
     });
@@ -652,6 +707,9 @@ export class WorldScene extends Phaser.Scene {
     } else if (pointer.button === 0) {
       if (this.activeOfficeTool) {
         const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+        if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
+          return;
+        }
         if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
           this.isOfficePainting = true;
           return;

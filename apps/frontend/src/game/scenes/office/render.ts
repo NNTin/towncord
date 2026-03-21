@@ -5,6 +5,7 @@ import type {
   OfficeSceneLayout,
   OfficeSceneTile,
 } from "./bootstrap";
+import { resolveOfficeTileTint } from "./colors";
 import { FURNITURE_ALL_ITEMS, type FurniturePaletteItem } from "../../office/officeFurniturePalette";
 
 const GRID_LINE_COLOR = 0x0f172a;
@@ -231,8 +232,11 @@ function buildTileObjects(
         const frameKey = tile.pattern ? `${tile.pattern}#0` : FLOOR_PATTERN_FRAME;
         const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, frameKey);
         img.setDisplaySize(cellSize, cellSize);
-        if (typeof tile.tint === "number") {
-          img.setTint(tile.tint);
+        const tint = typeof tile.tint === "number"
+          ? tile.tint
+          : resolveOfficeTileTint(tile.colorAdjust ?? null, null);
+        if (typeof tint === "number") {
+          img.setTint(tint);
         }
         container.add(img);
       } else if (tile.kind === "wall") {
