@@ -5,10 +5,44 @@ import react from "@vitejs/plugin-react";
 import { isOfficeLayoutDocument, type OfficeLayoutDocument } from "./src/app/officeLayoutDocument";
 
 const OFFICE_LAYOUT_ROUTE = "/__office-layout";
+const PUBLIC_ASSETS_JSON_PREFIX = "public-assets-json:";
 const OFFICE_LAYOUT_PATH = path.resolve(
   __dirname,
   "../../packages/donarg-office-assets/assets/default-layout.json",
 );
+const PUBLIC_OFFICE_LAYOUT_PATH = path.resolve(
+  __dirname,
+  "./public/assets/donarg-office/default-layout.json",
+);
+
+function publicJsonImportPlugin() {
+  return {
+    name: "towncord-public-json-import",
+    resolveId(source: string) {
+      if (!source.startsWith(PUBLIC_ASSETS_JSON_PREFIX)) {
+        return null;
+      }
+
+      const relativeAssetPath = source.slice(PUBLIC_ASSETS_JSON_PREFIX.length);
+      return `\0${PUBLIC_ASSETS_JSON_PREFIX}${Buffer.from(
+        path.resolve(__dirname, `./public/assets/${relativeAssetPath}`),
+      ).toString("base64url")}`;
+    },
+    async load(id: string) {
+      if (!id.startsWith(`\0${PUBLIC_ASSETS_JSON_PREFIX}`)) {
+        return null;
+      }
+
+      const filePath = Buffer.from(
+        id.slice(`\0${PUBLIC_ASSETS_JSON_PREFIX}`.length),
+        "base64url",
+      ).toString("utf8");
+      const raw = await fs.readFile(filePath, "utf8");
+      const parsed = JSON.parse(raw) as unknown;
+      return `export default ${JSON.stringify(parsed)};`;
+    },
+  };
+}
 
 async function readOfficeLayout(): Promise<OfficeLayoutDocument> {
   const raw = await fs.readFile(OFFICE_LAYOUT_PATH, "utf8");
@@ -26,11 +60,32 @@ async function writeOfficeLayout(layout: OfficeLayoutDocument): Promise<void> {
     throw new Error("Refusing to persist an invalid office layout document.");
   }
 
+  const payload = `${JSON.stringify(layout, null, 2)}\n`;
   await fs.writeFile(
     OFFICE_LAYOUT_PATH,
-    `${JSON.stringify(layout, null, 2)}\n`,
+    payload,
     "utf8",
   );
+  await writePublicOfficeLayout(layout);
+}
+
+async function writePublicOfficeLayout(layout: OfficeLayoutDocument): Promise<void> {
+  if (!isOfficeLayoutDocument(layout)) {
+    throw new Error("Refusing to persist an invalid office layout document.");
+  }
+
+  const payload = `${JSON.stringify(layout, null, 2)}\n`;
+  await fs.mkdir(path.dirname(PUBLIC_OFFICE_LAYOUT_PATH), { recursive: true });
+  await fs.writeFile(
+    PUBLIC_OFFICE_LAYOUT_PATH,
+    payload,
+    "utf8",
+  );
+}
+
+async function syncPublicOfficeLayout(): Promise<void> {
+  const layout = await readOfficeLayout();
+  await writePublicOfficeLayout(layout);
 }
 
 async function readBody(req: NodeJS.ReadableStream): Promise<string> {
@@ -47,6 +102,11 @@ function officeLayoutDevPlugin() {
   return {
     name: "towncord-office-layout-dev-api",
     configureServer(server: import("vite").ViteDevServer) {
+      void syncPublicOfficeLayout().catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : "Unknown office layout sync error.";
+        server.config.logger.error(message);
+      });
+
       server.middlewares.use(OFFICE_LAYOUT_ROUTE, async (req, res) => {
         const sendJson = (statusCode: number, payload: Record<string, unknown>) => {
           res.statusCode = statusCode;
@@ -101,6 +161,6 @@ function officeLayoutDevPlugin() {
 }
 
 export default defineConfig(({ command }) => ({
-  plugins: [react(), command === "serve" ? officeLayoutDevPlugin() : null].filter(Boolean),
+  plugins: [publicJsonImportPlugin(), react(), command === "serve" ? officeLayoutDevPlugin() : null].filter(Boolean),
   base: process.env.BASE_PATH ?? "/",
 }));

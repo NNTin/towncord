@@ -1,5 +1,35 @@
-import furnitureCatalogData from "../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
-import atlasData from "../../../../../packages/donarg-office-assets/assets/atlas.json";
+import furnitureCatalogDataJson from "public-assets-json:donarg-office/furniture-catalog.json";
+import atlasDataJson from "public-assets-json:donarg-office/atlas.json";
+
+type DonargOfficeAtlasData = {
+  meta: {
+    size: { w: number; h: number };
+  };
+  frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+};
+
+type DonargFurnitureAssetSource = {
+  id: string;
+  file: string;
+  label: string;
+  category: string;
+  width?: number;
+  height?: number;
+  footprintW?: number;
+  footprintH?: number;
+  canPlaceOnWalls?: boolean;
+  canPlaceOnSurfaces?: boolean;
+  groupId?: string;
+  orientation?: string;
+  state?: string;
+};
+
+type DonargFurnitureCatalogSource = {
+  assets: DonargFurnitureAssetSource[];
+};
+
+const atlasData = atlasDataJson as DonargOfficeAtlasData;
+const furnitureCatalogData = furnitureCatalogDataJson as DonargFurnitureCatalogSource;
 
 export type FurniturePalettePlacement = "floor" | "wall" | "surface";
 
@@ -84,7 +114,7 @@ function resolveColors(asset: RawAsset): { color: number; accentColor: number } 
   }
 }
 
-type RawAsset = (typeof furnitureCatalogData.assets)[number];
+type RawAsset = DonargFurnitureAssetSource;
 
 function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
   const frames = atlasData.frames as Record<string, { frame: { x: number; y: number; w: number; h: number } }>;

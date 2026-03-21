@@ -1,5 +1,5 @@
-import officeLayoutData from "../../../../../../packages/donarg-office-assets/assets/default-layout.json";
-import furnitureCatalogData from "../../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
+import officeLayoutDataJson from "public-assets-json:donarg-office/default-layout.json";
+import furnitureCatalogDataJson from "public-assets-json:donarg-office/furniture-catalog.json";
 import { fallbackFootprintFromPixels } from "../../office/officeFurniturePalette";
 import {
   cloneOfficeColorAdjust,
@@ -134,8 +134,8 @@ type MappedFurnitureEntry = OfficeSceneFurniture & {
 };
 
 const OFFICE_SCENE_BOOTSTRAP = buildOfficeSceneBootstrap(
-  officeLayoutData as DonargOfficeLayoutSource,
-  furnitureCatalogData as DonargFurnitureCatalogSource,
+  officeLayoutDataJson as DonargOfficeLayoutSource,
+  furnitureCatalogDataJson as DonargFurnitureCatalogSource,
 );
 
 export function createOfficeSceneBootstrap(): OfficeSceneBootstrap {
