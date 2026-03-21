@@ -228,7 +228,8 @@ function buildTileObjects(
       }
 
       if (tile.kind === "floor") {
-        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, FLOOR_PATTERN_FRAME);
+        const frameKey = tile.pattern ? `${tile.pattern}#0` : FLOOR_PATTERN_FRAME;
+        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, frameKey);
         img.setDisplaySize(cellSize, cellSize);
         if (typeof tile.tint === "number") {
           img.setTint(tile.tint);

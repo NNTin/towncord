@@ -49,6 +49,7 @@ export class WorldSceneRuntime {
   public officeRegion: TownOfficeRegion | null = null;
   public activeOfficeTool: OfficeEditorToolId | null = null;
   public activeTileColor = "neutral";
+  public activeFloorPattern: string | null = null;
   public activeFurnitureId: string | null = null;
   public isOfficePainting = false;
   public officeDirty = false;
@@ -83,6 +84,7 @@ export class WorldSceneRuntime {
     this.officeRegion = null;
     this.activeOfficeTool = null;
     this.activeTileColor = "neutral";
+    this.activeFloorPattern = null;
     this.activeFurnitureId = null;
     this.isOfficePainting = false;
     this.officeDirty = false;
