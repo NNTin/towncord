@@ -38,9 +38,10 @@ function App(): JSX.Element {
     emitOfficeEditorTool({
       tool: activeTool,
       tileColor: activeTileColor,
+      floorPattern: activeFloorPattern,
       furnitureId: activeFurnitureId,
     });
-  }, [activeTool, activeTileColor, activeFurnitureId, emitOfficeEditorTool]);
+  }, [activeTool, activeTileColor, activeFloorPattern, activeFurnitureId, emitOfficeEditorTool]);
 
   return (
     <main className="app">

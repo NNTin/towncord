@@ -66,6 +66,8 @@ export type OfficeSceneTile = {
   kind: OfficeSceneTileKind;
   tileId: number;
   tint?: number;
+  /** Atlas frame ID prefix for the floor pattern, e.g. "environment.floors.pattern-02". Defaults to pattern-01 when absent. */
+  pattern?: string;
 };
 
 export type OfficeSceneFurnitureCategory =
@@ -593,7 +595,8 @@ function isTileRecord(value: unknown): value is OfficeSceneTile {
     (value.kind === "void" || value.kind === "floor" || value.kind === "wall") &&
     "tileId" in value &&
     Number.isFinite((value as OfficeSceneTile).tileId) &&
-    (!("tint" in value) || Number.isFinite((value as OfficeSceneTile).tint))
+    (!("tint" in value) || Number.isFinite((value as OfficeSceneTile).tint)) &&
+    (!("pattern" in value) || typeof (value as OfficeSceneTile).pattern === "string")
   );
 }
 

@@ -186,6 +186,14 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.activeTileColor = value;
   }
 
+  private get activeFloorPattern(): string | null {
+    return this.runtimeState.activeFloorPattern;
+  }
+
+  private set activeFloorPattern(value: string | null) {
+    this.runtimeState.activeFloorPattern = value;
+  }
+
   private get activeFurnitureId(): string | null {
     return this.runtimeState.activeFurnitureId;
   }
@@ -572,6 +580,7 @@ export class WorldScene extends Phaser.Scene {
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.activeOfficeTool = payload.tool;
     this.activeTileColor = payload.tileColor ?? "neutral";
+    this.activeFloorPattern = payload.floorPattern ?? null;
     this.activeFurnitureId = payload.furnitureId;
     this.syncOfficeCellHighlight(this.input.activePointer);
   }
@@ -595,6 +604,7 @@ export class WorldScene extends Phaser.Scene {
       tool,
       cell,
       tileColor: this.activeTileColor,
+      floorPattern: this.activeFloorPattern,
       furnitureId: this.activeFurnitureId,
     });
 

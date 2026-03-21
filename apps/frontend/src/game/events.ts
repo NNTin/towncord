@@ -26,6 +26,7 @@ export type OfficeLayoutChangedPayload = {
 export type OfficeSetEditorToolPayload = {
   tool: OfficeEditorToolId | null;
   tileColor: string | null;
+  floorPattern: string | null;
   furnitureId: string | null;
 };
 
