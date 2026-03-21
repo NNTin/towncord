@@ -5,9 +5,40 @@ import { SidebarAccordion } from "./components/SidebarAccordion";
 import { ZoomControls } from "./components/ZoomControls";
 import { useOfficeLayoutEditor } from "./app/useOfficeLayoutEditor";
 import { useBloomseedUiBridge } from "./game/application/useBloomseedUiBridge";
+import type { OfficeFloorMode } from "./game/events";
+import type { OfficeTileColor } from "./game/office/model";
+import { FLOOR_PATTERN_ITEMS } from "./game/office/officeTilePalette";
+import {
+  DEFAULT_FLOOR_COLOR_ADJUST,
+  cloneOfficeColorAdjust,
+  findOfficeTileColorPreset,
+  resolveOfficeTileColorAdjustPreset,
+  type OfficeColorAdjust,
+} from "./game/scenes/office/colors";
+
+const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
 
 function App(): JSX.Element {
   const officeEditor = useOfficeLayoutEditor();
+
+  // isLayoutPaintMode controls the paint toolbar; the JSON drawer is a
+  // separate toggle so they don't force each other open.
+  const [isLayoutPaintMode, setIsLayoutPaintMode] = useState(false);
+  const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
+  const [activeFloorMode, setActiveFloorMode] = useState<OfficeFloorMode>("paint");
+  const [activeTileColor, setActiveTileColor] = useState<OfficeTileColor | null>(null);
+  const [activeFloorColor, setActiveFloorColor] = useState<OfficeColorAdjust>(
+    () => ({ ...DEFAULT_FLOOR_COLOR_ADJUST }),
+  );
+  const [activeFloorPattern, setActiveFloorPattern] = useState<string | null>(DEFAULT_FLOOR_PATTERN);
+  const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
+
+  function applyFloorColor(nextColor: OfficeColorAdjust): void {
+    const cloned = cloneOfficeColorAdjust(nextColor);
+    setActiveFloorColor(cloned);
+    setActiveTileColor(findOfficeTileColorPreset(cloned));
+  }
+
   const {
     gameRootRef,
     onGameRootDragOver,
@@ -15,15 +46,15 @@ function App(): JSX.Element {
     sidebarProps,
     zoomProps,
     emitOfficeEditorTool,
-  } = useBloomseedUiBridge({ onOfficeLayoutChanged: officeEditor.syncFromPhaser });
-
-  // isLayoutPaintMode controls the paint toolbar; the JSON drawer is a
-  // separate toggle so they don't force each other open.
-  const [isLayoutPaintMode, setIsLayoutPaintMode] = useState(false);
-  const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
-  const [activeTileColor, setActiveTileColor] = useState<import("./game/office/model").OfficeTileColor | null>(null);
-  const [activeFloorPattern, setActiveFloorPattern] = useState<string | null>(null);
-  const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
+  } = useBloomseedUiBridge({
+    onOfficeLayoutChanged: officeEditor.syncFromPhaser,
+    onOfficeFloorPicked: ({ floorColor, floorPattern }) => {
+      setActiveTool("floor");
+      setActiveFloorMode("paint");
+      setActiveFloorPattern(floorPattern);
+      applyFloorColor(floorColor ?? DEFAULT_FLOOR_COLOR_ADJUST);
+    },
+  });
 
   // Clear active tool when layout mode is closed so Phaser doesn't retain a
   // stale tool between layout mode sessions.
@@ -33,15 +64,45 @@ function App(): JSX.Element {
     }
   }, [isLayoutPaintMode]);
 
+  useEffect(() => {
+    if (activeTool !== "floor") {
+      setActiveFloorMode("paint");
+    }
+  }, [activeTool]);
+
   // Sync tool state to the Phaser scene whenever it changes
   useEffect(() => {
     emitOfficeEditorTool({
       tool: activeTool,
-      tileColor: activeTileColor,
-      floorPattern: activeFloorPattern,
+      floorMode: activeTool === "floor" ? activeFloorMode : null,
+      tileColor: activeTool === "floor" ? activeTileColor : null,
+      floorColor: activeTool === "floor" ? activeFloorColor : null,
+      floorPattern: activeTool === "floor" ? activeFloorPattern : null,
       furnitureId: activeFurnitureId,
     });
-  }, [activeTool, activeTileColor, activeFloorPattern, activeFurnitureId, emitOfficeEditorTool]);
+  }, [
+    activeTool,
+    activeFloorMode,
+    activeTileColor,
+    activeFloorColor,
+    activeFloorPattern,
+    activeFurnitureId,
+    emitOfficeEditorTool,
+  ]);
+
+  function handleSelectTileColor(color: OfficeTileColor): void {
+    setActiveTileColor(color);
+    applyFloorColor(resolveOfficeTileColorAdjustPreset(color));
+  }
+
+  function handleSelectFloorColor(color: OfficeColorAdjust): void {
+    applyFloorColor(color);
+  }
+
+  function handleSelectFloorMode(mode: OfficeFloorMode): void {
+    setActiveFloorMode(mode);
+    setActiveTool("floor");
+  }
 
   return (
     <main className="app">
@@ -74,8 +135,12 @@ function App(): JSX.Element {
         onToggleJsonEditor={officeEditor.toggleOpen}
         activeTool={activeTool}
         onSelectTool={setActiveTool}
+        activeFloorMode={activeFloorMode}
+        onSelectFloorMode={handleSelectFloorMode}
         activeTileColor={activeTileColor}
-        onSelectTileColor={setActiveTileColor}
+        onSelectTileColor={handleSelectTileColor}
+        activeFloorColor={activeFloorColor}
+        onSelectFloorColor={handleSelectFloorColor}
         activeFloorPattern={activeFloorPattern}
         onSelectFloorPattern={setActiveFloorPattern}
         activeFurnitureId={activeFurnitureId}

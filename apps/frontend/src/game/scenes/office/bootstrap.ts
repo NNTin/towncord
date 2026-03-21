@@ -1,6 +1,12 @@
 import officeLayoutData from "../../../../../../packages/donarg-office-assets/assets/default-layout.json";
 import furnitureCatalogData from "../../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
 import { fallbackFootprintFromPixels } from "../../office/officeFurniturePalette";
+import {
+  cloneOfficeColorAdjust,
+  isOfficeColorAdjust,
+  resolveOfficeTileTint,
+  type OfficeColorAdjust,
+} from "./colors";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 
@@ -23,6 +29,7 @@ type DonargLayoutColor = {
   s: number;
   b: number;
   c: number;
+  colorize?: boolean;
 };
 
 type DonargLayoutPlacement = {
@@ -36,7 +43,7 @@ type DonargOfficeLayoutSource = {
   version: number;
   cols: number;
   rows: number;
-  tiles: number[];
+  tiles: Array<number | OfficeSceneTile>;
   tileColors?: Array<DonargLayoutColor | null>;
   furniture: DonargLayoutPlacement[];
 };
@@ -66,6 +73,7 @@ export type OfficeSceneTile = {
   kind: OfficeSceneTileKind;
   tileId: number;
   tint?: number;
+  colorAdjust?: OfficeColorAdjust | null;
   /** Atlas frame ID prefix for the floor pattern, e.g. "environment.floors.pattern-02". Defaults to pattern-01 when absent. */
   pattern?: string;
 };
@@ -139,15 +147,9 @@ function buildOfficeSceneBootstrap(
   sourceCatalog: DonargFurnitureCatalogSource,
 ): OfficeSceneBootstrap {
   const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
-
-  const tilesRaw = sourceLayout.tiles as unknown[];
-  const tiles: OfficeSceneTile[] = tilesRaw.length > 0 && isTileRecord(tilesRaw[0])
-    ? tilesRaw.filter(isTileRecord)
-    : (sourceLayout.tiles as number[]).map((tileId, index) => {
-        const kind = toTileKind(tileId);
-        const tint = resolveSourceTileTint(tileId, sourceLayout.tileColors?.[index] ?? null);
-        return typeof tint === "number" ? { kind, tileId, tint } : { kind, tileId };
-      });
+  const tiles: OfficeSceneTile[] = sourceLayout.tiles.map((tile, index) =>
+    normalizeOfficeSceneTile(tile, index, sourceLayout),
+  );
 
   const furnitureRaw = (sourceLayout.furniture as unknown[]);
   const furniture: MappedFurnitureEntry[] = furnitureRaw.length > 0 && isFurnitureRecord(furnitureRaw[0])
@@ -341,7 +343,9 @@ function createDerivedCharacters(
   layout: DonargOfficeLayoutSource,
   furniture: MappedFurnitureEntry[],
 ): OfficeSceneCharacter[] {
-  const tileKindByIndex = layout.tiles.map(toTileKind);
+  const tileKindByIndex = layout.tiles.map((tile) =>
+    typeof tile === "number" ? toTileKind(tile) : tile.kind,
+  );
   const seatCandidates = furniture.filter(isSeatFurniture);
   const workstationCandidates = furniture.filter(isWorkstationFurniture);
   const occupiedSeats = new Set<string>();
@@ -505,25 +509,6 @@ function toTileKind(tileId: number): OfficeSceneTileKind {
   return "void";
 }
 
-function resolveSourceTileTint(
-  tileId: number,
-  sourceColor: DonargLayoutColor | null,
-): number | null {
-  const fallback = fallbackTileTint(tileId);
-  if (!sourceColor) {
-    return fallback;
-  }
-
-  const hue = ((sourceColor.h % 360) + 360) % 360 / 360;
-  const saturation = clamp01(sourceColor.s / 100);
-  const brightness = clamp01((sourceColor.b + 100) / 200);
-  const contrast = sourceColor.c / 100;
-  const lightness = clamp01(0.16 + brightness * 0.42 + contrast * 0.05);
-  const color = hslToHex(hue, saturation, lightness);
-
-  return color ?? fallback;
-}
-
 function fallbackTileTint(tileId: number): number | null {
   switch (tileId) {
     case 0:
@@ -541,52 +526,6 @@ function fallbackTileTint(tileId: number): number | null {
   }
 }
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
-}
-
-function hslToHex(hue: number, saturation: number, lightness: number): number {
-  if (saturation === 0) {
-    const channel = Math.round(lightness * 255);
-    return (channel << 16) | (channel << 8) | channel;
-  }
-
-  const q =
-    lightness < 0.5
-      ? lightness * (1 + saturation)
-      : lightness + saturation - lightness * saturation;
-  const p = 2 * lightness - q;
-  const red = hueToRgb(p, q, hue + 1 / 3);
-  const green = hueToRgb(p, q, hue);
-  const blue = hueToRgb(p, q, hue - 1 / 3);
-
-  return (
-    (Math.round(red * 255) << 16) |
-    (Math.round(green * 255) << 8) |
-    Math.round(blue * 255)
-  );
-}
-
-function hueToRgb(p: number, q: number, value: number): number {
-  let channel = value;
-  if (channel < 0) {
-    channel += 1;
-  }
-  if (channel > 1) {
-    channel -= 1;
-  }
-  if (channel < 1 / 6) {
-    return p + (q - p) * 6 * channel;
-  }
-  if (channel < 1 / 2) {
-    return q;
-  }
-  if (channel < 2 / 3) {
-    return p + (q - p) * (2 / 3 - channel) * 6;
-  }
-  return p;
-}
-
 function isTileRecord(value: unknown): value is OfficeSceneTile {
   return (
     typeof value === "object" &&
@@ -596,8 +535,62 @@ function isTileRecord(value: unknown): value is OfficeSceneTile {
     "tileId" in value &&
     Number.isFinite((value as OfficeSceneTile).tileId) &&
     (!("tint" in value) || Number.isFinite((value as OfficeSceneTile).tint)) &&
+    (!("colorAdjust" in value) ||
+      (value as OfficeSceneTile).colorAdjust == null ||
+      isOfficeColorAdjust((value as OfficeSceneTile).colorAdjust)) &&
     (!("pattern" in value) || typeof (value as OfficeSceneTile).pattern === "string")
   );
+}
+
+function normalizeOfficeSceneTile(
+  tile: number | OfficeSceneTile,
+  index: number,
+  sourceLayout: DonargOfficeLayoutSource,
+): OfficeSceneTile {
+  if (typeof tile === "number") {
+    const kind = toTileKind(tile);
+    const sourceColor = sourceLayout.tileColors?.[index];
+    const colorAdjust = isOfficeColorAdjust(sourceColor) ? cloneOfficeColorAdjust(sourceColor) : null;
+    const tint = resolveOfficeTileTint(colorAdjust, fallbackTileTint(tile));
+
+    const normalized: OfficeSceneTile = {
+      kind,
+      tileId: tile,
+    };
+
+    if (typeof tint === "number") {
+      normalized.tint = tint;
+    }
+    if (colorAdjust) {
+      normalized.colorAdjust = colorAdjust;
+    }
+
+    return normalized;
+  }
+
+  const normalized: OfficeSceneTile = {
+    kind: tile.kind,
+    tileId: tile.tileId,
+  };
+
+  if (typeof tile.pattern === "string") {
+    normalized.pattern = tile.pattern;
+  }
+
+  const colorAdjust = isOfficeColorAdjust(tile.colorAdjust) ? cloneOfficeColorAdjust(tile.colorAdjust) : null;
+  const tint = resolveOfficeTileTint(
+    colorAdjust,
+    typeof tile.tint === "number" ? tile.tint : fallbackTileTint(tile.tileId),
+  );
+
+  if (typeof tint === "number") {
+    normalized.tint = tint;
+  }
+  if (colorAdjust) {
+    normalized.colorAdjust = colorAdjust;
+  }
+
+  return normalized;
 }
 
 function isFurnitureRecord(value: unknown): value is OfficeSceneFurniture {
@@ -674,9 +667,17 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
       cols,
       rows,
       cellSize,
-      tiles,
-      furniture,
-      characters,
+      tiles: tiles.map((tile, index) =>
+        normalizeOfficeSceneTile(tile, index, {
+          version: 1,
+          cols,
+          rows,
+          tiles,
+          furniture: [],
+        }),
+      ),
+      furniture: furniture.map((item) => ({ ...item })),
+      characters: characters.map((item) => ({ ...item })),
     },
   };
 }
