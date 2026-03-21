@@ -4,39 +4,20 @@ import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import type { OfficeColorAdjust } from "./scenes/office/colors";
 import { isRecord } from "./utils/typeGuards";
 
-// Review: Event Emitters / Separation of Concerns — events are listed flat
-// without clear grouping by data-flow direction. The codebase follows a
-// one-way-data-flow model (React sends config → Phaser emits state), so this
-// file should make that contract explicit. Group events into two sections:
-//
-//   // ── React → Phaser (commands) ──
-//   PLACE_OBJECT_DROP_EVENT, PLACE_TERRAIN_DROP_EVENT, SELECT_TERRAIN_TOOL_EVENT,
-//   SET_ZOOM_EVENT, OFFICE_SET_EDITOR_TOOL_EVENT
-//
-//   // ── Phaser → React (notifications) ──
-//   TERRAIN_TILE_INSPECTED_EVENT, PLAYER_PLACED_EVENT, PLAYER_STATE_CHANGED_EVENT,
-//   RUNTIME_PERF_EVENT, ZOOM_CHANGED_EVENT, OFFICE_FLOOR_PICKED_EVENT,
-//   OFFICE_LAYOUT_CHANGED_EVENT, BLOOMSEED_READY_EVENT
-//
-// Consider a typed EventBus wrapper around Phaser's EventEmitter:
-//   type GameEvents = { [ZOOM_CHANGED_EVENT]: ZoomChangedPayload; ... }
-//   gameEvents.emit(ZOOM_CHANGED_EVENT, payload) // fully typed
-// This prevents silent mismatches when event names or payload shapes change.
-
-// Drag-and-drop placement: React → Phaser
+// React → Phaser commands
 export const PLACE_DRAG_MIME = "application/json";
 export const PLACE_OBJECT_DROP_EVENT = "placeObjectDrop";
 export const PLACE_TERRAIN_DROP_EVENT = "placeTerrainDrop";
 export const SELECT_TERRAIN_TOOL_EVENT = "selectTerrainTool";
+export const SET_ZOOM_EVENT = "setZoom";
+export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
+
+// Phaser → React notifications
 export const TERRAIN_TILE_INSPECTED_EVENT = "terrainTileInspected";
 export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
 export const RUNTIME_PERF_EVENT = "runtimePerf";
-
 export const ZOOM_CHANGED_EVENT = "zoomChanged";
-export const SET_ZOOM_EVENT = "setZoom";
-
-export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
 export const OFFICE_FLOOR_PICKED_EVENT = "officeFloorPicked";
 export const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 
