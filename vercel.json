@@ -1,7 +1,5 @@
 {
+  "ignoreCommand": "exit 1",
   "buildCommand": "npm run build:frontend",
-  "outputDirectory": "apps/frontend/dist",
-  "github": {
-    "enabled": false
-  }
+  "outputDirectory": "apps/frontend/dist"
 }
