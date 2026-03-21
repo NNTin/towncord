@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { TERRAIN_CELL_WORLD_SIZE } from "../contracts";
 import { TerrainSystem } from "../system";
 
 function createSceneStub() {
@@ -34,8 +35,8 @@ describe("TerrainSystem previewPaintAtWorld", () => {
         screenX: 0,
         screenY: 0,
       },
-      64 * 10 + 1,
-      64 * 10 + 1,
+      TERRAIN_CELL_WORLD_SIZE * 10 + 1,
+      TERRAIN_CELL_WORLD_SIZE * 10 + 1,
     );
 
     expect(tiles?.map(({ cellX, cellY, caseId }) => ({ cellX, cellY, caseId }))).toEqual([

@@ -149,7 +149,7 @@ describe("WorldScene terrain painting", () => {
       sprite: { displayHeight: 96 },
     });
 
-    expect(selectionBadge.setPosition).toHaveBeenCalledWith(128, 108);
+    expect(selectionBadge.setPosition).toHaveBeenCalledWith(128, 117);
   });
 
   test("creates the brush preview with a top-left origin", () => {

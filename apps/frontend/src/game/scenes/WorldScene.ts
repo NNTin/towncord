@@ -51,11 +51,11 @@ import { OfficeEditorSystem } from "./world/officeEditorSystem";
 
 export const WORLD_SCENE_KEY = "world";
 
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 4;
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 16;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
-const SELECTED_BADGE_SCALE = 2;
-const SELECTED_BADGE_VERTICAL_OFFSET = 12;
+const SELECTED_BADGE_SCALE = 0.5;
+const SELECTED_BADGE_VERTICAL_OFFSET = 3;
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
 const TERRAIN_BRUSH_PREVIEW_READY_FILL = 0x38bdf8;

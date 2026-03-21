@@ -5,7 +5,7 @@ import { loadTerrainBootstrap } from "../terrain/bootstrap";
 
 /**
  * The canonical base unit: 16px.
- * Terrain cells are 4 × 16px = 64px. Office cells are 1 × 16px = 16px (1:1 with sprites).
+ * Both terrain cells (1 × 16px = 16px) and office cells (1 × 16px = 16px) are 1:1 with sprites.
  */
 export const TOWN_BASE_PX = 16;
 

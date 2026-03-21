@@ -15,7 +15,7 @@ import type { WorldNavigationService } from "./navigation";
 import type { WorldEntity, WorldPoint, WorldSelectableActor } from "./types";
 import type Phaser from "phaser";
 
-const SPRITE_SCALE = 4;
+const SPRITE_SCALE = 1;
 
 type EntitySystemContext = {
   scene: Phaser.Scene;
