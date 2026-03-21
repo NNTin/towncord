@@ -119,25 +119,12 @@ export class WorldScene extends Phaser.Scene {
     this.runtimeState.entityRegistry = value;
   }
 
-  /**
-   * Provides direct access to the entity array for test harnesses that need to
-   * inject mock entities (e.g. to simulate occupied terrain cells).  In
-   * production code, the entity lifecycle is managed by EntitySystem.
-   */
-  private get entities(): WorldEntity[] {
-    return this.runtimeState.entities;
-  }
-
-  private set entities(value: WorldEntity[]) {
-    this.runtimeState.entities = value;
-  }
-
   private get selectedEntity(): WorldEntity | null {
-    return this.runtimeState.selectedEntity;
+    return this.entitySystem?.getSelected() ?? null;
   }
 
   private set selectedEntity(value: WorldEntity | null) {
-    this.runtimeState.selectedEntity = value;
+    this.entitySystem?.select(value);
   }
 
   private get selectionBadge(): Phaser.GameObjects.Sprite | null {
@@ -450,8 +437,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private selectEntity(entity: WorldEntity | null): void {
-    if (this.selectedEntity === entity) return;
-    this.selectedEntity = entity;
+    if (this.entitySystem?.getSelected() === entity) return;
     this.entitySystem?.select(entity);
     this.setSelectionBadgeVisible(Boolean(entity));
     if (entity) this.syncSelectionBadgePosition(entity);
@@ -978,22 +964,11 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem.queueDrop(payload, worldX, worldY);
   }
 
-  // Review: One Way Data Flow — this method reaches into two different sources
-  // of truth for entities (EntitySystem vs runtimeState.entities) to work around
-  // test harnesses that bypass EntitySystem. This dual-source pattern indicates
-  // the entity array ownership is split. EntitySystem should be the single owner;
-  // test harnesses should create a minimal EntitySystem (or a mock implementing
-  // the same interface) instead of injecting into runtimeState directly. See also
-  // the review on sceneRuntime.ts about duplicated entity state.
   private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
     if (!this.terrainSystem) return false;
 
     const grid = this.terrainSystem.getGameplayGrid();
-    // Prefer EntitySystem-managed entities; fall back to runtimeState.entities
-    // for test harnesses that inject mock entity positions directly.
-    const entities = this.entitySystem?.getAll().length
-      ? this.entitySystem.getAll()
-      : this.runtimeState.entities;
+    const entities = this.entitySystem?.getAll() ?? [];
     return entities.some((entity) => {
       const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
       return entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY;

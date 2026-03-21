@@ -60,6 +60,7 @@ function createSceneHarness(input?: {
   const previewPaintAtWorld = vi.fn(() => input?.previewTiles ?? []);
   const worldPoint = input?.worldPoint ?? { x: 96, y: 96 };
   const worldToCellResult = input?.worldToCellResult;
+  const entityPositions = [...(input?.entityPositions ?? [])];
   const worldToCell = vi.fn((worldX: number, worldY: number) =>
     worldToCellResult === undefined
       ? {
@@ -94,9 +95,11 @@ function createSceneHarness(input?: {
     previewPaintAtWorld,
     queueDrop,
   };
-  scene.entities = (input?.entityPositions ?? []).map((position) => ({
-    position,
-  }));
+  scene.entitySystem = {
+    getAll: () => entityPositions.map((position) => ({
+      position,
+    })),
+  };
   scene.activeTerrainTool = {
     materialId: "water",
     brushId: "water",
@@ -105,6 +108,7 @@ function createSceneHarness(input?: {
   scene.terrainPaintSession = new TerrainPaintSession();
 
   return {
+    entityPositions,
     previewPaintAtWorld,
     scene,
     queueDrop,
@@ -245,9 +249,9 @@ describe("WorldScene terrain painting", () => {
   });
 
   test("occupied cells are not marked as painted for the rest of the stroke", () => {
-    const { scene, queueDrop } = createOccupiedSceneHarness();
+    const { entityPositions, scene, queueDrop } = createOccupiedSceneHarness();
     beginBrushPaint(scene);
-    scene.entities = [];
+    entityPositions.length = 0;
     paintTerrainAtPointer(scene);
 
     expect(queueDrop).toHaveBeenCalledOnce();

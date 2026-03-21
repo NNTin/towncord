@@ -9,7 +9,6 @@ import type { OfficeTileColor } from "../../office/model";
 import type { TownOfficeRegion } from "../../town/layout";
 import type { WorldNavigationService } from "./navigation";
 import { TerrainPaintSession } from "./terrainPaintSession";
-import type { WorldEntity } from "./types";
 import type { OfficeColorAdjust } from "../../scenes/office/colors";
 
 export type WorldSceneMovementKeys = Record<
@@ -35,29 +34,10 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
   }
 }
 
-// Review: One Way Data Flow / Separation of Concerns — WorldSceneRuntime holds
-// `entities`, `selectedEntity`, `nextId`, and `directInputIdleMs`, but these
-// same fields are independently owned by EntitySystem (entitySystem.ts:39-42).
-// This creates two sources of truth for entity state. WorldScene reads from
-// runtimeState (via getters) while EntitySystem manages its own copies.
-//
-// The root issue is that WorldSceneRuntime was designed as a bag-of-all-state
-// before systems were extracted. Now that EntitySystem, OfficeEditorSystem, and
-// TerrainSystem each own their own state, the corresponding fields here are
-// either dead weight or a back-channel that test harnesses exploit (see the
-// isTerrainCellOccupied dual-source pattern in WorldScene.ts).
-//
-// Recommended: remove entity-owned fields from WorldSceneRuntime. Let each
-// system (EntitySystem, a future OfficePaintSession, CameraController) own its
-// slice of state. WorldSceneRuntime should shrink to only the fields that don't
-// belong to any system (wasd keys, terrain paint session, etc.) — or disappear
-// entirely once all state is system-owned.
 export class WorldSceneRuntime {
   public catalog: AnimationCatalog | null = null;
   public entityRegistry: EntityRegistry | null = null;
 
-  public entities: WorldEntity[] = [];
-  public selectedEntity: WorldEntity | null = null;
   public selectionBadge: Phaser.GameObjects.Sprite | null = null;
   public terrainBrushPreview: Phaser.GameObjects.Rectangle | null = null;
   public officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
@@ -74,7 +54,6 @@ export class WorldSceneRuntime {
   public activeFurnitureId: string | null = null;
   public isOfficePainting = false;
   public officeDirty = false;
-  public nextId = 0;
 
   public wasd: WorldSceneMovementKeys | null = null;
   public shiftKey: Phaser.Input.Keyboard.Key | null = null;
@@ -87,14 +66,11 @@ export class WorldSceneRuntime {
   public camStartX = 0;
   public camStartY = 0;
   public lastPerfEmitAtMs = 0;
-  public directInputIdleMs = 0;
 
   private reset(): void {
     this.catalog = null;
     this.entityRegistry = null;
 
-    this.entities = [];
-    this.selectedEntity = null;
     this.selectionBadge = null;
     this.terrainBrushPreview = null;
     this.officeCellHighlight = null;
@@ -111,7 +87,6 @@ export class WorldSceneRuntime {
     this.activeFurnitureId = null;
     this.isOfficePainting = false;
     this.officeDirty = false;
-    this.nextId = 0;
 
     this.wasd = null;
     this.shiftKey = null;
@@ -124,13 +99,11 @@ export class WorldSceneRuntime {
     this.camStartX = 0;
     this.camStartY = 0;
     this.lastPerfEmitAtMs = 0;
-    this.directInputIdleMs = 0;
   }
 
   public dispose(): void {
     this.terrainSystem?.destroy();
     this.officeRenderable?.destroy();
-    destroyGameObjects(this.entities.map((entity) => entity.sprite));
     destroyGameObject(this.selectionBadge);
     destroyGameObject(this.terrainBrushPreview);
     destroyGameObject(this.officeCellHighlight);
