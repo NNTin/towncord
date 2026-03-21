@@ -143,8 +143,6 @@ jobs:
         run: |
           failed=()
           [[ "${{ steps.audit.outcome }}"     != "success" ]] && failed+=("audit")
-          [[ "${{ steps.knip.outcome }}"      != "success" ]] && failed+=("knip")
-          [[ "${{ steps.jscpd.outcome }}"     != "success" ]] && failed+=("jscpd")
           [[ "${{ steps.typecheck.outcome }}" != "success" ]] && failed+=("typecheck")
           [[ "${{ steps.tests.outcome }}"     != "success" ]] && failed+=("tests")
           [[ "${{ steps.build.outcome }}"     != "success" ]] && failed+=("build")

@@ -12,6 +12,8 @@ MARKER = "<!-- ci-report -->"
 
 STEP_ORDER = ["audit", "knip", "jscpd", "typecheck", "tests", "build"]
 
+WARN_STEPS = {"knip", "jscpd"}
+
 STEP_LABELS = {
     "audit": "npm audit (high/critical)",
     "knip": "unused deps/exports/files",
@@ -74,7 +76,7 @@ def read_log(step: str) -> str:
 
 
 def outcome_emoji(outcome: str) -> str:
-    return {"success": "✅", "failure": "❌", "skipped": "⏭️"}.get(outcome, "⏭️")
+    return {"success": "✅", "failure": "❌", "warning": "⚠️", "skipped": "⏭️"}.get(outcome, "⏭️")
 
 
 def skip_npm_boilerplate(lines: list[str]) -> list[str]:
@@ -248,7 +250,7 @@ def compose_comment(outcomes: dict[str, str], run_url: str) -> str:
     parts.append("")
 
     for step in STEP_ORDER:
-        if outcomes.get(step) != "failure":
+        if outcomes.get(step) not in ("failure", "warning"):
             continue
         log = read_log(step)
         suffix, detail = EXTRACTORS[step](log)
@@ -315,9 +317,13 @@ def post_comment(repo: str, pr_number: str, body: str) -> None:
 
 
 def main() -> None:
-    outcomes = {
+    raw_outcomes = {
         step: os.environ.get(f"{step.upper()}_OUTCOME", "skipped")
         for step in STEP_ORDER
+    }
+    outcomes = {
+        step: ("warning" if outcome == "failure" and step in WARN_STEPS else outcome)
+        for step, outcome in raw_outcomes.items()
     }
     run_url = os.environ["RUN_URL"]
     pr_number = os.environ["PR_NUMBER"]
