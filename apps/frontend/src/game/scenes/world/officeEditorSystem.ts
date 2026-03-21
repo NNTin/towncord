@@ -71,6 +71,21 @@ export class OfficeEditorSystem {
   // Tool handlers
   // -------------------------------------------------------------------------
 
+  // Review: De-duplication / Separation of Concerns — the tint resolution logic
+  // here (floorColor → resolveOfficeTileTint vs tileColor → OFFICE_TILE_COLOR_TINTS
+  // lookup with neutralTint fallback) is a domain operation that also appears
+  // implicitly in BottomToolbar's FloorTilePreview. The branching between
+  // "raw color adjust" and "preset tileColor" is a domain rule ("how do we
+  // resolve a final tint from user input?") that should live in colors.ts as a
+  // single function:
+  //
+  //   function resolveFloorTint(
+  //     floorColor: OfficeColorAdjust | null,
+  //     tileColor: OfficeTileColor | null,
+  //   ): { tint: number; colorAdjust: OfficeColorAdjust }
+  //
+  // Both applyFloor and the UI preview would call this, ensuring they always
+  // agree on the tint derivation logic.
   private applyFloor(
     layout: OfficeSceneLayout,
     idx: number,

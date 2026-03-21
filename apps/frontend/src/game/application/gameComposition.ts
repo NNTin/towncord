@@ -26,6 +26,11 @@ type BloomseedBootstrap = {
 export const BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY = "bloomseed.worldBootstrap";
 export const BLOOMSEED_READY_EVENT = "bloomseedReady";
 
+// Review: De-duplication — this `isObjectRecord` guard is duplicated across at
+// least two files: here and `events.ts:104` (named `isRecord`). Both perform
+// the same `typeof value === "object" && value !== null` check. Extract a shared
+// utility (e.g. `utils/typeGuards.ts`) to avoid divergence and reduce
+// maintenance surface.
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }

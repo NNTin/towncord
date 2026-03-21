@@ -35,6 +35,23 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
   }
 }
 
+// Review: One Way Data Flow / Separation of Concerns — WorldSceneRuntime holds
+// `entities`, `selectedEntity`, `nextId`, and `directInputIdleMs`, but these
+// same fields are independently owned by EntitySystem (entitySystem.ts:39-42).
+// This creates two sources of truth for entity state. WorldScene reads from
+// runtimeState (via getters) while EntitySystem manages its own copies.
+//
+// The root issue is that WorldSceneRuntime was designed as a bag-of-all-state
+// before systems were extracted. Now that EntitySystem, OfficeEditorSystem, and
+// TerrainSystem each own their own state, the corresponding fields here are
+// either dead weight or a back-channel that test harnesses exploit (see the
+// isTerrainCellOccupied dual-source pattern in WorldScene.ts).
+//
+// Recommended: remove entity-owned fields from WorldSceneRuntime. Let each
+// system (EntitySystem, a future OfficePaintSession, CameraController) own its
+// slice of state. WorldSceneRuntime should shrink to only the fields that don't
+// belong to any system (wasd keys, terrain paint session, etc.) — or disappear
+// entirely once all state is system-owned.
 export class WorldSceneRuntime {
   public catalog: AnimationCatalog | null = null;
   public entityRegistry: EntityRegistry | null = null;

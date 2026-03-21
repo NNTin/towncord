@@ -35,6 +35,16 @@ export function SidebarAccordion({
   runtimePerf,
 }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
+  // Review: Global Store / Performance — createPlaceablesSidebarBridge is called
+  // on every render, creating a new bridge object (with new function references)
+  // each time. This triggers unnecessary re-renders of PlaceablesPanel because
+  // its `onDragStart` and `onSelectTerrainTool` props change referentially on
+  // every parent render. Wrap this in useMemo:
+  //
+  //   const placeablesBridge = useMemo(
+  //     () => createPlaceablesSidebarBridge({ placeables, activeTerrainTool, onSelectTerrainTool }),
+  //     [placeables, activeTerrainTool, onSelectTerrainTool],
+  //   );
   const placeablesBridge = createPlaceablesSidebarBridge({
     placeables,
     activeTerrainTool,

@@ -83,6 +83,24 @@ function parseRawPlaceDragPayload(rawPayload: string) {
   }
 }
 
+// Review: Separation of Concerns — this hook manages five independent concerns
+// in a single function:
+//   1. Phaser game lifecycle (create, destroy, ref management)
+//   2. Drag-and-drop handling (dragover, drop, payload parsing)
+//   3. Zoom state + emit (zoom in/out callbacks, zoom state tracking)
+//   4. Sidebar props construction (catalog, placeables, terrain tool, perf)
+//   5. Office editor tool forwarding (emitOfficeEditorTool)
+//
+// Each of these could be a focused custom hook:
+//   - useGameLifecycle(containerRef) → gameRef
+//   - useGameDragDrop(gameRef) → { onDragOver, onDrop }
+//   - useGameZoom(gameRef) → ZoomControlsProps | null
+//   - useGameSidebar(gameRef) → BloomseedSidebarBridgeProps | null
+//
+// The top-level bridge hook would then compose them, making each concern
+// independently testable and preventing this file from growing as new
+// Phaser ↔ React interactions are added. Currently at 248 LOC, it's on the
+// edge of becoming hard to reason about.
 export function useBloomseedUiBridge(options?: {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;

@@ -3,6 +3,25 @@ import type { OfficeTileColor } from "./office/model";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import type { OfficeColorAdjust } from "./scenes/office/colors";
 
+// Review: Event Emitters / Separation of Concerns — events are listed flat
+// without clear grouping by data-flow direction. The codebase follows a
+// one-way-data-flow model (React sends config → Phaser emits state), so this
+// file should make that contract explicit. Group events into two sections:
+//
+//   // ── React → Phaser (commands) ──
+//   PLACE_OBJECT_DROP_EVENT, PLACE_TERRAIN_DROP_EVENT, SELECT_TERRAIN_TOOL_EVENT,
+//   SET_ZOOM_EVENT, OFFICE_SET_EDITOR_TOOL_EVENT
+//
+//   // ── Phaser → React (notifications) ──
+//   TERRAIN_TILE_INSPECTED_EVENT, PLAYER_PLACED_EVENT, PLAYER_STATE_CHANGED_EVENT,
+//   RUNTIME_PERF_EVENT, ZOOM_CHANGED_EVENT, OFFICE_FLOOR_PICKED_EVENT,
+//   OFFICE_LAYOUT_CHANGED_EVENT, BLOOMSEED_READY_EVENT
+//
+// Consider a typed EventBus wrapper around Phaser's EventEmitter:
+//   type GameEvents = { [ZOOM_CHANGED_EVENT]: ZoomChangedPayload; ... }
+//   gameEvents.emit(ZOOM_CHANGED_EVENT, payload) // fully typed
+// This prevents silent mismatches when event names or payload shapes change.
+
 // Drag-and-drop placement: React → Phaser
 export const PLACE_DRAG_MIME = "application/json";
 export const PLACE_OBJECT_DROP_EVENT = "placeObjectDrop";
@@ -27,6 +46,22 @@ export type OfficeLayoutChangedPayload = {
   layout: import("./scenes/office/bootstrap").OfficeSceneLayout;
 };
 
+// Review: Interface Segregation Principle — this payload bundles every tool's
+// config into a single flat object. When tool === "furniture", the consumer
+// still receives floorMode, tileColor, floorColor, and floorPattern (all null).
+// When tool === "floor", furnitureId is carried but irrelevant.
+//
+// A discriminated union would make each tool's data requirements explicit:
+//   type OfficeSetEditorToolPayload =
+//     | { tool: "floor"; floorMode: OfficeFloorMode; tileColor: ...; floorColor: ...; floorPattern: ... }
+//     | { tool: "wall" }
+//     | { tool: "erase" }
+//     | { tool: "furniture"; furnitureId: string }
+//     | { tool: null }
+//
+// Benefits: (1) consumers can narrow on `tool` without null-checking irrelevant
+// fields, (2) adding a new tool's config won't bloat unrelated variants,
+// (3) TypeScript exhaustiveness checking catches missing handlers.
 export type OfficeSetEditorToolPayload = {
   tool: OfficeEditorToolId | null;
   floorMode: OfficeFloorMode | null;

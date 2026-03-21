@@ -18,6 +18,21 @@ import {
 
 const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
 
+// Review: Custom Hook / Separation of Concerns — App holds 7 useState calls,
+// 3 useEffects, and 3 handler functions that exclusively manage the office
+// editor tool state (activeTool, floorMode, tileColor, floorColor, floorPattern,
+// furnitureId, isLayoutPaintMode). This is a self-contained concern that should
+// be extracted into a `useOfficeToolState()` custom hook, similar to how
+// `useOfficeLayoutEditor()` already encapsulates the JSON editor lifecycle.
+//
+// The hook would own all tool-related state and expose a single
+// `editorToolPayload` (for emitOfficeEditorTool) plus individual handlers
+// (handleSelectTileColor, handleSelectFloorMode, etc.). App would then contain
+// only the bridge wiring and JSX, reducing its complexity from ~165 LOC to ~80.
+//
+// This also improves testability: tool state transitions (e.g. "clearing
+// activeTool when layout mode closes") can be unit-tested without rendering the
+// full App tree.
 function App(): JSX.Element {
   const officeEditor = useOfficeLayoutEditor();
 

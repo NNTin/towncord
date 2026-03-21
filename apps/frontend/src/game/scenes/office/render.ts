@@ -83,6 +83,17 @@ type RenderOfficeLayoutOptions = {
   depthAnchorRow?: number;
 };
 
+// Review: Separation of Concerns — renderOfficeLayout is a 100-line function
+// that returns a closure-based object (OfficeLayoutRenderable) with mutable
+// captured state (furnitureMap, characterEntries). This is effectively a class
+// in disguise. Converting it to an explicit class would make the state ownership
+// clear, improve debuggability (class instances are inspectable), and let
+// methods like `partialUpdate` and `destroy` be separately tested.
+//
+// Additionally, `partialUpdate` always rebuilds all characters ("derived data,
+// rarely changes") — but it never checks whether the character list actually
+// changed. A simple referential equality check on the characters array before
+// destroying and recreating would avoid unnecessary Phaser object churn.
 export function renderOfficeLayout(
   scene: Phaser.Scene,
   layout: OfficeSceneLayout,

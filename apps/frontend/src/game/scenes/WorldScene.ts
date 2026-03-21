@@ -73,6 +73,17 @@ const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
+// Review: Separation of Concerns — WorldScene is a God Object (~992 LOC). It
+// coordinates entity lifecycle, terrain brush previews, office editor tool
+// dispatch, camera panning, zoom handling, and all input routing. Each of these
+// is an independent concern. Extract them into dedicated systems that WorldScene
+// merely wires together in create() and delegates to in update():
+//   - InputRouter        (pointerdown/move/up/wheel dispatch)
+//   - CameraController   (pan, zoom, zoom-changed emit)
+//   - TerrainBrushPreviewSystem (preview rectangle + render preview images)
+//   - OfficePaintSession (cell highlight, apply-tool loop, dirty flag)
+// WorldScene should become a thin coordinator: ~100–150 LOC that creates systems
+// in create(), ticks them in update(), and tears them down in shutdown.
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
 
@@ -82,6 +93,16 @@ export class WorldScene extends Phaser.Scene {
   /** Dedicated system for office editor tool dispatch (floor/wall/furniture/erase). */
   private readonly officeEditorSystem = new OfficeEditorSystem();
 
+  // Review: Separation of Concerns — ~235 lines of trivial getter/setter pairs
+  // (lines 85–320) exist solely to proxy runtimeState fields through the scene.
+  // This layer adds no logic, no validation, and no encapsulation — every getter
+  // returns `this.runtimeState.X` and every setter assigns to it.
+  //
+  // Preferred fix: access `this.runtimeState` directly (it is already a private
+  // field) or, if encapsulation is desired, expose runtimeState through a single
+  // `private get rs()` shorthand and replace `this.catalog` with `this.rs.catalog`.
+  // This would remove ~200 lines of mechanical boilerplate and make the scene's
+  // actual logic easier to read and maintain.
   private get catalog(): AnimationCatalog | null {
     return this.runtimeState.catalog;
   }
@@ -598,6 +619,13 @@ export class WorldScene extends Phaser.Scene {
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
+  // Review: One Way Data Flow — this handler manually destructures every field
+  // from the payload into individual runtimeState properties. Adding a new tool
+  // property requires changes in events.ts, App.tsx, useBloomseedUiBridge.ts,
+  // AND here. Store the payload as a single `activeEditorConfig` object on
+  // runtimeState and read fields from it when needed (e.g. in applyOfficeTool).
+  // This reduces the coupling surface to one producer (React) and one shape
+  // (OfficeSetEditorToolPayload).
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.activeOfficeTool = payload.tool;
     this.activeTileColor = payload.tileColor ?? null;
@@ -696,6 +724,14 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  // Review: Separation of Concerns — onPointerDown routes three unrelated
+  // concerns (camera pan, office tool application, terrain paint + entity
+  // selection) inside a single method with nested early returns. Extract an
+  // InputRouter system that dispatches pointer events to the active subsystem
+  // based on priority: pan → office tool → terrain tool → entity selection.
+  // Each subsystem would implement a common InputHandler interface with
+  // `onDown(worldPoint) → boolean` (consumed flag), making the dispatch chain
+  // explicit and independently testable.
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
     if (pointer.button === 1) {
       this.isPanning = true;
@@ -783,6 +819,10 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
+  // Review: De-duplication — onWheel and onSetZoom both clamp the zoom and
+  // emit ZOOM_CHANGED_EVENT with the same shape. Extract a shared
+  // `applyZoom(nextZoom: number)` method that clamps, sets, and emits once.
+  // Both callers then reduce to one-liners.
   private onWheel(
     _pointer: Phaser.Input.Pointer,
     _gameObjects: unknown,
@@ -922,6 +962,13 @@ export class WorldScene extends Phaser.Scene {
     this.terrainSystem.queueDrop(payload, worldX, worldY);
   }
 
+  // Review: One Way Data Flow — this method reaches into two different sources
+  // of truth for entities (EntitySystem vs runtimeState.entities) to work around
+  // test harnesses that bypass EntitySystem. This dual-source pattern indicates
+  // the entity array ownership is split. EntitySystem should be the single owner;
+  // test harnesses should create a minimal EntitySystem (or a mock implementing
+  // the same interface) instead of injecting into runtimeState directly. See also
+  // the review on sceneRuntime.ts about duplicated entity state.
   private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
     if (!this.terrainSystem) return false;
 

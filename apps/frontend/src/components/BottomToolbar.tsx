@@ -27,6 +27,20 @@ import {
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
+// Review: Interface Segregation Principle — BottomToolbarProps has 23
+// properties, mixing three distinct concerns:
+//   1. Layout mode toggle (isLayoutMode, onToggleLayoutMode)
+//   2. Tool selection (activeTool, onSelectTool, floor/wall/furniture sub-props)
+//   3. Persistence actions (onSaveLayout, onResetLayout, canSave, isDirty, etc.)
+//
+// Group these into sub-interfaces:
+//   type LayoutModeProps = { isLayoutMode: boolean; onToggleLayoutMode: () => void };
+//   type ToolSelectionProps = { activeTool: ...; onSelectTool: ...; floor: FloorToolProps; ... };
+//   type PersistenceProps = { onSave: ...; onReset: ...; canSave: ...; isDirty: ...; };
+//
+// Then BottomToolbarProps = LayoutModeProps & ToolSelectionProps & PersistenceProps.
+// This makes it clear which concerns each sub-panel depends on and simplifies
+// future extraction of sub-panels into their own files.
 type BottomToolbarProps = {
   isLayoutMode: boolean;
   onToggleLayoutMode: () => void;
@@ -115,6 +129,20 @@ const divider: React.CSSProperties = {
 
 // ─── Furniture sprite ─────────────────────────────────────────────────────────
 
+// Review: De-duplication — FurnitureSprite and EnvironmentAtlasSprite are
+// near-identical CSS sprite renderers that differ only in atlas URL and atlas
+// dimensions. Extract a generic `AtlasSprite` component:
+//
+//   function AtlasSprite({ atlasUrl, atlasW, atlasH, frame, scale }: {
+//     atlasUrl: string; atlasW: number; atlasH: number;
+//     frame: { x: number; y: number; w: number; h: number }; scale: number;
+//   })
+//
+// Then FurnitureSprite and EnvironmentAtlasSprite become one-liner wrappers
+// (or disappear). WallSubPanel (line 377) also inlines the same CSS sprite
+// logic instead of using EnvironmentAtlasSprite — it should use the shared
+// component too.
+
 function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element {
   const { x, y, w, h } = item.atlasFrame;
   return (
@@ -183,6 +211,12 @@ function ColorSlider({
   );
 }
 
+// Review: De-duplication — FloorTilePreview and FloorPatternPreview both render
+// the same structure: an EnvironmentAtlasSprite overlaid with a tint div using
+// position:absolute, inset:0, multiply blend mode, and 0.45 opacity. Extract a
+// `TintedAtlasSprite` component that composes <EnvironmentAtlasSprite> + the
+// tint overlay. Both components would then call <TintedAtlasSprite> and differ
+// only in their outer wrapper (button vs plain div).
 function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): JSX.Element {
   const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"];
   if (!defaultFrame) {
@@ -374,6 +408,10 @@ function FloorSubPanel({
   );
 }
 
+// Review: De-duplication — WallSubPanel inlines the same CSS sprite rendering
+// that EnvironmentAtlasSprite already provides. It also redeclares `ENV_SCALE = 2`
+// which duplicates the module-level `SCALE` constant. Replace the inline div
+// with <EnvironmentAtlasSprite x={...} y={...} w={...} h={...} /> and use SCALE.
 function WallSubPanel(): JSX.Element {
   const previewFrame = ENVIRONMENT_ATLAS_FRAMES["environment.walls.mask-00#0"];
   const ENV_SCALE = 2;
