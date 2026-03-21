@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "exit 1",
+  "ignoreCommand": "exit 0",
   "buildCommand": "npm run build:frontend",
   "outputDirectory": "apps/frontend/dist"
 }
