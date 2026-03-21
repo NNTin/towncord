@@ -38,7 +38,7 @@ function makeOfficeRegion(
   const layout: OfficeSceneLayout = {
     cols,
     rows,
-    cellSize: 48,
+    cellSize: 16,
     tiles,
     furniture: [],
     characters: [],
@@ -79,14 +79,14 @@ describe("TownCollisionGrid — office precedence", () => {
     const grid = new TownCollisionGrid(makeTerrainGrid(32, 32, "water"), region);
     // Cell (1,0) is floor — center pixel
     const { worldX, worldY } = officeCellToWorldPixel(1, 0, region);
-    expect(grid.isWorldWalkable(worldX + 24, worldY + 24)).toBe(true);
+    expect(grid.isWorldWalkable(worldX + 8, worldY + 8)).toBe(true);
   });
 
   test("office wall cell is not walkable even when terrain underneath is ground", () => {
     const grid = new TownCollisionGrid(makeTerrainGrid(32, 32, "ground"), region);
     // Cell (0,0) is wall
     const { worldX, worldY } = officeCellToWorldPixel(0, 0, region);
-    expect(grid.isWorldWalkable(worldX + 24, worldY + 24)).toBe(false);
+    expect(grid.isWorldWalkable(worldX + 8, worldY + 8)).toBe(false);
   });
 
   test("outside the office, terrain walkability applies", () => {
@@ -115,15 +115,15 @@ describe("TownCollisionGrid — office precedence", () => {
   test("first pixel past the right office edge defers to terrain", () => {
     // terrain = water, so outside the office is not walkable
     const grid = new TownCollisionGrid(makeTerrainGrid(32, 32, "water"), region);
-    const rightEdge = (anchorX16 + cols * 3) * TOWN_BASE_PX;
-    expect(grid.isWorldWalkable(rightEdge, anchorY16 * TOWN_BASE_PX + 24)).toBe(false);
+    const rightEdge = (anchorX16 + cols * 1) * TOWN_BASE_PX;
+    expect(grid.isWorldWalkable(rightEdge, anchorY16 * TOWN_BASE_PX + 8)).toBe(false);
   });
 
   test("all pixels of a floor cell are walkable", () => {
     const grid = new TownCollisionGrid(makeTerrainGrid(32, 32, "water"), region);
     const { worldX, worldY } = officeCellToWorldPixel(2, 2, region);
-    for (let dx = 0; dx < 48; dx += 8) {
-      for (let dy = 0; dy < 48; dy += 8) {
+    for (let dx = 0; dx < 16; dx += 4) {
+      for (let dy = 0; dy < 16; dy += 4) {
         expect(grid.isWorldWalkable(worldX + dx, worldY + dy)).toBe(true);
       }
     }

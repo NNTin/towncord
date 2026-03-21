@@ -5,8 +5,7 @@ import { loadTerrainBootstrap } from "../terrain/bootstrap";
 
 /**
  * The canonical base unit: 16px.
- * Both terrain cells (4 × 16px = 64px) and office cells (3 × 16px = 48px)
- * are multiples of this unit.
+ * Terrain cells are 4 × 16px = 64px. Office cells are 1 × 16px = 16px (1:1 with sprites).
  */
 export const TOWN_BASE_PX = 16;
 
@@ -28,7 +27,7 @@ export type TownOfficeRegion = {
   /** Top-left corner of the office in 16px grid units. */
   anchorX16: number;
   anchorY16: number;
-  /** Office layout — cellSize is always 48px (DONARG_TILE_WORLD_SIZE * 3). */
+  /** Office layout — cellSize is 16px (DONARG_TILE_WORLD_SIZE, 1:1 with sprites). */
   layout: OfficeSceneLayout;
 };
 
@@ -83,8 +82,10 @@ export function worldToOfficeCell(
 /**
  * Returns the world-pixel position of the top-left corner of an office cell.
  *
- * worldX = (anchorX16 + col * 3) * 16
- * worldY = (anchorY16 + row * 3) * 16
+ * worldX = (anchorX16 + col * cu) * 16
+ * worldY = (anchorY16 + row * cu) * 16
+ *
+ * where cu = officeCellUnits(region) = cellSize / 16 (currently 1 for 16px cells).
  */
 export function officeCellToWorldPixel(
   col: number,

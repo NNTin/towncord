@@ -351,7 +351,7 @@ export class WorldScene extends Phaser.Scene {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-        depthAnchorRow: Math.round(anchorY16 / 3),
+        depthAnchorRow: anchorY16,
       });
     }
     this.bindSceneEvents();
@@ -447,7 +447,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private createOfficeCellHighlight(): void {
-    const cellSize = this.officeRegion?.layout.cellSize ?? 48;
+    const cellSize = this.officeRegion?.layout.cellSize ?? 16;
     const highlight = this.add.rectangle(
       0,
       0,
@@ -636,7 +636,7 @@ export class WorldScene extends Phaser.Scene {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-        depthAnchorRow: Math.round(anchorY16 / 3),
+        depthAnchorRow: anchorY16,
       });
     }
   }
