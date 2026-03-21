@@ -1,6 +1,7 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import { buildAnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
+import { isRecord } from "../utils/typeGuards";
 import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
 import {
   listEntityPlaceables,
@@ -26,17 +27,8 @@ type BloomseedBootstrap = {
 export const BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY = "bloomseed.worldBootstrap";
 export const BLOOMSEED_READY_EVENT = "bloomseedReady";
 
-// Review: De-duplication — this `isObjectRecord` guard is duplicated across at
-// least two files: here and `events.ts:104` (named `isRecord`). Both perform
-// the same `typeof value === "object" && value !== null` check. Extract a shared
-// utility (e.g. `utils/typeGuards.ts`) to avoid divergence and reduce
-// maintenance surface.
-function isObjectRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
 export function getBloomseedWorldBootstrap(value: unknown): BloomseedWorldBootstrap | null {
-  if (!isObjectRecord(value)) return null;
+  if (!isRecord(value)) return null;
   if (!("catalog" in value) || !("entityRegistry" in value)) return null;
   return value as BloomseedWorldBootstrap;
 }

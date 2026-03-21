@@ -819,35 +819,29 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  // Review: De-duplication — onWheel and onSetZoom both clamp the zoom and
-  // emit ZOOM_CHANGED_EVENT with the same shape. Extract a shared
-  // `applyZoom(nextZoom: number)` method that clamps, sets, and emits once.
-  // Both callers then reduce to one-liners.
+  private applyZoom(nextZoom: number): void {
+    const cam = this.cameras.main;
+    cam.setZoom(Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM));
+    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+      zoom: cam.zoom,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
+  }
+
   private onWheel(
     _pointer: Phaser.Input.Pointer,
     _gameObjects: unknown,
     _dx: number,
     dy: number,
   ): void {
-    const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
-    cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
-      zoom: cam.zoom,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    });
+    this.applyZoom(this.cameras.main.zoom * factor);
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
   private onSetZoom(payload: SetZoomPayload): void {
-    const cam = this.cameras.main;
-    cam.setZoom(Phaser.Math.Clamp(payload.zoom, MIN_ZOOM, MAX_ZOOM));
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
-      zoom: cam.zoom,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    });
+    this.applyZoom(payload.zoom);
   }
 
   private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {

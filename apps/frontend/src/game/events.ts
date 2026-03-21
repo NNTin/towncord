@@ -2,6 +2,7 @@ import type { EntityId } from "./domain/model";
 import type { OfficeTileColor } from "./office/model";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import type { OfficeColorAdjust } from "./scenes/office/colors";
+import { isRecord } from "./utils/typeGuards";
 
 // Review: Event Emitters / Separation of Concerns — events are listed flat
 // without clear grouping by data-flow direction. The codebase follows a
@@ -135,10 +136,6 @@ export type RuntimePerfPayload = {
   updateMs: number;
   terrainMs: number;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
 
 export function parsePlaceDragPayload(
   value: unknown,
