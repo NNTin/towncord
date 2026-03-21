@@ -121,6 +121,10 @@ export function useBloomseedGameLifecycle({
   onOfficeFloorPicked,
 }: BloomseedGameLifecycleOptions): MutableRefObject<Phaser.Game | null> {
   const gameRef = useRef<Phaser.Game | null>(null);
+  const onBootstrapRef = useLatestRef(onBootstrap);
+  const onTerrainTileInspectedRef = useLatestRef(onTerrainTileInspected);
+  const onRuntimePerfRef = useLatestRef(onRuntimePerf);
+  const onZoomChangedRef = useLatestRef(onZoomChanged);
   const onOfficeLayoutChangedRef = useLatestRef(onOfficeLayoutChanged);
   const onOfficeFloorPickedRef = useLatestRef(onOfficeFloorPicked);
 
@@ -132,19 +136,19 @@ export function useBloomseedGameLifecycle({
     gameRef.current = game;
 
     function handleBootstrap(payload: BloomseedUiBootstrap): void {
-      onBootstrap(payload);
+      onBootstrapRef.current(payload);
     }
 
     function handleTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
-      onTerrainTileInspected(payload);
+      onTerrainTileInspectedRef.current(payload);
     }
 
     function handleRuntimePerf(payload: RuntimePerfPayload): void {
-      onRuntimePerf(payload);
+      onRuntimePerfRef.current(payload);
     }
 
     function handleZoomChanged(payload: ZoomChangedPayload): void {
-      onZoomChanged(payload);
+      onZoomChangedRef.current(payload);
     }
 
     function handleOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
@@ -169,17 +173,11 @@ export function useBloomseedGameLifecycle({
       game.events.off(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
       game.events.off(OFFICE_FLOOR_PICKED_EVENT, handleOfficeFloorPicked);
       game.destroy(true);
-      gameRef.current = null;
+      if (gameRef.current === game) {
+        gameRef.current = null;
+      }
     };
-  }, [
-    gameRootRef,
-    onBootstrap,
-    onOfficeFloorPickedRef,
-    onOfficeLayoutChangedRef,
-    onRuntimePerf,
-    onTerrainTileInspected,
-    onZoomChanged,
-  ]);
+  }, [gameRootRef]);
 
   return gameRef;
 }

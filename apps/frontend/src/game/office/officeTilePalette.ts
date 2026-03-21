@@ -1,4 +1,4 @@
-import atlasData from "../../../public/assets/donarg-office/atlas.json";
+import atlasData from "../../../../../packages/donarg-office-assets/assets/atlas.json";
 
 export const ENVIRONMENT_ATLAS_IMAGE_URL = "/assets/donarg-office/atlas.png";
 export const ENVIRONMENT_ATLAS_W = atlasData.meta.size.w;

@@ -9,7 +9,7 @@
   "scripts": {
     "bootstrap": "git submodule update --init --recursive && npm install",
     "postinstall": "npm run -w @towncord/public-animation-contracts generate",
-    "dev:frontend": "npm run assets:public && npm run -w @towncord/frontend dev",
+    "dev:frontend": "sh -c 'npm run assets:public && npm run -w @towncord/frontend dev -- \"$@\"' --",
     "build:frontend": "npm run assets:public && npm run -w @towncord/frontend build",
     "typecheck:frontend": "npm run -w @towncord/frontend typecheck",
     "assets:dry": "npm run -w @towncord/public-assets export:dry",

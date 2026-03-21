@@ -1,5 +1,5 @@
 import furnitureCatalogData from "../../../../../packages/donarg-office-assets/assets/furniture/furniture-catalog.json";
-import atlasData from "../../../public/assets/donarg-office/atlas.json";
+import atlasData from "../../../../../packages/donarg-office-assets/assets/atlas.json";
 
 export type FurniturePalettePlacement = "floor" | "wall" | "surface";
 
