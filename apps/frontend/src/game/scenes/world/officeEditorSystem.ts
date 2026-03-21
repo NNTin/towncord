@@ -2,11 +2,8 @@ import type { OfficeTileColor } from "../../office/model";
 import type { OfficeCellCoord } from "../../town/layout";
 import type { OfficeSceneFurniture, OfficeSceneFurnitureCategory, OfficeSceneLayout } from "../office/bootstrap";
 import {
-  cloneOfficeColorAdjust,
   officeColorAdjustEquals,
-  OFFICE_TILE_COLOR_TINTS,
-  resolveOfficeTileColorAdjustPreset,
-  resolveOfficeTileTint,
+  resolveOfficeFloorAppearance,
   type OfficeColorAdjust,
 } from "../office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../../office/officeFurniturePalette";
@@ -70,7 +67,6 @@ export class OfficeEditorSystem {
   // -------------------------------------------------------------------------
   // Tool handlers
   // -------------------------------------------------------------------------
-
   private applyFloor(
     layout: OfficeSceneLayout,
     idx: number,
@@ -80,15 +76,7 @@ export class OfficeEditorSystem {
   ): boolean {
     const tile = layout.tiles[idx];
     if (!tile) return false;
-    const neutralTint = OFFICE_TILE_COLOR_TINTS.neutral ?? 0x475569;
-    const colorAdjust = floorColor
-      ? cloneOfficeColorAdjust(floorColor)
-      : resolveOfficeTileColorAdjustPreset(tileColor);
-    const tint = floorColor
-      ? resolveOfficeTileTint(colorAdjust, neutralTint) ?? neutralTint
-      : tileColor
-        ? OFFICE_TILE_COLOR_TINTS[tileColor] ?? neutralTint
-        : neutralTint;
+    const { colorAdjust, tint } = resolveOfficeFloorAppearance(floorColor, tileColor);
     const pattern = floorPattern ?? "environment.floors.pattern-01";
     if (
       tile.kind === "floor" &&

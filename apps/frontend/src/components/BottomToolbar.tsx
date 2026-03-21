@@ -19,17 +19,19 @@ import {
 import {
   DEFAULT_FLOOR_COLOR_ADJUST,
   cloneOfficeColorAdjust,
-  resolveOfficeTileColorAdjustPreset,
-  resolveOfficeTileTint,
+  resolveOfficeFloorAppearance,
   tintToHexCss,
   type OfficeColorAdjust,
 } from "../game/scenes/office/colors";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
-type BottomToolbarProps = {
+type LayoutModeProps = {
   isLayoutMode: boolean;
   onToggleLayoutMode: () => void;
+};
+
+type ToolSelectionProps = {
   isJsonEditorOpen?: boolean;
   onToggleJsonEditor?: () => void;
   activeTool?: OfficeLayoutTool | null;
@@ -44,6 +46,9 @@ type BottomToolbarProps = {
   onSelectFloorPattern?: (id: string) => void;
   activeFurnitureId?: string | null;
   onSelectFurnitureId?: (id: string) => void;
+};
+
+type PersistenceProps = {
   onResetLayout?: () => void;
   onSaveLayout?: () => void;
   canResetLayout?: boolean;
@@ -52,6 +57,8 @@ type BottomToolbarProps = {
   isSavingLayout?: boolean;
   layoutStatusText?: string | null;
 };
+
+type BottomToolbarProps = LayoutModeProps & ToolSelectionProps & PersistenceProps;
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -115,16 +122,34 @@ const divider: React.CSSProperties = {
 
 // ─── Furniture sprite ─────────────────────────────────────────────────────────
 
-function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element {
-  const { x, y, w, h } = item.atlasFrame;
+type AtlasFrame = {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+function AtlasSprite({
+  atlasUrl,
+  atlasW,
+  atlasH,
+  frame,
+  scale = SCALE,
+}: {
+  atlasUrl: string;
+  atlasW: number;
+  atlasH: number;
+  frame: AtlasFrame;
+  scale?: number;
+}): JSX.Element {
   return (
     <div
       style={{
-        width: w * SCALE,
-        height: h * SCALE,
-        backgroundImage: `url('${ATLAS_IMAGE_URL}')`,
-        backgroundPosition: `${-x * SCALE}px ${-y * SCALE}px`,
-        backgroundSize: `${ATLAS_W * SCALE}px ${ATLAS_H * SCALE}px`,
+        width: frame.w * scale,
+        height: frame.h * scale,
+        backgroundImage: `url('${atlasUrl}')`,
+        backgroundPosition: `${-frame.x * scale}px ${-frame.y * scale}px`,
+        backgroundSize: `${atlasW * scale}px ${atlasH * scale}px`,
         imageRendering: "pixelated",
         flexShrink: 0,
       }}
@@ -132,19 +157,57 @@ function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element 
   );
 }
 
-function EnvironmentAtlasSprite({ x, y, w, h }: { x: number; y: number; w: number; h: number }): JSX.Element {
+function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element {
+  return (
+    <AtlasSprite
+      atlasUrl={ATLAS_IMAGE_URL}
+      atlasW={ATLAS_W}
+      atlasH={ATLAS_H}
+      frame={item.atlasFrame}
+    />
+  );
+}
+
+function EnvironmentAtlasSprite({ frame }: { frame: AtlasFrame }): JSX.Element {
+  return (
+    <AtlasSprite
+      atlasUrl={ENVIRONMENT_ATLAS_IMAGE_URL}
+      atlasW={ENVIRONMENT_ATLAS_W}
+      atlasH={ENVIRONMENT_ATLAS_H}
+      frame={frame}
+    />
+  );
+}
+
+function TintedAtlasSprite({
+  frame,
+  tint,
+}: {
+  frame: AtlasFrame;
+  tint: number | null | undefined;
+}): JSX.Element {
   return (
     <div
       style={{
-        width: w * SCALE,
-        height: h * SCALE,
-        backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
-        backgroundPosition: `${-x * SCALE}px ${-y * SCALE}px`,
-        backgroundSize: `${ENVIRONMENT_ATLAS_W * SCALE}px ${ENVIRONMENT_ATLAS_H * SCALE}px`,
-        imageRendering: "pixelated",
+        position: "relative",
+        width: frame.w * SCALE,
+        height: frame.h * SCALE,
+        overflow: "hidden",
         flexShrink: 0,
+        isolation: "isolate",
       }}
-    />
+    >
+      <EnvironmentAtlasSprite frame={frame} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: tintToHexCss(tint) ?? "transparent",
+          opacity: 0.45,
+          mixBlendMode: "multiply",
+        }}
+      />
+    </div>
   );
 }
 
@@ -185,8 +248,8 @@ function ColorSlider({
 
 function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): JSX.Element {
   const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"];
+  const { tint } = resolveOfficeFloorAppearance(colorAdjust, null);
   if (!defaultFrame) {
-    const tint = resolveOfficeTileTint(colorAdjust, null);
     return (
       <div
         style={{
@@ -197,31 +260,7 @@ function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): 
       />
     );
   }
-  const { x, y, w, h } = defaultFrame.frame;
-  const tint = resolveOfficeTileTint(colorAdjust, null);
-  return (
-    <div
-      style={{
-        position: "relative",
-        width: w * SCALE,
-        height: h * SCALE,
-        overflow: "hidden",
-        flexShrink: 0,
-        isolation: "isolate",
-      }}
-    >
-      <EnvironmentAtlasSprite x={x} y={y} w={w} h={h} />
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: tintToHexCss(tint) ?? "transparent",
-          opacity: 0.45,
-          mixBlendMode: "multiply",
-        }}
-      />
-    </div>
-  );
+  return <TintedAtlasSprite frame={defaultFrame.frame} tint={tint} />;
 }
 
 function FloorPatternPreview({
@@ -242,7 +281,7 @@ function FloorPatternPreview({
     return <button type="button" onClick={onClick} style={selected ? btnActive : btnBase}>{patternId}</button>;
   }
 
-  const tint = resolveOfficeTileTint(colorAdjust, null);
+  const { tint } = resolveOfficeFloorAppearance(colorAdjust, null);
   return (
     <button
       type="button"
@@ -256,18 +295,7 @@ function FloorPatternPreview({
         flexShrink: 0,
       }}
     >
-      <div style={{ position: "relative", width: frame.w * SCALE, height: frame.h * SCALE, overflow: "hidden", isolation: "isolate" }}>
-        <EnvironmentAtlasSprite x={frame.x} y={frame.y} w={frame.w} h={frame.h} />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: tintToHexCss(tint) ?? "transparent",
-            opacity: 0.45,
-            mixBlendMode: "multiply",
-          }}
-        />
-      </div>
+      <TintedAtlasSprite frame={frame} tint={tint} />
     </button>
   );
 }
@@ -340,7 +368,7 @@ function FloorSubPanel({
               cursor: "pointer",
             }}
           >
-            <FloorTilePreview colorAdjust={resolveOfficeTileColorAdjustPreset(color)} />
+            <FloorTilePreview colorAdjust={resolveOfficeFloorAppearance(null, color).colorAdjust} />
           </button>
         ))}
       </div>
@@ -376,25 +404,12 @@ function FloorSubPanel({
 
 function WallSubPanel(): JSX.Element {
   const previewFrame = ENVIRONMENT_ATLAS_FRAMES["environment.walls.mask-00#0"];
-  const ENV_SCALE = 2;
   return (
     <div style={subPanel}>
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
         Wall
       </div>
-      {previewFrame ? (
-        <div
-          style={{
-            width: previewFrame.frame.w * ENV_SCALE,
-            height: previewFrame.frame.h * ENV_SCALE,
-            backgroundImage: `url('${ENVIRONMENT_ATLAS_IMAGE_URL}')`,
-            backgroundPosition: `${-previewFrame.frame.x * ENV_SCALE}px ${-previewFrame.frame.y * ENV_SCALE}px`,
-            backgroundSize: `${ENVIRONMENT_ATLAS_W * ENV_SCALE}px ${ENVIRONMENT_ATLAS_H * ENV_SCALE}px`,
-            imageRendering: "pixelated",
-            flexShrink: 0,
-          }}
-        />
-      ) : null}
+      {previewFrame ? <EnvironmentAtlasSprite frame={previewFrame.frame} /> : null}
     </div>
   );
 }

@@ -2,21 +2,22 @@ import type { EntityId } from "./domain/model";
 import type { OfficeTileColor } from "./office/model";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import type { OfficeColorAdjust } from "./scenes/office/colors";
+import { isRecord } from "./utils/typeGuards";
 
-// Drag-and-drop placement: React → Phaser
+// React → Phaser commands
 export const PLACE_DRAG_MIME = "application/json";
 export const PLACE_OBJECT_DROP_EVENT = "placeObjectDrop";
 export const PLACE_TERRAIN_DROP_EVENT = "placeTerrainDrop";
 export const SELECT_TERRAIN_TOOL_EVENT = "selectTerrainTool";
+export const SET_ZOOM_EVENT = "setZoom";
+export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
+
+// Phaser → React notifications
 export const TERRAIN_TILE_INSPECTED_EVENT = "terrainTileInspected";
 export const PLAYER_PLACED_EVENT = "playerPlaced";
 export const PLAYER_STATE_CHANGED_EVENT = "playerStateChanged";
 export const RUNTIME_PERF_EVENT = "runtimePerf";
-
 export const ZOOM_CHANGED_EVENT = "zoomChanged";
-export const SET_ZOOM_EVENT = "setZoom";
-
-export const OFFICE_SET_EDITOR_TOOL_EVENT = "officeSetEditorTool";
 export const OFFICE_FLOOR_PICKED_EVENT = "officeFloorPicked";
 export const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 
@@ -27,14 +28,37 @@ export type OfficeLayoutChangedPayload = {
   layout: import("./scenes/office/bootstrap").OfficeSceneLayout;
 };
 
-export type OfficeSetEditorToolPayload = {
-  tool: OfficeEditorToolId | null;
-  floorMode: OfficeFloorMode | null;
+export type OfficeSetEditorToolNonePayload = {
+  tool: null;
+};
+
+export type OfficeSetEditorToolWallPayload = {
+  tool: "wall";
+};
+
+export type OfficeSetEditorToolErasePayload = {
+  tool: "erase";
+};
+
+export type OfficeSetEditorToolFurniturePayload = {
+  tool: "furniture";
+  furnitureId: string | null;
+};
+
+export type OfficeSetEditorToolFloorPayload = {
+  tool: "floor";
+  floorMode: OfficeFloorMode;
   tileColor: OfficeTileColor | null;
   floorColor: OfficeColorAdjust | null;
   floorPattern: string | null;
-  furnitureId: string | null;
 };
+
+export type OfficeSetEditorToolPayload =
+  | OfficeSetEditorToolNonePayload
+  | OfficeSetEditorToolWallPayload
+  | OfficeSetEditorToolErasePayload
+  | OfficeSetEditorToolFurniturePayload
+  | OfficeSetEditorToolFloorPayload;
 
 export type OfficeFloorPickedPayload = {
   floorColor: OfficeColorAdjust | null;
@@ -56,10 +80,7 @@ export type PlaceTerrainDragPayload = {
 };
 
 export type PlaceDragPayload = PlaceEntityDragPayload | PlaceTerrainDragPayload;
-
-
 export type PlaceEntityDropPayload = PlaceEntityDragPayload & {
-
   screenX: number;
   screenY: number;
 };
@@ -100,10 +121,6 @@ export type RuntimePerfPayload = {
   updateMs: number;
   terrainMs: number;
 };
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
 
 export function parsePlaceDragPayload(
   value: unknown,

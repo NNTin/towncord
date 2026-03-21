@@ -1,4 +1,13 @@
-import atlasData from "../../../public/assets/donarg-office/atlas.json";
+import atlasDataJson from "public-assets-json:donarg-office/atlas.json";
+
+type DonargOfficeAtlasData = {
+  meta: {
+    size: { w: number; h: number };
+  };
+  frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+};
+
+const atlasData = atlasDataJson as DonargOfficeAtlasData;
 
 export const ENVIRONMENT_ATLAS_IMAGE_URL = "/assets/donarg-office/atlas.png";
 export const ENVIRONMENT_ATLAS_W = atlasData.meta.size.w;

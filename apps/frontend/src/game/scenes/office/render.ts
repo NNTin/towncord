@@ -95,99 +95,139 @@ export function renderOfficeLayout(
     depthAnchorRow = 0,
   } = options;
 
-  // Single top-level container for the entire office. All child objects are
-  // positioned relative to this container, so translating the container moves
-  // the whole office in one call and frustum-culling can target it directly.
-  const officeContainer = scene.add.container(worldOffsetX, worldOffsetY);
+  return new OfficeLayoutRenderableImpl(
+    scene,
+    layout,
+    worldOffsetX,
+    worldOffsetY,
+    tileDepth,
+    depthAnchorRow,
+  );
+}
 
-  // Children use local (container-relative) coordinates — no worldOffset needed.
-  const tileLayer = renderTiles(scene, layout, 0, 0, tileDepth);
-  officeContainer.add(tileLayer);
+class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
+  public renderIndex: OfficeSceneRenderIndex;
+  public readonly container: Phaser.GameObjects.Container;
 
-  const furnitureEntries = layout.furniture.map((item) => {
-    const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
-    const { target, container } = renderFurniture(scene, layout, item, paletteItem, 0, 0, depthAnchorRow);
-    officeContainer.add(container);
-    // bounds must be in world space so callers can hit-test against world coordinates
-    target.bounds.x += worldOffsetX;
-    target.bounds.y += worldOffsetY;
-    return { id: item.id, target, container };
-  });
+  private readonly scene: Phaser.Scene;
+  private readonly tileLayer: Phaser.GameObjects.Container;
+  private readonly worldOffsetX: number;
+  private readonly worldOffsetY: number;
+  private readonly depthAnchorRow: number;
+  private readonly furnitureMap = new Map<
+    string,
+    { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }
+  >();
+  private characterEntries: Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> = [];
+  private characterSource: readonly OfficeSceneCharacter[];
 
-  const characterEntries = layout.characters.map((actor) => {
-    const { target, container } = renderCharacter(scene, layout, actor, 0, 0, depthAnchorRow);
-    officeContainer.add(container);
-    target.bounds.x += worldOffsetX;
-    target.bounds.y += worldOffsetY;
-    return { target, container };
-  });
+  constructor(
+    scene: Phaser.Scene,
+    layout: OfficeSceneLayout,
+    worldOffsetX: number,
+    worldOffsetY: number,
+    tileDepth: number,
+    depthAnchorRow: number,
+  ) {
+    this.scene = scene;
+    this.worldOffsetX = worldOffsetX;
+    this.worldOffsetY = worldOffsetY;
+    this.depthAnchorRow = depthAnchorRow;
 
-  // Live furniture map: id → { target, container } for O(1) diff lookups.
-  const furnitureMap = new Map(furnitureEntries.map((e) => [e.id, { target: e.target, container: e.container }]));
+    // Single top-level container for the entire office. All child objects are
+    // positioned relative to this container, so translating the container moves
+    // the whole office in one call and frustum-culling can target it directly.
+    this.container = scene.add.container(worldOffsetX, worldOffsetY);
 
-  function buildRenderIndex(): OfficeSceneRenderIndex {
+    // Children use local (container-relative) coordinates - no worldOffset needed.
+    this.tileLayer = renderTiles(scene, layout, 0, 0, tileDepth);
+    this.container.add(this.tileLayer);
+
+    this.characterSource = layout.characters;
+    this.syncFurniture(layout);
+    this.characterEntries = this.buildCharacterEntries(layout);
+    this.renderIndex = this.buildRenderIndex();
+  }
+
+  public partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex {
+    // --- Tile layer: remove all children and rebuild ---
+    this.tileLayer.removeAll(true);
+    buildTileObjects(this.scene, this.tileLayer, newLayout);
+
+    this.syncFurniture(newLayout);
+    this.syncCharacters(newLayout);
+
+    this.renderIndex = this.buildRenderIndex();
+    return this.renderIndex;
+  }
+
+  public destroy(): void {
+    // Destroying the top-level container also destroys all its children.
+    this.container.destroy(true);
+  }
+
+  private buildRenderIndex(): OfficeSceneRenderIndex {
     return {
-      furniture: [...furnitureMap.values()].map((e) => e.target),
-      characters: characterEntries.map((e) => e.target),
+      furniture: [...this.furnitureMap.values()].map((entry) => entry.target),
+      characters: this.characterEntries.map((entry) => entry.target),
     };
   }
 
-  const renderable: OfficeLayoutRenderable = {
-    container: officeContainer,
-    renderIndex: buildRenderIndex(),
+  private syncFurniture(layout: OfficeSceneLayout): void {
+    const newFurnitureIds = new Set(layout.furniture.map((furniture) => furniture.id));
 
-    partialUpdate(newLayout: OfficeSceneLayout): OfficeSceneRenderIndex {
-      // --- Tile layer: remove all children and rebuild ---
-      tileLayer.removeAll(true);
-      buildTileObjects(scene, tileLayer, newLayout);
+    for (const [id, entry] of this.furnitureMap) {
+      if (!newFurnitureIds.has(id)) {
+        this.container.remove(entry.container, true);
+        this.furnitureMap.delete(id);
+      }
+    }
 
-      // --- Furniture: diff by id ---
-      const newFurnitureIds = new Set(newLayout.furniture.map((f) => f.id));
-
-      // Remove stale furniture containers.
-      for (const [id, entry] of furnitureMap) {
-        if (!newFurnitureIds.has(id)) {
-          officeContainer.remove(entry.container, true);
-          furnitureMap.delete(id);
-        }
+    for (const item of layout.furniture) {
+      if (this.furnitureMap.has(item.id)) {
+        continue;
       }
 
-      // Add new furniture containers.
-      for (const item of newLayout.furniture) {
-        if (!furnitureMap.has(item.id)) {
-          const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
-          const { target, container } = renderFurniture(scene, newLayout, item, paletteItem, 0, 0, depthAnchorRow);
-          officeContainer.add(container);
-          target.bounds.x += worldOffsetX;
-          target.bounds.y += worldOffsetY;
-          furnitureMap.set(item.id, { target, container });
-        }
-      }
+      const paletteItem = FURNITURE_PALETTE_MAP.get(item.assetId);
+      const { target, container } = renderFurniture(
+        this.scene,
+        layout,
+        item,
+        paletteItem,
+        0,
+        0,
+        this.depthAnchorRow,
+      );
+      this.container.add(container);
+      target.bounds.x += this.worldOffsetX;
+      target.bounds.y += this.worldOffsetY;
+      this.furnitureMap.set(item.id, { target, container });
+    }
+  }
 
-      // --- Characters: always rebuild (derived, rarely changes) ---
-      for (const entry of characterEntries) {
-        officeContainer.remove(entry.container, true);
-      }
-      characterEntries.length = 0;
-      for (const actor of newLayout.characters) {
-        const { target, container } = renderCharacter(scene, newLayout, actor, 0, 0, depthAnchorRow);
-        officeContainer.add(container);
-        target.bounds.x += worldOffsetX;
-        target.bounds.y += worldOffsetY;
-        characterEntries.push({ target, container });
-      }
+  private syncCharacters(newLayout: OfficeSceneLayout): void {
+    if (newLayout.characters === this.characterSource) {
+      return;
+    }
 
-      renderable.renderIndex = buildRenderIndex();
-      return renderable.renderIndex;
-    },
+    for (const entry of this.characterEntries) {
+      this.container.remove(entry.container, true);
+    }
+    this.characterEntries = this.buildCharacterEntries(newLayout);
+    this.characterSource = newLayout.characters;
+  }
 
-    destroy() {
-      // Destroying the top-level container also destroys all its children.
-      officeContainer.destroy(true);
-    },
-  };
-
-  return renderable;
+  private buildCharacterEntries(
+    layout: OfficeSceneLayout,
+  ): Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> {
+    return layout.characters.map((actor) => {
+      const { target, container } = renderCharacter(this.scene, layout, actor, 0, 0, this.depthAnchorRow);
+      this.container.add(container);
+      target.bounds.x += this.worldOffsetX;
+      target.bounds.y += this.worldOffsetY;
+      return { target, container };
+    });
+  }
 }
 
 function renderTiles(

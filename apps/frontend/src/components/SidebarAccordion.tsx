@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { AnimationCatalog } from "../game/assets/animationCatalog";
 import { createPlaceablesSidebarBridge } from "../game/application/placeablesSidebarBridge";
 import type {
@@ -35,11 +35,14 @@ export function SidebarAccordion({
   runtimePerf,
 }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
-  const placeablesBridge = createPlaceablesSidebarBridge({
-    placeables,
-    activeTerrainTool,
-    onSelectTerrainTool,
-  });
+  const placeablesBridge = useMemo(
+    () => createPlaceablesSidebarBridge({
+      placeables,
+      activeTerrainTool,
+      onSelectTerrainTool,
+    }),
+    [placeables, activeTerrainTool, onSelectTerrainTool],
+  );
 
   return (
     <div

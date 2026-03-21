@@ -1,0 +1,77 @@
+import type Phaser from "phaser";
+
+type Pointer = Phaser.Input.Pointer;
+
+type WorldSceneInputRouterContext = {
+  beginPan: (pointer: Pointer) => void;
+  tryHandleOfficePointerDown: (pointer: Pointer) => boolean;
+  hasActiveTerrainTool: () => boolean;
+  beginTerrainPaint: (pointer: Pointer) => void;
+  handleSelectionAndInspect: (pointer: Pointer) => void;
+  isPanning: () => boolean;
+  updatePan: (pointer: Pointer) => void;
+  syncHover: (pointer: Pointer) => void;
+  shouldContinueOfficePainting: (pointer: Pointer) => boolean;
+  continueOfficePainting: (pointer: Pointer) => void;
+  shouldContinueTerrainPainting: () => boolean;
+  continueTerrainPainting: (pointer: Pointer) => void;
+  endPan: (pointer: Pointer) => void;
+  endPrimaryPointer: (pointer: Pointer) => void;
+};
+
+export class WorldSceneInputRouter {
+  constructor(private readonly context: WorldSceneInputRouterContext) {}
+
+  onPointerDown(pointer: Pointer): void {
+    if (pointer.button === 1) {
+      this.context.beginPan(pointer);
+      return;
+    }
+
+    if (pointer.button !== 0) {
+      return;
+    }
+
+    if (this.context.tryHandleOfficePointerDown(pointer)) {
+      return;
+    }
+
+    if (this.context.hasActiveTerrainTool()) {
+      this.context.beginTerrainPaint(pointer);
+      return;
+    }
+
+    this.context.handleSelectionAndInspect(pointer);
+  }
+
+  onPointerMove(pointer: Pointer): void {
+    if (this.context.isPanning()) {
+      this.context.updatePan(pointer);
+      return;
+    }
+
+    this.context.syncHover(pointer);
+
+    if (this.context.shouldContinueOfficePainting(pointer)) {
+      this.context.continueOfficePainting(pointer);
+      return;
+    }
+
+    if (!this.context.shouldContinueTerrainPainting()) {
+      return;
+    }
+
+    this.context.continueTerrainPainting(pointer);
+  }
+
+  onPointerUp(pointer: Pointer): void {
+    if (pointer.button === 1) {
+      this.context.endPan(pointer);
+      return;
+    }
+
+    if (pointer.button === 0) {
+      this.context.endPrimaryPointer(pointer);
+    }
+  }
+}

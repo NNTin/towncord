@@ -42,6 +42,7 @@ import {
   type TerrainRenderTile,
 } from "../terrain";
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
+import { WorldSceneInputRouter } from "./world/inputRouter";
 import { TownCollisionGrid } from "../town/collisionGrid";
 import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
@@ -81,254 +82,30 @@ export class WorldScene extends Phaser.Scene {
 
   /** Dedicated system for office editor tool dispatch (floor/wall/furniture/erase). */
   private readonly officeEditorSystem = new OfficeEditorSystem();
+  private readonly inputRouter: WorldSceneInputRouter;
 
-  private get catalog(): AnimationCatalog | null {
-    return this.runtimeState.catalog;
-  }
-
-  private set catalog(value: AnimationCatalog | null) {
-    this.runtimeState.catalog = value;
-  }
-
-  private get entityRegistry(): EntityRegistry | null {
-    return this.runtimeState.entityRegistry;
-  }
-
-  private set entityRegistry(value: EntityRegistry | null) {
-    this.runtimeState.entityRegistry = value;
-  }
-
-  /**
-   * Provides direct access to the entity array for test harnesses that need to
-   * inject mock entities (e.g. to simulate occupied terrain cells).  In
-   * production code, the entity lifecycle is managed by EntitySystem.
-   */
-  private get entities(): WorldEntity[] {
-    return this.runtimeState.entities;
-  }
-
-  private set entities(value: WorldEntity[]) {
-    this.runtimeState.entities = value;
-  }
-
-  private get selectedEntity(): WorldEntity | null {
-    return this.runtimeState.selectedEntity;
-  }
-
-  private set selectedEntity(value: WorldEntity | null) {
-    this.runtimeState.selectedEntity = value;
-  }
-
-  private get selectionBadge(): Phaser.GameObjects.Sprite | null {
-    return this.runtimeState.selectionBadge;
-  }
-
-  private set selectionBadge(value: Phaser.GameObjects.Sprite | null) {
-    this.runtimeState.selectionBadge = value;
-  }
-
-  private get terrainBrushPreview(): Phaser.GameObjects.Rectangle | null {
-    return this.runtimeState.terrainBrushPreview;
-  }
-
-  private set terrainBrushPreview(value: Phaser.GameObjects.Rectangle | null) {
-    this.runtimeState.terrainBrushPreview = value;
-  }
-
-  private get officeCellHighlight(): Phaser.GameObjects.Rectangle | null {
-    return this.runtimeState.officeCellHighlight;
-  }
-
-  private set officeCellHighlight(value: Phaser.GameObjects.Rectangle | null) {
-    this.runtimeState.officeCellHighlight = value;
-  }
-
-  private get terrainBrushRenderPreviewImages(): Phaser.GameObjects.Image[] {
-    return this.runtimeState.terrainBrushRenderPreviewImages;
-  }
-
-  private set terrainBrushRenderPreviewImages(value: Phaser.GameObjects.Image[]) {
-    this.runtimeState.terrainBrushRenderPreviewImages = value;
-  }
-
-  private get terrainSystem(): TerrainSystem | null {
-    return this.runtimeState.terrainSystem;
-  }
-
-  private set terrainSystem(value: TerrainSystem | null) {
-    this.runtimeState.terrainSystem = value;
-  }
-
-  private get officeRenderable(): OfficeLayoutRenderable | null {
-    return this.runtimeState.officeRenderable;
-  }
-
-  private set officeRenderable(value: OfficeLayoutRenderable | null) {
-    this.runtimeState.officeRenderable = value;
-  }
-
-  private get officeRegion(): TownOfficeRegion | null {
-    return this.runtimeState.officeRegion;
-  }
-
-  private set officeRegion(value: TownOfficeRegion | null) {
-    this.runtimeState.officeRegion = value;
-  }
-
-  private get activeOfficeTool(): OfficeEditorToolId | null {
-    return this.runtimeState.activeOfficeTool;
-  }
-
-  private set activeOfficeTool(value: OfficeEditorToolId | null) {
-    this.runtimeState.activeOfficeTool = value;
-  }
-
-  private get activeTileColor(): OfficeTileColor | null {
-    return this.runtimeState.activeTileColor;
-  }
-
-  private set activeTileColor(value: OfficeTileColor | null) {
-    this.runtimeState.activeTileColor = value;
-  }
-
-  private get activeFloorColor(): OfficeColorAdjust | null {
-    return this.runtimeState.activeFloorColor;
-  }
-
-  private set activeFloorColor(value: OfficeColorAdjust | null) {
-    this.runtimeState.activeFloorColor = value;
-  }
-
-  private get activeFloorPattern(): string | null {
-    return this.runtimeState.activeFloorPattern;
-  }
-
-  private get activeFloorMode(): OfficeFloorMode {
-    return this.runtimeState.activeFloorMode;
-  }
-
-  private set activeFloorMode(value: OfficeFloorMode) {
-    this.runtimeState.activeFloorMode = value;
-  }
-
-  private set activeFloorPattern(value: string | null) {
-    this.runtimeState.activeFloorPattern = value;
-  }
-
-  private get activeFurnitureId(): string | null {
-    return this.runtimeState.activeFurnitureId;
-  }
-
-  private set activeFurnitureId(value: string | null) {
-    this.runtimeState.activeFurnitureId = value;
-  }
-
-  private get isOfficePainting(): boolean {
-    return this.runtimeState.isOfficePainting;
-  }
-
-  private set isOfficePainting(value: boolean) {
-    this.runtimeState.isOfficePainting = value;
-  }
-
-  private get officeDirty(): boolean {
-    return this.runtimeState.officeDirty;
-  }
-
-  private set officeDirty(value: boolean) {
-    this.runtimeState.officeDirty = value;
-  }
-
-  private get navigation(): WorldNavigationService | null {
-    return this.runtimeState.navigation;
-  }
-
-  private set navigation(value: WorldNavigationService | null) {
-    this.runtimeState.navigation = value;
-  }
-
-  private get wasd(): WorldSceneMovementKeys | null {
-    return this.runtimeState.wasd;
-  }
-
-  private set wasd(value: WorldSceneMovementKeys | null) {
-    this.runtimeState.wasd = value;
-  }
-
-  private get shiftKey(): Phaser.Input.Keyboard.Key | null {
-    return this.runtimeState.shiftKey;
-  }
-
-  private set shiftKey(value: Phaser.Input.Keyboard.Key | null) {
-    this.runtimeState.shiftKey = value;
-  }
-
-  private get activeTerrainTool(): SelectedTerrainToolPayload {
-    return this.runtimeState.activeTerrainTool;
-  }
-
-  private set activeTerrainTool(value: SelectedTerrainToolPayload) {
-    this.runtimeState.activeTerrainTool = value;
-  }
-
-  private get terrainPaintSession(): TerrainPaintSession {
-    return this.runtimeState.terrainPaintSession;
-  }
-
-  private set terrainPaintSession(value: TerrainPaintSession) {
-    this.runtimeState.terrainPaintSession = value;
-  }
-
-  private get isPanning(): boolean {
-    return this.runtimeState.isPanning;
-  }
-
-  private set isPanning(value: boolean) {
-    this.runtimeState.isPanning = value;
-  }
-
-  private get panStartX(): number {
-    return this.runtimeState.panStartX;
-  }
-
-  private set panStartX(value: number) {
-    this.runtimeState.panStartX = value;
-  }
-
-  private get panStartY(): number {
-    return this.runtimeState.panStartY;
-  }
-
-  private set panStartY(value: number) {
-    this.runtimeState.panStartY = value;
-  }
-
-  private get camStartX(): number {
-    return this.runtimeState.camStartX;
-  }
-
-  private set camStartX(value: number) {
-    this.runtimeState.camStartX = value;
-  }
-
-  private get camStartY(): number {
-    return this.runtimeState.camStartY;
-  }
-
-  private set camStartY(value: number) {
-    this.runtimeState.camStartY = value;
-  }
-
-  private get lastPerfEmitAtMs(): number {
-    return this.runtimeState.lastPerfEmitAtMs;
-  }
-
-  private set lastPerfEmitAtMs(value: number) {
-    this.runtimeState.lastPerfEmitAtMs = value;
+  private get rs(): WorldSceneRuntime {
+    return this.runtimeState;
   }
 
   constructor() {
     super(WORLD_SCENE_KEY);
+    this.inputRouter = new WorldSceneInputRouter({
+      beginPan: (pointer) => this.beginPan(pointer),
+      tryHandleOfficePointerDown: (pointer) => this.tryHandleOfficePointerDown(pointer),
+      hasActiveTerrainTool: () => Boolean(this.rs.activeTerrainTool),
+      beginTerrainPaint: (pointer) => this.beginTerrainPaint(pointer),
+      handleSelectionAndInspect: (pointer) => this.handleSelectionAndInspect(pointer),
+      isPanning: () => this.rs.isPanning,
+      updatePan: (pointer) => this.updatePan(pointer),
+      syncHover: (pointer) => this.syncHover(pointer),
+      shouldContinueOfficePainting: (pointer) => this.shouldContinueOfficePainting(pointer),
+      continueOfficePainting: (pointer) => this.continueOfficePainting(pointer),
+      shouldContinueTerrainPainting: () => this.shouldContinueTerrainPainting(),
+      continueTerrainPainting: (pointer) => this.continueTerrainPainting(pointer),
+      endPan: (pointer) => this.endPan(pointer),
+      endPrimaryPointer: (pointer) => this.endPrimaryPointer(pointer),
+    });
   }
 
   public create(): void {
@@ -336,29 +113,29 @@ export class WorldScene extends Phaser.Scene {
       this.registry.get(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY),
     );
     if (bootstrap) {
-      this.catalog = bootstrap.catalog;
-      this.entityRegistry = bootstrap.entityRegistry;
+      this.rs.catalog = bootstrap.catalog;
+      this.rs.entityRegistry = bootstrap.entityRegistry;
     }
 
-    this.wasd = this.input.keyboard!.addKeys("W,A,S,D") as WorldSceneMovementKeys;
-    this.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    this.rs.wasd = this.input.keyboard!.addKeys("W,A,S,D") as WorldSceneMovementKeys;
+    this.rs.shiftKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 
-    this.terrainSystem = new TerrainSystem(this);
+    this.rs.terrainSystem = new TerrainSystem(this);
     const officeRegion = loadTownOfficeRegion();
     const collisionGrid = new TownCollisionGrid(
-      this.terrainSystem.getGameplayGrid(),
+      this.rs.terrainSystem.getGameplayGrid(),
       officeRegion,
     );
     const navigation = createTerrainNavigationService(
-      this.terrainSystem.getGameplayGrid(),
+      this.rs.terrainSystem.getGameplayGrid(),
       collisionGrid,
     );
-    this.navigation = navigation;
+    this.rs.navigation = navigation;
 
-    if (this.catalog) {
+    if (this.rs.catalog) {
       this.entitySystem = new EntitySystem({
         scene: this,
-        catalog: this.catalog,
+        catalog: this.rs.catalog,
         navigation,
         emitGameEvent: (event, payload) => this.game.events.emit(event, payload),
         onSelectedEntityUpdated: (entity) => this.syncSelectionBadgePosition(entity),
@@ -367,8 +144,8 @@ export class WorldScene extends Phaser.Scene {
 
     {
       const { anchorX16, anchorY16, layout } = officeRegion;
-      this.officeRegion = officeRegion;
-      this.officeRenderable = renderOfficeLayout(this, layout, {
+      this.rs.officeRegion = officeRegion;
+      this.rs.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
@@ -389,22 +166,22 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public override update(_time: number, delta: number): void {
-    const runtimeState = this.runtimeState;
+    const rs = this.rs;
     const updateStart = performance.now();
 
-    const terrainSystem = runtimeState.terrainSystem;
+    const terrainSystem = rs.terrainSystem;
     const terrainStart = performance.now();
     terrainSystem?.update();
     const terrainMs = performance.now() - terrainStart;
 
-    const { shiftKey, wasd } = runtimeState;
+    const { shiftKey, wasd } = rs;
     if (wasd && shiftKey && this.entitySystem) {
       const directInput = this.resolveDirectMovementInput(wasd, shiftKey);
       this.entitySystem.update(delta, directInput);
     }
 
     const now = performance.now();
-    if (now - runtimeState.lastPerfEmitAtMs >= 100) {
+    if (now - rs.lastPerfEmitAtMs >= 100) {
       const updateMs = now - updateStart;
       const fps = delta > 0 ? 1000 / delta : 0;
       const payload: RuntimePerfPayload = {
@@ -415,22 +192,21 @@ export class WorldScene extends Phaser.Scene {
         terrainMs,
       };
       this.game.events.emit(RUNTIME_PERF_EVENT, payload);
-      runtimeState.lastPerfEmitAtMs = now;
+      rs.lastPerfEmitAtMs = now;
     }
 
-    if (runtimeState.officeDirty) {
+    if (rs.officeDirty) {
       this.rerenderOffice();
-      runtimeState.officeDirty = false;
-      if (this.officeRegion) {
-        const payload: OfficeLayoutChangedPayload = { layout: this.officeRegion.layout };
+      rs.officeDirty = false;
+      if (this.rs.officeRegion) {
+        const payload: OfficeLayoutChangedPayload = { layout: this.rs.officeRegion.layout };
         this.game.events.emit(OFFICE_LAYOUT_CHANGED_EVENT, payload);
       }
     }
   }
 
   private selectEntity(entity: WorldEntity | null): void {
-    if (this.selectedEntity === entity) return;
-    this.selectedEntity = entity;
+    if (this.entitySystem?.getSelected() === entity) return;
     this.entitySystem?.select(entity);
     this.setSelectionBadgeVisible(Boolean(entity));
     if (entity) this.syncSelectionBadgePosition(entity);
@@ -444,7 +220,7 @@ export class WorldScene extends Phaser.Scene {
     badge.setScale(SELECTED_BADGE_SCALE);
     badge.setDepth(RENDER_LAYERS.UI_OVERLAY);
     badge.setVisible(false);
-    this.selectionBadge = badge;
+    this.rs.selectionBadge = badge;
   }
 
   private createTerrainBrushPreview(): void {
@@ -464,11 +240,11 @@ export class WorldScene extends Phaser.Scene {
       0.9,
     );
     preview.setVisible(false);
-    this.terrainBrushPreview = preview;
+    this.rs.terrainBrushPreview = preview;
   }
 
   private createOfficeCellHighlight(): void {
-    const cellSize = this.officeRegion?.layout.cellSize ?? 16;
+    const cellSize = this.rs.officeRegion?.layout.cellSize ?? 16;
     const highlight = this.add.rectangle(
       0,
       0,
@@ -481,45 +257,45 @@ export class WorldScene extends Phaser.Scene {
     highlight.setDepth(RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT);
     highlight.setStrokeStyle(OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH, OFFICE_CELL_HIGHLIGHT_STROKE, 0.9);
     highlight.setVisible(false);
-    this.officeCellHighlight = highlight;
+    this.rs.officeCellHighlight = highlight;
   }
 
   private syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
-    if (!pointer || !this.activeOfficeTool || !this.officeRegion) {
-      this.officeCellHighlight?.setVisible(false);
+    if (!pointer || !this.rs.activeOfficeTool || !this.rs.officeRegion) {
+      this.rs.officeCellHighlight?.setVisible(false);
       return;
     }
 
     const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-    const cell = worldToOfficeCell(worldPoint.x, worldPoint.y, this.officeRegion);
+    const cell = worldToOfficeCell(worldPoint.x, worldPoint.y, this.rs.officeRegion);
     if (!cell) {
-      this.officeCellHighlight?.setVisible(false);
+      this.rs.officeCellHighlight?.setVisible(false);
       return;
     }
 
-    const { worldX, worldY } = officeCellToWorldPixel(cell.col, cell.row, this.officeRegion);
-    this.officeCellHighlight?.setPosition(worldX, worldY);
-    this.officeCellHighlight?.setVisible(true);
+    const { worldX, worldY } = officeCellToWorldPixel(cell.col, cell.row, this.rs.officeRegion);
+    this.rs.officeCellHighlight?.setPosition(worldX, worldY);
+    this.rs.officeCellHighlight?.setVisible(true);
   }
 
   private setSelectionBadgeVisible(visible: boolean): void {
-    if (!this.selectionBadge) return;
-    this.selectionBadge.setVisible(visible);
+    if (!this.rs.selectionBadge) return;
+    this.rs.selectionBadge.setVisible(visible);
   }
 
   private setTerrainBrushPreviewVisible(visible: boolean): void {
-    if (!this.terrainBrushPreview) return;
-    this.terrainBrushPreview.setVisible(visible);
+    if (!this.rs.terrainBrushPreview) return;
+    this.rs.terrainBrushPreview.setVisible(visible);
   }
 
   private hideTerrainBrushRenderPreview(): void {
-    for (const image of this.terrainBrushRenderPreviewImages) {
+    for (const image of this.rs.terrainBrushRenderPreviewImages) {
       image.setVisible(false);
     }
   }
 
   private getTerrainBrushRenderPreviewImage(index: number): Phaser.GameObjects.Image {
-    const existing = this.terrainBrushRenderPreviewImages[index];
+    const existing = this.rs.terrainBrushRenderPreviewImages[index];
     if (existing) {
       return existing;
     }
@@ -528,7 +304,7 @@ export class WorldScene extends Phaser.Scene {
     image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
     image.setDepth(RENDER_LAYERS.TERRAIN_BRUSH_PREVIEW - 1);
     image.setVisible(false);
-    this.terrainBrushRenderPreviewImages[index] = image;
+    this.rs.terrainBrushRenderPreviewImages[index] = image;
     return image;
   }
 
@@ -546,14 +322,14 @@ export class WorldScene extends Phaser.Scene {
       image.setVisible(true);
     });
 
-    for (let index = tiles.length; index < this.terrainBrushRenderPreviewImages.length; index += 1) {
-      this.terrainBrushRenderPreviewImages[index]?.setVisible(false);
+    for (let index = tiles.length; index < this.rs.terrainBrushRenderPreviewImages.length; index += 1) {
+      this.rs.terrainBrushRenderPreviewImages[index]?.setVisible(false);
     }
   }
 
   private syncSelectionBadgePosition(entity: WorldSelectableActor): void {
-    if (!this.selectionBadge) return;
-    this.selectionBadge.setPosition(
+    if (!this.rs.selectionBadge) return;
+    this.rs.selectionBadge.setPosition(
       entity.position.x,
       entity.position.y -
         entity.sprite.displayHeight * EntitySystem.spriteOriginY -
@@ -562,16 +338,16 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPlaceObjectDrop(payload: PlaceObjectDropPayload): void {
-    if (!this.catalog || !this.entityRegistry || !this.terrainSystem || !this.entitySystem) return;
+    if (!this.rs.catalog || !this.rs.entityRegistry || !this.rs.terrainSystem || !this.entitySystem) return;
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
-    const runtime = this.entityRegistry.getRuntimeById(spawnRequest.entityId);
+    const runtime = this.rs.entityRegistry.getRuntimeById(spawnRequest.entityId);
     if (!runtime || !runtime.definition.placeable) return;
     const { definition } = runtime;
 
     const worldPoint = this.cameras.main.getWorldPoint(spawnRequest.screenX, spawnRequest.screenY);
-    const clamped = this.terrainSystem.getGameplayGrid().clampWorldPoint(worldPoint.x, worldPoint.y);
-    if (!this.terrainSystem.getGameplayGrid().isWorldWalkable(clamped.worldX, clamped.worldY)) {
+    const clamped = this.rs.terrainSystem.getGameplayGrid().clampWorldPoint(worldPoint.x, worldPoint.y);
+    if (!this.rs.terrainSystem.getGameplayGrid().isWorldWalkable(clamped.worldX, clamped.worldY)) {
       return;
     }
 
@@ -587,24 +363,53 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onPlaceTerrainDrop(payload: PlaceTerrainDropPayload): void {
-    if (!this.terrainSystem) return;
+    if (!this.rs.terrainSystem) return;
     const worldPoint = this.cameras.main.getWorldPoint(payload.screenX, payload.screenY);
     this.queueTerrainDropAtWorld(payload, worldPoint.x, worldPoint.y);
   }
 
   private onSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
-    this.activeTerrainTool = payload;
-    this.terrainPaintSession.end();
+    this.rs.activeTerrainTool = payload;
+    this.rs.terrainPaintSession.end();
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
-    this.activeOfficeTool = payload.tool;
-    this.activeTileColor = payload.tileColor ?? null;
-    this.activeFloorMode = payload.floorMode ?? "paint";
-    this.activeFloorColor = payload.floorColor ?? null;
-    this.activeFloorPattern = payload.floorPattern ?? null;
-    this.activeFurnitureId = payload.furnitureId;
+    switch (payload.tool) {
+      case "floor":
+        this.rs.activeOfficeTool = "floor";
+        this.rs.activeFloorMode = payload.floorMode;
+        this.rs.activeTileColor = payload.tileColor;
+        this.rs.activeFloorColor = payload.floorColor;
+        this.rs.activeFloorPattern = payload.floorPattern;
+        this.rs.activeFurnitureId = null;
+        break;
+      case "furniture":
+        this.rs.activeOfficeTool = "furniture";
+        this.rs.activeTileColor = null;
+        this.rs.activeFloorMode = "paint";
+        this.rs.activeFloorColor = null;
+        this.rs.activeFloorPattern = null;
+        this.rs.activeFurnitureId = payload.furnitureId;
+        break;
+      case "wall":
+      case "erase":
+        this.rs.activeOfficeTool = payload.tool;
+        this.rs.activeTileColor = null;
+        this.rs.activeFloorMode = "paint";
+        this.rs.activeFloorColor = null;
+        this.rs.activeFloorPattern = null;
+        this.rs.activeFurnitureId = null;
+        break;
+      default:
+        this.rs.activeOfficeTool = null;
+        this.rs.activeTileColor = null;
+        this.rs.activeFloorMode = "paint";
+        this.rs.activeFloorColor = null;
+        this.rs.activeFloorPattern = null;
+        this.rs.activeFurnitureId = null;
+        break;
+    }
     this.syncOfficeCellHighlight(this.input.activePointer);
   }
 
@@ -613,8 +418,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private pickOfficeFloor(worldX: number, worldY: number): boolean {
-    const region = this.officeRegion;
-    if (!region || this.activeOfficeTool !== "floor" || this.activeFloorMode !== "pick") {
+    const region = this.rs.officeRegion;
+    if (!region || this.rs.activeOfficeTool !== "floor" || this.rs.activeFloorMode !== "pick") {
       return false;
     }
 
@@ -625,7 +430,7 @@ export class WorldScene extends Phaser.Scene {
 
     const tile = region.layout.tiles[cell.row * region.layout.cols + cell.col];
     if (!tile || tile.kind !== "floor") {
-      this.isOfficePainting = false;
+      this.rs.isOfficePainting = false;
       return true;
     }
 
@@ -634,8 +439,8 @@ export class WorldScene extends Phaser.Scene {
       floorPattern: tile.pattern ?? "environment.floors.pattern-01",
     });
 
-    this.isOfficePainting = false;
-    this.activeFloorMode = "paint";
+    this.rs.isOfficePainting = false;
+    this.rs.activeFloorMode = "paint";
     return true;
   }
 
@@ -647,8 +452,8 @@ export class WorldScene extends Phaser.Scene {
    * Returns false when the point is outside the office or no region/tool is set.
    */
   private applyOfficeTool(worldX: number, worldY: number): boolean {
-    const region = this.officeRegion;
-    const tool = this.activeOfficeTool;
+    const region = this.rs.officeRegion;
+    const tool = this.rs.activeOfficeTool;
     if (!region || !tool) return false;
 
     const cell = worldToOfficeCell(worldX, worldY, region);
@@ -657,14 +462,14 @@ export class WorldScene extends Phaser.Scene {
     const changed = this.officeEditorSystem.applyCommand(region.layout, {
       tool,
       cell,
-      tileColor: this.activeTileColor,
-      floorColor: this.activeFloorColor,
-      floorPattern: this.activeFloorPattern,
-      furnitureId: this.activeFurnitureId,
+      tileColor: this.rs.activeTileColor,
+      floorColor: this.rs.activeFloorColor,
+      floorPattern: this.rs.activeFloorPattern,
+      furnitureId: this.rs.activeFurnitureId,
     });
 
     if (changed) {
-      this.officeDirty = true;
+      this.rs.officeDirty = true;
     }
 
     return true;
@@ -680,14 +485,14 @@ export class WorldScene extends Phaser.Scene {
    * - Characters: rebuilt (derived data, infrequent change).
    */
   private rerenderOffice(): void {
-    const region = this.officeRegion;
+    const region = this.rs.officeRegion;
     if (!region) return;
 
-    if (this.officeRenderable) {
-      this.officeRenderable.partialUpdate(region.layout);
+    if (this.rs.officeRenderable) {
+      this.rs.officeRenderable.partialUpdate(region.layout);
     } else {
       const { anchorX16, anchorY16, layout } = region;
-      this.officeRenderable = renderOfficeLayout(this, layout, {
+      this.rs.officeRenderable = renderOfficeLayout(this, layout, {
         worldOffsetX: anchorX16 * TOWN_BASE_PX,
         worldOffsetY: anchorY16 * TOWN_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
@@ -696,91 +501,127 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  private onPointerDown(pointer: Phaser.Input.Pointer): void {
-    if (pointer.button === 1) {
-      this.isPanning = true;
-      this.panStartX = pointer.x;
-      this.panStartY = pointer.y;
-      this.camStartX = this.cameras.main.scrollX;
-      this.camStartY = this.cameras.main.scrollY;
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-    } else if (pointer.button === 0) {
-      if (this.activeOfficeTool) {
-        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
-          return;
-        }
-        if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
-          this.isOfficePainting = true;
-          return;
-        }
-      }
-
-      if (this.activeTerrainTool) {
-        this.terrainPaintSession.begin();
-        this.syncTerrainBrushPreviewFromPointer(pointer);
-        this.paintTerrainAtScreen(pointer.x, pointer.y);
-        return;
-      }
-
-      let hit: WorldEntity | null = null;
-      const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
-
-      for (const target of hits) {
-        const entity = this.entitySystem?.findBySpriteTarget(target) ?? null;
-        if (entity) {
-          hit = entity;
-          break;
-        }
-      }
-
-      this.selectEntity(hit);
-
-      if (this.terrainSystem) {
-        const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-        const inspected = this.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
-        if (inspected) {
-          const payload: TerrainTileInspectedPayload = inspected;
-          this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
-        }
-      }
-    }
+  private beginPan(pointer: Phaser.Input.Pointer): void {
+    this.rs.isPanning = true;
+    this.rs.panStartX = pointer.x;
+    this.rs.panStartY = pointer.y;
+    this.rs.camStartX = this.cameras.main.scrollX;
+    this.rs.camStartY = this.cameras.main.scrollY;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
   }
 
-  private onPointerMove(pointer: Phaser.Input.Pointer): void {
-    if (this.isPanning) {
-      const zoom = this.cameras.main.zoom;
-      const dx = (pointer.x - this.panStartX) / zoom;
-      const dy = (pointer.y - this.panStartY) / zoom;
-      this.cameras.main.setScroll(this.camStartX - dx, this.camStartY - dy);
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-      this.syncOfficeCellHighlight(pointer);
-      return;
+  private tryHandleOfficePointerDown(pointer: Phaser.Input.Pointer): boolean {
+    if (!this.rs.activeOfficeTool) {
+      return false;
     }
 
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
+      return true;
+    }
+
+    if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
+      this.rs.isOfficePainting = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  private beginTerrainPaint(pointer: Phaser.Input.Pointer): void {
+    this.rs.terrainPaintSession.begin();
     this.syncTerrainBrushPreviewFromPointer(pointer);
-    this.syncOfficeCellHighlight(pointer);
-
-    if (this.isOfficePainting && this.activeOfficeTool && pointer.isDown) {
-      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-      this.applyOfficeTool(worldPoint.x, worldPoint.y);
-      return;
-    }
-
-    if (!this.activeTerrainTool) return;
-    if (!this.terrainPaintSession.isActive()) return;
     this.paintTerrainAtScreen(pointer.x, pointer.y);
   }
 
-  private onPointerUp(pointer: Phaser.Input.Pointer): void {
-    if (pointer.button === 1) {
-      this.isPanning = false;
-      this.syncTerrainBrushPreviewFromPointer(pointer);
-    } else if (pointer.button === 0) {
-      this.isOfficePainting = false;
-      this.terrainPaintSession.end();
-      this.syncTerrainBrushPreviewFromPointer(pointer);
+  private handleSelectionAndInspect(pointer: Phaser.Input.Pointer): void {
+    let hit: WorldEntity | null = null;
+    const hits = this.input.sortGameObjects(this.input.hitTestPointer(pointer), pointer);
+
+    for (const target of hits) {
+      const entity = this.entitySystem?.findBySpriteTarget(target) ?? null;
+      if (entity) {
+        hit = entity;
+        break;
+      }
     }
+
+    this.selectEntity(hit);
+
+    if (!this.rs.terrainSystem) {
+      return;
+    }
+
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const inspected = this.rs.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
+    if (inspected) {
+      const payload: TerrainTileInspectedPayload = inspected;
+      this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
+    }
+  }
+
+  private updatePan(pointer: Phaser.Input.Pointer): void {
+    const zoom = this.cameras.main.zoom;
+    const dx = (pointer.x - this.rs.panStartX) / zoom;
+    const dy = (pointer.y - this.rs.panStartY) / zoom;
+    this.cameras.main.setScroll(this.rs.camStartX - dx, this.rs.camStartY - dy);
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    this.syncOfficeCellHighlight(pointer);
+  }
+
+  private syncHover(pointer: Phaser.Input.Pointer): void {
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+    this.syncOfficeCellHighlight(pointer);
+  }
+
+  private shouldContinueOfficePainting(pointer: Phaser.Input.Pointer): boolean {
+    return Boolean(this.rs.isOfficePainting && this.rs.activeOfficeTool && pointer.isDown);
+  }
+
+  private continueOfficePainting(pointer: Phaser.Input.Pointer): void {
+    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    this.applyOfficeTool(worldPoint.x, worldPoint.y);
+  }
+
+  private shouldContinueTerrainPainting(): boolean {
+    return Boolean(this.rs.activeTerrainTool && this.rs.terrainPaintSession.isActive());
+  }
+
+  private continueTerrainPainting(pointer: Phaser.Input.Pointer): void {
+    this.paintTerrainAtScreen(pointer.x, pointer.y);
+  }
+
+  private endPan(pointer: Phaser.Input.Pointer): void {
+    this.rs.isPanning = false;
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+  }
+
+  private endPrimaryPointer(pointer: Phaser.Input.Pointer): void {
+    this.rs.isOfficePainting = false;
+    this.rs.terrainPaintSession.end();
+    this.syncTerrainBrushPreviewFromPointer(pointer);
+  }
+
+  private onPointerDown(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerDown(pointer);
+  }
+
+  private onPointerMove(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerMove(pointer);
+  }
+
+  private onPointerUp(pointer: Phaser.Input.Pointer): void {
+    this.inputRouter.onPointerUp(pointer);
+  }
+
+  private applyZoom(nextZoom: number): void {
+    const cam = this.cameras.main;
+    cam.setZoom(Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM));
+    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+      zoom: cam.zoom,
+      minZoom: MIN_ZOOM,
+      maxZoom: MAX_ZOOM,
+    });
   }
 
   private onWheel(
@@ -789,25 +630,13 @@ export class WorldScene extends Phaser.Scene {
     _dx: number,
     dy: number,
   ): void {
-    const cam = this.cameras.main;
     const factor = dy > 0 ? 0.9 : 1.1;
-    cam.setZoom(Phaser.Math.Clamp(cam.zoom * factor, MIN_ZOOM, MAX_ZOOM));
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
-      zoom: cam.zoom,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    });
+    this.applyZoom(this.cameras.main.zoom * factor);
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
   private onSetZoom(payload: SetZoomPayload): void {
-    const cam = this.cameras.main;
-    cam.setZoom(Phaser.Math.Clamp(payload.zoom, MIN_ZOOM, MAX_ZOOM));
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
-      zoom: cam.zoom,
-      minZoom: MIN_ZOOM,
-      maxZoom: MAX_ZOOM,
-    });
+    this.applyZoom(payload.zoom);
   }
 
   private syncTerrainBrushPreviewFromPointer(pointer: Phaser.Input.Pointer | null): void {
@@ -831,19 +660,19 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private paintTerrainAtScreen(screenX: number, screenY: number): void {
-    if (!this.activeTerrainTool || !this.terrainSystem) return;
+    if (!this.rs.activeTerrainTool || !this.rs.terrainSystem) return;
 
     const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
-    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
-    if (!cell || this.isTerrainCellOccupied(cell) || !this.terrainPaintSession.shouldPaintCell(cell)) {
+    const cell = this.rs.terrainSystem.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
+    if (!cell || this.isTerrainCellOccupied(cell) || !this.rs.terrainPaintSession.shouldPaintCell(cell)) {
       return;
     }
 
     this.queueTerrainDropAtWorld(
       {
         type: "terrain",
-        materialId: this.activeTerrainTool.materialId,
-        brushId: this.activeTerrainTool.brushId,
+        materialId: this.rs.activeTerrainTool.materialId,
+        brushId: this.rs.activeTerrainTool.brushId,
         screenX,
         screenY,
       },
@@ -853,14 +682,14 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private syncTerrainBrushPreviewAtScreen(screenX: number, screenY: number): void {
-    if (!this.activeTerrainTool || !this.terrainSystem || !this.terrainBrushPreview) {
+    if (!this.rs.activeTerrainTool || !this.rs.terrainSystem || !this.rs.terrainBrushPreview) {
       this.setTerrainBrushPreviewVisible(false);
       this.hideTerrainBrushRenderPreview();
       return;
     }
 
     const worldPoint = this.cameras.main.getWorldPoint(screenX, screenY);
-    const grid = this.terrainSystem.getGameplayGrid();
+    const grid = this.rs.terrainSystem.getGameplayGrid();
     const cell = grid.worldToCell(worldPoint.x, worldPoint.y);
     if (!cell) {
       this.setTerrainBrushPreviewVisible(false);
@@ -869,32 +698,32 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const isBlocked = this.isTerrainCellOccupied(cell);
-    this.terrainBrushPreview.setFillStyle(
+    this.rs.terrainBrushPreview.setFillStyle(
       isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL : TERRAIN_BRUSH_PREVIEW_READY_FILL,
       TERRAIN_BRUSH_PREVIEW_ALPHA,
     );
-    this.terrainBrushPreview.setStrokeStyle(
+    this.rs.terrainBrushPreview.setStrokeStyle(
       TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH,
       isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE : TERRAIN_BRUSH_PREVIEW_READY_STROKE,
       0.9,
     );
     // Terrain edits target the placement grid anchor; render tiles are resolved on the dual grid.
-    this.terrainBrushPreview.setPosition(
+    this.rs.terrainBrushPreview.setPosition(
       cell.cellX * TERRAIN_CELL_WORLD_SIZE,
       cell.cellY * TERRAIN_CELL_WORLD_SIZE,
     );
-    this.terrainBrushPreview.setVisible(true);
+    this.rs.terrainBrushPreview.setVisible(true);
 
     if (isBlocked) {
       this.hideTerrainBrushRenderPreview();
       return;
     }
 
-    const previewTiles = this.terrainSystem.previewPaintAtWorld(
+    const previewTiles = this.rs.terrainSystem.previewPaintAtWorld(
       {
         type: "terrain",
-        materialId: this.activeTerrainTool.materialId,
-        brushId: this.activeTerrainTool.brushId,
+        materialId: this.rs.activeTerrainTool.materialId,
+        brushId: this.rs.activeTerrainTool.brushId,
         screenX,
         screenY,
       },
@@ -914,23 +743,19 @@ export class WorldScene extends Phaser.Scene {
     worldX: number,
     worldY: number,
   ): void {
-    if (!this.terrainSystem) return;
+    if (!this.rs.terrainSystem) return;
 
-    const cell = this.terrainSystem.getGameplayGrid().worldToCell(worldX, worldY);
+    const cell = this.rs.terrainSystem.getGameplayGrid().worldToCell(worldX, worldY);
     if (!cell || this.isTerrainCellOccupied(cell)) return;
 
-    this.terrainSystem.queueDrop(payload, worldX, worldY);
+    this.rs.terrainSystem.queueDrop(payload, worldX, worldY);
   }
 
   private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
-    if (!this.terrainSystem) return false;
+    if (!this.rs.terrainSystem) return false;
 
-    const grid = this.terrainSystem.getGameplayGrid();
-    // Prefer EntitySystem-managed entities; fall back to runtimeState.entities
-    // for test harnesses that inject mock entity positions directly.
-    const entities = this.entitySystem?.getAll().length
-      ? this.entitySystem.getAll()
-      : this.runtimeState.entities;
+    const grid = this.rs.terrainSystem.getGameplayGrid();
+    const entities = this.entitySystem?.getAll() ?? [];
     return entities.some((entity) => {
       const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
       return entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY;
@@ -938,8 +763,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private resolveDirectMovementInput(
-    wasd: WorldSceneMovementKeys | null = this.wasd,
-    shiftKey: Phaser.Input.Keyboard.Key | null = this.shiftKey,
+    wasd: WorldSceneMovementKeys | null = this.rs.wasd,
+    shiftKey: Phaser.Input.Keyboard.Key | null = this.rs.shiftKey,
   ): MovementInput {
     if (!wasd || !shiftKey) {
       return {
@@ -987,6 +812,6 @@ export class WorldScene extends Phaser.Scene {
     this.unbindSceneEvents();
     this.entitySystem?.dispose();
     this.entitySystem = null;
-    this.runtimeState.dispose();
+    this.rs.dispose();
   }
 }

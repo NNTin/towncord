@@ -41,6 +41,10 @@ type WorldPoint = {
 
 const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
 
+function runtimeState(scene: Record<string, unknown>): Record<string, unknown> {
+  return scene.runtimeState as Record<string, unknown>;
+}
+
 function createSceneHarness(input?: {
   entityPositions?: WorldPoint[];
   worldPoint?: WorldPoint;
@@ -60,6 +64,7 @@ function createSceneHarness(input?: {
   const previewPaintAtWorld = vi.fn(() => input?.previewTiles ?? []);
   const worldPoint = input?.worldPoint ?? { x: 96, y: 96 };
   const worldToCellResult = input?.worldToCellResult;
+  const entityPositions = [...(input?.entityPositions ?? [])];
   const worldToCell = vi.fn((worldX: number, worldY: number) =>
     worldToCellResult === undefined
       ? {
@@ -87,24 +92,27 @@ function createSceneHarness(input?: {
       y: 34,
     },
   };
-  scene.terrainSystem = {
+  runtimeState(scene).terrainSystem = {
     getGameplayGrid: () => ({
       worldToCell,
     }),
     previewPaintAtWorld,
     queueDrop,
   };
-  scene.entities = (input?.entityPositions ?? []).map((position) => ({
-    position,
-  }));
-  scene.activeTerrainTool = {
+  scene.entitySystem = {
+    getAll: () => entityPositions.map((position) => ({
+      position,
+    })),
+  };
+  runtimeState(scene).activeTerrainTool = {
     materialId: "water",
     brushId: "water",
   };
-  scene.terrainBrushPreview = terrainBrushPreview;
-  scene.terrainPaintSession = new TerrainPaintSession();
+  runtimeState(scene).terrainBrushPreview = terrainBrushPreview;
+  runtimeState(scene).terrainPaintSession = new TerrainPaintSession();
 
   return {
+    entityPositions,
     previewPaintAtWorld,
     scene,
     queueDrop,
@@ -148,7 +156,7 @@ function createOfficePickSceneHarness(
       y: 34,
     },
   };
-  scene.officeRegion = {
+  runtimeState(scene).officeRegion = {
     anchorX16: 0,
     anchorY16: 0,
     layout: {
@@ -160,13 +168,13 @@ function createOfficePickSceneHarness(
       characters: [],
     },
   };
-  scene.activeOfficeTool = "floor";
-  scene.activeFloorMode = "pick";
-  scene.activeFloorColor = { h: 35, s: 30, b: 15, c: 0 };
-  scene.activeFloorPattern = "environment.floors.pattern-01";
-  scene.activeFurnitureId = null;
-  scene.isOfficePainting = true;
-  scene.officeDirty = false;
+  runtimeState(scene).activeOfficeTool = "floor";
+  runtimeState(scene).activeFloorMode = "pick";
+  runtimeState(scene).activeFloorColor = { h: 35, s: 30, b: 15, c: 0 };
+  runtimeState(scene).activeFloorPattern = "environment.floors.pattern-01";
+  runtimeState(scene).activeFurnitureId = null;
+  runtimeState(scene).isOfficePainting = true;
+  runtimeState(scene).officeDirty = false;
 
   return { emit, scene };
 }
@@ -179,7 +187,7 @@ function paintTerrainAtPointer(scene: Record<string, unknown>): void {
 }
 
 function beginBrushPaint(scene: Record<string, unknown>): void {
-  (scene.terrainPaintSession as TerrainPaintSession).begin();
+  (runtimeState(scene).terrainPaintSession as TerrainPaintSession).begin();
   paintTerrainAtPointer(scene);
 }
 
@@ -204,7 +212,7 @@ describe("WorldScene terrain painting", () => {
       setPosition: vi.fn(),
     };
 
-    scene.selectionBadge = selectionBadge;
+    runtimeState(scene).selectionBadge = selectionBadge;
 
     (
       scene.syncSelectionBadgePosition as (entity: {
@@ -245,9 +253,9 @@ describe("WorldScene terrain painting", () => {
   });
 
   test("occupied cells are not marked as painted for the rest of the stroke", () => {
-    const { scene, queueDrop } = createOccupiedSceneHarness();
+    const { entityPositions, scene, queueDrop } = createOccupiedSceneHarness();
     beginBrushPaint(scene);
-    scene.entities = [];
+    entityPositions.length = 0;
     paintTerrainAtPointer(scene);
 
     expect(queueDrop).toHaveBeenCalledOnce();
@@ -353,7 +361,7 @@ describe("WorldScene terrain painting", () => {
     scene.add = {
       image: vi.fn(() => image),
     };
-    scene.terrainBrushRenderPreviewImages = [];
+    runtimeState(scene).terrainBrushRenderPreviewImages = [];
 
     (
       scene.syncTerrainBrushRenderPreviewTiles as (
@@ -487,9 +495,9 @@ describe("WorldScene terrain painting", () => {
       floorColor: { h: 214, s: 30, b: -100, c: -55 },
       floorPattern: "environment.floors.pattern-03",
     });
-    expect(scene.activeFloorMode).toBe("paint");
-    expect(scene.isOfficePainting).toBe(false);
-    expect(scene.officeDirty).toBe(false);
+    expect(runtimeState(scene).activeFloorMode).toBe("paint");
+    expect(runtimeState(scene).isOfficePainting).toBe(false);
+    expect(runtimeState(scene).officeDirty).toBe(false);
   });
 
   test("pick mode clears painting state when a non-floor tile consumes the click", () => {
@@ -501,8 +509,8 @@ describe("WorldScene terrain painting", () => {
     clickPrimaryPointer(scene);
 
     expect(emit).not.toHaveBeenCalled();
-    expect(scene.activeFloorMode).toBe("pick");
-    expect(scene.isOfficePainting).toBe(false);
-    expect(scene.officeDirty).toBe(false);
+    expect(runtimeState(scene).activeFloorMode).toBe("pick");
+    expect(runtimeState(scene).isOfficePainting).toBe(false);
+    expect(runtimeState(scene).officeDirty).toBe(false);
   });
 });
