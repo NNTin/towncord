@@ -1,5 +1,5 @@
 import type { ContentRepository } from "../../app/contentInterfaces";
-import type { OfficeSceneTile } from "../scenes/office/bootstrap";
+import type { OfficeSceneTile } from "../officeLayoutContract";
 import defaultLayoutDataJson from "public-assets-json:donarg-office/default-layout.json";
 import furnitureCatalogDataJson from "public-assets-json:donarg-office/furniture-catalog.json";
 

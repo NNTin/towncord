@@ -26,7 +26,7 @@ import {
   type ZoomChangedPayload,
 } from "../protocol";
 import { PreviewScene } from "../scenes/PreviewScene";
-import type { OfficeSceneLayout } from "../../app/officeLayoutSceneContract";
+import type { OfficeSceneLayout } from "../officeLayoutContract";
 
 export type {
   PreviewAnimationRequest,

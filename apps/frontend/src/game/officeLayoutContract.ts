@@ -1,4 +1,10 @@
-import type { OfficeColorAdjust } from "../game/office/colors";
+export type OfficeLayoutColorAdjust = {
+  h: number;
+  s: number;
+  b: number;
+  c: number;
+  colorize?: boolean;
+};
 
 export type OfficeSceneTileKind = "void" | "floor" | "wall";
 
@@ -6,7 +12,7 @@ export type OfficeSceneTile = {
   kind: OfficeSceneTileKind;
   tileId: number;
   tint?: number;
-  colorAdjust?: OfficeColorAdjust | null;
+  colorAdjust?: OfficeLayoutColorAdjust | null;
   /** Atlas frame ID prefix for the floor pattern, e.g. "environment.floors.pattern-02". Defaults to pattern-01 when absent. */
   pattern?: string;
 };

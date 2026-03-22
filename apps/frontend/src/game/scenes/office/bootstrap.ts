@@ -21,7 +21,7 @@ import type {
   OfficeSceneLayout,
   OfficeSceneTile,
   OfficeSceneTileKind,
-} from "../../../app/officeLayoutSceneContract";
+} from "../../officeLayoutContract";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 export type {
@@ -33,7 +33,7 @@ export type {
   OfficeSceneLayout,
   OfficeSceneTile,
   OfficeSceneTileKind,
-} from "../../../app/officeLayoutSceneContract";
+} from "../../officeLayoutContract";
 
 const DONARG_TILE_WORLD_SIZE = 16;
 const MAX_DERIVED_CHARACTERS = 6;

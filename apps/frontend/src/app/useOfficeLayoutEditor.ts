@@ -7,7 +7,7 @@ import type {
   OfficeLayoutPersistenceAdapter,
   OfficeLayoutPersistenceSnapshot,
 } from "./officeLayoutContracts";
-import type { OfficeSceneLayout } from "./officeLayoutSceneContract";
+import type { OfficeSceneLayout } from "../game/officeLayoutContract";
 
 type ParsedState = {
   document: OfficeLayoutDocument | null;

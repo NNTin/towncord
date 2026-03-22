@@ -1,5 +1,5 @@
 import type { TerrainGridSpec } from "../terrain/contracts";
-import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
+import type { OfficeSceneLayout } from "../officeLayoutContract";
 import { createOfficeSceneBootstrap } from "../scenes/office/bootstrap";
 import { loadTerrainBootstrap } from "../terrain/bootstrap";
 
