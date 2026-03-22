@@ -10,6 +10,8 @@ const FORBIDDEN_IMPORT_PATTERN = /\bfrom\s+["']phaser["']/;
 const FORBIDDEN_RUNTIME_ACCESS_PATTERN =
   /\bgame(?:Ref(?:\?\.|\.)current)?(?:\?\.|\.)events\b/;
 const FORBIDDEN_PREVIEW_SCENE_IMPORT_PATTERN = /\bPreviewScene\b/;
+const FORBIDDEN_EXPERIENCE_RUNTIME_IMPORT_PATTERN =
+  /\bfrom\s+["'](?:\.\.?\/)+game\/(?:phaser|scenes|application\/runtimeGateway)\b/;
 const FORBIDDEN_OFFICE_SCENE_CONTRACT_IMPORT_PATTERN =
   /officeLayoutSceneContract|scenes\/office\/bootstrap/;
 const GATEWAY_ENTRYPOINTS = new Set([
@@ -84,8 +86,8 @@ describe("runtime integration boundaries", () => {
     const contractBoundaryFiles = [
       path.join(SRC_ROOT, "game", "protocol.ts"),
       path.join(SRC_ROOT, "game", "application", "runtimeGateway.ts"),
-      path.join(SRC_ROOT, "game", "application", "useBloomseedUiBridge.ts"),
-      path.join(SRC_ROOT, "game", "application", "bloomseedUiBridgeHooks.ts"),
+      path.join(SRC_ROOT, "game", "application", "useRuntimeUiBridge.ts"),
+      path.join(SRC_ROOT, "game", "application", "runtimeUiBridgeHooks.ts"),
       path.join(SRC_ROOT, "app", "useOfficeLayoutEditor.ts"),
     ];
 
@@ -96,6 +98,28 @@ describe("runtime integration boundaries", () => {
         ),
       )
       .map((filePath) => path.relative(SRC_ROOT, filePath));
+
+    expect(violations).toEqual([]);
+  });
+
+  test("experience-layer files do not import runtime implementation modules directly", () => {
+    const rootsToScan = [
+      path.join(SRC_ROOT, "app"),
+      path.join(SRC_ROOT, "components"),
+      path.join(SRC_ROOT, "App.tsx"),
+    ];
+
+    const violations: string[] = [];
+    for (const root of rootsToScan) {
+      const filePaths = fs.statSync(root).isDirectory() ? collectSourceFiles(root) : [root];
+
+      for (const filePath of filePaths) {
+        const sourceText = fs.readFileSync(filePath, "utf8");
+        if (FORBIDDEN_EXPERIENCE_RUNTIME_IMPORT_PATTERN.test(sourceText)) {
+          violations.push(path.relative(SRC_ROOT, filePath));
+        }
+      }
+    }
 
     expect(violations).toEqual([]);
   });

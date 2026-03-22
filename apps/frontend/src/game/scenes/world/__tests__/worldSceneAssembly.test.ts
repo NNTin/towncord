@@ -69,7 +69,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeSyncHighlight: vi.fn(),
   officeTryHandlePointerDown: vi.fn(() => false),
   officeUpdate: vi.fn(),
-  placementHandlePlaceObjectDrop: vi.fn(),
+  placementHandlePlaceEntityDrop: vi.fn(),
   projectionEmit: vi.fn(),
   selectionCreateSelectionBadge: vi.fn(),
   selectionDispose: vi.fn(),
@@ -119,8 +119,8 @@ vi.mock("phaser", () => {
 });
 
 vi.mock("../../../application/gameComposition", () => ({
-  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY: "bloomseed.worldBootstrap",
-  getBloomseedWorldBootstrap: vi.fn(() => ({
+  WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
+  getWorldBootstrap: vi.fn(() => ({
     catalog: {},
     entityRegistry: {},
   })),
@@ -215,7 +215,7 @@ vi.mock("../worldSceneOfficeRuntime", () => ({
 
 vi.mock("../worldScenePlacementController", () => ({
   WorldScenePlacementController: class {
-    public handlePlaceObjectDrop = assemblyMocks.placementHandlePlaceObjectDrop;
+    public handlePlaceEntityDrop = assemblyMocks.placementHandlePlaceEntityDrop;
   },
 }));
 

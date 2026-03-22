@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { OfficeFloorMode } from "../game/events";
+import type { OfficeFloorMode } from "../game/protocol";
 import { OFFICE_TILE_COLORS, type OfficeTileColor } from "../game/office/model";
 import {
   ATLAS_H,

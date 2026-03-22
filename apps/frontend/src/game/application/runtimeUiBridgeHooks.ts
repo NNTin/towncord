@@ -7,7 +7,7 @@ import {
 } from "../protocol";
 import type { OfficeSceneLayout } from "../officeLayoutContract";
 import {
-  bloomseedRuntimeGateway,
+  runtimeGateway,
   type RuntimeBootstrap,
   type RuntimeDiagnostics,
   type RuntimeGateway,
@@ -53,7 +53,7 @@ type RuntimeInteractionOptions = {
 };
 
 export function useRuntimeGatewayLifecycle({
-  gateway = bloomseedRuntimeGateway,
+  gateway = runtimeGateway,
   onBootstrap,
   onTerrainTileInspected,
   onRuntimeDiagnostics,

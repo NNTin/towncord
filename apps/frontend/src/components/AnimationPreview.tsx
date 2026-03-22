@@ -12,12 +12,12 @@ import {
 } from "../game/assets/equipmentGroups";
 import type {
   PreviewAnimationRequest,
-  PreviewRuntimeState,
-  RuntimeTerrainInspection,
-} from "../game/application/runtimeGateway";
+  PreviewRuntimeInfo,
+} from "../game/previewRuntimeContract";
+import type { TerrainTileInspectedPayload } from "../game/protocol";
 import { usePreviewRuntime } from "../game/application/usePreviewRuntime";
 
-export type PreviewInfo = PreviewRuntimeState;
+export type PreviewInfo = PreviewRuntimeInfo;
 
 const PREVIEW_WIDTH = 164;
 const PREVIEW_HEIGHT = 130;
@@ -28,7 +28,7 @@ type Props = {
   equipmentId: EquipmentId | "";
   material: Material;
   frameIndex: number | null;
-  inspectedTile: RuntimeTerrainInspection | null;
+  inspectedTile: TerrainTileInspectedPayload | null;
   onInfo: (info: PreviewInfo | null) => void;
 };
 

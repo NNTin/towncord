@@ -1,4 +1,7 @@
-import type { PlaceTerrainDropPayload, TerrainTileInspectedPayload } from "../events";
+import type {
+  PlaceTerrainDropPayload,
+  TerrainTileInspectedPayload,
+} from "../protocol";
 import type { TerrainRenderTile } from "./contracts";
 import { resolveTerrainEditMaterial } from "./editPolicy";
 import { TerrainGameplayGrid } from "./gameplayGrid";

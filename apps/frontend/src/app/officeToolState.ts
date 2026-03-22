@@ -1,4 +1,8 @@
-import type { OfficeFloorMode, OfficeFloorPickedPayload, OfficeEditorToolId } from "../game/events";
+import type {
+  OfficeFloorMode,
+  OfficeFloorPickedPayload,
+  OfficeEditorToolId,
+} from "../game/protocol";
 import type { OfficeTileColor } from "../game/office/model";
 import { FLOOR_PATTERN_ITEMS } from "../game/office/officeTilePalette";
 import {

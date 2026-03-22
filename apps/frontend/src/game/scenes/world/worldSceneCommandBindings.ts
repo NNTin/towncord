@@ -2,7 +2,7 @@ import {
   UI_TO_RUNTIME_COMMANDS,
   bindUiToRuntimeCommand,
   type OfficeSetEditorToolPayload,
-  type PlaceObjectDropPayload,
+  type PlaceEntityDropPayload,
   type PlaceTerrainDropPayload,
   type SelectedTerrainToolPayload,
   type SetZoomPayload,
@@ -22,7 +22,7 @@ type RuntimeCommandHost = {
 };
 
 type WorldSceneRuntimeCommandHandlers = {
-  handlePlaceObjectDrop: (payload: PlaceObjectDropPayload) => void;
+  handlePlaceEntityDrop: (payload: PlaceEntityDropPayload) => void;
   handlePlaceTerrainDrop: (payload: PlaceTerrainDropPayload) => void;
   handleSelectTerrainTool: (payload: SelectedTerrainToolPayload) => void;
   handleSetOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
@@ -47,8 +47,8 @@ export class WorldSceneCommandBindings {
     this.unsubscribers = [
       bindUiToRuntimeCommand(
         runtimeHost,
-        UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP,
-        this.handlers.handlePlaceObjectDrop,
+        UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP,
+        this.handlers.handlePlaceEntityDrop,
       ),
       bindUiToRuntimeCommand(
         runtimeHost,

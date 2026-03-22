@@ -16,7 +16,7 @@ import {
   emitPlaceDropCommand,
   emitUiToRuntimeCommand,
   toPlaceDropPayload,
-  type BloomseedUiBootstrap,
+  type RuntimeBootstrapPayload,
   type OfficeFloorPickedPayload,
   type OfficeSetEditorToolPayload,
   type PlaceDragPayload,
@@ -52,7 +52,7 @@ type RuntimeFactory = (parent: HTMLElement) => RuntimeHost;
 const PREVIEW_WIDTH = 164;
 const PREVIEW_HEIGHT = 130;
 
-export type RuntimeBootstrap = BloomseedUiBootstrap;
+export type RuntimeBootstrap = RuntimeBootstrapPayload;
 export type RuntimeTerrainInspection = TerrainTileInspectedPayload;
 export type RuntimeDiagnostics = RuntimePerfPayload;
 export type RuntimeZoomState = ZoomChangedPayload;
@@ -141,7 +141,7 @@ export function createRuntimeGateway(options: {
 
       const unbindBootstrap = bindRuntimeToUiEvent(
         runtime,
-        RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY,
+        RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
         (payload) => {
           if (bootstrapSnapshot) {
             return;
@@ -387,5 +387,5 @@ function bindPreviewRuntimeEvent<T>(
   };
 }
 
-export const bloomseedRuntimeGateway = createRuntimeGateway();
+export const runtimeGateway = createRuntimeGateway();
 export const previewRuntimeGateway = createPreviewRuntimeGateway();

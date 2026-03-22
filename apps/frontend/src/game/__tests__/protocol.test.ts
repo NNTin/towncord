@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
-  type BloomseedUiBootstrap,
+  type RuntimeBootstrapPayload,
   emitRuntimeToUiEvent,
   RUNTIME_TO_UI_EVENTS,
   UI_TO_RUNTIME_COMMANDS,
@@ -83,7 +83,7 @@ function createLayoutSnapshot(): OfficeLayoutChangedPayload["layout"] {
   };
 }
 
-function createBootstrapPayload(): BloomseedUiBootstrap {
+function createBootstrapPayload(): RuntimeBootstrapPayload {
   const catalog: AnimationCatalog = {
       entityTypes: ["player"],
       playerModels: ["female"],
@@ -137,42 +137,31 @@ function createBootstrapPayload(): BloomseedUiBootstrap {
 }
 
 describe("protocol boundary", () => {
-  test("parses legacy drag payloads without an explicit type", () => {
-    expect(parsePlaceDragPayload({ entityId: "player.seed" })).toEqual({
-      type: "entity",
-      entityId: "player.seed",
-    });
+  test("requires explicit drag payload types", () => {
+    expect(parsePlaceDragPayload({ entityId: "player.seed" })).toBeNull();
   });
 
   test("rejects invalid drag mime payload JSON", () => {
     expect(parsePlaceDragMimePayload("{not-json")).toBeNull();
   });
 
-  test("rejects legacy entity fallback when an explicit non-entity type is present", () => {
+  test("rejects malformed entity drop commands at the command boundary", () => {
     expect(parsePlaceDragPayload({ type: "terrain", entityId: "player.seed" })).toBeNull();
     expect(
-      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
         type: "terrain",
         entityId: "player.seed",
         screenX: 32,
         screenY: 48,
       }),
     ).toBeUndefined();
-  });
-
-  test("normalizes legacy entity drop commands at the command boundary", () => {
     expect(
-      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
         entityId: "player.seed",
         screenX: 32,
         screenY: 48,
       }),
-    ).toEqual({
-      type: "entity",
-      entityId: "player.seed",
-      screenX: 32,
-      screenY: 48,
-    });
+    ).toBeUndefined();
   });
 
   test("validates and clones office editor tool payloads", () => {
@@ -206,21 +195,22 @@ describe("protocol boundary", () => {
     ).toBeUndefined();
   });
 
-  test("bindUiToRuntimeCommand drops malformed payloads and keeps compatibility shims", () => {
+  test("bindUiToRuntimeCommand drops malformed entity payloads", () => {
     const { host } = createHost();
     const handler = vi.fn();
     const unbind = bindUiToRuntimeCommand(
       host,
-      UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP,
+      UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP,
       handler,
     );
 
-    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
+      type: "entity",
       entityId: "player.seed",
       screenX: 16,
       screenY: 24,
     });
-    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
       entityId: 42,
       screenX: 16,
       screenY: 24,
@@ -235,7 +225,8 @@ describe("protocol boundary", () => {
     });
 
     unbind();
-    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+    host.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
+      type: "entity",
       entityId: "player.seed",
       screenX: 32,
       screenY: 40,
@@ -284,8 +275,8 @@ describe("protocol boundary", () => {
     const handler = vi.fn();
     const payload = createBootstrapPayload();
 
-    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY, handler);
-    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY, payload);
+    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.RUNTIME_READY, handler);
+    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.RUNTIME_READY, payload);
 
     const received = handler.mock.calls[0]?.[0];
     expect(received).toEqual(payload);

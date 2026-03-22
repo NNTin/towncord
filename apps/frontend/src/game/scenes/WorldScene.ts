@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import {
-  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
-  getBloomseedWorldBootstrap,
+  WORLD_BOOTSTRAP_REGISTRY_KEY,
+  getWorldBootstrap,
 } from "../application/gameComposition";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
@@ -106,8 +106,8 @@ export class WorldScene extends Phaser.Scene {
         getRuntimeHost: () => this.game,
       },
       {
-        handlePlaceObjectDrop: (payload) =>
-          this.placementController.handlePlaceObjectDrop(payload),
+        handlePlaceEntityDrop: (payload) =>
+          this.placementController.handlePlaceEntityDrop(payload),
         handlePlaceTerrainDrop: (payload) =>
           this.terrainController.handlePlaceTerrainDrop(payload),
         handleSelectTerrainTool: (payload) =>
@@ -143,8 +143,8 @@ export class WorldScene extends Phaser.Scene {
   }
 
   public create(): void {
-    const bootstrap = getBloomseedWorldBootstrap(
-      this.registry.get(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY),
+    const bootstrap = getWorldBootstrap(
+      this.registry.get(WORLD_BOOTSTRAP_REGISTRY_KEY),
     );
     this.catalog = bootstrap?.catalog ?? null;
     this.entityRegistry = bootstrap?.entityRegistry ?? null;

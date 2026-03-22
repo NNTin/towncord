@@ -15,8 +15,8 @@ const OFFICE_LAYOUT_CONTRACT_BOUNDARY_FILES = [
   path.join(SRC_ROOT, "app", "useOfficeLayoutEditor.ts"),
   path.join(SRC_ROOT, "game", "protocol.ts"),
   path.join(SRC_ROOT, "game", "application", "runtimeGateway.ts"),
-  path.join(SRC_ROOT, "game", "application", "useBloomseedUiBridge.ts"),
-  path.join(SRC_ROOT, "game", "application", "bloomseedUiBridgeHooks.ts"),
+  path.join(SRC_ROOT, "game", "application", "useRuntimeUiBridge.ts"),
+  path.join(SRC_ROOT, "game", "application", "runtimeUiBridgeHooks.ts"),
 ];
 
 function collectSourceFiles(root: string): string[] {

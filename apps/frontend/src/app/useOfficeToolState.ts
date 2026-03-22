@@ -3,7 +3,7 @@ import type {
   OfficeFloorMode,
   OfficeFloorPickedPayload,
   OfficeEditorToolId,
-} from "../game/events";
+} from "../game/protocol";
 import type { OfficeTileColor } from "../game/office/model";
 import type { OfficeColorAdjust } from "../game/office/colors";
 import {

@@ -1,31 +1,31 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import { buildAnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
-import type { BloomseedUiBootstrap } from "../protocol";
+import type { RuntimeBootstrapPayload } from "../protocol";
 import { isRecord } from "../utils/typeGuards";
 import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
 import { listEntityPlaceables } from "./placeableService";
 import { listTerrainPlaceables } from "./terrainPlaceableCatalog";
 
-type BloomseedWorldBootstrap = {
+type WorldBootstrap = {
   catalog: AnimationCatalog;
   entityRegistry: EntityRegistry;
 };
 
-type BloomseedBootstrap = {
-  world: BloomseedWorldBootstrap;
-  ui: BloomseedUiBootstrap;
+type RuntimeBootstrapBundle = {
+  world: WorldBootstrap;
+  ui: RuntimeBootstrapPayload;
 };
 
-export const BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY = "bloomseed.worldBootstrap";
+export const WORLD_BOOTSTRAP_REGISTRY_KEY = "worldBootstrap";
 
-export function getBloomseedWorldBootstrap(value: unknown): BloomseedWorldBootstrap | null {
+export function getWorldBootstrap(value: unknown): WorldBootstrap | null {
   if (!isRecord(value)) return null;
   if (!("catalog" in value) || !("entityRegistry" in value)) return null;
-  return value as BloomseedWorldBootstrap;
+  return value as WorldBootstrap;
 }
 
-export function composeBloomseedBootstrap(animationKeys: string[]): BloomseedBootstrap {
+export function composeRuntimeBootstrap(animationKeys: string[]): RuntimeBootstrapBundle {
   const catalog = buildAnimationCatalog(animationKeys);
   const entityRegistry = buildEntityRegistryFromCatalog(catalog);
   const placeables = [
