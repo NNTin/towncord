@@ -61,23 +61,58 @@ export type PreviewAnimationPayload = PreviewAnimationRequest;
 export type PreviewTilePayload = PreviewTileRequest;
 export type PreviewRuntimeState = PreviewRuntimeInfo;
 
-export type RuntimeGatewayNotifications = {
+// Projection ports — what the runtime emits to feature code.
+export type RuntimeLifecycleProjectionPort = {
   onBootstrap?: (payload: RuntimeBootstrap) => void;
+};
+
+export type RuntimeTerrainProjectionPort = {
   onTerrainTileInspected?: (payload: RuntimeTerrainInspection) => void;
+};
+
+export type RuntimeDiagnosticsProjectionPort = {
   onRuntimeDiagnostics?: (payload: RuntimeDiagnostics) => void;
+};
+
+export type RuntimeCameraProjectionPort = {
   onZoomChanged?: (payload: RuntimeZoomState) => void;
+};
+
+export type RuntimeOfficeProjectionPort = {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
 };
 
-export type RuntimeGatewaySession = {
-  subscribe: (notifications: RuntimeGatewayNotifications) => () => void;
+export type RuntimeGatewayNotifications = RuntimeLifecycleProjectionPort &
+  RuntimeTerrainProjectionPort &
+  RuntimeDiagnosticsProjectionPort &
+  RuntimeCameraProjectionPort &
+  RuntimeOfficeProjectionPort;
+
+// Command ports — what feature code sends to the runtime.
+export type RuntimePlacementCommandPort = {
   placeDragDrop: (payload: PlaceDragPayload, point: ScreenPoint) => void;
-  selectTerrainTool: (tool: RuntimeTerrainToolSelection) => void;
-  setZoom: (zoom: number) => void;
-  setOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
-  destroy: () => void;
 };
+
+export type RuntimeTerrainCommandPort = {
+  selectTerrainTool: (tool: RuntimeTerrainToolSelection) => void;
+};
+
+export type RuntimeCameraCommandPort = {
+  setZoom: (zoom: number) => void;
+};
+
+export type RuntimeOfficeCommandPort = {
+  setOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
+};
+
+export type RuntimeGatewaySession = RuntimePlacementCommandPort &
+  RuntimeTerrainCommandPort &
+  RuntimeCameraCommandPort &
+  RuntimeOfficeCommandPort & {
+    subscribe: (notifications: RuntimeGatewayNotifications) => () => void;
+    destroy: () => void;
+  };
 
 export type RuntimeGateway = {
   mount: (container: HTMLElement) => RuntimeGatewaySession;

@@ -7,7 +7,7 @@ import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
 import { listEntityPlaceables } from "./placeableService";
 import { listTerrainPlaceables } from "./terrainPlaceableCatalog";
 
-type WorldBootstrap = {
+export type WorldBootstrap = {
   catalog: AnimationCatalog;
   entityRegistry: EntityRegistry;
 };
