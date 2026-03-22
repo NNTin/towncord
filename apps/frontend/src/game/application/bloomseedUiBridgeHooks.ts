@@ -5,7 +5,7 @@ import {
   parsePlaceDragMimePayload,
   type OfficeFloorPickedPayload,
 } from "../protocol";
-import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
+import type { OfficeSceneLayout } from "../officeLayoutContract";
 import {
   bloomseedRuntimeGateway,
   type RuntimeBootstrap,

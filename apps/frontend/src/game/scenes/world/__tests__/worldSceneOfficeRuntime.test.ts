@@ -4,6 +4,11 @@ import { WorldSceneOfficeRuntime } from "../worldSceneOfficeRuntime";
 import { WorldSceneProjectionEmitter } from "../worldSceneProjections";
 
 const officeRenderMocks = vi.hoisted(() => ({
+  loadTownOfficeRegion: vi.fn((layout) => ({
+    anchorX16: 0,
+    anchorY16: 0,
+    layout,
+  })),
   renderOfficeLayout: vi.fn(() => ({
     destroy: vi.fn(),
     partialUpdate: vi.fn(),
@@ -16,23 +21,7 @@ vi.mock("../../office/render", () => ({
 
 vi.mock("../../../town/layout", () => ({
   TOWN_BASE_PX: 16,
-  loadTownOfficeRegion: () => ({
-    anchorX16: 0,
-    anchorY16: 0,
-    layout: {
-      cols: 1,
-      rows: 1,
-      cellSize: 16,
-      tiles: [
-        {
-          kind: "void",
-          tileId: 0,
-        },
-      ],
-      furniture: [],
-      characters: [],
-    },
-  }),
+  loadTownOfficeRegion: officeRenderMocks.loadTownOfficeRegion,
   officeCellToWorldPixel: () => ({
     worldX: 0,
     worldY: 0,
@@ -42,6 +31,22 @@ vi.mock("../../../town/layout", () => ({
       ? { col: 0, row: 0 }
       : null,
 }));
+
+function createLayout() {
+  return {
+    cols: 1,
+    rows: 1,
+    cellSize: 16,
+    tiles: [
+      {
+        kind: "void" as const,
+        tileId: 0,
+      },
+    ],
+    furniture: [],
+    characters: [],
+  };
+}
 
 function createHarness() {
   const emit = vi.fn();
@@ -100,9 +105,11 @@ function createHarness() {
 describe("WorldSceneOfficeRuntime", () => {
   test("bootstraps the office renderable and highlight overlay", () => {
     const { highlight, runtime, scene } = createHarness();
+    const layout = createLayout();
 
-    runtime.bootstrap();
+    runtime.bootstrap(layout);
 
+    expect(officeRenderMocks.loadTownOfficeRegion).toHaveBeenCalledWith(layout);
     expect(officeRenderMocks.renderOfficeLayout).toHaveBeenCalledOnce();
     expect(scene.add.rectangle).toHaveBeenCalledOnce();
     expect(highlight.setOrigin).toHaveBeenCalledWith(0, 0);
@@ -110,8 +117,9 @@ describe("WorldSceneOfficeRuntime", () => {
 
   test("rerenders and emits layout projections after office edits", () => {
     const { emit, runtime } = createHarness();
+    const layout = createLayout();
 
-    runtime.bootstrap();
+    runtime.bootstrap(layout);
     runtime.handleSetEditorTool({
       tool: "wall",
     });

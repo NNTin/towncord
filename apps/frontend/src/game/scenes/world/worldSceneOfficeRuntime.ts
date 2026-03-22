@@ -1,4 +1,5 @@
 import type Phaser from "phaser";
+import type { OfficeSceneLayout } from "../../officeLayoutContract";
 import { RENDER_LAYERS } from "../../renderLayers";
 import {
   loadTownOfficeRegion,
@@ -47,8 +48,8 @@ export class WorldSceneOfficeRuntime {
     });
   }
 
-  public bootstrap(): TownOfficeRegion {
-    const officeRegion = loadTownOfficeRegion();
+  public bootstrap(layout: OfficeSceneLayout): TownOfficeRegion {
+    const officeRegion = loadTownOfficeRegion(layout);
     this.officeRegion = officeRegion;
     this.officeRenderable = renderOfficeLayout(this.host.scene, officeRegion.layout, {
       worldOffsetX: officeRegion.anchorX16 * TOWN_BASE_PX,

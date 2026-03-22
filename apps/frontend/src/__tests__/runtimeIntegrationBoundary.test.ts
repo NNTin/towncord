@@ -10,6 +10,8 @@ const FORBIDDEN_IMPORT_PATTERN = /\bfrom\s+["']phaser["']/;
 const FORBIDDEN_RUNTIME_ACCESS_PATTERN =
   /\bgame(?:Ref(?:\?\.|\.)current)?(?:\?\.|\.)events\b/;
 const FORBIDDEN_PREVIEW_SCENE_IMPORT_PATTERN = /\bPreviewScene\b/;
+const FORBIDDEN_OFFICE_SCENE_CONTRACT_IMPORT_PATTERN =
+  /officeLayoutSceneContract|scenes\/office\/bootstrap/;
 const GATEWAY_ENTRYPOINTS = new Set([
   path.join(SRC_ROOT, "game", "application", "runtimeGateway.ts"),
 ]);
@@ -74,6 +76,26 @@ describe("runtime integration boundaries", () => {
         }
       }
     }
+
+    expect(violations).toEqual([]);
+  });
+
+  test("protocol and gateway seams avoid scene bootstrap type imports", () => {
+    const contractBoundaryFiles = [
+      path.join(SRC_ROOT, "game", "protocol.ts"),
+      path.join(SRC_ROOT, "game", "application", "runtimeGateway.ts"),
+      path.join(SRC_ROOT, "game", "application", "useBloomseedUiBridge.ts"),
+      path.join(SRC_ROOT, "game", "application", "bloomseedUiBridgeHooks.ts"),
+      path.join(SRC_ROOT, "app", "useOfficeLayoutEditor.ts"),
+    ];
+
+    const violations = contractBoundaryFiles
+      .filter((filePath) =>
+        FORBIDDEN_OFFICE_SCENE_CONTRACT_IMPORT_PATTERN.test(
+          fs.readFileSync(filePath, "utf8"),
+        ),
+      )
+      .map((filePath) => path.relative(SRC_ROOT, filePath));
 
     expect(violations).toEqual([]);
   });

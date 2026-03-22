@@ -1,7 +1,4 @@
-import type { TerrainGridSpec } from "../terrain/contracts";
-import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
-import { createOfficeSceneBootstrap } from "../scenes/office/bootstrap";
-import { loadTerrainBootstrap } from "../terrain/bootstrap";
+import type { OfficeSceneLayout } from "../officeLayoutContract";
 
 /**
  * The canonical base unit: 16px.
@@ -17,11 +14,6 @@ export const TOWN_BASE_PX = 16;
 function officeCellUnits(region: TownOfficeRegion): number {
   return Math.round(region.layout.cellSize / TOWN_BASE_PX);
 }
-
-type TownLayout = {
-  terrain: TerrainGridSpec;
-  office: TownOfficeRegion | null;
-};
 
 export type TownOfficeRegion = {
   /** Top-left corner of the office in 16px grid units. */
@@ -103,44 +95,28 @@ export function officeCellToWorldPixel(
  * Default anchor for the single office: (20, 20) in 16px units → worldX=320, worldY=320.
  * The office must be at least one terrain cell (4 × 16px) from the terrain boundary.
  *
- * These are intentionally kept as named constants so `loadTownOfficeRegion()` can be
- * called without arguments and callers that load anchor coordinates from level data can
- * pass them explicitly instead.
+ * These are intentionally kept as named constants so callers can pass only layout data
+ * when they want the default anchor, or provide explicit anchor coordinates from level
+ * data/multi-building scenarios.
  */
 const DEFAULT_OFFICE_ANCHOR_X16 = 1;
 const DEFAULT_OFFICE_ANCHOR_Y16 = 1;
 
 /**
  * Returns the office region for the given anchor position (in 16px base units).
- * Defaults to `DEFAULT_OFFICE_ANCHOR_X16` / `DEFAULT_OFFICE_ANCHOR_Y16` so existing
- * call sites that do not supply an anchor continue to work unchanged.
+ * The office layout is provided by the runtime composition root.
  *
  * Pass explicit `anchorX16` / `anchorY16` values when loading anchor coordinates from
  * level data or when supporting multiple buildings.
- *
- * Does not load terrain data; prefer this over `loadTownLayout` when only the office
- * region is needed.
  */
 export function loadTownOfficeRegion(
+  layout: OfficeSceneLayout,
   anchorX16: number = DEFAULT_OFFICE_ANCHOR_X16,
   anchorY16: number = DEFAULT_OFFICE_ANCHOR_Y16,
 ): TownOfficeRegion {
-  const { layout } = createOfficeSceneBootstrap();
   return {
     anchorX16,
     anchorY16,
     layout,
-  };
-}
-
-/**
- * Produces the unified TownLayout by merging the existing terrain spec and
- * the default office layout with a hardcoded anchor position.
- */
-function loadTownLayout(): TownLayout {
-  const { gridSpec } = loadTerrainBootstrap();
-  return {
-    terrain: gridSpec,
-    office: loadTownOfficeRegion(),
   };
 }

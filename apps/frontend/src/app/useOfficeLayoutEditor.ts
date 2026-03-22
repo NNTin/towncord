@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  loadOfficeLayout,
-  saveOfficeLayout,
-  type OfficeLayoutApiResponse,
   type OfficeLayoutDocument,
+  officeLayoutPersistence,
 } from "./officeLayoutApi";
-import type { OfficeSceneLayout } from "../game/scenes/office/bootstrap";
+import type {
+  OfficeLayoutPersistenceAdapter,
+  OfficeLayoutPersistenceSnapshot,
+} from "./officeLayoutContracts";
+import type { OfficeSceneLayout } from "../game/officeLayoutContract";
 
 type ParsedState = {
   document: OfficeLayoutDocument | null;
@@ -33,6 +35,10 @@ type OfficeLayoutEditorState = {
   reset: () => void;
   save: () => Promise<void>;
   syncFromPhaser: (layout: OfficeSceneLayout) => void;
+};
+
+type UseOfficeLayoutEditorOptions = {
+  persistence?: OfficeLayoutPersistenceAdapter;
 };
 
 function formatOfficeLayout(layout: OfficeLayoutDocument): string {
@@ -91,7 +97,10 @@ function toStatusText(args: {
   return "Synced";
 }
 
-export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
+export function useOfficeLayoutEditor(
+  options: UseOfficeLayoutEditorOptions = {},
+): OfficeLayoutEditorState {
+  const persistence = options.persistence ?? officeLayoutPersistence;
   const [isOpen, setIsOpen] = useState(false);
   const [jsonText, setJsonText] = useState("");
   const [savedText, setSavedText] = useState("");
@@ -101,28 +110,30 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
   const [sourcePath, setSourcePath] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
-  const isAvailable = import.meta.env.DEV;
+  const isAvailable = persistence.isAvailable;
   const isDirty = jsonText !== savedText;
   const parsed = useMemo(() => parseOfficeLayout(jsonText), [jsonText]);
 
-  const applyResponse = useCallback((payload: OfficeLayoutApiResponse): void => {
-    const nextText = formatOfficeLayout(payload.layout);
+  const applySnapshot = useCallback((snapshot: OfficeLayoutPersistenceSnapshot): void => {
+    const nextText = formatOfficeLayout(snapshot.document);
     setJsonText(nextText);
     setSavedText(nextText);
-    setSourcePath(payload.path);
-    setUpdatedAt(payload.updatedAt);
+    setSourcePath(snapshot.sourcePath);
+    setUpdatedAt(snapshot.updatedAt);
     setError(null);
   }, []);
 
   const reload = useCallback(async () => {
     if (!isAvailable) {
-      setError("Canonical office layout sync is only available in Vite dev mode.");
+      setError(
+        persistence.unavailableReason ?? "Office layout persistence is not available.",
+      );
       return;
     }
 
     setIsLoading(true);
     try {
-      applyResponse(await loadOfficeLayout());
+      applySnapshot(await persistence.load());
     } catch (nextError) {
       setError(
         nextError instanceof Error
@@ -132,7 +143,7 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
     } finally {
       setIsLoading(false);
     }
-  }, [applyResponse, isAvailable]);
+  }, [applySnapshot, isAvailable, persistence]);
 
   useEffect(() => {
     void reload();
@@ -161,7 +172,7 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
 
     setIsSaving(true);
     try {
-      applyResponse(await saveOfficeLayout(parsed.document));
+      applySnapshot(await persistence.save(parsed.document));
     } catch (nextError) {
       setError(
         nextError instanceof Error
@@ -171,7 +182,7 @@ export function useOfficeLayoutEditor(): OfficeLayoutEditorState {
     } finally {
       setIsSaving(false);
     }
-  }, [applyResponse, isAvailable, parsed.document]);
+  }, [applySnapshot, isAvailable, parsed.document, persistence]);
 
   return {
     isOpen,

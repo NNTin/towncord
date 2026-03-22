@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { TownCollisionGrid } from "../collisionGrid";
 import { officeCellToWorldPixel, TOWN_BASE_PX, type TownOfficeRegion } from "../layout";
-import type { OfficeSceneLayout, OfficeSceneTile } from "../../scenes/office/bootstrap";
+import type { OfficeSceneLayout, OfficeSceneTile } from "../../officeLayoutContract";
 import { TERRAIN_CHUNK_SIZE, type TerrainGridSpec } from "../../terrain/contracts";
 import { TerrainGameplayGrid } from "../../terrain/gameplayGrid";
 import { TerrainMapStore } from "../../terrain/store";

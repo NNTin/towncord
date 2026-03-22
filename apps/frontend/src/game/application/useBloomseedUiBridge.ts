@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import type { MutableRefObject } from "react";
 import type { OfficeFloorPickedPayload } from "../protocol";
-import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
+import type { OfficeSceneLayout } from "../officeLayoutContract";
 import {
   useRuntimeGatewayLifecycle,
   useRuntimeInteractionAdapter,

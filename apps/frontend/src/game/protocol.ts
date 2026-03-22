@@ -4,20 +4,16 @@ import type {
 } from "./assets/animationCatalog";
 import type { EntityId } from "./domain/model";
 import {
-  cloneOfficeColorAdjust,
-  isOfficeColorAdjust,
-  type OfficeColorAdjust,
-} from "./office/colors";
-import {
   OFFICE_TILE_COLORS,
   type OfficeTileColor,
 } from "./office/model";
 import type {
+  OfficeLayoutColorAdjust,
   OfficeSceneCharacter,
   OfficeSceneFurniture,
   OfficeSceneLayout,
   OfficeSceneTile,
-} from "./scenes/office/bootstrap";
+} from "./officeLayoutContract";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import { isRecord } from "./utils/typeGuards";
 import type { PlaceableViewModel } from "./application/placeableService";
@@ -86,7 +82,7 @@ export type OfficeSetEditorToolFloorPayload = {
   tool: "floor";
   floorMode: OfficeFloorMode;
   tileColor: OfficeTileColor | null;
-  floorColor: OfficeColorAdjust | null;
+  floorColor: OfficeLayoutColorAdjust | null;
   floorPattern: string | null;
 };
 
@@ -98,7 +94,7 @@ export type OfficeSetEditorToolPayload =
   | OfficeSetEditorToolFloorPayload;
 
 export type OfficeFloorPickedPayload = {
-  floorColor: OfficeColorAdjust | null;
+  floorColor: OfficeLayoutColorAdjust | null;
   floorPattern: string | null;
 };
 
@@ -288,6 +284,34 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+function cloneOfficeLayoutColorAdjust(
+  color: OfficeLayoutColorAdjust,
+): OfficeLayoutColorAdjust {
+  return {
+    h: color.h,
+    s: color.s,
+    b: color.b,
+    c: color.c,
+    ...(typeof color.colorize === "boolean" ? { colorize: color.colorize } : {}),
+  };
+}
+
+function isOfficeLayoutColorAdjust(
+  value: unknown,
+): value is OfficeLayoutColorAdjust {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    isFiniteNumber(value.h) &&
+    isFiniteNumber(value.s) &&
+    isFiniteNumber(value.b) &&
+    isFiniteNumber(value.c) &&
+    (!("colorize" in value) || typeof value.colorize === "boolean")
+  );
+}
+
 function normalizeNullableString(value: unknown): string | null | undefined {
   if (value == null) {
     return null;
@@ -302,12 +326,14 @@ function isRotate90(value: unknown): value is 0 | 1 | 2 | 3 {
 
 function normalizeNullableOfficeColorAdjust(
   value: unknown,
-): OfficeColorAdjust | null | undefined {
+): OfficeLayoutColorAdjust | null | undefined {
   if (value == null) {
     return null;
   }
 
-  return isOfficeColorAdjust(value) ? cloneOfficeColorAdjust(value) : undefined;
+  return isOfficeLayoutColorAdjust(value)
+    ? cloneOfficeLayoutColorAdjust(value)
+    : undefined;
 }
 
 function normalizeNullableOfficeTileColor(
@@ -332,7 +358,7 @@ function isOfficeSceneTile(value: unknown): value is OfficeSceneTile {
     (!("tint" in value) || value.tint == null || isFiniteNumber(value.tint)) &&
     (!("colorAdjust" in value) ||
       value.colorAdjust == null ||
-      isOfficeColorAdjust(value.colorAdjust)) &&
+      isOfficeLayoutColorAdjust(value.colorAdjust)) &&
     (!("pattern" in value) || value.pattern == null || typeof value.pattern === "string")
   );
 }

@@ -7,7 +7,7 @@ import {
   type TownOfficeRegion,
   type OfficeCellCoord,
 } from "../layout";
-import type { OfficeSceneLayout } from "../../scenes/office/bootstrap";
+import type { OfficeSceneLayout } from "../../officeLayoutContract";
 
 const OFFICE_CELL_SIZE = 16; // 1 × 16px — kept here for readability in tests
 
