@@ -59,6 +59,7 @@ export const WORLD_SCENE_KEY = "world";
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 16;
+const INITIAL_ZOOM = 2;
 const SELECTED_BADGE_ANIMATION_KEY = "props.bloomseed.static.rocks.variant-03";
 const SELECTED_BADGE_SCALE = 0.5;
 const SELECTED_BADGE_VERTICAL_OFFSET = 3;
@@ -158,11 +159,30 @@ export class WorldScene extends Phaser.Scene {
     this.createTerrainBrushPreview();
     this.createOfficeCellHighlight();
 
+    this.cameras.main.setZoom(INITIAL_ZOOM);
+    this.centerCameraOnWorld();
+    this.scale.once(Phaser.Scale.Events.RESIZE, this.centerCameraOnWorld, this);
     this.game.events.emit(ZOOM_CHANGED_EVENT, {
       zoom: this.cameras.main.zoom,
       minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
     });
+  }
+
+  private centerCameraOnWorld(): void {
+    if (!this.rs.terrainSystem) return;
+    const worldBounds = this.rs.terrainSystem.getGameplayGrid().getWorldBounds();
+    const cam = this.cameras.main;
+    // In Phaser 3: world_at_canvas_center = scrollX + cam.width/2  (zoom cancels out).
+    // To center world midpoint at the visible area center (sidebar is 180px):
+    //   visible_center_x = (cam.width + SIDEBAR_WIDTH) / 2
+    //   scrollX = worldCenter - cam.width/2 + (cam.width/2 - visible_center_x) / zoom
+    //           = worldCenter - cam.width/2 - SIDEBAR_WIDTH / (2 * zoom)
+    const SIDEBAR_WIDTH = 180;
+    cam.setScroll(
+      worldBounds.width / 2 - cam.width / 2 - SIDEBAR_WIDTH / (2 * cam.zoom),
+      worldBounds.height / 2 - cam.height / 2,
+    );
   }
 
   public override update(_time: number, delta: number): void {

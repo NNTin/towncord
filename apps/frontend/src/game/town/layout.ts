@@ -107,8 +107,8 @@ export function officeCellToWorldPixel(
  * called without arguments and callers that load anchor coordinates from level data can
  * pass them explicitly instead.
  */
-const DEFAULT_OFFICE_ANCHOR_X16 = 20;
-const DEFAULT_OFFICE_ANCHOR_Y16 = 20;
+const DEFAULT_OFFICE_ANCHOR_X16 = 1;
+const DEFAULT_OFFICE_ANCHOR_Y16 = 1;
 
 /**
  * Returns the office region for the given anchor position (in 16px base units).
