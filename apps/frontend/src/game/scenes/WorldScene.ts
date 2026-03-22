@@ -173,9 +173,15 @@ export class WorldScene extends Phaser.Scene {
     if (!this.rs.terrainSystem) return;
     const worldBounds = this.rs.terrainSystem.getGameplayGrid().getWorldBounds();
     const cam = this.cameras.main;
+    // In Phaser 3: world_at_canvas_center = scrollX + cam.width/2  (zoom cancels out).
+    // To center world midpoint at the visible area center (sidebar is 180px):
+    //   visible_center_x = (cam.width + SIDEBAR_WIDTH) / 2
+    //   scrollX = worldCenter - cam.width/2 + (cam.width/2 - visible_center_x) / zoom
+    //           = worldCenter - cam.width/2 - SIDEBAR_WIDTH / (2 * zoom)
+    const SIDEBAR_WIDTH = 180;
     cam.setScroll(
-      worldBounds.width / 2 - cam.width / (2 * INITIAL_ZOOM),
-      worldBounds.height / 2 - cam.height / (2 * INITIAL_ZOOM),
+      worldBounds.width / 2 - cam.width / 2 - SIDEBAR_WIDTH / (2 * cam.zoom),
+      worldBounds.height / 2 - cam.height / 2,
     );
   }
 
