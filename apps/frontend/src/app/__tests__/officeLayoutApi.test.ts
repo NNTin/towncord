@@ -3,6 +3,54 @@ import { createOfficeLayoutPersistenceAdapter, createDevelopmentOfficeLayoutPers
 import { OFFICE_LAYOUT_DEV_ROUTE } from "../officeLayoutContracts";
 
 describe("office layout persistence adapter", () => {
+  test("selects the development adapter when config enables persistence", async () => {
+    const fetchMock = vi.fn(async () =>
+      new Response(
+        JSON.stringify({
+          path: "/workspace/default-layout.json",
+          updatedAt: "2026-03-22T09:00:00.000Z",
+          layout: {
+            version: 2,
+            cols: 2,
+            rows: 1,
+            tiles: [0, 1],
+          },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    const adapter = createOfficeLayoutPersistenceAdapter({
+      config: {
+        features: {
+          logContentPersistenceEvents: false,
+        },
+        officeLayout: {
+          persistenceMode: "development",
+        },
+      },
+      fetch: fetchMock as typeof fetch,
+    });
+
+    expect(adapter.isAvailable).toBe(true);
+    expect(adapter.id).toBe("development");
+    await expect(adapter.load()).resolves.toMatchObject({
+      sourcePath: "/workspace/default-layout.json",
+      document: {
+        version: 2,
+        cols: 2,
+        rows: 1,
+        tiles: [0, 1],
+      },
+    });
+    expect(fetchMock).toHaveBeenCalledWith(OFFICE_LAYOUT_DEV_ROUTE, {
+      headers: { Accept: "application/json" },
+    });
+  });
+
   test("wraps the Vite development endpoint behind a persistence adapter", async () => {
     const fetchMock = vi.fn(async () =>
       new Response(

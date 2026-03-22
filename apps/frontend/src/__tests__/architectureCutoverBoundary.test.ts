@@ -20,6 +20,10 @@ const LEGACY_ARCHITECTURE_PATTERNS = [
   /\bPlaceObjectDropPayload\b/,
   /\bnormalizePlaceObjectDropPayload\b/,
 ];
+const LEGACY_PROTOCOL_SHIM_IMPORT_PATTERNS = [
+  /\bfrom\s+["']\.\.\/events["']/,
+  /\bfrom\s+["']\.\.\/game\/events["']/,
+];
 
 function collectSourceFiles(root: string): string[] {
   const entries = fs.readdirSync(root, { withFileTypes: true });
@@ -51,5 +55,21 @@ describe("architecture cutover boundary", () => {
       .map((filePath) => path.relative(SRC_ROOT, filePath));
 
     expect(violations).toEqual([]);
+  });
+
+  test("removes the legacy game/events protocol shim and its imports", () => {
+    const shimPath = path.join(SRC_ROOT, "game", "events.ts");
+    const importViolations = collectSourceFiles(SRC_ROOT)
+      .filter((filePath) => path.basename(filePath) !== "architectureCutoverBoundary.test.ts")
+      .filter((filePath) => {
+        const sourceText = fs.readFileSync(filePath, "utf8");
+        return LEGACY_PROTOCOL_SHIM_IMPORT_PATTERNS.some((pattern) =>
+          pattern.test(sourceText),
+        );
+      })
+      .map((filePath) => path.relative(SRC_ROOT, filePath));
+
+    expect(fs.existsSync(shimPath)).toBe(false);
+    expect(importViolations).toEqual([]);
   });
 });

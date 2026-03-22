@@ -7,7 +7,7 @@ import {
   type OfficeColorAdjust,
 } from "../../office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../../office/officeFurniturePalette";
-import type { OfficeEditorToolId } from "../../events";
+import type { OfficeEditorToolId } from "../../protocol";
 
 // Monotonic counter for unique furniture placement IDs. Module-level so it
 // survives re-instantiation of OfficeEditorSystem across re-renders.
