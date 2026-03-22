@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { createStaticOfficeSceneContentRepository } from "../../../assets/officeContentRepository";
 import {
   createOfficeSceneBootstrap,
   getOfficeSceneBootstrap,
@@ -92,5 +93,32 @@ describe("createOfficeSceneBootstrap", () => {
     expect(parsed?.layout.tiles[0]?.tint).toBe(
       resolveOfficeTileTint({ h: 214, s: 30, b: -100, c: -55 }, 0x123456),
     );
+  });
+
+  test("builds bootstrap data from the injected content repository", () => {
+    const repository = createStaticOfficeSceneContentRepository({
+      sourceId: "test-office-content",
+      layout: {
+        version: 2,
+        cols: 2,
+        rows: 1,
+        tiles: [0, 8],
+        furniture: [],
+      },
+      furnitureCatalog: {
+        assets: [],
+      },
+    });
+
+    const bootstrap = createOfficeSceneBootstrap(repository);
+
+    expect(bootstrap.layout.cols).toBe(2);
+    expect(bootstrap.layout.rows).toBe(1);
+    expect(bootstrap.layout.tiles).toEqual([
+      expect.objectContaining({ kind: "floor", tileId: 0 }),
+      expect.objectContaining({ kind: "wall", tileId: 8 }),
+    ]);
+    expect(bootstrap.layout.furniture).toEqual([]);
+    expect(bootstrap.layout.characters).toEqual([]);
   });
 });

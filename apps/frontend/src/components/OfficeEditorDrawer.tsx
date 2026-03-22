@@ -1,4 +1,4 @@
-import type { OfficeLayoutDocument } from "../app/officeLayoutApi";
+import type { OfficeLayoutDocument } from "../app/officeLayoutDocument";
 
 type Props = {
   canReload: boolean;

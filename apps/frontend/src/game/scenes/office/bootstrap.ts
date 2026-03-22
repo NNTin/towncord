@@ -1,5 +1,3 @@
-import officeLayoutDataJson from "public-assets-json:donarg-office/default-layout.json";
-import furnitureCatalogDataJson from "public-assets-json:donarg-office/furniture-catalog.json";
 import { fallbackFootprintFromPixels } from "../../office/officeFurniturePalette";
 import {
   cloneOfficeColorAdjust,
@@ -7,6 +5,14 @@ import {
   resolveOfficeTileTint,
   type OfficeColorAdjust,
 } from "../../office/colors";
+import {
+  officeSceneContentRepository,
+  type DonargFurnitureAssetSource,
+  type DonargFurnitureCatalogSource,
+  type DonargLayoutPlacement,
+  type DonargOfficeLayoutSource,
+  type OfficeSceneContentRepository,
+} from "../../assets/officeContentRepository";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 
@@ -23,49 +29,6 @@ const CHARACTER_PALETTE = [
   { color: 0x7c3aed, accentColor: 0xddd6fe },
   { color: 0xea580c, accentColor: 0xfdba74 },
 ] as const;
-
-type DonargLayoutColor = {
-  h: number;
-  s: number;
-  b: number;
-  c: number;
-  colorize?: boolean;
-};
-
-type DonargLayoutPlacement = {
-  uid: string;
-  type: string;
-  col: number;
-  row: number;
-};
-
-type DonargOfficeLayoutSource = {
-  version: number;
-  cols: number;
-  rows: number;
-  tiles: Array<number | OfficeSceneTile>;
-  tileColors?: Array<DonargLayoutColor | null>;
-  furniture: DonargLayoutPlacement[];
-};
-
-type DonargFurnitureAssetSource = {
-  id: string;
-  label?: string;
-  category?: string;
-  width?: number;
-  height?: number;
-  footprintW?: number;
-  footprintH?: number;
-  canPlaceOnWalls?: boolean;
-  canPlaceOnSurfaces?: boolean;
-  groupId?: string;
-  orientation?: string;
-  state?: string;
-};
-
-type DonargFurnitureCatalogSource = {
-  assets: DonargFurnitureAssetSource[];
-};
 
 export type OfficeSceneTileKind = "void" | "floor" | "wall";
 
@@ -123,7 +86,7 @@ export type OfficeSceneLayout = {
   characters: OfficeSceneCharacter[];
 };
 
-type OfficeSceneBootstrap = {
+export type OfficeSceneBootstrap = {
   layout: OfficeSceneLayout;
 };
 
@@ -133,13 +96,22 @@ type MappedFurnitureEntry = OfficeSceneFurniture & {
   groupId?: string;
 };
 
-const OFFICE_SCENE_BOOTSTRAP = buildOfficeSceneBootstrap(
-  officeLayoutDataJson as DonargOfficeLayoutSource,
-  furnitureCatalogDataJson as DonargFurnitureCatalogSource,
-);
+const DEFAULT_OFFICE_SCENE_BOOTSTRAP = buildDefaultOfficeSceneBootstrap();
 
-export function createOfficeSceneBootstrap(): OfficeSceneBootstrap {
-  return { layout: structuredClone(OFFICE_SCENE_BOOTSTRAP.layout) };
+export function createOfficeSceneBootstrap(
+  repository: OfficeSceneContentRepository = officeSceneContentRepository,
+): OfficeSceneBootstrap {
+  if (repository === officeSceneContentRepository) {
+    return { layout: structuredClone(DEFAULT_OFFICE_SCENE_BOOTSTRAP.layout) };
+  }
+
+  const content = repository.read();
+  return buildOfficeSceneBootstrap(content.layout, content.furnitureCatalog);
+}
+
+function buildDefaultOfficeSceneBootstrap(): OfficeSceneBootstrap {
+  const content = officeSceneContentRepository.read();
+  return buildOfficeSceneBootstrap(content.layout, content.furnitureCatalog);
 }
 
 function buildOfficeSceneBootstrap(
