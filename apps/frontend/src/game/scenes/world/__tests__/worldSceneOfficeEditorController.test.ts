@@ -78,4 +78,31 @@ describe("WorldSceneOfficeEditorController", () => {
     expect(controller.consumePendingLayoutChange()).toBe(true);
     expect(controller.consumePendingLayoutChange()).toBe(false);
   });
+
+  test("pick mode emits the selected floor settings and switches back to paint mode", () => {
+    const { controller, emitOfficeFloorPicked } = createControllerHarness();
+
+    controller.setOfficeEditorTool({
+      tool: "floor",
+      floorMode: "pick",
+      tileColor: null,
+      floorColor: { h: 35, s: 30, b: 15, c: 0 },
+      floorPattern: "environment.floors.pattern-01",
+    });
+
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 12,
+        y: 12,
+      } as never),
+    ).toBe(true);
+    expect(emitOfficeFloorPicked).toHaveBeenCalledWith({
+      floorColor: null,
+      floorPattern: "environment.floors.pattern-01",
+    });
+    expect(controller.getOfficeFloorMode()).toBe("paint");
+    expect(controller.consumePendingLayoutChange()).toBe(false);
+  });
 });

@@ -1,0 +1,73 @@
+import { describe, expect, test, vi } from "vitest";
+import { RUNTIME_TO_UI_EVENTS } from "../../../protocol";
+import { WorldScenePlacementController } from "../worldScenePlacementController";
+import { WorldSceneProjectionEmitter } from "../worldSceneProjections";
+
+describe("WorldScenePlacementController", () => {
+  test("places a player, selects it, and emits the player placement projection", () => {
+    const emit = vi.fn();
+    const addEntity = vi.fn(() => ({
+      id: 1,
+      position: { x: 96, y: 160 },
+    }));
+    const selectEntity = vi.fn();
+    const controller = new WorldScenePlacementController(
+      {
+        getEntityRegistry: () =>
+          ({
+            getRuntimeById: () => ({
+              definition: {
+                kind: "player",
+                placeable: true,
+              },
+            }),
+          }) as never,
+        getTerrainSystem: () =>
+          ({
+            getGameplayGrid: () => ({
+              clampWorldPoint: () => ({
+                worldX: 96,
+                worldY: 160,
+              }),
+              isWorldWalkable: () => true,
+            }),
+          }) as never,
+        getEntitySystem: () =>
+          ({
+            addEntity,
+          }) as never,
+        getWorldPoint: () => ({
+          x: 100,
+          y: 160,
+        }),
+        selectEntity,
+      },
+      new WorldSceneProjectionEmitter({
+        getRuntimeHost: () => ({
+          events: {
+            emit,
+            on: vi.fn(),
+            off: vi.fn(),
+          },
+        }),
+      }),
+    );
+
+    controller.handlePlaceObjectDrop({
+      type: "entity",
+      entityId: "player",
+      screenX: 12,
+      screenY: 34,
+    });
+
+    expect(addEntity).toHaveBeenCalled();
+    expect(selectEntity).toHaveBeenCalledWith({
+      id: 1,
+      position: { x: 96, y: 160 },
+    });
+    expect(emit).toHaveBeenCalledWith(RUNTIME_TO_UI_EVENTS.PLAYER_PLACED, {
+      worldX: 96,
+      worldY: 160,
+    });
+  });
+});
