@@ -34,6 +34,31 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
   }
 }
 
+// Review: WorldSceneRuntime is a "bag of state" anti-pattern. It conflates at least
+// three unrelated concerns into a single class with no internal encapsulation:
+//
+//   1. Subsystem references (catalog, entityRegistry, terrainSystem, navigation,
+//      officeRenderable, officeRegion) — these are dependency-injection slots that
+//      should be constructor parameters on the scene or owned by a DI container.
+//
+//   2. Visual feedback game objects (selectionBadge, terrainBrushPreview,
+//      officeCellHighlight, terrainBrushRenderPreviewImages) — these are Phaser
+//      game objects that belong to a SceneFeedbackLayer class. Storing them in a
+//      shared runtime bag means any method in the scene can mutate them directly,
+//      with no ownership boundary.
+//
+//   3. Editor tool state (activeOfficeTool, activeFloorMode, activeTileColor,
+//      activeFloorColor, activeFloorPattern, activeFurnitureId) — these six fields
+//      are an exact mirror of the state owned by React's useOfficeToolState hook.
+//      Duplication creates two sources of truth that can diverge.
+//
+//   4. Input / interaction state (isPanning, panStartX/Y, camStartX/Y, wasd,
+//      shiftKey, terrainPaintSession, isOfficePainting, officeDirty,
+//      activeTerrainTool) — this is transient runtime state for in-progress gestures
+//      and should be scoped to the relevant input handler, not a shared global bag.
+//
+// All public fields being mutable with no accessors means there are zero invariants
+// enforced and zero way to trace who last changed a field at runtime.
 export class WorldSceneRuntime {
   public catalog: AnimationCatalog | null = null;
   public entityRegistry: EntityRegistry | null = null;
@@ -46,6 +71,14 @@ export class WorldSceneRuntime {
   public navigation: WorldNavigationService | null = null;
   public officeRenderable: OfficeLayoutRenderable | null = null;
   public officeRegion: TownOfficeRegion | null = null;
+  // Review: activeOfficeTool, activeFloorMode, activeTileColor, activeFloorColor,
+  // activeFloorPattern, and activeFurnitureId are a direct structural copy of the
+  // six useState variables in useOfficeToolState.ts (lines 41–48). This means the
+  // same logical concept — "what office tool is the user currently using" — lives
+  // simultaneously in two places: React state and this runtime bag. Any time the
+  // payload schema changes, both must be updated in lockstep. A single shared
+  // representation (e.g. storing the raw OfficeSetEditorToolPayload as-is) would
+  // eliminate the duplication and make the schema the only source of truth.
   public activeOfficeTool: OfficeEditorToolId | null = null;
   public activeFloorMode: OfficeFloorMode = "paint";
   public activeTileColor: OfficeTileColor | null = null;
