@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { WorldScene } from "../../WorldScene";
 import { TerrainPaintSession } from "../terrainPaintSession";
-import { OFFICE_FLOOR_PICKED_EVENT } from "../../../events";
+import { OFFICE_FLOOR_PICKED_EVENT, type OfficeFloorMode } from "../../../events";
 
 vi.mock("phaser", () => {
   class Scene {
@@ -46,11 +46,11 @@ function runtimeState(scene: Record<string, unknown>): Record<string, unknown> {
 }
 
 function officeController(scene: Record<string, unknown>): {
-  getOfficeFloorMode: () => string;
+  getOfficeFloorMode: () => OfficeFloorMode;
   consumePendingLayoutChange: () => boolean;
 } {
   return scene.officeEditorController as {
-    getOfficeFloorMode: () => string;
+    getOfficeFloorMode: () => OfficeFloorMode;
     consumePendingLayoutChange: () => boolean;
   };
 }

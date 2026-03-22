@@ -30,27 +30,6 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
     destroyGameObject(object);
   }
 }
-
-// Review: WorldSceneRuntime is a "bag of state" anti-pattern. It conflates at least
-// three unrelated concerns into a single class with no internal encapsulation:
-//
-//   1. Subsystem references (catalog, entityRegistry, terrainSystem, navigation,
-//      officeRenderable, officeRegion) — these are dependency-injection slots that
-//      should be constructor parameters on the scene or owned by a DI container.
-//
-//   2. Visual feedback game objects (selectionBadge, terrainBrushPreview,
-//      officeCellHighlight, terrainBrushRenderPreviewImages) — these are Phaser
-//      game objects that belong to a SceneFeedbackLayer class. Storing them in a
-//      shared runtime bag means any method in the scene can mutate them directly,
-//      with no ownership boundary.
-//
-//   3. Input / interaction state (isPanning, panStartX/Y, camStartX/Y, wasd,
-//      shiftKey, terrainPaintSession, activeTerrainTool) — this is transient
-//      runtime state for in-progress gestures and should be scoped to the
-//      relevant input handler, not a shared global bag.
-//
-// All public fields being mutable with no accessors means there are zero invariants
-// enforced and zero way to trace who last changed a field at runtime.
 export class WorldSceneRuntime {
   public catalog: AnimationCatalog | null = null;
   public entityRegistry: EntityRegistry | null = null;

@@ -48,25 +48,6 @@ import type { WorldEntity, WorldSelectableActor } from "./world/types";
 import { EntitySystem } from "./world/entitySystem";
 import { WorldSceneOfficeEditorController } from "./world/worldSceneOfficeEditorController";
 
-// Review: WorldScene is a God Object that violates the Single Responsibility Principle.
-// This file currently owns at least seven distinct concerns:
-//   1. Scene lifecycle (create, update, shutdown)
-//   2. Entity management delegation (EntitySystem orchestration)
-//   3. Camera control and zoom (centerCameraOnWorld, applyZoom, onWheel)
-//   4. Terrain painting workflow (beginTerrainPaint, continueTerrainPainting, queueTerrainDropAtWorld)
-//   5. Office editing workflow (delegated to WorldSceneOfficeEditorController, rerenderOffice remains here)
-//   6. Visual feedback / UI rendering (createSelectionBadge, syncTerrainBrushRenderPreviewTiles, syncOfficeCellHighlight)
-//   7. Office event bridging and shutdown/reset coordination
-//
-// The correct fix is to extract dedicated managers, e.g.:
-//   - WorldSceneCameraManager  → zoom clamping, scrolling, centering
-//   - WorldSceneEditorManager  → office tool state, office painting, floor picking
-//   - WorldSceneFeedbackLayer  → selection badge, brush previews, cell highlight
-//   - WorldSceneTerrainManager → terrain painting, drop queuing, cell occupancy checks
-//
-// Until then, any change to one concern risks accidentally breaking all others
-// because they share the same `rs` runtime bag and the same method namespace.
-
 export const WORLD_SCENE_KEY = "world";
 
 const MIN_ZOOM = 1;
@@ -126,13 +107,6 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  // Review: The create() method conflates scene bootstrapping with Phaser game-object
-  // construction. Bootstrapping (fetching the registry, initialising subsystems) is a
-  // composition concern, while game-object creation (selection badge, brush preview,
-  // cell highlight) is a rendering concern. The two should be separated so each can
-  // evolve and be tested independently. A dedicated SceneFeedbackLayer class, for
-  // example, could own all visual-feedback game objects and expose a clean interface,
-  // making it possible to unit-test badge/preview logic without standing up the full scene.
   public create(): void {
     const bootstrap = getBloomseedWorldBootstrap(
       this.registry.get(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY),
@@ -193,12 +167,6 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  // Review: centerCameraOnWorld contains an inline magic constant (SIDEBAR_WIDTH = 180)
-  // that encodes knowledge of the React UI layout directly inside the Phaser scene. The
-  // scene should not know the pixel dimensions of the sidebar; that is a UI concern. The
-  // correct approach is for this value to be passed in as configuration at game-creation
-  // time (e.g. a `sidebarWidthPx` option in the Phaser config or a constant shared via
-  // events.ts), so the scene remains agnostic of the UI dimensions.
   private centerCameraOnWorld(): void {
     if (!this.rs.terrainSystem) return;
     const worldBounds = this.rs.terrainSystem.getGameplayGrid().getWorldBounds();
@@ -261,16 +229,6 @@ export class WorldScene extends Phaser.Scene {
     if (entity) this.syncSelectionBadgePosition(entity);
   }
 
-  // Review: createSelectionBadge, createTerrainBrushPreview, and createOfficeCellHighlight
-  // are three game-object factory methods whose sole purpose is to create a Phaser sprite
-  // or rectangle, configure its visual properties, and store a reference in the runtime
-  // bag. They represent a "visual feedback layer" concern that does not belong in the scene
-  // orchestrator. Because these objects are stored in WorldSceneRuntime (a shared bag), any
-  // method in the scene can accidentally read or mutate them, and there is no encapsulation
-  // boundary protecting their state. Extracting a SceneFeedbackLayer class would give these
-  // objects a single owner, make all mutations explicit via method calls, and allow the
-  // visual feedback behaviour to be tested by mocking only the Phaser factory calls rather
-  // than standing up the entire WorldScene.
   private createSelectionBadge(): void {
     const firstFrame = this.anims.get(SELECTED_BADGE_ANIMATION_KEY)?.frames[0];
     if (!firstFrame) return;
@@ -353,16 +311,6 @@ export class WorldScene extends Phaser.Scene {
     return image;
   }
 
-  // Review: syncTerrainBrushRenderPreviewTiles and getTerrainBrushRenderPreviewImage
-  // implement a lazy-growing pool of Phaser.GameObjects.Image objects used to preview
-  // what terrain tiles would look like if the current brush were applied. This logic
-  // mixes two distinct concerns: (1) deciding which render tiles to preview (a query
-  // delegated to TerrainSystem.previewPaintAtWorld) and (2) directly manipulating Phaser
-  // Image objects (setTexture, setScale, setRotation, setFlip, setPosition, setVisible).
-  // The pool management and Phaser mutations belong in a dedicated TerrainBrushPreviewLayer
-  // class that can be constructed with a Phaser.Scene reference and tested with a minimal
-  // Phaser mock. As written, the preview logic is inlined in the scene and cannot be
-  // tested without instantiating the full WorldScene.
   private syncTerrainBrushRenderPreviewTiles(tiles: readonly TerrainRenderTile[]): void {
     tiles.forEach((tile, index) => {
       const image = this.getTerrainBrushRenderPreviewImage(index);
@@ -382,16 +330,6 @@ export class WorldScene extends Phaser.Scene {
     }
   }
 
-  // Review: syncSelectionBadgePosition calculates the badge's visual position from an
-  // entity's world position and sprite height, then mutates the Phaser sprite. This is
-  // a layout/rendering calculation that the scene exposes as a private method only
-  // because it is passed as a callback to EntitySystem (line 142: onSelectedEntityUpdated).
-  // The coupling is inverted: the entity system should not drive the scene's visual state
-  // by calling back into it. Instead, EntitySystem should emit a "selection changed" event
-  // and a SceneFeedbackLayer should react to it — keeping both systems unaware of each
-  // other's internals. Additionally, the formula (entity.sprite.displayHeight *
-  // EntitySystem.spriteOriginY) reaches into EntitySystem's static constant from the scene,
-  // meaning the scene is tightly coupled to EntitySystem's internal rendering contract.
   private syncSelectionBadgePosition(entity: WorldSelectableActor): void {
     if (!this.rs.selectionBadge) return;
     this.rs.selectionBadge.setPosition(
@@ -634,21 +572,6 @@ export class WorldScene extends Phaser.Scene {
     );
   }
 
-  // Review: syncTerrainBrushPreviewAtScreen is the clearest example of business logic
-  // and rendering logic being fused into a single method. The method performs all of
-  // the following in sequence:
-  //   1. Coordinate conversion  (screen → world → cell)            — pure math
-  //   2. Occupancy check        (isTerrainCellOccupied)            — domain query
-  //   3. Colour selection       (isBlocked → pick fill/stroke)     — visual policy
-  //   4. Phaser rect mutation   (setFillStyle, setStrokeStyle, setPosition, setVisible) — rendering
-  //   5. Preview tile query     (terrainSystem.previewPaintAtWorld) — domain query
-  //   6. Phaser image pool sync (syncTerrainBrushRenderPreviewTiles) — rendering
-  //
-  // Steps 1–2 are pure and testable; steps 3–6 are Phaser-coupled and cannot be tested
-  // without a running game instance. Extracting a TerrainBrushPreviewController with a
-  // method like updatePreview(screenX, screenY): PreviewState (pure return) and a separate
-  // TerrainBrushPreviewLayer that applies the state to Phaser objects would allow the
-  // policy logic to be unit-tested and would decouple the preview from the rendering backend.
   private syncTerrainBrushPreviewAtScreen(screenX: number, screenY: number): void {
     if (!this.rs.activeTerrainTool || !this.rs.terrainSystem || !this.rs.terrainBrushPreview) {
       this.setTerrainBrushPreviewVisible(false);
