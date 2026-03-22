@@ -1,15 +1,9 @@
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { EntityRegistry } from "../../domain/entityRegistry";
-import type {
-  OfficeFloorMode,
-  OfficeSetEditorToolPayload,
-  SelectedTerrainToolPayload,
-} from "../../events";
+import type { SelectedTerrainToolPayload } from "../../events";
 import type { TerrainSystem } from "../../terrain";
 import type { OfficeLayoutRenderable } from "../../scenes/office/render";
-import type { OfficeTileColor } from "../../office/model";
-import type { OfficeColorAdjust } from "../../office/colors";
 import type { TownOfficeRegion } from "../../town/layout";
 import type { WorldNavigationService } from "./navigation";
 import { TerrainPaintSession } from "./terrainPaintSession";
@@ -37,64 +31,6 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
   }
 }
 
-export function cloneOfficeEditorToolPayload(
-  payload: OfficeSetEditorToolPayload,
-): OfficeSetEditorToolPayload {
-  switch (payload.tool) {
-    case "floor":
-      return {
-        tool: "floor",
-        floorMode: payload.floorMode,
-        tileColor: payload.tileColor,
-        floorColor: payload.floorColor,
-        floorPattern: payload.floorPattern,
-      };
-    case "furniture":
-      return {
-        tool: "furniture",
-        furnitureId: payload.furnitureId,
-      };
-    case "wall":
-    case "erase":
-      return { tool: payload.tool };
-    default:
-      return { tool: null };
-  }
-}
-
-export function getOfficeEditorTool(
-  payload: OfficeSetEditorToolPayload,
-): OfficeSetEditorToolPayload["tool"] {
-  return payload.tool;
-}
-
-export function getOfficeFloorMode(payload: OfficeSetEditorToolPayload): OfficeFloorMode {
-  return payload.tool === "floor" ? payload.floorMode : "paint";
-}
-
-export function getOfficeTileColor(payload: OfficeSetEditorToolPayload): OfficeTileColor | null {
-  return payload.tool === "floor" ? payload.tileColor : null;
-}
-
-export function getOfficeFloorColor(payload: OfficeSetEditorToolPayload): OfficeColorAdjust | null {
-  return payload.tool === "floor" ? payload.floorColor : null;
-}
-
-export function getOfficeFloorPattern(payload: OfficeSetEditorToolPayload): string | null {
-  return payload.tool === "floor" ? payload.floorPattern : null;
-}
-
-export function getOfficeFurnitureId(payload: OfficeSetEditorToolPayload): string | null {
-  return payload.tool === "furniture" ? payload.furnitureId : null;
-}
-
-export function setOfficeFloorMode(
-  payload: OfficeSetEditorToolPayload,
-  floorMode: OfficeFloorMode,
-): OfficeSetEditorToolPayload {
-  return payload.tool === "floor" ? { ...payload, floorMode } : payload;
-}
-
 // Review: WorldSceneRuntime is a "bag of state" anti-pattern. It conflates at least
 // three unrelated concerns into a single class with no internal encapsulation:
 //
@@ -108,14 +44,10 @@ export function setOfficeFloorMode(
 //      shared runtime bag means any method in the scene can mutate them directly,
 //      with no ownership boundary.
 //
-//   3. Editor tool state (officeEditorToolPayload plus derived selectors) — the
-//      runtime stores the raw editor payload and derives tool-specific values from
-//      it instead of mirroring six separate fields.
-//
-//   4. Input / interaction state (isPanning, panStartX/Y, camStartX/Y, wasd,
-//      shiftKey, terrainPaintSession, isOfficePainting, officeDirty,
-//      activeTerrainTool) — this is transient runtime state for in-progress gestures
-//      and should be scoped to the relevant input handler, not a shared global bag.
+//   3. Input / interaction state (isPanning, panStartX/Y, camStartX/Y, wasd,
+//      shiftKey, terrainPaintSession, activeTerrainTool) — this is transient
+//      runtime state for in-progress gestures and should be scoped to the
+//      relevant input handler, not a shared global bag.
 //
 // All public fields being mutable with no accessors means there are zero invariants
 // enforced and zero way to trace who last changed a field at runtime.
@@ -131,9 +63,6 @@ export class WorldSceneRuntime {
   public navigation: WorldNavigationService | null = null;
   public officeRenderable: OfficeLayoutRenderable | null = null;
   public officeRegion: TownOfficeRegion | null = null;
-  public officeEditorToolPayload: OfficeSetEditorToolPayload = { tool: null };
-  public isOfficePainting = false;
-  public officeDirty = false;
 
   public wasd: WorldSceneMovementKeys | null = null;
   public shiftKey: Phaser.Input.Keyboard.Key | null = null;
@@ -159,9 +88,6 @@ export class WorldSceneRuntime {
     this.navigation = null;
     this.officeRenderable = null;
     this.officeRegion = null;
-    this.officeEditorToolPayload = { tool: null };
-    this.isOfficePainting = false;
-    this.officeDirty = false;
 
     this.wasd = null;
     this.shiftKey = null;

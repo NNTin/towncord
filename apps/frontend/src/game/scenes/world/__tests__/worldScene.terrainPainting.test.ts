@@ -1,11 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { WorldScene } from "../../WorldScene";
 import { TerrainPaintSession } from "../terrainPaintSession";
-import {
-  OFFICE_FLOOR_PICKED_EVENT,
-  type OfficeSetEditorToolPayload,
-} from "../../../events";
-import { getOfficeFloorMode } from "../sceneRuntime";
+import { OFFICE_FLOOR_PICKED_EVENT } from "../../../events";
 
 vi.mock("phaser", () => {
   class Scene {
@@ -47,6 +43,16 @@ const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
 
 function runtimeState(scene: Record<string, unknown>): Record<string, unknown> {
   return scene.runtimeState as Record<string, unknown>;
+}
+
+function officeController(scene: Record<string, unknown>): {
+  getOfficeFloorMode: () => string;
+  consumePendingLayoutChange: () => boolean;
+} {
+  return scene.officeEditorController as {
+    getOfficeFloorMode: () => string;
+    consumePendingLayoutChange: () => boolean;
+  };
 }
 
 function createSceneHarness(input?: {
@@ -172,15 +178,21 @@ function createOfficePickSceneHarness(
       characters: [],
     },
   };
-  runtimeState(scene).officeEditorToolPayload = {
+  (
+    scene.onSetOfficeEditorTool as (payload: {
+      tool: "floor";
+      floorMode: "pick";
+      tileColor: null;
+      floorColor: { h: number; s: number; b: number; c: number };
+      floorPattern: string;
+    }) => void
+  )({
     tool: "floor",
     floorMode: "pick",
     tileColor: null,
     floorColor: { h: 35, s: 30, b: 15, c: 0 },
     floorPattern: "environment.floors.pattern-01",
-  };
-  runtimeState(scene).isOfficePainting = true;
-  runtimeState(scene).officeDirty = false;
+  });
 
   return { emit, scene };
 }
@@ -501,13 +513,8 @@ describe("WorldScene terrain painting", () => {
       floorColor: { h: 214, s: 30, b: -100, c: -55 },
       floorPattern: "environment.floors.pattern-03",
     });
-    expect(
-      getOfficeFloorMode(
-        runtimeState(scene).officeEditorToolPayload as OfficeSetEditorToolPayload,
-      ),
-    ).toBe("paint");
-    expect(runtimeState(scene).isOfficePainting).toBe(false);
-    expect(runtimeState(scene).officeDirty).toBe(false);
+    expect(officeController(scene).getOfficeFloorMode()).toBe("paint");
+    expect(officeController(scene).consumePendingLayoutChange()).toBe(false);
   });
 
   test("pick mode clears painting state when a non-floor tile consumes the click", () => {
@@ -519,12 +526,7 @@ describe("WorldScene terrain painting", () => {
     clickPrimaryPointer(scene);
 
     expect(emit).not.toHaveBeenCalled();
-    expect(
-      getOfficeFloorMode(
-        runtimeState(scene).officeEditorToolPayload as OfficeSetEditorToolPayload,
-      ),
-    ).toBe("pick");
-    expect(runtimeState(scene).isOfficePainting).toBe(false);
-    expect(runtimeState(scene).officeDirty).toBe(false);
+    expect(officeController(scene).getOfficeFloorMode()).toBe("pick");
+    expect(officeController(scene).consumePendingLayoutChange()).toBe(false);
   });
 });

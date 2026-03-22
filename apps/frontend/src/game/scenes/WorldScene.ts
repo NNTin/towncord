@@ -6,7 +6,6 @@ import {
 import { RENDER_LAYERS } from "../renderLayers";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import type { AnimationCatalog } from "../assets/animationCatalog";
-import type { EntityRegistry } from "../domain/entityRegistry";
 import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
   OFFICE_FLOOR_PICKED_EVENT,
@@ -17,9 +16,8 @@ import {
   RUNTIME_PERF_EVENT,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
-  type OfficeFloorPickedPayload,
-  type OfficeLayoutChangedPayload,
   type OfficeSetEditorToolPayload,
+  type OfficeLayoutChangedPayload,
   type PlaceObjectDropPayload,
   type PlaceTerrainDropPayload,
   type PlayerPlacedPayload,
@@ -41,26 +39,14 @@ import {
 import { createTerrainNavigationService, type WorldNavigationService } from "./world/navigation";
 import { WorldSceneInputRouter } from "./world/inputRouter";
 import { TownCollisionGrid } from "../town/collisionGrid";
-import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
+import { loadTownOfficeRegion, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
-import type { TownOfficeRegion } from "../town/layout";
-import {
-  cloneOfficeEditorToolPayload,
-  getOfficeEditorTool,
-  getOfficeFloorColor,
-  getOfficeFloorMode,
-  getOfficeFloorPattern,
-  getOfficeFurnitureId,
-  getOfficeTileColor,
-  setOfficeFloorMode,
-  WorldSceneRuntime,
-  type WorldSceneMovementKeys,
-} from "./world/sceneRuntime";
+import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import type { MovementInput } from "./world/movementSystem";
 import type { WorldEntity, WorldSelectableActor } from "./world/types";
 import { EntitySystem } from "./world/entitySystem";
-import { OfficeEditorSystem } from "./world/officeEditorSystem";
+import { WorldSceneOfficeEditorController } from "./world/worldSceneOfficeEditorController";
 
 // Review: WorldScene is a God Object that violates the Single Responsibility Principle.
 // This file currently owns at least seven distinct concerns:
@@ -68,9 +54,9 @@ import { OfficeEditorSystem } from "./world/officeEditorSystem";
 //   2. Entity management delegation (EntitySystem orchestration)
 //   3. Camera control and zoom (centerCameraOnWorld, applyZoom, onWheel)
 //   4. Terrain painting workflow (beginTerrainPaint, continueTerrainPainting, queueTerrainDropAtWorld)
-//   5. Office editing workflow (tryHandleOfficePointerDown, applyOfficeTool, pickOfficeFloor, rerenderOffice)
+//   5. Office editing workflow (delegated to WorldSceneOfficeEditorController, rerenderOffice remains here)
 //   6. Visual feedback / UI rendering (createSelectionBadge, syncTerrainBrushRenderPreviewTiles, syncOfficeCellHighlight)
-//   7. Editor tool state management (onSetOfficeEditorTool stores the current payload and the scene derives values from it)
+//   7. Office event bridging and shutdown/reset coordination
 //
 // The correct fix is to extract dedicated managers, e.g.:
 //   - WorldSceneCameraManager  → zoom clamping, scrolling, centering
@@ -106,9 +92,7 @@ export class WorldScene extends Phaser.Scene {
 
   /** Dedicated system for all per-entity updates (autonomy, movement, animation, position sync). */
   private entitySystem: EntitySystem | null = null;
-
-  /** Dedicated system for office editor tool dispatch (floor/wall/furniture/erase). */
-  private readonly officeEditorSystem = new OfficeEditorSystem();
+  private readonly officeEditorController: WorldSceneOfficeEditorController;
   private readonly inputRouter: WorldSceneInputRouter;
 
   private get rs(): WorldSceneRuntime {
@@ -117,6 +101,13 @@ export class WorldScene extends Phaser.Scene {
 
   constructor() {
     super(WORLD_SCENE_KEY);
+    this.officeEditorController = new WorldSceneOfficeEditorController({
+      getOfficeRegion: () => this.rs.officeRegion,
+      getOfficeCellHighlight: () => this.rs.officeCellHighlight,
+      getActivePointer: () => this.input.activePointer,
+      getWorldPoint: (screenX, screenY) => this.cameras.main.getWorldPoint(screenX, screenY),
+      emitOfficeFloorPicked: (payload) => this.game.events.emit(OFFICE_FLOOR_PICKED_EVENT, payload),
+    });
     this.inputRouter = new WorldSceneInputRouter({
       beginPan: (pointer) => this.beginPan(pointer),
       tryHandleOfficePointerDown: (pointer) => this.tryHandleOfficePointerDown(pointer),
@@ -254,17 +245,8 @@ export class WorldScene extends Phaser.Scene {
       rs.lastPerfEmitAtMs = now;
     }
 
-    // Review: The officeDirty flag check in update() mixes three concerns in a single
-    // conditional block: (1) deciding whether to re-render (state management), (2)
-    // performing the re-render (rendering concern), and (3) emitting an event to notify
-    // React of the layout change (cross-layer communication). Each of these should be
-    // the responsibility of a separate object. The dirty-flag pattern itself is a code
-    // smell here because it couples the update loop to knowledge of internal office state;
-    // a cleaner approach would have OfficeEditorSystem emit a layout-changed event that
-    // both the renderer and the React bridge subscribe to independently.
-    if (rs.officeDirty) {
+    if (this.officeEditorController.consumePendingLayoutChange()) {
       this.rerenderOffice();
-      rs.officeDirty = false;
       if (this.rs.officeRegion) {
         const payload: OfficeLayoutChangedPayload = { layout: this.rs.officeRegion.layout };
         this.game.events.emit(OFFICE_LAYOUT_CHANGED_EVENT, payload);
@@ -338,21 +320,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
-    if (!pointer || !getOfficeEditorTool(this.rs.officeEditorToolPayload) || !this.rs.officeRegion) {
-      this.rs.officeCellHighlight?.setVisible(false);
-      return;
-    }
-
-    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-    const cell = worldToOfficeCell(worldPoint.x, worldPoint.y, this.rs.officeRegion);
-    if (!cell) {
-      this.rs.officeCellHighlight?.setVisible(false);
-      return;
-    }
-
-    const { worldX, worldY } = officeCellToWorldPixel(cell.col, cell.row, this.rs.officeRegion);
-    this.rs.officeCellHighlight?.setPosition(worldX, worldY);
-    this.rs.officeCellHighlight?.setVisible(true);
+    this.officeEditorController.syncOfficeCellHighlight(pointer);
   }
 
   private setSelectionBadgeVisible(visible: boolean): void {
@@ -472,75 +440,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
-    this.rs.officeEditorToolPayload = cloneOfficeEditorToolPayload(payload);
-    this.syncOfficeCellHighlight(this.input.activePointer);
-  }
-
-  private emitPickedOfficeFloor(payload: OfficeFloorPickedPayload): void {
-    this.game.events.emit(OFFICE_FLOOR_PICKED_EVENT, payload);
-  }
-
-  private pickOfficeFloor(worldX: number, worldY: number): boolean {
-    const region = this.rs.officeRegion;
-    if (
-      !region ||
-      getOfficeEditorTool(this.rs.officeEditorToolPayload) !== "floor" ||
-      getOfficeFloorMode(this.rs.officeEditorToolPayload) !== "pick"
-    ) {
-      return false;
-    }
-
-    const cell = worldToOfficeCell(worldX, worldY, region);
-    if (!cell) {
-      return false;
-    }
-
-    const tile = region.layout.tiles[cell.row * region.layout.cols + cell.col];
-    if (!tile || tile.kind !== "floor") {
-      this.rs.isOfficePainting = false;
-      return true;
-    }
-
-    this.emitPickedOfficeFloor({
-      floorColor: tile.colorAdjust ? { ...tile.colorAdjust } : null,
-      floorPattern: tile.pattern ?? "environment.floors.pattern-01",
-    });
-
-    this.rs.isOfficePainting = false;
-    this.rs.officeEditorToolPayload = setOfficeFloorMode(this.rs.officeEditorToolPayload, "paint");
-    return true;
-  }
-
-  /**
-   * Applies the active office editor tool at a world-pixel position.
-   * Returns true if the point is inside the office region (event consumed),
-   * regardless of whether a mutation occurred — this prevents terrain tools
-   * from firing through the office floor on the same click.
-   * Returns false when the point is outside the office or no region/tool is set.
-   */
-  private applyOfficeTool(worldX: number, worldY: number): boolean {
-    const region = this.rs.officeRegion;
-    const payload = this.rs.officeEditorToolPayload;
-    const tool = getOfficeEditorTool(payload);
-    if (!region || !tool) return false;
-
-    const cell = worldToOfficeCell(worldX, worldY, region);
-    if (!cell) return false;
-
-    const changed = this.officeEditorSystem.applyCommand(region.layout, {
-      tool,
-      cell,
-      tileColor: getOfficeTileColor(payload),
-      floorColor: getOfficeFloorColor(payload),
-      floorPattern: getOfficeFloorPattern(payload),
-      furnitureId: getOfficeFurnitureId(payload),
-    });
-
-    if (changed) {
-      this.rs.officeDirty = true;
-    }
-
-    return true;
+    this.officeEditorController.setOfficeEditorTool(payload);
   }
 
   /**
@@ -579,21 +479,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private tryHandleOfficePointerDown(pointer: Phaser.Input.Pointer): boolean {
-    if (!getOfficeEditorTool(this.rs.officeEditorToolPayload)) {
-      return false;
-    }
-
-    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-    if (this.pickOfficeFloor(worldPoint.x, worldPoint.y)) {
-      return true;
-    }
-
-    if (this.applyOfficeTool(worldPoint.x, worldPoint.y)) {
-      this.rs.isOfficePainting = true;
-      return true;
-    }
-
-    return false;
+    return this.officeEditorController.tryHandlePointerDown(pointer);
   }
 
   private beginTerrainPaint(pointer: Phaser.Input.Pointer): void {
@@ -643,14 +529,11 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private shouldContinueOfficePainting(pointer: Phaser.Input.Pointer): boolean {
-    return Boolean(
-      this.rs.isOfficePainting && getOfficeEditorTool(this.rs.officeEditorToolPayload) && pointer.isDown,
-    );
+    return this.officeEditorController.shouldContinuePainting(pointer);
   }
 
   private continueOfficePainting(pointer: Phaser.Input.Pointer): void {
-    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-    this.applyOfficeTool(worldPoint.x, worldPoint.y);
+    this.officeEditorController.continuePainting(pointer);
   }
 
   private shouldContinueTerrainPainting(): boolean {
@@ -667,7 +550,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private endPrimaryPointer(pointer: Phaser.Input.Pointer): void {
-    this.rs.isOfficePainting = false;
+    this.officeEditorController.endPainting();
     this.rs.terrainPaintSession.end();
     this.syncTerrainBrushPreviewFromPointer(pointer);
   }
@@ -897,6 +780,7 @@ export class WorldScene extends Phaser.Scene {
     this.unbindSceneEvents();
     this.entitySystem?.dispose();
     this.entitySystem = null;
+    this.officeEditorController.reset();
     this.rs.dispose();
   }
 }
