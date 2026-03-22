@@ -165,8 +165,8 @@ export class WorldScene extends Phaser.Scene {
         scene: this,
         catalog: this.catalog,
         navigation: this.navigation,
-        emitRuntimeEvent: (event, payload) =>
-          this.projections.emit(event, payload),
+        emitPlayerStateChanged: (payload) =>
+          this.projections.emitPlayerStateChanged(payload),
         onSelectedEntityUpdated: (entity) =>
           this.selectionController.syncSelectionBadgePosition(entity),
       });

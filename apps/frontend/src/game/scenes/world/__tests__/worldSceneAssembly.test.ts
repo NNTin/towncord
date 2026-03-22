@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 const assemblyMocks = vi.hoisted(() => ({
   cameraBeginPan: vi.fn(),
@@ -140,7 +140,7 @@ vi.mock("../entitySystem", () => ({
 
 vi.mock("../worldSceneProjections", () => ({
   WorldSceneProjectionEmitter: class {
-    public emit = assemblyMocks.projectionEmit;
+    public emitPlayerStateChanged = assemblyMocks.projectionEmit;
   },
 }));
 
@@ -236,6 +236,10 @@ vi.mock("../inputRouter", () => ({
 import { WorldScene } from "../../WorldScene";
 
 describe("WorldScene assembly", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("assembles feature runtimes in create and delegates updates to them", () => {
     const scene = new WorldScene() as unknown as Record<string, unknown>;
 
@@ -297,5 +301,64 @@ describe("WorldScene assembly", () => {
     expect(assemblyMocks.entitySystemUpdate).toHaveBeenCalledOnce();
     expect(assemblyMocks.diagnosticsRecordFrame).toHaveBeenCalledOnce();
     expect(assemblyMocks.officeUpdate).toHaveBeenCalledOnce();
+  });
+
+  test("tears down runtime modules and scene bindings on shutdown", () => {
+    const scene = new WorldScene() as unknown as Record<string, unknown>;
+
+    scene.registry = {
+      get: vi.fn(() => ({ world: true })),
+    };
+    scene.input = {
+      activePointer: {
+        withinGame: true,
+        x: 12,
+        y: 34,
+      },
+      keyboard: {
+        addKeys: vi.fn(() => ({
+          W: { isDown: false },
+          A: { isDown: false },
+          S: { isDown: false },
+          D: { isDown: false },
+        })),
+        addKey: vi.fn(() => ({ isDown: false })),
+      },
+      on: vi.fn(),
+      off: vi.fn(),
+    };
+    scene.scale = {
+      once: vi.fn(),
+    };
+    scene.events = {
+      once: vi.fn(),
+    };
+    scene.cameras = {
+      main: {
+        getWorldPoint: vi.fn((x: number, y: number) => ({ x, y })),
+      },
+    };
+    scene.game = {
+      events: {
+        emit: vi.fn(),
+        on: vi.fn(),
+        off: vi.fn(),
+      },
+    };
+
+    (scene.create as () => void)();
+    (scene.handleShutdown as () => void)();
+
+    expect(assemblyMocks.commandUnbind).toHaveBeenCalledOnce();
+    expect(
+      (scene.input as { off: ReturnType<typeof vi.fn> }).off,
+    ).toHaveBeenCalledTimes(5);
+    expect(assemblyMocks.entitySystemDispose).toHaveBeenCalledOnce();
+    expect(assemblyMocks.terrainSystemDestroy).toHaveBeenCalledOnce();
+    expect(assemblyMocks.officeDispose).toHaveBeenCalledOnce();
+    expect(assemblyMocks.selectionDispose).toHaveBeenCalledOnce();
+    expect(assemblyMocks.terrainControllerDispose).toHaveBeenCalledOnce();
+    expect(assemblyMocks.cameraReset).toHaveBeenCalledOnce();
+    expect(assemblyMocks.diagnosticsReset).toHaveBeenCalledOnce();
   });
 });
