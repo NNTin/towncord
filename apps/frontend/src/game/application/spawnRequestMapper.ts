@@ -1,4 +1,4 @@
-import type { PlaceObjectDropPayload } from "../events";
+import type { PlaceObjectDropPayload } from "../protocol";
 import type { EntityId } from "../domain/model";
 
 type SpawnRequest = {

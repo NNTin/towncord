@@ -4,7 +4,7 @@ import type {
   OfficeFloorMode,
   OfficeFloorPickedPayload,
   OfficeSetEditorToolPayload,
-} from "../../events";
+} from "../../protocol";
 import { officeCellToWorldPixel, worldToOfficeCell, type TownOfficeRegion } from "../../town/layout";
 import { OfficeEditorSystem } from "./officeEditorSystem";
 

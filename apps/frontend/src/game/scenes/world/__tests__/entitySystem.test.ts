@@ -51,7 +51,7 @@ describe("EntitySystem", () => {
       scene: {} as never,
       catalog: {} as AnimationCatalog,
       navigation: {} as never,
-      emitGameEvent: vi.fn(),
+      emitRuntimeEvent: vi.fn(),
       onSelectedEntityUpdated: vi.fn(),
     });
 

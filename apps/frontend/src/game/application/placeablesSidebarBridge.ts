@@ -1,9 +1,10 @@
 import type { DragEvent } from "react";
 import {
   PLACE_DRAG_MIME,
+  serializePlaceDragPayload,
   type PlaceDragPayload,
   type SelectedTerrainToolPayload,
-} from "../events";
+} from "../protocol";
 import type {
   PlaceableViewModel,
   TerrainPlaceableViewModel,
@@ -58,7 +59,7 @@ export function createPlaceablesSidebarBridge({
   return {
     activeTerrainToolId: resolveActiveTerrainToolId(placeables, activeTerrainTool),
     onDragStart(event, placeable) {
-      event.dataTransfer.setData(PLACE_DRAG_MIME, JSON.stringify(toPlaceDragPayload(placeable)));
+      event.dataTransfer.setData(PLACE_DRAG_MIME, serializePlaceDragPayload(toPlaceDragPayload(placeable)));
       event.dataTransfer.effectAllowed = "copy";
     },
     onSelectTerrainTool(placeable) {

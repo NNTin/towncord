@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type { DragEvent, MutableRefObject } from "react";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import {
-  OFFICE_SET_EDITOR_TOOL_EVENT,
-  SELECT_TERRAIN_TOOL_EVENT,
+  UI_TO_RUNTIME_COMMANDS,
+  emitUiToRuntimeCommand,
   type OfficeFloorPickedPayload,
   type RuntimePerfPayload,
   type ZoomChangedPayload,
-} from "../events";
+} from "../protocol";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { PlaceableViewModel } from "./placeableService";
 import {
@@ -62,11 +62,19 @@ export function useBloomseedUiBridge(options: {
   const zoomProps = useBloomseedZoomControls({ gameRef, zoomState });
 
   useEffect(() => {
-    gameRef.current?.events.emit(SELECT_TERRAIN_TOOL_EVENT, terrainBridge.activeTerrainTool);
+    emitUiToRuntimeCommand(
+      gameRef.current,
+      UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
+      terrainBridge.activeTerrainTool,
+    );
   }, [gameRef, terrainBridge.activeTerrainTool]);
 
   useEffect(() => {
-    gameRef.current?.events.emit(OFFICE_SET_EDITOR_TOOL_EVENT, buildOfficeEditorToolPayload(options.officeToolState));
+    emitUiToRuntimeCommand(
+      gameRef.current,
+      UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
+      buildOfficeEditorToolPayload(options.officeToolState),
+    );
   }, [
     gameRef,
     options.officeToolState.activeTool,
