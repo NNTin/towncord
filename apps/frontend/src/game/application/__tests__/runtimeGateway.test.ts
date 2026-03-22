@@ -1,15 +1,47 @@
 import { describe, expect, test, vi } from "vitest";
+import {
+  PREVIEW_INFO_EVENT,
+  PREVIEW_PLAY_EVENT,
+  PREVIEW_READY_EVENT,
+  PREVIEW_SHOW_TILE_EVENT,
+} from "../../previewRuntimeContract";
 import { RUNTIME_TO_UI_EVENTS, UI_TO_RUNTIME_COMMANDS } from "../../protocol";
-const { createGameMock } = vi.hoisted(() => ({
+
+const {
+  createGameMock,
+  phaserGameMock,
+} = vi.hoisted(() => ({
   createGameMock: vi.fn(),
+  phaserGameMock: vi.fn(),
 }));
+
+vi.mock("phaser", () => {
+  class Scene {}
+
+  return {
+    default: {
+      AUTO: "AUTO",
+      Scale: {
+        NONE: "NONE",
+      },
+      Scene,
+      Game: phaserGameMock,
+      Math: {
+        Clamp: (value: number, min: number, max: number) =>
+          Math.max(min, Math.min(max, value)),
+      },
+    },
+  };
+});
 
 vi.mock("../../phaser/createGame", () => ({
   createGame: createGameMock,
 }));
 
 import {
+  createPreviewRuntimeGateway,
   createRuntimeGateway,
+  type PreviewRuntimeState,
   type RuntimeBootstrap,
 } from "../runtimeGateway";
 
@@ -158,6 +190,105 @@ describe("RuntimeGateway", () => {
         brushId: "fill",
         screenX: 12,
         screenY: 24,
+      },
+    );
+  });
+});
+
+describe("PreviewRuntimeGateway", () => {
+  test("owns preview runtime lifecycle behind the gateway", () => {
+    const runtimeHost = createRuntimeHost();
+    phaserGameMock.mockImplementation(() => runtimeHost);
+    const gateway = createPreviewRuntimeGateway();
+    const session = gateway.mount({} as HTMLElement);
+
+    session.destroy();
+
+    expect(phaserGameMock).toHaveBeenCalledTimes(1);
+    expect(runtimeHost.destroy).toHaveBeenCalledWith(true);
+  });
+
+  test("queues preview commands until the preview runtime reports ready", () => {
+    const runtimeHost = createRuntimeHost();
+    phaserGameMock.mockImplementation(() => runtimeHost);
+    const gateway = createPreviewRuntimeGateway();
+    const session = gateway.mount({} as HTMLElement);
+
+    session.showTile({
+      textureKey: "debug.tilesets",
+      frame: "grass_0",
+      caseId: 2,
+      materialId: "grass",
+      cellX: 4,
+      cellY: 6,
+      rotate90: 0,
+      flipX: false,
+      flipY: false,
+    });
+    expect(runtimeHost.events.emit).not.toHaveBeenCalledWith(
+      PREVIEW_SHOW_TILE_EVENT,
+      expect.anything(),
+    );
+
+    runtimeHost.events.emit(PREVIEW_READY_EVENT);
+
+    expect(runtimeHost.events.emit).toHaveBeenLastCalledWith(
+      PREVIEW_SHOW_TILE_EVENT,
+      {
+        textureKey: "debug.tilesets",
+        frame: "grass_0",
+        caseId: 2,
+        materialId: "grass",
+        cellX: 4,
+        cellY: 6,
+        rotate90: 0,
+        flipX: false,
+        flipY: false,
+      },
+    );
+  });
+
+  test("forwards preview info notifications to subscribers", () => {
+    const runtimeHost = createRuntimeHost();
+    phaserGameMock.mockImplementation(() => runtimeHost);
+    const gateway = createPreviewRuntimeGateway();
+    const session = gateway.mount({} as HTMLElement);
+    const onInfo = vi.fn();
+    const payload: PreviewRuntimeState = {
+      sourceType: "animation",
+      animationKey: "characters.bloomseed.player.idle.down",
+      frameWidth: 64,
+      frameHeight: 64,
+      frameCount: 6,
+      flipX: false,
+      flipY: false,
+      scale: 3,
+      displayWidth: 192,
+      displayHeight: 192,
+    };
+
+    session.subscribe({ onInfo });
+    runtimeHost.events.emit(PREVIEW_INFO_EVENT, payload);
+
+    expect(onInfo).toHaveBeenCalledWith(payload);
+
+    runtimeHost.events.emit(PREVIEW_READY_EVENT);
+    session.showAnimation({
+      key: payload.animationKey,
+      flipX: false,
+      equipKey: null,
+      equipFlipX: false,
+      frameIndex: null,
+    });
+
+    expect(runtimeHost.events.emit).toHaveBeenLastCalledWith(
+      PREVIEW_PLAY_EVENT,
+      {
+        key: payload.animationKey,
+        flipX: false,
+        equipKey: null,
+        equipFlipX: false,
+        frameIndex: null,
       },
     );
   });

@@ -1,56 +1,21 @@
 import Phaser from "phaser";
 import { preloadBloomseedPack, preloadDebugPack } from "../assets/preload";
 import { registerBloomseedAnimations } from "../assets/animation";
+import {
+  PREVIEW_INFO_EVENT,
+  PREVIEW_PLAY_EVENT,
+  PREVIEW_READY_EVENT,
+  PREVIEW_SHOW_TILE_EVENT,
+  type PreviewAnimationRequest,
+  type PreviewRuntimeInfo,
+  type PreviewTileRequest,
+} from "../previewRuntimeContract";
 
 const PREVIEW_SCENE_KEY = "preview";
-
-// Internal events for the preview game instance (not shared with main game)
-export const PREVIEW_READY_EVENT = "preview:ready";
-export const PREVIEW_PLAY_EVENT = "preview:play";
-export const PREVIEW_SHOW_TILE_EVENT = "preview:showTile";
-export const PREVIEW_INFO_EVENT = "preview:info";
 
 const EQUIPMENT_ATLAS = "bloomseed.equipment";
 
 const PREVIEW_SCALE = 3;
-
-export type PreviewPlayPayload = {
-  key: string;
-  flipX: boolean;
-  equipKey: string | null;
-  equipFlipX: boolean;
-  frameIndex?: number | null;
-};
-
-export type PreviewShowTilePayload = {
-  textureKey: string;
-  frame: string;
-  caseId: number;
-  materialId: string;
-  cellX: number;
-  cellY: number;
-  rotate90: 0 | 1 | 2 | 3;
-  flipX: boolean;
-  flipY: boolean;
-};
-
-export type PreviewInfo = {
-  sourceType: "animation" | "terrain-tile";
-  animationKey: string;
-  frameWidth: number;
-  frameHeight: number;
-  frameCount: number;
-  flipX: boolean;
-  flipY: boolean;
-  scale: number;
-  displayWidth: number;
-  displayHeight: number;
-  caseId?: number;
-  materialId?: string;
-  cellX?: number;
-  cellY?: number;
-  rotate90?: 0 | 1 | 2 | 3;
-};
 
 export class PreviewScene extends Phaser.Scene {
   private sprite: Phaser.GameObjects.Sprite | null = null;
@@ -106,7 +71,7 @@ export class PreviewScene extends Phaser.Scene {
     return this.sprite;
   }
 
-  private onPlay(payload: PreviewPlayPayload): void {
+  private onPlay(payload: PreviewAnimationRequest): void {
     const { key, flipX, equipKey, equipFlipX, frameIndex } = payload;
 
     const animation = this.anims.get(key);
@@ -162,7 +127,7 @@ export class PreviewScene extends Phaser.Scene {
     const frame = texture.get(selectedAnimationFrame.textureFrame);
     if (!frame) return;
 
-    const info: PreviewInfo = {
+    const info: PreviewRuntimeInfo = {
       sourceType: "animation",
       animationKey: key,
       frameWidth: frame.width,
@@ -177,7 +142,7 @@ export class PreviewScene extends Phaser.Scene {
     this.game.events.emit(PREVIEW_INFO_EVENT, info);
   }
 
-  private onShowTile(payload: PreviewShowTilePayload): void {
+  private onShowTile(payload: PreviewTileRequest): void {
     const {
       textureKey,
       frame,
@@ -205,7 +170,7 @@ export class PreviewScene extends Phaser.Scene {
       this.equipSprite.setVisible(false);
     }
 
-    const info: PreviewInfo = {
+    const info: PreviewRuntimeInfo = {
       sourceType: "terrain-tile",
       animationKey: frame,
       frameWidth: resolvedFrame.width,

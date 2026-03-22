@@ -10,11 +10,14 @@ import {
   type Material,
   resolveEquipmentKey,
 } from "../game/assets/equipmentGroups";
-import { type PreviewInfo, type PreviewPlayPayload } from "../game/scenes/PreviewScene";
-import type { RuntimeTerrainInspection } from "../game/application/runtimeGateway";
+import type {
+  PreviewAnimationRequest,
+  PreviewRuntimeState,
+  RuntimeTerrainInspection,
+} from "../game/application/runtimeGateway";
 import { usePreviewRuntime } from "../game/application/usePreviewRuntime";
 
-export type { PreviewInfo };
+export type PreviewInfo = PreviewRuntimeState;
 
 const PREVIEW_WIDTH = 164;
 const PREVIEW_HEIGHT = 130;
@@ -35,7 +38,7 @@ function resolvePreviewAnimationPayload(args: {
   equipmentId: EquipmentId | "";
   material: Material;
   frameIndex: number | null;
-}): PreviewPlayPayload | null {
+}): PreviewAnimationRequest | null {
   if (!args.track) {
     return null;
   }

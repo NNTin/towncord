@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { MutableRefObject } from "react";
 import {
   PLACE_DRAG_MIME,
@@ -117,7 +117,7 @@ export function useRuntimeGatewayLifecycle({
   };
 }
 
-export function useRuntimeInteractionAdapter({
+export function createRuntimeInteractionAdapter({
   runtimeRootRef,
   sessionRef,
   zoomState,
@@ -125,53 +125,50 @@ export function useRuntimeInteractionAdapter({
   runtimeRootBindings: RuntimeRootBindings;
   zoomViewModel: ZoomControlsViewModel | null;
 } {
-  const onDragOver = useCallback<RuntimeRootBindings["onDragOver"]>((event) => {
+  const onDragOver: RuntimeRootBindings["onDragOver"] = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "copy";
-  }, []);
+  };
 
-  const onDrop = useCallback<RuntimeRootBindings["onDrop"]>(
-    (event) => {
-      event.preventDefault();
+  const onDrop: RuntimeRootBindings["onDrop"] = (event) => {
+    event.preventDefault();
 
-      const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
-      if (!rawPayload) {
-        return;
-      }
+    const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
+    if (!rawPayload) {
+      return;
+    }
 
-      const dragPayload = parsePlaceDragMimePayload(rawPayload);
-      if (!dragPayload) {
-        return;
-      }
+    const dragPayload = parsePlaceDragMimePayload(rawPayload);
+    if (!dragPayload) {
+      return;
+    }
 
-      const rect = runtimeRootRef.current?.getBoundingClientRect();
-      if (!rect) {
-        return;
-      }
+    const rect = runtimeRootRef.current?.getBoundingClientRect();
+    if (!rect) {
+      return;
+    }
 
-      sessionRef.current?.placeDragDrop(dragPayload, {
-        screenX: event.clientX - rect.left,
-        screenY: event.clientY - rect.top,
-      });
-    },
-    [runtimeRootRef, sessionRef],
-  );
+    sessionRef.current?.placeDragDrop(dragPayload, {
+      screenX: event.clientX - rect.left,
+      screenY: event.clientY - rect.top,
+    });
+  };
 
-  const onZoomIn = useCallback(() => {
+  const onZoomIn = (): void => {
     if (!zoomState) {
       return;
     }
 
     sessionRef.current?.setZoom(zoomState.zoom * 1.1);
-  }, [sessionRef, zoomState]);
+  };
 
-  const onZoomOut = useCallback(() => {
+  const onZoomOut = (): void => {
     if (!zoomState) {
       return;
     }
 
     sessionRef.current?.setZoom(zoomState.zoom * 0.9);
-  }, [sessionRef, zoomState]);
+  };
 
   return {
     runtimeRootBindings: {
@@ -188,6 +185,19 @@ export function useRuntimeInteractionAdapter({
         }
       : null,
   };
+}
+
+export function useRuntimeInteractionAdapter(
+  options: RuntimeInteractionOptions,
+): {
+  runtimeRootBindings: RuntimeRootBindings;
+  zoomViewModel: ZoomControlsViewModel | null;
+} {
+  return useMemo(() => createRuntimeInteractionAdapter(options), [
+    options.runtimeRootRef,
+    options.sessionRef,
+    options.zoomState,
+  ]);
 }
 
 export function useRuntimeSyncAdapter(): {

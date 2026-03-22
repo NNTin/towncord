@@ -1,4 +1,14 @@
+import Phaser from "phaser";
 import { createGame } from "../phaser/createGame";
+import {
+  PREVIEW_INFO_EVENT,
+  PREVIEW_PLAY_EVENT,
+  PREVIEW_READY_EVENT,
+  PREVIEW_SHOW_TILE_EVENT,
+  type PreviewAnimationRequest,
+  type PreviewRuntimeInfo,
+  type PreviewTileRequest,
+} from "../previewRuntimeContract";
 import {
   RUNTIME_TO_UI_EVENTS,
   UI_TO_RUNTIME_COMMANDS,
@@ -15,10 +25,16 @@ import {
   type TerrainTileInspectedPayload,
   type ZoomChangedPayload,
 } from "../protocol";
+import { PreviewScene } from "../scenes/PreviewScene";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 
+export type {
+  PreviewAnimationRequest,
+  PreviewTileRequest,
+} from "../previewRuntimeContract";
+
 type RuntimeHost = {
-  destroy: (removeCanvas?: boolean) => void;
+  destroy: (removeCanvas: boolean, noReturn?: boolean) => void;
   events: {
     emit: (event: string, payload?: unknown) => void;
     on: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
@@ -33,11 +49,17 @@ type ScreenPoint = {
 
 type RuntimeFactory = (parent: HTMLElement) => RuntimeHost;
 
+const PREVIEW_WIDTH = 164;
+const PREVIEW_HEIGHT = 130;
+
 export type RuntimeBootstrap = BloomseedUiBootstrap;
 export type RuntimeTerrainInspection = TerrainTileInspectedPayload;
 export type RuntimeDiagnostics = RuntimePerfPayload;
 export type RuntimeZoomState = ZoomChangedPayload;
 export type RuntimeTerrainToolSelection = SelectedTerrainToolPayload;
+export type PreviewAnimationPayload = PreviewAnimationRequest;
+export type PreviewTilePayload = PreviewTileRequest;
+export type PreviewRuntimeState = PreviewRuntimeInfo;
 
 export type RuntimeGatewayNotifications = {
   onBootstrap?: (payload: RuntimeBootstrap) => void;
@@ -60,6 +82,42 @@ export type RuntimeGatewaySession = {
 export type RuntimeGateway = {
   mount: (container: HTMLElement) => RuntimeGatewaySession;
 };
+
+export type PreviewRuntimeGatewayNotifications = {
+  onInfo?: (payload: PreviewRuntimeState) => void;
+};
+
+export type PreviewRuntimeGatewaySession = {
+  subscribe: (notifications: PreviewRuntimeGatewayNotifications) => () => void;
+  showAnimation: (payload: PreviewAnimationRequest) => void;
+  showTile: (payload: PreviewTileRequest) => void;
+  destroy: () => void;
+};
+
+export type PreviewRuntimeGateway = {
+  mount: (container: HTMLElement) => PreviewRuntimeGatewaySession;
+};
+
+function createPreviewRuntimeHost(parent: HTMLElement): RuntimeHost {
+  return new Phaser.Game({
+    type: Phaser.AUTO,
+    width: PREVIEW_WIDTH,
+    height: PREVIEW_HEIGHT,
+    backgroundColor: "#0f172a",
+    parent,
+    scene: [PreviewScene],
+    input: { keyboard: false },
+    audio: { noAudio: true },
+    scale: { mode: Phaser.Scale.NONE },
+    disableContextMenu: true,
+    render: {
+      pixelArt: true,
+      antialias: false,
+      roundPixels: true,
+      antialiasGL: false,
+    },
+  });
+}
 
 export function createRuntimeGateway(options: {
   createRuntime?: RuntimeFactory;
@@ -208,4 +266,126 @@ export function createRuntimeGateway(options: {
   };
 }
 
+export function createPreviewRuntimeGateway(options: {
+  createRuntime?: RuntimeFactory;
+} = {}): PreviewRuntimeGateway {
+  const createRuntime = options.createRuntime ?? createPreviewRuntimeHost;
+
+  return {
+    mount(container) {
+      const runtime = createRuntime(container);
+      const subscribers = new Set<PreviewRuntimeGatewayNotifications>();
+      let pendingCommand:
+        | { type: "animation"; payload: PreviewAnimationRequest }
+        | { type: "tile"; payload: PreviewTileRequest }
+        | null = null;
+      let ready = false;
+      let destroyed = false;
+
+      const notifyInfo = (payload: PreviewRuntimeState): void => {
+        for (const subscriber of subscribers) {
+          subscriber.onInfo?.(payload);
+        }
+      };
+
+      const unbindReady = bindPreviewRuntimeEvent(
+        runtime,
+        PREVIEW_READY_EVENT,
+        () => {
+          ready = true;
+          if (!pendingCommand) {
+            return;
+          }
+
+          if (pendingCommand.type === "tile") {
+            runtime.events.emit(PREVIEW_SHOW_TILE_EVENT, pendingCommand.payload);
+          } else {
+            runtime.events.emit(PREVIEW_PLAY_EVENT, pendingCommand.payload);
+          }
+
+          pendingCommand = null;
+        },
+      );
+      const unbindInfo = bindPreviewRuntimeEvent(
+        runtime,
+        PREVIEW_INFO_EVENT,
+        (payload: PreviewRuntimeState) => notifyInfo(payload),
+      );
+
+      const destroy = (): void => {
+        if (destroyed) {
+          return;
+        }
+
+        destroyed = true;
+        subscribers.clear();
+        pendingCommand = null;
+        unbindReady();
+        unbindInfo();
+        runtime.destroy(true);
+      };
+
+      return {
+        subscribe(notifications) {
+          if (destroyed) {
+            return () => {};
+          }
+
+          subscribers.add(notifications);
+          return () => {
+            subscribers.delete(notifications);
+          };
+        },
+        showAnimation(payload) {
+          if (destroyed) {
+            return;
+          }
+
+          if (!ready) {
+            pendingCommand = {
+              type: "animation",
+              payload,
+            };
+            return;
+          }
+
+          runtime.events.emit(PREVIEW_PLAY_EVENT, payload);
+        },
+        showTile(payload) {
+          if (destroyed) {
+            return;
+          }
+
+          if (!ready) {
+            pendingCommand = {
+              type: "tile",
+              payload,
+            };
+            return;
+          }
+
+          runtime.events.emit(PREVIEW_SHOW_TILE_EVENT, payload);
+        },
+        destroy,
+      };
+    },
+  };
+}
+
+function bindPreviewRuntimeEvent<T>(
+  runtime: RuntimeHost,
+  event: string,
+  handler: (payload: T) => void,
+): () => void {
+  const wrapped = (payload: unknown): void => {
+    handler(payload as T);
+  };
+
+  runtime.events.on(event, wrapped);
+  return () => {
+    runtime.events.off(event, wrapped);
+  };
+}
+
 export const bloomseedRuntimeGateway = createRuntimeGateway();
+export const previewRuntimeGateway = createPreviewRuntimeGateway();

@@ -1,132 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { MutableRefObject } from "react";
-import Phaser from "phaser";
+import type {
+  PreviewAnimationRequest,
+  PreviewRuntimeGateway,
+  PreviewRuntimeGatewaySession,
+  PreviewRuntimeState,
+  RuntimeTerrainInspection,
+} from "./runtimeGateway";
 import {
-  PreviewScene,
-  PREVIEW_INFO_EVENT,
-  PREVIEW_PLAY_EVENT,
-  PREVIEW_READY_EVENT,
-  PREVIEW_SHOW_TILE_EVENT,
-  type PreviewInfo,
-  type PreviewPlayPayload,
-  type PreviewShowTilePayload,
-} from "../scenes/PreviewScene";
-import type { RuntimeTerrainInspection } from "./runtimeGateway";
-
-const PREVIEW_WIDTH = 164;
-const PREVIEW_HEIGHT = 130;
-
-type PreviewRuntimeSession = {
-  destroy: () => void;
-  onInfo: (handler: (info: PreviewInfo) => void) => () => void;
-  play: (payload: PreviewPlayPayload) => void;
-  showTile: (payload: PreviewShowTilePayload) => void;
-};
-
-function createPreviewRuntimeSession(container: HTMLElement): PreviewRuntimeSession {
-  const game = new Phaser.Game({
-    type: Phaser.AUTO,
-    width: PREVIEW_WIDTH,
-    height: PREVIEW_HEIGHT,
-    backgroundColor: "#0f172a",
-    parent: container,
-    scene: [PreviewScene],
-    input: { keyboard: false },
-    audio: { noAudio: true },
-    scale: { mode: Phaser.Scale.NONE },
-    disableContextMenu: true,
-    render: {
-      pixelArt: true,
-      antialias: false,
-      roundPixels: true,
-      antialiasGL: false,
-    },
-  });
-
-  let destroyed = false;
-  let ready = false;
-  let pendingPlay: PreviewPlayPayload | null = null;
-  let pendingTile: PreviewShowTilePayload | null = null;
-  const infoHandlers = new Set<(info: PreviewInfo) => void>();
-
-  const emitWhenReady = (
-    eventName: typeof PREVIEW_PLAY_EVENT | typeof PREVIEW_SHOW_TILE_EVENT,
-    payload: PreviewPlayPayload | PreviewShowTilePayload,
-  ): void => {
-    if (destroyed) {
-      return;
-    }
-
-    if (ready) {
-      game.events.emit(eventName, payload);
-      return;
-    }
-
-    if (eventName === PREVIEW_SHOW_TILE_EVENT) {
-      pendingTile = payload as PreviewShowTilePayload;
-      pendingPlay = null;
-      return;
-    }
-
-    pendingPlay = payload as PreviewPlayPayload;
-  };
-
-  const handleReady = (): void => {
-    ready = true;
-    if (pendingTile) {
-      game.events.emit(PREVIEW_SHOW_TILE_EVENT, pendingTile);
-      pendingTile = null;
-      return;
-    }
-
-    if (pendingPlay) {
-      game.events.emit(PREVIEW_PLAY_EVENT, pendingPlay);
-      pendingPlay = null;
-    }
-  };
-
-  const handleInfo = (info: PreviewInfo): void => {
-    for (const handler of infoHandlers) {
-      handler(info);
-    }
-  };
-
-  game.events.once(PREVIEW_READY_EVENT, handleReady);
-  game.events.on(PREVIEW_INFO_EVENT, handleInfo);
-
-  return {
-    destroy() {
-      if (destroyed) {
-        return;
-      }
-
-      destroyed = true;
-      infoHandlers.clear();
-      game.events.off(PREVIEW_INFO_EVENT, handleInfo);
-      game.destroy(true);
-    },
-    onInfo(handler) {
-      if (destroyed) {
-        return () => {};
-      }
-
-      infoHandlers.add(handler);
-      return () => {
-        infoHandlers.delete(handler);
-      };
-    },
-    play(payload) {
-      emitWhenReady(PREVIEW_PLAY_EVENT, payload);
-    },
-    showTile(payload) {
-      emitWhenReady(PREVIEW_SHOW_TILE_EVENT, payload);
-    },
-  };
-}
+  previewRuntimeGateway,
+} from "./runtimeGateway";
 
 function toPreviewTilePayload(
   inspectedTile: RuntimeTerrainInspection,
-): PreviewShowTilePayload {
+): Parameters<PreviewRuntimeGatewaySession["showTile"]>[0] {
   return {
     textureKey: inspectedTile.textureKey,
     frame: inspectedTile.frame,
@@ -140,15 +27,59 @@ function toPreviewTilePayload(
   };
 }
 
+export function createPreviewRuntimeAdapter(args: {
+  onInfo: (info: PreviewRuntimeState | null) => void;
+  sessionRef: MutableRefObject<PreviewRuntimeGatewaySession | null>;
+}): {
+  showPreviewAnimation: (
+    previewAnimation: PreviewAnimationRequest | null,
+    previewTile: RuntimeTerrainInspection | null,
+  ) => void;
+  showPreviewTile: (previewTile: RuntimeTerrainInspection | null) => void;
+} {
+  return {
+    showPreviewAnimation(previewAnimation, previewTile) {
+      if (previewTile) {
+        return;
+      }
+
+      if (!previewAnimation) {
+        args.onInfo(null);
+        return;
+      }
+
+      args.sessionRef.current?.showAnimation(previewAnimation);
+    },
+    showPreviewTile(previewTile) {
+      if (!previewTile) {
+        return;
+      }
+
+      args.sessionRef.current?.showTile(toPreviewTilePayload(previewTile));
+    },
+  };
+}
+
 export function usePreviewRuntime(options: {
+  gateway?: PreviewRuntimeGateway;
   previewTile: RuntimeTerrainInspection | null;
-  previewAnimation: PreviewPlayPayload | null;
-  onInfo: (info: PreviewInfo | null) => void;
+  previewAnimation: PreviewAnimationRequest | null;
+  onInfo: (info: PreviewRuntimeState | null) => void;
 }): MutableRefObject<HTMLDivElement | null> {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const sessionRef = useRef<PreviewRuntimeSession | null>(null);
+  const sessionRef = useRef<PreviewRuntimeGatewaySession | null>(null);
   const onInfoRef = useRef(options.onInfo);
   onInfoRef.current = options.onInfo;
+  const adapter = useMemo(
+    () =>
+      createPreviewRuntimeAdapter({
+        onInfo(info) {
+          onInfoRef.current(info);
+        },
+        sessionRef,
+      }),
+    [sessionRef],
+  );
 
   useEffect(() => {
     const container = containerRef.current;
@@ -156,10 +87,12 @@ export function usePreviewRuntime(options: {
       return;
     }
 
-    const session = createPreviewRuntimeSession(container);
+    const session = (options.gateway ?? previewRuntimeGateway).mount(container);
     sessionRef.current = session;
-    const unsubscribe = session.onInfo((info) => {
-      onInfoRef.current(info);
+    const unsubscribe = session.subscribe({
+      onInfo(info) {
+        onInfoRef.current(info);
+      },
     });
 
     return () => {
@@ -169,28 +102,15 @@ export function usePreviewRuntime(options: {
         sessionRef.current = null;
       }
     };
-  }, []);
+  }, [options.gateway]);
 
   useEffect(() => {
-    if (!options.previewTile) {
-      return;
-    }
-
-    sessionRef.current?.showTile(toPreviewTilePayload(options.previewTile));
-  }, [options.previewTile]);
+    adapter.showPreviewTile(options.previewTile);
+  }, [adapter, options.previewTile]);
 
   useEffect(() => {
-    if (options.previewTile) {
-      return;
-    }
-
-    if (!options.previewAnimation) {
-      onInfoRef.current(null);
-      return;
-    }
-
-    sessionRef.current?.play(options.previewAnimation);
-  }, [options.previewAnimation, options.previewTile]);
+    adapter.showPreviewAnimation(options.previewAnimation, options.previewTile);
+  }, [adapter, options.previewAnimation, options.previewTile]);
 
   return containerRef;
 }
