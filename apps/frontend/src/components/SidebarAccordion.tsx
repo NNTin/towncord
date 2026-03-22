@@ -1,14 +1,5 @@
-import { useMemo, useState } from "react";
-import type { AnimationCatalog } from "../game/assets/animationCatalog";
-import { createPlaceablesSidebarBridge } from "../game/application/placeablesSidebarBridge";
-import type {
-  PlaceableViewModel,
-} from "../game/application/placeableService";
-import type {
-  RuntimePerfPayload,
-  SelectedTerrainToolPayload,
-  TerrainTileInspectedPayload,
-} from "../game/events";
+import { useState } from "react";
+import type { SidebarViewModel } from "../game/application/runtimeViewModels";
 import type { PreviewInfo } from "./AnimationPreview";
 import { AnimationInfoPanel } from "./sidebar/AnimationInfoPanel";
 import { PlaceablesPanel } from "./sidebar/PlaceablesPanel";
@@ -16,33 +7,11 @@ import { PreviewPanel } from "./sidebar/PreviewPanel";
 import { RuntimePerfPanel } from "./sidebar/RuntimePerfPanel";
 
 type Props = {
-  catalog: AnimationCatalog;
-  placeables: PlaceableViewModel[];
-  inspectedTile: TerrainTileInspectedPayload | null;
-  onClearInspectedTile: () => void;
-  activeTerrainTool: SelectedTerrainToolPayload;
-  onSelectTerrainTool: (tool: SelectedTerrainToolPayload) => void;
-  runtimePerf: RuntimePerfPayload | null;
+  sidebar: SidebarViewModel;
 };
 
-export function SidebarAccordion({
-  catalog,
-  placeables,
-  inspectedTile,
-  onClearInspectedTile,
-  activeTerrainTool,
-  onSelectTerrainTool,
-  runtimePerf,
-}: Props): JSX.Element {
+export function SidebarAccordion({ sidebar }: Props): JSX.Element {
   const [animInfo, setAnimInfo] = useState<PreviewInfo | null>(null);
-  const placeablesBridge = useMemo(
-    () => createPlaceablesSidebarBridge({
-      placeables,
-      activeTerrainTool,
-      onSelectTerrainTool,
-    }),
-    [placeables, activeTerrainTool, onSelectTerrainTool],
-  );
 
   return (
     <div
@@ -62,22 +31,12 @@ export function SidebarAccordion({
         zIndex: 10,
       }}
     >
-      <PlaceablesPanel
-        placeables={placeables}
-        onDragStart={placeablesBridge.onDragStart}
-        activeTerrainToolId={placeablesBridge.activeTerrainToolId}
-        onSelectTerrainTool={placeablesBridge.onSelectTerrainTool}
-      />
+      <PlaceablesPanel viewModel={sidebar.placeablesPanel} />
 
-      <PreviewPanel
-        catalog={catalog}
-        inspectedTile={inspectedTile}
-        onClearInspectedTile={onClearInspectedTile}
-        onInfo={setAnimInfo}
-      />
+      <PreviewPanel preview={sidebar.previewPanel} onInfo={setAnimInfo} />
 
       <AnimationInfoPanel animInfo={animInfo} />
-      <RuntimePerfPanel perf={runtimePerf} />
+      <RuntimePerfPanel perf={sidebar.runtimeDiagnostics} />
 
       <div
         style={{

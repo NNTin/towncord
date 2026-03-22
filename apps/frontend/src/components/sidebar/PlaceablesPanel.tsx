@@ -1,24 +1,16 @@
 import { useState } from "react";
-import type {
-  PlaceableViewModel,
-  TerrainPlaceableViewModel,
-} from "../../game/application/placeableService";
+import type { PlaceablesPanelViewModel } from "../../game/application/runtimeViewModels";
 import { AccordionHeader } from "./common";
-
-type Props = {
-  placeables: PlaceableViewModel[];
-  onDragStart: (e: React.DragEvent, placeable: PlaceableViewModel) => void;
-  activeTerrainToolId: string | null;
-  onSelectTerrainTool: (placeable: TerrainPlaceableViewModel) => void;
-};
 
 type PlaceableGroup = {
   key: string;
   label: string;
-  placeables: PlaceableViewModel[];
+  placeables: PlaceablesPanelViewModel["placeables"];
 };
 
-function groupPlaceablesByGroup(placeables: PlaceableViewModel[]): PlaceableGroup[] {
+function groupPlaceablesByGroup(
+  placeables: PlaceablesPanelViewModel["placeables"],
+): PlaceableGroup[] {
   const byGroup = new Map<string, PlaceableGroup>();
 
   for (const placeable of placeables) {
@@ -94,17 +86,24 @@ function TerrainToolEntry({
 }
 
 export function PlaceablesPanel({
-  placeables,
-  onDragStart,
-  activeTerrainToolId,
-  onSelectTerrainTool,
-}: Props): JSX.Element {
+  viewModel,
+}: {
+  viewModel: PlaceablesPanelViewModel;
+}): JSX.Element {
   const [openByGroup, setOpenByGroup] = useState<Record<string, boolean>>({});
-  const groups = groupPlaceablesByGroup(placeables);
+  const groups = groupPlaceablesByGroup(viewModel.placeables);
 
   return (
     <>
-      <div style={{ color: "#94a3b8", fontSize: 11, marginBottom: 2, textTransform: "uppercase", letterSpacing: 1 }}>
+      <div
+        style={{
+          color: "#94a3b8",
+          fontSize: 11,
+          marginBottom: 2,
+          textTransform: "uppercase",
+          letterSpacing: 1,
+        }}
+      >
         Placeables
       </div>
 
@@ -124,22 +123,22 @@ export function PlaceablesPanel({
             />
             {open && (
               <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
-                {group.placeables.map((placeable) => (
+                {group.placeables.map((placeable) =>
                   placeable.type === "terrain" ? (
                     <TerrainToolEntry
                       key={placeable.id}
-                      active={activeTerrainToolId === placeable.id}
+                      active={viewModel.activeTerrainToolId === placeable.id}
                       label={placeable.label}
-                      onClick={() => onSelectTerrainTool(placeable)}
+                      onClick={() => viewModel.onSelectTerrainTool(placeable)}
                     />
                   ) : (
                     <DraggableEntry
                       key={placeable.id}
                       label={placeable.label}
-                      onDragStart={(e) => onDragStart(e, placeable)}
+                      onDragStart={(event) => viewModel.onDragStart(event, placeable)}
                     />
-                  )
-                ))}
+                  ),
+                )}
               </div>
             )}
           </div>
