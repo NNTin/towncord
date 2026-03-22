@@ -170,6 +170,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private centerCameraOnWorld(): void {
+    if (!this.rs.terrainSystem) return;
     const worldBounds = this.rs.terrainSystem.getGameplayGrid().getWorldBounds();
     const cam = this.cameras.main;
     cam.setScroll(
