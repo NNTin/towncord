@@ -5,16 +5,16 @@ import { SidebarAccordion } from "./components/SidebarAccordion";
 import { ZoomControls } from "./components/ZoomControls";
 import { useOfficeLayoutEditor } from "./app/useOfficeLayoutEditor";
 import { useBloomseedUiBridge } from "./game/application/useBloomseedUiBridge";
+
 function App(): JSX.Element {
   const officeEditor = useOfficeLayoutEditor();
   const officeToolState = useOfficeToolState();
 
   const {
-    gameRootRef,
-    onGameRootDragOver,
-    onGameRootDrop,
-    sidebarProps,
-    zoomProps,
+    runtimeRootRef,
+    runtimeRootBindings,
+    sidebarViewModel,
+    zoomViewModel,
   } = useBloomseedUiBridge({
     officeToolState: {
       activeTool: officeToolState.activeTool,
@@ -30,7 +30,7 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {sidebarProps ? <SidebarAccordion {...sidebarProps} /> : null}
+      {sidebarViewModel ? <SidebarAccordion sidebar={sidebarViewModel} /> : null}
       {officeEditor.isOpen ? (
         <OfficeEditorDrawer
           canReload={officeEditor.isAvailable && !officeEditor.isLoading && !officeEditor.isSaving}
@@ -51,7 +51,7 @@ function App(): JSX.Element {
           updatedAt={officeEditor.updatedAt}
         />
       ) : null}
-      {zoomProps ? <ZoomControls {...zoomProps} /> : null}
+      {zoomViewModel ? <ZoomControls {...zoomViewModel} /> : null}
       <BottomToolbar
         isLayoutMode={officeToolState.isLayoutPaintMode}
         onToggleLayoutMode={officeToolState.toggleLayoutMode}
@@ -77,12 +77,7 @@ function App(): JSX.Element {
         isSavingLayout={officeEditor.isSaving}
         layoutStatusText={officeEditor.statusText}
       />
-      <div
-        ref={gameRootRef}
-        className="game-root"
-        onDragOver={onGameRootDragOver}
-        onDrop={onGameRootDrop}
-      />
+      <div ref={runtimeRootRef} className="game-root" {...runtimeRootBindings} />
     </main>
   );
 }

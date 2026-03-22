@@ -1,12 +1,5 @@
 import { useState } from "react";
-
-type ZoomControlsProps = {
-  zoom: number;
-  minZoom: number;
-  maxZoom: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-};
+import type { ZoomControlsViewModel } from "../game/application/runtimeViewModels";
 
 const btnBase: React.CSSProperties = {
   width: 40,
@@ -30,7 +23,7 @@ export function ZoomControls({
   maxZoom,
   onZoomIn,
   onZoomOut,
-}: ZoomControlsProps): JSX.Element {
+}: ZoomControlsViewModel): JSX.Element {
   const [hovered, setHovered] = useState<"plus" | "minus" | null>(null);
 
   const minDisabled = zoom <= minZoom;

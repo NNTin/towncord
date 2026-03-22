@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { RuntimePerfPayload } from "../../game/events";
+import type { RuntimeDiagnostics } from "../../game/application/runtimeGateway";
 import {
   AccordionHeader,
   KeyValueRow,
@@ -8,7 +8,7 @@ import {
 } from "./common";
 
 type Props = {
-  perf: RuntimePerfPayload | null;
+  perf: RuntimeDiagnostics | null;
 };
 
 const HISTORY_CAPACITY = 100;

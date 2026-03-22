@@ -1,19 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  type AnimationCatalog,
   type InputDirection,
   resolveTrackForDirection,
 } from "../../game/assets/animationCatalog";
 import { type Material, MATERIALS } from "../../game/assets/equipmentGroups";
-import type { TerrainTileInspectedPayload } from "../../game/events";
+import type { PreviewPanelViewModel } from "../../game/application/runtimeViewModels";
 import { AnimationPreview, type PreviewInfo } from "../AnimationPreview";
 import { AccordionHeader, SectionLabel, activeBtn } from "./common";
 import { usePreviewSelectionModel } from "./usePreviewSelectionModel";
 
 type Props = {
-  catalog: AnimationCatalog;
-  inspectedTile: TerrainTileInspectedPayload | null;
-  onClearInspectedTile: () => void;
+  preview: PreviewPanelViewModel;
   onInfo: (info: PreviewInfo | null) => void;
 };
 
@@ -58,12 +55,7 @@ function useWASDDirection(): InputDirection {
   return direction;
 }
 
-export function PreviewPanel({
-  catalog,
-  inspectedTile,
-  onClearInspectedTile,
-  onInfo,
-}: Props): JSX.Element {
+export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
   const previewDirection = useWASDDirection();
 
   const [previewOpen, setPreviewOpen] = useState(true);
@@ -98,7 +90,7 @@ export function PreviewPanel({
     equipmentId,
     setEquipmentId,
     setTilesetFrameIndex,
-  } = usePreviewSelectionModel(catalog);
+  } = usePreviewSelectionModel(preview.catalog);
   const expectedPreviewKey = currentTrack
     ? resolveTrackForDirection(currentTrack, previewDirection)?.key ?? null
     : null;
@@ -125,16 +117,20 @@ export function PreviewPanel({
       <AccordionHeader label="Entity" open={previewOpen} onToggle={() => setPreviewOpen((v) => !v)} />
       {previewOpen && (
         <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 4 }}>
-          {catalog.entityTypes.map((et) => (
-            <button key={et} onClick={() => selectEntityType(et)} style={activeBtn(entityType === et)}>
-              {et}
+          {preview.catalog.entityTypes.map((entityTypeId) => (
+            <button
+              key={entityTypeId}
+              onClick={() => selectEntityType(entityTypeId)}
+              style={activeBtn(entityType === entityTypeId)}
+            >
+              {entityTypeId}
             </button>
           ))}
 
-          {entityType === "player" && catalog.playerModels.length > 1 && (
+          {entityType === "player" && preview.catalog.playerModels.length > 1 && (
             <>
               <SectionLabel>Family</SectionLabel>
-              {catalog.playerModels.map((family) => (
+              {preview.catalog.playerModels.map((family) => (
                 <button key={family} onClick={() => selectPlayerFamily(family)} style={activeBtn(playerFamily === family)}>
                   {family}
                 </button>
@@ -145,7 +141,7 @@ export function PreviewPanel({
           {entityType === "mobs" && (
             <>
               <SectionLabel>Family</SectionLabel>
-              {catalog.mobFamilies.map((family) => (
+              {preview.catalog.mobFamilies.map((family) => (
                 <button key={family} onClick={() => selectMobFamily(family)} style={activeBtn(mobFamily === family)}>
                   {family}
                 </button>
@@ -162,7 +158,7 @@ export function PreviewPanel({
           {entityType === "props" && (
             <>
               <SectionLabel>Family</SectionLabel>
-              {catalog.propFamilies.map((family) => (
+              {preview.catalog.propFamilies.map((family) => (
                 <button key={family} onClick={() => selectPropFamily(family)} style={activeBtn(propFamily === family)}>
                   {family}
                 </button>
@@ -183,7 +179,7 @@ export function PreviewPanel({
           {entityType === "tilesets" && (
             <>
               <SectionLabel>Family</SectionLabel>
-              {catalog.tilesetFamilies.map((family) => (
+              {preview.catalog.tilesetFamilies.map((family) => (
                 <button key={family} onClick={() => selectTilesetFamily(family)} style={activeBtn(tilesetFamily === family)}>
                   {family}
                 </button>
@@ -279,13 +275,18 @@ export function PreviewPanel({
               ))}
               <SectionLabel>Material</SectionLabel>
               <div style={{ display: "flex", gap: 4 }}>
-                {MATERIALS.map((mat) => (
+                {MATERIALS.map((nextMaterial) => (
                   <button
-                    key={mat}
-                    onClick={() => setMaterial(mat)}
-                    style={{ ...activeBtn(material === mat), flex: 1, textAlign: "center", padding: "4px 2px" }}
+                    key={nextMaterial}
+                    onClick={() => setMaterial(nextMaterial)}
+                    style={{
+                      ...activeBtn(material === nextMaterial),
+                      flex: 1,
+                      textAlign: "center",
+                      padding: "4px 2px",
+                    }}
                   >
-                    {mat}
+                    {nextMaterial}
                   </button>
                 ))}
               </div>
@@ -293,12 +294,12 @@ export function PreviewPanel({
           )}
 
           <SectionLabel>Preview</SectionLabel>
-          {inspectedTile && (
+          {preview.inspectedTile && (
             <>
               <div style={{ color: "#94a3b8", fontSize: 10 }}>
-                Inspecting tile {inspectedTile.cellX},{inspectedTile.cellY}
+                Inspecting tile {preview.inspectedTile.cellX},{preview.inspectedTile.cellY}
               </div>
-              <button onClick={onClearInspectedTile} style={activeBtn(false)}>
+              <button onClick={preview.onClearInspectedTile} style={activeBtn(false)}>
                 Back to animation
               </button>
             </>
@@ -309,7 +310,7 @@ export function PreviewPanel({
             equipmentId={equipmentId}
             material={material}
             frameIndex={isTilesetStatic ? resolvedTilesetFrameIndex : null}
-            inspectedTile={inspectedTile}
+            inspectedTile={preview.inspectedTile}
             onInfo={handlePreviewInfo}
           />
         </div>

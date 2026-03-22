@@ -1,292 +1,248 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { DragEvent, MutableRefObject } from "react";
-import type Phaser from "phaser";
-import type { AnimationCatalog } from "../assets/animationCatalog";
+import { useCallback, useEffect, useReducer, useRef } from "react";
+import type { MutableRefObject } from "react";
 import {
-  type BloomseedUiBootstrap,
   PLACE_DRAG_MIME,
-  RUNTIME_TO_UI_EVENTS,
-  UI_TO_RUNTIME_COMMANDS,
-  bindRuntimeToUiEvent,
-  emitPlaceDropCommand,
-  emitUiToRuntimeCommand,
-  type OfficeFloorPickedPayload,
-  type OfficeLayoutChangedPayload,
-  type PlaceObjectDropPayload,
-  type PlaceTerrainDropPayload,
-  type RuntimePerfPayload,
-  type SelectedTerrainToolPayload,
-  type TerrainTileInspectedPayload,
-  type ZoomChangedPayload,
   parsePlaceDragMimePayload,
-  toPlaceDropPayload,
+  type OfficeFloorPickedPayload,
 } from "../protocol";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
-import { createGame } from "../phaser/createGame";
-import type { PlaceableViewModel } from "./placeableService";
+import {
+  bloomseedRuntimeGateway,
+  type RuntimeBootstrap,
+  type RuntimeDiagnostics,
+  type RuntimeGateway,
+  type RuntimeGatewaySession,
+  type RuntimeTerrainInspection,
+  type RuntimeTerrainToolSelection,
+  type RuntimeZoomState,
+} from "./runtimeGateway";
+import {
+  createRuntimeBridgeState,
+  reduceRuntimeBridgeState,
+  selectRuntimeSidebarProjection,
+} from "./runtimeBridgeState";
+import type {
+  RuntimeRootBindings,
+  ZoomControlsViewModel,
+} from "./runtimeViewModels";
 
-export type BloomseedSidebarBridgeProps = {
-  catalog: AnimationCatalog;
-  placeables: PlaceableViewModel[];
-  inspectedTile: TerrainTileInspectedPayload | null;
-  onClearInspectedTile: () => void;
-  activeTerrainTool: SelectedTerrainToolPayload;
-  onSelectTerrainTool: (tool: SelectedTerrainToolPayload) => void;
-  runtimePerf: RuntimePerfPayload | null;
-};
+function useLatestRef<T>(value: T): MutableRefObject<T> {
+  const ref = useRef(value);
 
-export type ZoomControlsProps = {
-  zoom: number;
-  minZoom: number;
-  maxZoom: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
-};
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
 
-type BloomseedGameLifecycleOptions = {
-  gameRootRef: MutableRefObject<HTMLDivElement | null>;
-  onBootstrap: (payload: BloomseedUiBootstrap) => void;
-  onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
-  onRuntimePerf: (payload: RuntimePerfPayload) => void;
-  onZoomChanged: (payload: ZoomChangedPayload) => void;
+  return ref;
+}
+
+type RuntimeGatewayLifecycleOptions = {
+  gateway?: RuntimeGateway;
+  onBootstrap: (payload: RuntimeBootstrap) => void;
+  onTerrainTileInspected: (payload: RuntimeTerrainInspection) => void;
+  onRuntimeDiagnostics: (payload: RuntimeDiagnostics) => void;
+  onZoomChanged: (payload: RuntimeZoomState) => void;
   onOfficeLayoutChanged?: ((layout: OfficeSceneLayout) => void) | undefined;
   onOfficeFloorPicked?: ((payload: OfficeFloorPickedPayload) => void) | undefined;
 };
 
-type BloomseedDragDropOptions = {
-  gameRootRef: MutableRefObject<HTMLDivElement | null>;
-  gameRef: MutableRefObject<Phaser.Game | null>;
+type RuntimeInteractionOptions = {
+  runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
+  sessionRef: MutableRefObject<RuntimeGatewaySession | null>;
+  zoomState: RuntimeZoomState | null;
 };
 
-type BloomseedZoomOptions = {
-  gameRef: MutableRefObject<Phaser.Game | null>;
-  zoomState: ZoomChangedPayload | null;
-};
-
-type BloomseedTerrainBridgeOptions = {
-  catalog: AnimationCatalog | null;
-  placeables: PlaceableViewModel[] | null;
-  runtimePerf: RuntimePerfPayload | null;
-};
-
-type BloomseedTerrainBridge = {
-  sidebarProps: BloomseedSidebarBridgeProps | null;
-  activeTerrainTool: SelectedTerrainToolPayload;
-  onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
-};
-
-function useLatestRef<T>(value: T): MutableRefObject<T> {
-  const ref = useRef(value);
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref;
-}
-
-export function useBloomseedGameLifecycle({
-  gameRootRef,
+export function useRuntimeGatewayLifecycle({
+  gateway = bloomseedRuntimeGateway,
   onBootstrap,
   onTerrainTileInspected,
-  onRuntimePerf,
+  onRuntimeDiagnostics,
   onZoomChanged,
   onOfficeLayoutChanged,
   onOfficeFloorPicked,
-}: BloomseedGameLifecycleOptions): MutableRefObject<Phaser.Game | null> {
-  const gameRef = useRef<Phaser.Game | null>(null);
+}: RuntimeGatewayLifecycleOptions): {
+  runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
+  sessionRef: MutableRefObject<RuntimeGatewaySession | null>;
+} {
+  const runtimeRootRef = useRef<HTMLDivElement | null>(null);
+  const sessionRef = useRef<RuntimeGatewaySession | null>(null);
   const onBootstrapRef = useLatestRef(onBootstrap);
   const onTerrainTileInspectedRef = useLatestRef(onTerrainTileInspected);
-  const onRuntimePerfRef = useLatestRef(onRuntimePerf);
+  const onRuntimeDiagnosticsRef = useLatestRef(onRuntimeDiagnostics);
   const onZoomChangedRef = useLatestRef(onZoomChanged);
   const onOfficeLayoutChangedRef = useLatestRef(onOfficeLayoutChanged);
   const onOfficeFloorPickedRef = useLatestRef(onOfficeFloorPicked);
 
   useEffect(() => {
-    const container = gameRootRef.current;
-    if (!container) return;
-
-    const game = createGame(container);
-    gameRef.current = game;
-
-    function handleBootstrap(payload: BloomseedUiBootstrap): void {
-      onBootstrapRef.current(payload);
+    const container = runtimeRootRef.current;
+    if (!container) {
+      return;
     }
 
-    function handleTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
-      onTerrainTileInspectedRef.current(payload);
-    }
-
-    function handleRuntimePerf(payload: RuntimePerfPayload): void {
-      onRuntimePerfRef.current(payload);
-    }
-
-    function handleZoomChanged(payload: ZoomChangedPayload): void {
-      onZoomChangedRef.current(payload);
-    }
-
-    function handleOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
-      onOfficeLayoutChangedRef.current?.(payload.layout);
-    }
-
-    function handleOfficeFloorPicked(payload: OfficeFloorPickedPayload): void {
-      onOfficeFloorPickedRef.current?.(payload);
-    }
-
-    let unbindBootstrap = () => {};
-    unbindBootstrap = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY,
-      (payload) => {
-        handleBootstrap(payload);
-        unbindBootstrap();
+    const session = gateway.mount(container);
+    sessionRef.current = session;
+    const unsubscribe = session.subscribe({
+      onBootstrap(payload) {
+        onBootstrapRef.current(payload);
       },
-    );
-    const unbindTerrainTileInspected = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED,
-      handleTerrainTileInspected,
-    );
-    const unbindRuntimePerf = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.RUNTIME_PERF,
-      handleRuntimePerf,
-    );
-    const unbindZoomChanged = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED,
-      handleZoomChanged,
-    );
-    const unbindOfficeLayoutChanged = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,
-      handleOfficeLayoutChanged,
-    );
-    const unbindOfficeFloorPicked = bindRuntimeToUiEvent(
-      game,
-      RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED,
-      handleOfficeFloorPicked,
-    );
+      onTerrainTileInspected(payload) {
+        onTerrainTileInspectedRef.current(payload);
+      },
+      onRuntimeDiagnostics(payload) {
+        onRuntimeDiagnosticsRef.current(payload);
+      },
+      onZoomChanged(payload) {
+        onZoomChangedRef.current(payload);
+      },
+      onOfficeLayoutChanged(layout) {
+        onOfficeLayoutChangedRef.current?.(layout);
+      },
+      onOfficeFloorPicked(payload) {
+        onOfficeFloorPickedRef.current?.(payload);
+      },
+    });
 
     return () => {
-      unbindBootstrap();
-      unbindTerrainTileInspected();
-      unbindRuntimePerf();
-      unbindZoomChanged();
-      unbindOfficeLayoutChanged();
-      unbindOfficeFloorPicked();
-      game.destroy(true);
-      if (gameRef.current === game) {
-        gameRef.current = null;
+      unsubscribe();
+      session.destroy();
+      if (sessionRef.current === session) {
+        sessionRef.current = null;
       }
     };
-  }, [gameRootRef]);
+  }, [gateway]);
 
-  return gameRef;
+  return {
+    runtimeRootRef,
+    sessionRef,
+  };
 }
 
-export function useBloomseedDragDrop({
-  gameRootRef,
-  gameRef,
-}: BloomseedDragDropOptions): {
-  onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
-  onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
+export function useRuntimeInteractionAdapter({
+  runtimeRootRef,
+  sessionRef,
+  zoomState,
+}: RuntimeInteractionOptions): {
+  runtimeRootBindings: RuntimeRootBindings;
+  zoomViewModel: ZoomControlsViewModel | null;
 } {
-  const onGameRootDragOver = useCallback((event: DragEvent<HTMLDivElement>): void => {
+  const onDragOver = useCallback<RuntimeRootBindings["onDragOver"]>((event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "copy";
   }, []);
 
-  const onGameRootDrop = useCallback((event: DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
+  const onDrop = useCallback<RuntimeRootBindings["onDrop"]>(
+    (event) => {
+      event.preventDefault();
 
-    const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
-    if (!rawPayload) return;
+      const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
+      if (!rawPayload) {
+        return;
+      }
 
-    const dragPayload = parsePlaceDragMimePayload(rawPayload);
-    if (!dragPayload) return;
+      const dragPayload = parsePlaceDragMimePayload(rawPayload);
+      if (!dragPayload) {
+        return;
+      }
 
-    const rect = gameRootRef.current?.getBoundingClientRect();
-    if (!rect) return;
+      const rect = runtimeRootRef.current?.getBoundingClientRect();
+      if (!rect) {
+        return;
+      }
 
-    emitPlaceDropCommand(
-      gameRef.current,
-      toPlaceDropPayload(
-        dragPayload,
-        event.clientX - rect.left,
-        event.clientY - rect.top,
-      ),
-    );
-  }, [gameRef, gameRootRef]);
+      sessionRef.current?.placeDragDrop(dragPayload, {
+        screenX: event.clientX - rect.left,
+        screenY: event.clientY - rect.top,
+      });
+    },
+    [runtimeRootRef, sessionRef],
+  );
 
-  return {
-    onGameRootDragOver,
-    onGameRootDrop,
-  };
-}
-
-export function useBloomseedZoomControls({
-  gameRef,
-  zoomState,
-}: BloomseedZoomOptions): ZoomControlsProps | null {
   const onZoomIn = useCallback(() => {
-    if (!zoomState) return;
-    emitUiToRuntimeCommand(gameRef.current, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
-      zoom: zoomState.zoom * 1.1,
-    });
-  }, [gameRef, zoomState]);
+    if (!zoomState) {
+      return;
+    }
+
+    sessionRef.current?.setZoom(zoomState.zoom * 1.1);
+  }, [sessionRef, zoomState]);
 
   const onZoomOut = useCallback(() => {
-    if (!zoomState) return;
-    emitUiToRuntimeCommand(gameRef.current, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
-      zoom: zoomState.zoom * 0.9,
-    });
-  }, [gameRef, zoomState]);
+    if (!zoomState) {
+      return;
+    }
 
-  if (!zoomState) {
-    return null;
-  }
+    sessionRef.current?.setZoom(zoomState.zoom * 0.9);
+  }, [sessionRef, zoomState]);
 
   return {
-    zoom: zoomState.zoom,
-    minZoom: zoomState.minZoom,
-    maxZoom: zoomState.maxZoom,
-    onZoomIn,
-    onZoomOut,
+    runtimeRootBindings: {
+      onDragOver,
+      onDrop,
+    },
+    zoomViewModel: zoomState
+      ? {
+          zoom: zoomState.zoom,
+          minZoom: zoomState.minZoom,
+          maxZoom: zoomState.maxZoom,
+          onZoomIn,
+          onZoomOut,
+        }
+      : null,
   };
 }
 
-export function useBloomseedTerrainBridge({
-  catalog,
-  placeables,
-  runtimePerf,
-}: BloomseedTerrainBridgeOptions): BloomseedTerrainBridge {
-  const [inspectedTile, setInspectedTile] = useState<TerrainTileInspectedPayload | null>(null);
-  const [activeTerrainTool, setActiveTerrainTool] = useState<SelectedTerrainToolPayload>(null);
+export function useRuntimeSyncAdapter(): {
+  activeTerrainTool: RuntimeTerrainToolSelection;
+  onBootstrap: (payload: RuntimeBootstrap) => void;
+  onClearInspectedTile: () => void;
+  onRuntimeDiagnostics: (payload: RuntimeDiagnostics) => void;
+  onSelectTerrainTool: (tool: RuntimeTerrainToolSelection) => void;
+  onTerrainTileInspected: (payload: RuntimeTerrainInspection) => void;
+  onZoomChanged: (payload: RuntimeZoomState) => void;
+  runtimeSidebarProjection: ReturnType<typeof selectRuntimeSidebarProjection>;
+  zoomState: RuntimeZoomState | null;
+} {
+  const [state, dispatch] = useReducer(
+    reduceRuntimeBridgeState,
+    undefined,
+    createRuntimeBridgeState,
+  );
 
-  const onClearInspectedTile = useCallback(() => {
-    setInspectedTile(null);
+  const onBootstrap = useCallback((payload: RuntimeBootstrap) => {
+    dispatch({ type: "runtimeBootstrapped", payload });
   }, []);
 
-  const onSelectTerrainTool = useCallback((tool: SelectedTerrainToolPayload) => {
-    setActiveTerrainTool(tool);
-    if (tool) {
-      setInspectedTile(null);
-    }
+  const onTerrainTileInspected = useCallback(
+    (payload: RuntimeTerrainInspection) => {
+      dispatch({ type: "terrainTileInspected", payload });
+    },
+    [],
+  );
+
+  const onRuntimeDiagnostics = useCallback((payload: RuntimeDiagnostics) => {
+    dispatch({ type: "runtimeDiagnosticsUpdated", payload });
+  }, []);
+
+  const onZoomChanged = useCallback((payload: RuntimeZoomState) => {
+    dispatch({ type: "zoomChanged", payload });
+  }, []);
+
+  const onSelectTerrainTool = useCallback((tool: RuntimeTerrainToolSelection) => {
+    dispatch({ type: "terrainToolSelected", tool });
+  }, []);
+
+  const onClearInspectedTile = useCallback(() => {
+    dispatch({ type: "inspectedTileCleared" });
   }, []);
 
   return {
-    sidebarProps:
-      catalog && placeables
-        ? {
-            catalog,
-            placeables,
-            inspectedTile,
-            onClearInspectedTile,
-            activeTerrainTool,
-            onSelectTerrainTool,
-            runtimePerf,
-          }
-        : null,
-    activeTerrainTool,
-    onTerrainTileInspected: setInspectedTile,
+    activeTerrainTool: state.activeTerrainTool,
+    onBootstrap,
+    onClearInspectedTile,
+    onRuntimeDiagnostics,
+    onSelectTerrainTool,
+    onTerrainTileInspected,
+    onZoomChanged,
+    runtimeSidebarProjection: selectRuntimeSidebarProjection(state),
+    zoomState: state.zoomState,
   };
 }

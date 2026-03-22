@@ -5,6 +5,7 @@ import {
   type PlaceDragPayload,
   type SelectedTerrainToolPayload,
 } from "../protocol";
+import type { PlaceablesPanelViewModel } from "./runtimeViewModels";
 import type {
   PlaceableViewModel,
   TerrainPlaceableViewModel,
@@ -14,12 +15,6 @@ type CreatePlaceablesSidebarBridgeParams = {
   placeables: PlaceableViewModel[];
   activeTerrainTool: SelectedTerrainToolPayload;
   onSelectTerrainTool: (tool: SelectedTerrainToolPayload) => void;
-};
-
-type PlaceablesSidebarBridge = {
-  activeTerrainToolId: string | null;
-  onDragStart: (event: DragEvent, placeable: PlaceableViewModel) => void;
-  onSelectTerrainTool: (placeable: TerrainPlaceableViewModel) => void;
 };
 
 function toPlaceDragPayload(placeable: PlaceableViewModel): PlaceDragPayload {
@@ -55,8 +50,9 @@ export function createPlaceablesSidebarBridge({
   placeables,
   activeTerrainTool,
   onSelectTerrainTool,
-}: CreatePlaceablesSidebarBridgeParams): PlaceablesSidebarBridge {
+}: CreatePlaceablesSidebarBridgeParams): PlaceablesPanelViewModel {
   return {
+    placeables,
     activeTerrainToolId: resolveActiveTerrainToolId(placeables, activeTerrainTool),
     onDragStart(event, placeable) {
       event.dataTransfer.setData(PLACE_DRAG_MIME, serializePlaceDragPayload(toPlaceDragPayload(placeable)));

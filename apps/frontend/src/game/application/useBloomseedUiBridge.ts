@@ -1,82 +1,61 @@
-import { useEffect, useRef, useState } from "react";
-import type { DragEvent, MutableRefObject } from "react";
+import { useEffect, useMemo } from "react";
+import type { MutableRefObject } from "react";
+import type { OfficeFloorPickedPayload } from "../protocol";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import {
-  UI_TO_RUNTIME_COMMANDS,
-  emitUiToRuntimeCommand,
-  type OfficeFloorPickedPayload,
-  type RuntimePerfPayload,
-  type ZoomChangedPayload,
-} from "../protocol";
-import type { AnimationCatalog } from "../assets/animationCatalog";
-import type { PlaceableViewModel } from "./placeableService";
-import {
-  useBloomseedDragDrop,
-  useBloomseedGameLifecycle,
-  useBloomseedTerrainBridge,
-  useBloomseedZoomControls,
-  type BloomseedSidebarBridgeProps,
-  type ZoomControlsProps,
+  useRuntimeGatewayLifecycle,
+  useRuntimeInteractionAdapter,
+  useRuntimeSyncAdapter,
 } from "./bloomseedUiBridgeHooks";
 import {
   buildOfficeEditorToolPayload,
   type OfficeEditorBridgeState,
 } from "./officeEditorToolPayload";
+import { createPlaceablesSidebarBridge } from "./placeablesSidebarBridge";
+import type {
+  RuntimeRootBindings,
+  SidebarViewModel,
+  ZoomControlsViewModel,
+} from "./runtimeViewModels";
 
 type BloomseedUiBridge = {
-  gameRootRef: MutableRefObject<HTMLDivElement | null>;
-  onGameRootDragOver: (event: DragEvent<HTMLDivElement>) => void;
-  onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
-  sidebarProps: BloomseedSidebarBridgeProps | null;
-  zoomProps: ZoomControlsProps | null;
+  runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
+  runtimeRootBindings: RuntimeRootBindings;
+  sidebarViewModel: SidebarViewModel | null;
+  zoomViewModel: ZoomControlsViewModel | null;
 };
 
+// Transitional composition hook retained while the old bridge naming is still in use.
 export function useBloomseedUiBridge(options: {
   officeToolState: OfficeEditorBridgeState;
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
 }): BloomseedUiBridge {
-  const gameRootRef = useRef<HTMLDivElement | null>(null);
-  const [catalog, setCatalog] = useState<AnimationCatalog | null>(null);
-  const [placeables, setPlaceables] = useState<PlaceableViewModel[] | null>(null);
-  const [runtimePerf, setRuntimePerf] = useState<RuntimePerfPayload | null>(null);
-  const [zoomState, setZoomState] = useState<ZoomChangedPayload | null>(null);
-  const terrainBridge = useBloomseedTerrainBridge({
-    catalog,
-    placeables,
-    runtimePerf,
-  });
-  const gameRef = useBloomseedGameLifecycle({
-    gameRootRef,
-    onBootstrap: (payload) => {
-      setCatalog(payload.catalog);
-      setPlaceables(payload.placeables);
-    },
-    onTerrainTileInspected: terrainBridge.onTerrainTileInspected,
-    onRuntimePerf: setRuntimePerf,
-    onZoomChanged: setZoomState,
+  const runtimeSync = useRuntimeSyncAdapter();
+  const { runtimeRootRef, sessionRef } = useRuntimeGatewayLifecycle({
+    onBootstrap: runtimeSync.onBootstrap,
+    onTerrainTileInspected: runtimeSync.onTerrainTileInspected,
+    onRuntimeDiagnostics: runtimeSync.onRuntimeDiagnostics,
+    onZoomChanged: runtimeSync.onZoomChanged,
     onOfficeLayoutChanged: options.onOfficeLayoutChanged,
     onOfficeFloorPicked: options.onOfficeFloorPicked,
   });
-  const dragDropHandlers = useBloomseedDragDrop({ gameRootRef, gameRef });
-  const zoomProps = useBloomseedZoomControls({ gameRef, zoomState });
+  const { runtimeRootBindings, zoomViewModel } = useRuntimeInteractionAdapter({
+    runtimeRootRef,
+    sessionRef,
+    zoomState: runtimeSync.zoomState,
+  });
 
   useEffect(() => {
-    emitUiToRuntimeCommand(
-      gameRef.current,
-      UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
-      terrainBridge.activeTerrainTool,
-    );
-  }, [gameRef, terrainBridge.activeTerrainTool]);
+    sessionRef.current?.selectTerrainTool(runtimeSync.activeTerrainTool);
+  }, [sessionRef, runtimeSync.activeTerrainTool]);
 
   useEffect(() => {
-    emitUiToRuntimeCommand(
-      gameRef.current,
-      UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
+    sessionRef.current?.setOfficeEditorTool(
       buildOfficeEditorToolPayload(options.officeToolState),
     );
   }, [
-    gameRef,
+    sessionRef,
     options.officeToolState.activeTool,
     options.officeToolState.activeFloorMode,
     options.officeToolState.activeTileColor,
@@ -85,11 +64,36 @@ export function useBloomseedUiBridge(options: {
     options.officeToolState.activeFurnitureId,
   ]);
 
+  const sidebarViewModel = useMemo<SidebarViewModel | null>(() => {
+    const projection = runtimeSync.runtimeSidebarProjection;
+    if (!projection) {
+      return null;
+    }
+
+    return {
+      placeablesPanel: createPlaceablesSidebarBridge({
+        placeables: projection.placeables,
+        activeTerrainTool: runtimeSync.activeTerrainTool,
+        onSelectTerrainTool: runtimeSync.onSelectTerrainTool,
+      }),
+      previewPanel: {
+        catalog: projection.catalog,
+        inspectedTile: projection.inspectedTile,
+        onClearInspectedTile: runtimeSync.onClearInspectedTile,
+      },
+      runtimeDiagnostics: projection.runtimeDiagnostics,
+    };
+  }, [
+    runtimeSync.activeTerrainTool,
+    runtimeSync.onClearInspectedTile,
+    runtimeSync.onSelectTerrainTool,
+    runtimeSync.runtimeSidebarProjection,
+  ]);
+
   return {
-    gameRootRef,
-    onGameRootDragOver: dragDropHandlers.onGameRootDragOver,
-    onGameRootDrop: dragDropHandlers.onGameRootDrop,
-    sidebarProps: terrainBridge.sidebarProps,
-    zoomProps,
+    runtimeRootRef,
+    runtimeRootBindings,
+    sidebarViewModel,
+    zoomViewModel,
   };
 }
