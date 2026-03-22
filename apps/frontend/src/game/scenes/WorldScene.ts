@@ -7,6 +7,11 @@ import type { AnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
 import { TerrainSystem } from "../terrain";
 import { TownCollisionGrid } from "../town/collisionGrid";
+import {
+  createOfficeSceneBootstrap,
+  getOfficeSceneBootstrap,
+  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
+} from "./office/bootstrap";
 import { WorldSceneInputRouter } from "./world/inputRouter";
 import type { MovementInput } from "./world/movementSystem";
 import {
@@ -150,7 +155,11 @@ export class WorldScene extends Phaser.Scene {
     );
 
     this.terrainSystem = new TerrainSystem(this);
-    const officeRegion = this.officeRuntime.bootstrap();
+    const officeBootstrap =
+      getOfficeSceneBootstrap(
+        this.registry.get(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY),
+      ) ?? createOfficeSceneBootstrap();
+    const officeRegion = this.officeRuntime.bootstrap(officeBootstrap.layout);
     const collisionGrid = new TownCollisionGrid(
       this.terrainSystem.getGameplayGrid(),
       officeRegion,

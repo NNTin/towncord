@@ -33,6 +33,34 @@ const assemblyMocks = vi.hoisted(() => ({
       characters: [],
     },
   })),
+  officeSceneBootstrapLayout: {
+    cols: 2,
+    rows: 2,
+    cellSize: 16,
+    tiles: [],
+    furniture: [],
+    characters: [],
+  },
+  createOfficeSceneBootstrap: vi.fn(() => ({
+    layout: {
+      cols: 3,
+      rows: 3,
+      cellSize: 16,
+      tiles: [],
+      furniture: [],
+      characters: [],
+    },
+  })),
+  getOfficeSceneBootstrap: vi.fn(() => ({
+    layout: {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: [],
+      furniture: [],
+      characters: [],
+    },
+  })),
   officeContinuePainting: vi.fn(),
   officeDispose: vi.fn(),
   officeEndPainting: vi.fn(),
@@ -96,6 +124,12 @@ vi.mock("../../../application/gameComposition", () => ({
     catalog: {},
     entityRegistry: {},
   })),
+}));
+
+vi.mock("../../office/bootstrap", () => ({
+  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY: "officeSceneBootstrap",
+  createOfficeSceneBootstrap: assemblyMocks.createOfficeSceneBootstrap,
+  getOfficeSceneBootstrap: assemblyMocks.getOfficeSceneBootstrap,
 }));
 
 vi.mock("../../../terrain", () => ({
@@ -238,6 +272,9 @@ import { WorldScene } from "../../WorldScene";
 describe("WorldScene assembly", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    assemblyMocks.getOfficeSceneBootstrap.mockReturnValue({
+      layout: assemblyMocks.officeSceneBootstrapLayout,
+    });
   });
 
   test("assembles feature runtimes in create and delegates updates to them", () => {
@@ -285,7 +322,11 @@ describe("WorldScene assembly", () => {
 
     (scene.create as () => void)();
 
-    expect(assemblyMocks.officeBootstrap).toHaveBeenCalledOnce();
+    expect(assemblyMocks.getOfficeSceneBootstrap).toHaveBeenCalledWith({ world: true });
+    expect(assemblyMocks.officeBootstrap).toHaveBeenCalledWith(
+      assemblyMocks.officeSceneBootstrapLayout,
+    );
+    expect(assemblyMocks.createOfficeSceneBootstrap).not.toHaveBeenCalled();
     expect(assemblyMocks.createTerrainNavigationService).toHaveBeenCalledOnce();
     expect(assemblyMocks.entitySystemConstruct).toHaveBeenCalledOnce();
     expect(assemblyMocks.selectionCreateSelectionBadge).toHaveBeenCalledOnce();
@@ -347,6 +388,9 @@ describe("WorldScene assembly", () => {
     };
 
     (scene.create as () => void)();
+    expect(assemblyMocks.officeBootstrap).toHaveBeenCalledWith(
+      assemblyMocks.officeSceneBootstrapLayout,
+    );
     (scene.handleShutdown as () => void)();
 
     expect(assemblyMocks.commandUnbind).toHaveBeenCalledOnce();
