@@ -1,6 +1,6 @@
 import { mapDropPayloadToSpawnRequest } from "../../application/spawnRequestMapper";
 import type {
-  PlaceObjectDropPayload,
+  PlaceEntityDropPayload,
   PlayerPlacedPayload,
 } from "../../protocol";
 import type { EntityRegistry } from "../../domain/entityRegistry";
@@ -23,7 +23,7 @@ export class WorldScenePlacementController {
     private readonly projections: WorldSceneProjectionEmitter,
   ) {}
 
-  public handlePlaceObjectDrop(payload: PlaceObjectDropPayload): void {
+  public handlePlaceEntityDrop(payload: PlaceEntityDropPayload): void {
     const entityRegistry = this.host.getEntityRegistry();
     const terrainSystem = this.host.getTerrainSystem();
     const entitySystem = this.host.getEntitySystem();

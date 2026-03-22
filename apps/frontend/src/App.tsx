@@ -4,7 +4,7 @@ import { BottomToolbar } from "./components/BottomToolbar";
 import { SidebarAccordion } from "./components/SidebarAccordion";
 import { ZoomControls } from "./components/ZoomControls";
 import { useOfficeLayoutEditor } from "./app/useOfficeLayoutEditor";
-import { useBloomseedUiBridge } from "./game/application/useBloomseedUiBridge";
+import { useRuntimeUiBridge } from "./game/application/useRuntimeUiBridge";
 
 function App(): JSX.Element {
   const officeEditor = useOfficeLayoutEditor();
@@ -15,7 +15,7 @@ function App(): JSX.Element {
     runtimeRootBindings,
     sidebarViewModel,
     zoomViewModel,
-  } = useBloomseedUiBridge({
+  } = useRuntimeUiBridge({
     officeToolState: {
       activeTool: officeToolState.activeTool,
       activeFloorMode: officeToolState.activeFloorMode,
@@ -24,7 +24,7 @@ function App(): JSX.Element {
       activeFloorPattern: officeToolState.activeFloorPattern,
       activeFurnitureId: officeToolState.activeFurnitureId,
     },
-    onOfficeLayoutChanged: officeEditor.syncFromPhaser,
+    onOfficeLayoutChanged: officeEditor.syncFromRuntime,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
   });
 

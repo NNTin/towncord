@@ -124,13 +124,13 @@ describe("RuntimeGateway", () => {
     };
 
     session.subscribe(firstSubscriber);
-    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY, bootstrap);
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
 
     const lateSubscriber = {
       onBootstrap: vi.fn(),
     };
     session.subscribe(lateSubscriber);
-    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY, bootstrap);
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
 
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledTimes(1);
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);

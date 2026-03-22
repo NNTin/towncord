@@ -6,7 +6,7 @@ import {
   useRuntimeGatewayLifecycle,
   useRuntimeInteractionAdapter,
   useRuntimeSyncAdapter,
-} from "./bloomseedUiBridgeHooks";
+} from "./runtimeUiBridgeHooks";
 import {
   buildOfficeEditorToolPayload,
   type OfficeEditorBridgeState,
@@ -18,19 +18,18 @@ import type {
   ZoomControlsViewModel,
 } from "./runtimeViewModels";
 
-type BloomseedUiBridge = {
+type RuntimeUiBridge = {
   runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
   zoomViewModel: ZoomControlsViewModel | null;
 };
 
-// Transitional composition hook retained while the old bridge naming is still in use.
-export function useBloomseedUiBridge(options: {
+export function useRuntimeUiBridge(options: {
   officeToolState: OfficeEditorBridgeState;
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
-}): BloomseedUiBridge {
+}): RuntimeUiBridge {
   const runtimeSync = useRuntimeSyncAdapter();
   const { runtimeRootRef, sessionRef } = useRuntimeGatewayLifecycle({
     onBootstrap: runtimeSync.onBootstrap,

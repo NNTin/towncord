@@ -21,7 +21,7 @@ import type { PlaceableViewModel } from "./application/placeableService";
 export const PLACE_DRAG_MIME = "application/json";
 
 export const UI_TO_RUNTIME_COMMANDS = {
-  PLACE_OBJECT_DROP: "placeObjectDrop",
+  PLACE_ENTITY_DROP: "placeEntityDrop",
   PLACE_TERRAIN_DROP: "placeTerrainDrop",
   SELECT_TERRAIN_TOOL: "selectTerrainTool",
   SET_ZOOM: "setZoom",
@@ -29,7 +29,7 @@ export const UI_TO_RUNTIME_COMMANDS = {
 } as const;
 
 export const RUNTIME_TO_UI_EVENTS = {
-  BLOOMSEED_READY: "bloomseedReady",
+  RUNTIME_READY: "runtimeReady",
   TERRAIN_TILE_INSPECTED: "terrainTileInspected",
   PLAYER_PLACED: "playerPlaced",
   PLAYER_STATE_CHANGED: "playerStateChanged",
@@ -39,13 +39,13 @@ export const RUNTIME_TO_UI_EVENTS = {
   OFFICE_LAYOUT_CHANGED: "officeLayoutChanged",
 } as const;
 
-export const PLACE_OBJECT_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP;
+export const PLACE_ENTITY_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP;
 export const PLACE_TERRAIN_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP;
 export const SELECT_TERRAIN_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL;
 export const SET_ZOOM_EVENT = UI_TO_RUNTIME_COMMANDS.SET_ZOOM;
 export const OFFICE_SET_EDITOR_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
 
-export const BLOOMSEED_READY_EVENT = RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY;
+export const RUNTIME_READY_EVENT = RUNTIME_TO_UI_EVENTS.RUNTIME_READY;
 export const TERRAIN_TILE_INSPECTED_EVENT = RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED;
 export const PLAYER_PLACED_EVENT = RUNTIME_TO_UI_EVENTS.PLAYER_PLACED;
 export const PLAYER_STATE_CHANGED_EVENT = RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED;
@@ -124,9 +124,6 @@ export type PlaceTerrainDropPayload = PlaceTerrainDragPayload & {
 };
 
 export type PlaceDropPayload = PlaceEntityDropPayload | PlaceTerrainDropPayload;
-
-// Kept for entity placement compatibility while terrain drops use PLACE_TERRAIN_DROP_EVENT.
-export type PlaceObjectDropPayload = PlaceEntityDropPayload;
 export type SelectedTerrainToolPayload = {
   materialId: TerrainMaterialId;
   brushId: TerrainBrushId;
@@ -155,7 +152,7 @@ export type RuntimePerfPayload = {
   terrainMs: number;
 };
 
-export type BloomseedUiBootstrap = {
+export type RuntimeBootstrapPayload = {
   catalog: AnimationCatalog;
   placeables: PlaceableViewModel[];
 };
@@ -167,7 +164,7 @@ export type RuntimeToUiEventName =
   (typeof RUNTIME_TO_UI_EVENTS)[keyof typeof RUNTIME_TO_UI_EVENTS];
 
 export type UiToRuntimeCommandPayloadByName = {
-  [UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP]: PlaceObjectDropPayload;
+  [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: PlaceEntityDropPayload;
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: PlaceTerrainDropPayload;
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: SelectedTerrainToolPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: SetZoomPayload;
@@ -175,7 +172,7 @@ export type UiToRuntimeCommandPayloadByName = {
 };
 
 export type RuntimeToUiEventPayloadByName = {
-  [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: BloomseedUiBootstrap;
+  [RUNTIME_TO_UI_EVENTS.RUNTIME_READY]: RuntimeBootstrapPayload;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED]: TerrainTileInspectedPayload;
   [RUNTIME_TO_UI_EVENTS.PLAYER_PLACED]: PlayerPlacedPayload;
   [RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED]: PlayerStateChangedPayload;
@@ -185,7 +182,7 @@ export type RuntimeToUiEventPayloadByName = {
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]: OfficeLayoutChangedPayload;
 };
 
-type ProtocolStability = "stable" | "compatibility" | "runtime-internal";
+type ProtocolStability = "stable" | "runtime-internal";
 
 type ProtocolEntryMetadata = {
   stability: ProtocolStability;
@@ -194,10 +191,9 @@ type ProtocolEntryMetadata = {
 
 export const BLOOMSEED_UI_RUNTIME_PROTOCOL = {
   commands: {
-    [UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP]: {
-      stability: "compatibility",
-      description:
-        "Legacy entity-placement command retained while callers migrate to explicit command helpers.",
+    [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: {
+      stability: "stable",
+      description: "Stable entity-placement command from React into the runtime.",
     },
     [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: {
       stability: "stable",
@@ -217,7 +213,7 @@ export const BLOOMSEED_UI_RUNTIME_PROTOCOL = {
     },
   } satisfies Record<UiToRuntimeCommandName, ProtocolEntryMetadata>,
   events: {
-    [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: {
+    [RUNTIME_TO_UI_EVENTS.RUNTIME_READY]: {
       stability: "stable",
       description: "Stable runtime bootstrap event that delivers the UI-facing startup snapshot to React.",
     },
@@ -510,14 +506,6 @@ function normalizePlaceDragPayloadInternal(value: unknown): PlaceDragPayload | u
     };
   }
 
-  // Backward-compatible legacy payload: { entityId }
-  if (!("type" in value) && typeof value.entityId === "string") {
-    return {
-      type: "entity",
-      entityId: value.entityId,
-    };
-  }
-
   return undefined;
 }
 
@@ -560,22 +548,22 @@ export function toPlaceDropPayload(
   };
 }
 
-export function normalizePlaceObjectDropPayload(
+export function normalizePlaceEntityDropPayload(
   value: unknown,
-): PlaceObjectDropPayload | undefined {
-  if (!isRecord(value)) return undefined;
-  if (!isFiniteNumber(value.screenX) || !isFiniteNumber(value.screenY)) {
-    return undefined;
-  }
-
-  const dragPayload = normalizePlaceDragPayloadInternal(value);
-  if (!dragPayload || dragPayload.type !== "entity") {
+): PlaceEntityDropPayload | undefined {
+  if (
+    !isRecord(value) ||
+    value.type !== "entity" ||
+    typeof value.entityId !== "string" ||
+    !isFiniteNumber(value.screenX) ||
+    !isFiniteNumber(value.screenY)
+  ) {
     return undefined;
   }
 
   return {
     type: "entity",
-    entityId: dragPayload.entityId,
+    entityId: value.entityId,
     screenX: value.screenX,
     screenY: value.screenY,
   };
@@ -814,9 +802,9 @@ export function normalizeOfficeLayoutChangedPayload(
   };
 }
 
-export function normalizeBloomseedUiBootstrapPayload(
+export function normalizeRuntimeBootstrapPayload(
   value: unknown,
-): BloomseedUiBootstrap | undefined {
+): RuntimeBootstrapPayload | undefined {
   if (
     !isRecord(value) ||
     !isAnimationCatalog(value.catalog) ||
@@ -833,7 +821,7 @@ export function normalizeBloomseedUiBootstrapPayload(
 }
 
 const uiToRuntimeCommandNormalizers = {
-  [UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP]: normalizePlaceObjectDropPayload,
+  [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: normalizeSelectedTerrainToolPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: normalizeSetZoomPayload,
@@ -843,7 +831,7 @@ const uiToRuntimeCommandNormalizers = {
 };
 
 const runtimeToUiEventNormalizers = {
-  [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: normalizeBloomseedUiBootstrapPayload,
+  [RUNTIME_TO_UI_EVENTS.RUNTIME_READY]: normalizeRuntimeBootstrapPayload,
   [RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED]: normalizeTerrainTileInspectedPayload,
   [RUNTIME_TO_UI_EVENTS.PLAYER_PLACED]: normalizePlayerPlacedPayload,
   [RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED]: normalizePlayerStateChangedPayload,
@@ -901,10 +889,10 @@ export function emitRuntimeToUiEvent<K extends RuntimeToUiEventName>(
 
 export function emitPlaceDropCommand(
   host: ProtocolHost | null | undefined,
-  payload: PlaceObjectDropPayload | PlaceTerrainDropPayload,
+  payload: PlaceEntityDropPayload | PlaceTerrainDropPayload,
 ): void {
   if (payload.type === "entity") {
-    emitUiToRuntimeCommand(host, UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, payload);
+    emitUiToRuntimeCommand(host, UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, payload);
     return;
   }
 

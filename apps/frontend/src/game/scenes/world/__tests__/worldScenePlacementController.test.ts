@@ -53,7 +53,7 @@ describe("WorldScenePlacementController", () => {
       }),
     );
 
-    controller.handlePlaceObjectDrop({
+    controller.handlePlaceEntityDrop({
       type: "entity",
       entityId: "player",
       screenX: 12,

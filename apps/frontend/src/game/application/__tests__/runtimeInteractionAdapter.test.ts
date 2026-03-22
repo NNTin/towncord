@@ -2,12 +2,12 @@ import { describe, expect, test, vi } from "vitest";
 import { serializePlaceDragPayload } from "../../protocol";
 
 vi.mock("../runtimeGateway", () => ({
-  bloomseedRuntimeGateway: {
+  runtimeGateway: {
     mount: vi.fn(),
   },
 }));
 
-import { createRuntimeInteractionAdapter } from "../bloomseedUiBridgeHooks";
+import { createRuntimeInteractionAdapter } from "../runtimeUiBridgeHooks";
 
 function createDropEvent(payload: string) {
   return {

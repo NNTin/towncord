@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import {
   UI_TO_RUNTIME_COMMANDS,
   type OfficeSetEditorToolPayload,
-  type PlaceObjectDropPayload,
+  type PlaceEntityDropPayload,
   type PlaceTerrainDropPayload,
   type SelectedTerrainToolPayload,
   type SetZoomPayload,
@@ -35,7 +35,7 @@ function createRuntimeHost() {
 describe("WorldSceneCommandBindings", () => {
   test("routes runtime commands to feature handlers and unbinds cleanly", () => {
     const runtimeHost = createRuntimeHost();
-    const handlePlaceObjectDrop = vi.fn<(payload: PlaceObjectDropPayload) => void>();
+    const handlePlaceEntityDrop = vi.fn<(payload: PlaceEntityDropPayload) => void>();
     const handlePlaceTerrainDrop = vi.fn<(payload: PlaceTerrainDropPayload) => void>();
     const handleSelectTerrainTool = vi.fn<(payload: SelectedTerrainToolPayload) => void>();
     const handleSetOfficeEditorTool = vi.fn<(payload: OfficeSetEditorToolPayload) => void>();
@@ -45,7 +45,7 @@ describe("WorldSceneCommandBindings", () => {
         getRuntimeHost: () => runtimeHost,
       },
       {
-        handlePlaceObjectDrop,
+        handlePlaceEntityDrop,
         handlePlaceTerrainDrop,
         handleSelectTerrainTool,
         handleSetOfficeEditorTool,
@@ -55,7 +55,7 @@ describe("WorldSceneCommandBindings", () => {
 
     bindings.bind();
 
-    runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP, {
+    runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
       type: "entity",
       entityId: "player",
       screenX: 10,
@@ -79,7 +79,7 @@ describe("WorldSceneCommandBindings", () => {
       zoom: 4,
     });
 
-    expect(handlePlaceObjectDrop).toHaveBeenCalledWith({
+    expect(handlePlaceEntityDrop).toHaveBeenCalledWith({
       type: "entity",
       entityId: "player",
       screenX: 10,

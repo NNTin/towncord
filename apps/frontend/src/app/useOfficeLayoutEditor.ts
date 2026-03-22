@@ -34,7 +34,7 @@ type OfficeLayoutEditorState = {
   reload: () => Promise<void>;
   reset: () => void;
   save: () => Promise<void>;
-  syncFromPhaser: (layout: OfficeSceneLayout) => void;
+  syncFromRuntime: (layout: OfficeSceneLayout) => void;
 };
 
 type UseOfficeLayoutEditorOptions = {
@@ -154,7 +154,7 @@ export function useOfficeLayoutEditor(
     setError(null);
   }, [savedText]);
 
-  const syncFromPhaser = useCallback((layout: OfficeSceneLayout): void => {
+  const syncFromRuntime = useCallback((layout: OfficeSceneLayout): void => {
     const doc: OfficeLayoutDocument = {
       version: 2,
       cols: layout.cols,
@@ -211,6 +211,6 @@ export function useOfficeLayoutEditor(
     reload,
     reset,
     save,
-    syncFromPhaser,
+    syncFromRuntime,
   };
 }

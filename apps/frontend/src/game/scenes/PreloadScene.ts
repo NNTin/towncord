@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import {
-  BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY,
-  composeBloomseedBootstrap,
+  WORLD_BOOTSTRAP_REGISTRY_KEY,
+  composeRuntimeBootstrap,
 } from "../application/gameComposition";
 import {
   RUNTIME_TO_UI_EVENTS,
@@ -33,10 +33,10 @@ export class PreloadScene extends Phaser.Scene {
 
   public create(): void {
     const { bloomseedAnimationKeys } = registerPreloadAnimations(this);
-    const bootstrap = composeBloomseedBootstrap(bloomseedAnimationKeys);
-    this.registry.set(BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
+    const bootstrap = composeRuntimeBootstrap(bloomseedAnimationKeys);
+    this.registry.set(WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
     this.registry.set(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY, createOfficeSceneBootstrap());
-    emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY, bootstrap.ui);
+    emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap.ui);
     this.scene.start(WORLD_SCENE_KEY);
   }
 }
