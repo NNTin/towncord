@@ -1,4 +1,8 @@
-import type { OfficeEditorToolId, OfficeFloorMode, OfficeSetEditorToolPayload } from "../events";
+import type {
+  OfficeEditorToolId,
+  OfficeFloorMode,
+  OfficeSetEditorToolPayload,
+} from "../protocol";
 import type { OfficeColorAdjust } from "../office/colors";
 import type { OfficeTileColor } from "../office/model";
 

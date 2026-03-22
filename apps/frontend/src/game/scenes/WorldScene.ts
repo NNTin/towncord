@@ -7,15 +7,10 @@ import { RENDER_LAYERS } from "../renderLayers";
 import { mapDropPayloadToSpawnRequest } from "../application/spawnRequestMapper";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
-  OFFICE_SET_EDITOR_TOOL_EVENT,
-  OFFICE_FLOOR_PICKED_EVENT,
-  OFFICE_LAYOUT_CHANGED_EVENT,
-  PLACE_OBJECT_DROP_EVENT,
-  PLACE_TERRAIN_DROP_EVENT,
-  PLAYER_PLACED_EVENT,
-  RUNTIME_PERF_EVENT,
-  SELECT_TERRAIN_TOOL_EVENT,
-  TERRAIN_TILE_INSPECTED_EVENT,
+  RUNTIME_TO_UI_EVENTS,
+  UI_TO_RUNTIME_COMMANDS,
+  bindUiToRuntimeCommand,
+  emitRuntimeToUiEvent,
   type OfficeSetEditorToolPayload,
   type OfficeLayoutChangedPayload,
   type PlaceObjectDropPayload,
@@ -24,10 +19,8 @@ import {
   type RuntimePerfPayload,
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
-  ZOOM_CHANGED_EVENT,
-  SET_ZOOM_EVENT,
   type SetZoomPayload,
-} from "../events";
+} from "../protocol";
 import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
@@ -70,6 +63,7 @@ const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
 
 export class WorldScene extends Phaser.Scene {
   private readonly runtimeState = new WorldSceneRuntime();
+  private protocolUnsubscribers: Array<() => void> = [];
 
   /** Dedicated system for all per-entity updates (autonomy, movement, animation, position sync). */
   private entitySystem: EntitySystem | null = null;
@@ -87,7 +81,8 @@ export class WorldScene extends Phaser.Scene {
       getOfficeCellHighlight: () => this.rs.officeCellHighlight,
       getActivePointer: () => this.input.activePointer,
       getWorldPoint: (screenX, screenY) => this.cameras.main.getWorldPoint(screenX, screenY),
-      emitOfficeFloorPicked: (payload) => this.game.events.emit(OFFICE_FLOOR_PICKED_EVENT, payload),
+      emitOfficeFloorPicked: (payload) =>
+        emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED, payload),
     });
     this.inputRouter = new WorldSceneInputRouter({
       beginPan: (pointer) => this.beginPan(pointer),
@@ -136,7 +131,7 @@ export class WorldScene extends Phaser.Scene {
         scene: this,
         catalog: this.rs.catalog,
         navigation,
-        emitGameEvent: (event, payload) => this.game.events.emit(event, payload),
+        emitRuntimeEvent: (event, payload) => emitRuntimeToUiEvent(this.game, event, payload),
         onSelectedEntityUpdated: (entity) => this.syncSelectionBadgePosition(entity),
       });
     }
@@ -160,7 +155,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.setZoom(INITIAL_ZOOM);
     this.centerCameraOnWorld();
     this.scale.once(Phaser.Scale.Events.RESIZE, this.centerCameraOnWorld, this);
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+    emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED, {
       zoom: this.cameras.main.zoom,
       minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
@@ -209,7 +204,7 @@ export class WorldScene extends Phaser.Scene {
         updateMs,
         terrainMs,
       };
-      this.game.events.emit(RUNTIME_PERF_EVENT, payload);
+      emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.RUNTIME_PERF, payload);
       rs.lastPerfEmitAtMs = now;
     }
 
@@ -217,7 +212,7 @@ export class WorldScene extends Phaser.Scene {
       this.rerenderOffice();
       if (this.rs.officeRegion) {
         const payload: OfficeLayoutChangedPayload = { layout: this.rs.officeRegion.layout };
-        this.game.events.emit(OFFICE_LAYOUT_CHANGED_EVENT, payload);
+        emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, payload);
       }
     }
   }
@@ -361,7 +356,7 @@ export class WorldScene extends Phaser.Scene {
 
     if (definition.kind === "player") {
       const placedPayload: PlayerPlacedPayload = { worldX: clamped.worldX, worldY: clamped.worldY };
-      this.game.events.emit(PLAYER_PLACED_EVENT, placedPayload);
+      emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.PLAYER_PLACED, placedPayload);
     }
   }
 
@@ -448,7 +443,7 @@ export class WorldScene extends Phaser.Scene {
     const inspected = this.rs.terrainSystem.inspectAtWorld(worldPoint.x, worldPoint.y);
     if (inspected) {
       const payload: TerrainTileInspectedPayload = inspected;
-      this.game.events.emit(TERRAIN_TILE_INSPECTED_EVENT, payload);
+      emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED, payload);
     }
   }
 
@@ -508,7 +503,7 @@ export class WorldScene extends Phaser.Scene {
   private applyZoom(nextZoom: number): void {
     const cam = this.cameras.main;
     cam.setZoom(Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM));
-    this.game.events.emit(ZOOM_CHANGED_EVENT, {
+    emitRuntimeToUiEvent(this.game, RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED, {
       zoom: cam.zoom,
       minZoom: MIN_ZOOM,
       maxZoom: MAX_ZOOM,
@@ -678,20 +673,41 @@ export class WorldScene extends Phaser.Scene {
     this.input.on("pointerup", this.onPointerUp, this);
     this.input.on("pointerupoutside", this.onPointerUp, this);
     this.input.on("wheel", this.onWheel, this);
-    this.game.events.on(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-    this.game.events.on(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
-    this.game.events.on(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
-    this.game.events.on(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetOfficeEditorTool, this);
-    this.game.events.on(SET_ZOOM_EVENT, this.onSetZoom, this);
+    this.protocolUnsubscribers = [
+      bindUiToRuntimeCommand(
+        this.game,
+        UI_TO_RUNTIME_COMMANDS.PLACE_OBJECT_DROP,
+        this.onPlaceObjectDrop.bind(this),
+      ),
+      bindUiToRuntimeCommand(
+        this.game,
+        UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP,
+        this.onPlaceTerrainDrop.bind(this),
+      ),
+      bindUiToRuntimeCommand(
+        this.game,
+        UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
+        this.onSelectTerrainTool.bind(this),
+      ),
+      bindUiToRuntimeCommand(
+        this.game,
+        UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
+        this.onSetOfficeEditorTool.bind(this),
+      ),
+      bindUiToRuntimeCommand(
+        this.game,
+        UI_TO_RUNTIME_COMMANDS.SET_ZOOM,
+        this.onSetZoom.bind(this),
+      ),
+    ];
     this.events.once("shutdown", this.handleShutdown, this);
   }
 
   private unbindSceneEvents(): void {
-    this.game.events.off(PLACE_OBJECT_DROP_EVENT, this.onPlaceObjectDrop, this);
-    this.game.events.off(PLACE_TERRAIN_DROP_EVENT, this.onPlaceTerrainDrop, this);
-    this.game.events.off(SELECT_TERRAIN_TOOL_EVENT, this.onSelectTerrainTool, this);
-    this.game.events.off(OFFICE_SET_EDITOR_TOOL_EVENT, this.onSetOfficeEditorTool, this);
-    this.game.events.off(SET_ZOOM_EVENT, this.onSetZoom, this);
+    for (const unsubscribe of this.protocolUnsubscribers) {
+      unsubscribe();
+    }
+    this.protocolUnsubscribers = [];
     this.input.off("pointerdown", this.onPointerDown, this);
     this.input.off("pointermove", this.onPointerMove, this);
     this.input.off("pointerup", this.onPointerUp, this);

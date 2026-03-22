@@ -3,15 +3,12 @@ import type { DragEvent, MutableRefObject } from "react";
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
-  OFFICE_FLOOR_PICKED_EVENT,
-  OFFICE_LAYOUT_CHANGED_EVENT,
   PLACE_DRAG_MIME,
-  PLACE_OBJECT_DROP_EVENT,
-  PLACE_TERRAIN_DROP_EVENT,
-  RUNTIME_PERF_EVENT,
-  TERRAIN_TILE_INSPECTED_EVENT,
-  ZOOM_CHANGED_EVENT,
-  SET_ZOOM_EVENT,
+  RUNTIME_TO_UI_EVENTS,
+  UI_TO_RUNTIME_COMMANDS,
+  bindRuntimeToUiEvent,
+  emitPlaceDropCommand,
+  emitUiToRuntimeCommand,
   type OfficeFloorPickedPayload,
   type OfficeLayoutChangedPayload,
   type PlaceObjectDropPayload,
@@ -20,9 +17,9 @@ import {
   type SelectedTerrainToolPayload,
   type TerrainTileInspectedPayload,
   type ZoomChangedPayload,
-  parsePlaceDragPayload,
+  parsePlaceDragMimePayload,
   toPlaceDropPayload,
-} from "../events";
+} from "../protocol";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import { createGame } from "../phaser/createGame";
 import {
@@ -81,28 +78,6 @@ type BloomseedTerrainBridge = {
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
 };
 
-function emitPlaceDrop(
-  game: Phaser.Game | null,
-  payload: PlaceObjectDropPayload | PlaceTerrainDropPayload,
-): void {
-  if (!game) return;
-
-  if (payload.type === "entity") {
-    game.events.emit(PLACE_OBJECT_DROP_EVENT, payload);
-    return;
-  }
-
-  game.events.emit(PLACE_TERRAIN_DROP_EVENT, payload);
-}
-
-function parseRawPlaceDragPayload(rawPayload: string) {
-  try {
-    return parsePlaceDragPayload(JSON.parse(rawPayload));
-  } catch {
-    return null;
-  }
-}
-
 function useLatestRef<T>(value: T): MutableRefObject<T> {
   const ref = useRef(value);
   useEffect(() => {
@@ -160,18 +135,38 @@ export function useBloomseedGameLifecycle({
     }
 
     game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
-    game.events.on(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
-    game.events.on(RUNTIME_PERF_EVENT, handleRuntimePerf);
-    game.events.on(ZOOM_CHANGED_EVENT, handleZoomChanged);
-    game.events.on(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
-    game.events.on(OFFICE_FLOOR_PICKED_EVENT, handleOfficeFloorPicked);
+    const unbindTerrainTileInspected = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED,
+      handleTerrainTileInspected,
+    );
+    const unbindRuntimePerf = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.RUNTIME_PERF,
+      handleRuntimePerf,
+    );
+    const unbindZoomChanged = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED,
+      handleZoomChanged,
+    );
+    const unbindOfficeLayoutChanged = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,
+      handleOfficeLayoutChanged,
+    );
+    const unbindOfficeFloorPicked = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED,
+      handleOfficeFloorPicked,
+    );
 
     return () => {
-      game.events.off(TERRAIN_TILE_INSPECTED_EVENT, handleTerrainTileInspected);
-      game.events.off(RUNTIME_PERF_EVENT, handleRuntimePerf);
-      game.events.off(ZOOM_CHANGED_EVENT, handleZoomChanged);
-      game.events.off(OFFICE_LAYOUT_CHANGED_EVENT, handleOfficeLayoutChanged);
-      game.events.off(OFFICE_FLOOR_PICKED_EVENT, handleOfficeFloorPicked);
+      unbindTerrainTileInspected();
+      unbindRuntimePerf();
+      unbindZoomChanged();
+      unbindOfficeLayoutChanged();
+      unbindOfficeFloorPicked();
       game.destroy(true);
       if (gameRef.current === game) {
         gameRef.current = null;
@@ -200,13 +195,13 @@ export function useBloomseedDragDrop({
     const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
     if (!rawPayload) return;
 
-    const dragPayload = parseRawPlaceDragPayload(rawPayload);
+    const dragPayload = parsePlaceDragMimePayload(rawPayload);
     if (!dragPayload) return;
 
     const rect = gameRootRef.current?.getBoundingClientRect();
     if (!rect) return;
 
-    emitPlaceDrop(
+    emitPlaceDropCommand(
       gameRef.current,
       toPlaceDropPayload(
         dragPayload,
@@ -228,12 +223,16 @@ export function useBloomseedZoomControls({
 }: BloomseedZoomOptions): ZoomControlsProps | null {
   const onZoomIn = useCallback(() => {
     if (!zoomState) return;
-    gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 1.1 });
+    emitUiToRuntimeCommand(gameRef.current, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
+      zoom: zoomState.zoom * 1.1,
+    });
   }, [gameRef, zoomState]);
 
   const onZoomOut = useCallback(() => {
     if (!zoomState) return;
-    gameRef.current?.events.emit(SET_ZOOM_EVENT, { zoom: zoomState.zoom * 0.9 });
+    emitUiToRuntimeCommand(gameRef.current, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
+      zoom: zoomState.zoom * 0.9,
+    });
   }, [gameRef, zoomState]);
 
   if (!zoomState) {

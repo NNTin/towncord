@@ -1,7 +1,11 @@
 import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { RegisteredEntity } from "../../domain/entityRegistry";
-import type { PlayerStateChangedPayload } from "../../events";
-import { PLAYER_STATE_CHANGED_EVENT } from "../../events";
+import {
+  RUNTIME_TO_UI_EVENTS,
+  type PlayerStateChangedPayload,
+  type RuntimeToUiEventName,
+  type RuntimeToUiEventPayloadByName,
+} from "../../protocol";
 import { playEntityAnimation } from "./animationSystem";
 import {
   AUTONOMY_IDLE_DELAY_MS,
@@ -22,7 +26,10 @@ type EntitySystemContext = {
   catalog: AnimationCatalog;
   navigation: WorldNavigationService;
   /** Called to emit game-level events (e.g. player state changes). */
-  emitGameEvent: (event: string, payload: unknown) => void;
+  emitRuntimeEvent: <K extends RuntimeToUiEventName>(
+    event: K,
+    payload: RuntimeToUiEventPayloadByName[K],
+  ) => void;
   /** Called after each entity update if the entity is the currently selected one, to sync the selection badge. */
   onSelectedEntityUpdated: (entity: WorldSelectableActor) => void;
 };
@@ -114,7 +121,7 @@ export class EntitySystem {
    * @param directInput  Movement input from the player keyboard for the selected entity.
    */
   update(delta: number, directInput: MovementInput): void {
-    const { catalog, navigation, emitGameEvent, onSelectedEntityUpdated } = this.context;
+    const { catalog, navigation, emitRuntimeEvent, onSelectedEntityUpdated } = this.context;
     const dt = delta / 1000;
 
     const hasDirectMovement = directInput.moveX !== 0 || directInput.moveY !== 0;
@@ -182,7 +189,7 @@ export class EntitySystem {
         playEntityAnimation(entity, catalog);
         if (isSelected && stateChanged && entity.definition.kind === "player") {
           const payload: PlayerStateChangedPayload = { state: entity.state };
-          emitGameEvent(PLAYER_STATE_CHANGED_EVENT, payload);
+          emitRuntimeEvent(RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED, payload);
         }
       }
 
