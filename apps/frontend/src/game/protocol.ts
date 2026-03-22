@@ -17,7 +17,7 @@ import type {
   OfficeSceneFurniture,
   OfficeSceneLayout,
   OfficeSceneTile,
-} from "./scenes/office/bootstrap";
+} from "../app/officeLayoutSceneContract";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import { isRecord } from "./utils/typeGuards";
 import type { PlaceableViewModel } from "./application/placeableService";

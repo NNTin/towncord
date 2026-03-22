@@ -1,10 +1,15 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { defineConfig } from "vite";
+import type { Plugin, ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { createOfficeLayoutDevAdapter } from "./officeLayoutDevAdapter";
+import {
+  PUBLIC_ASSETS_JSON_PREFIX,
+  createPublicJsonImportModuleId,
+  resolvePublicJsonImportRelativeAssetPath,
+} from "./publicJsonImport";
 
-const PUBLIC_ASSETS_JSON_PREFIX = "public-assets-json:";
 const PUBLIC_ASSETS_ROOT = path.resolve(__dirname, "./public/assets");
 const OFFICE_LAYOUT_PATH = path.resolve(
   __dirname,
@@ -44,7 +49,7 @@ async function resolvePublicJsonPath(relativeAssetPath: string): Promise<string>
   }
 }
 
-function publicJsonImportPlugin() {
+function publicJsonImportPlugin(): Plugin {
   return {
     name: "towncord-public-json-import",
     resolveId(source: string) {
@@ -53,9 +58,7 @@ function publicJsonImportPlugin() {
       }
 
       const relativeAssetPath = source.slice(PUBLIC_ASSETS_JSON_PREFIX.length);
-      return `\0${PUBLIC_ASSETS_JSON_PREFIX}${Buffer.from(
-        relativeAssetPath,
-        ).toString("base64url")}`;
+      return createPublicJsonImportModuleId(relativeAssetPath);
     },
     async load(id: string) {
       if (!id.startsWith(`\0${PUBLIC_ASSETS_JSON_PREFIX}`)) {
@@ -70,6 +73,30 @@ function publicJsonImportPlugin() {
       const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as unknown;
       return `export default ${JSON.stringify(parsed)};`;
+    },
+    configureServer(server: ViteDevServer) {
+      const invalidateRelativeAsset = (relativeAssetPath: string): void => {
+        const moduleId = createPublicJsonImportModuleId(relativeAssetPath);
+        const module = server.moduleGraph.getModuleById(moduleId);
+        if (module) {
+          server.moduleGraph.invalidateModule(module);
+        }
+      };
+
+      const invalidateFromFilePath = (filePath: string): void => {
+        const relativeAssetPath = resolvePublicJsonImportRelativeAssetPath(filePath, {
+          publicAssetsRoot: PUBLIC_ASSETS_ROOT,
+          fallbackEntries: Array.from(PUBLIC_JSON_FALLBACKS.entries()),
+        });
+
+        if (relativeAssetPath) {
+          invalidateRelativeAsset(relativeAssetPath);
+        }
+      };
+
+      server.watcher.on("add", invalidateFromFilePath);
+      server.watcher.on("change", invalidateFromFilePath);
+      server.watcher.on("unlink", invalidateFromFilePath);
     },
   };
 }

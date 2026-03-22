@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
+import { createPublicJsonImportModuleId } from "./publicJsonImport";
 import { OFFICE_LAYOUT_DEV_ROUTE } from "./src/app/officeLayoutContracts";
 import { isOfficeLayoutDocument, type OfficeLayoutDocument } from "./src/app/officeLayoutDocument";
 
@@ -87,15 +88,28 @@ export function createOfficeLayoutDevAdapter(
   options: OfficeLayoutDevAdapterOptions,
 ): Plugin {
   const fileSystemAdapter = createOfficeLayoutFileSystemAdapter(options);
+  const invalidateOfficeLayoutModule = (server: ViteDevServer): void => {
+    const module = server.moduleGraph.getModuleById(
+      createPublicJsonImportModuleId("donarg-office/default-layout.json"),
+    );
+
+    if (module) {
+      server.moduleGraph.invalidateModule(module);
+    }
+  };
 
   return {
     name: "towncord-office-layout-dev-api",
     configureServer(server: ViteDevServer) {
-      void fileSystemAdapter.syncPublicCopy().catch((error: unknown) => {
-        const message =
-          error instanceof Error ? error.message : "Unknown office layout sync error.";
-        server.config.logger.error(message);
-      });
+      void fileSystemAdapter.syncPublicCopy()
+        .then(() => {
+          invalidateOfficeLayoutModule(server);
+        })
+        .catch((error: unknown) => {
+          const message =
+            error instanceof Error ? error.message : "Unknown office layout sync error.";
+          server.config.logger.error(message);
+        });
 
       server.middlewares.use(OFFICE_LAYOUT_DEV_ROUTE, async (req, res) => {
         const sendJson = (statusCode: number, payload: Record<string, unknown>) => {
@@ -128,6 +142,7 @@ export function createOfficeLayoutDevAdapter(
             }
 
             await fileSystemAdapter.write(parsed);
+            invalidateOfficeLayoutModule(server);
             const metadata = await fileSystemAdapter.readMetadata();
             sendJson(200, {
               path: metadata.path,
