@@ -6,7 +6,7 @@ import {
   isOfficeColorAdjust,
   resolveOfficeTileTint,
   type OfficeColorAdjust,
-} from "./colors";
+} from "../../office/colors";
 
 export const OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY = "officeSceneBootstrap";
 

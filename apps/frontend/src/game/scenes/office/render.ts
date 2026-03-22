@@ -5,7 +5,7 @@ import type {
   OfficeSceneLayout,
   OfficeSceneTile,
 } from "./bootstrap";
-import { resolveOfficeTileTint } from "./colors";
+import { resolveOfficeTileTint } from "../../office/colors";
 import { FURNITURE_ALL_ITEMS, type FurniturePaletteItem } from "../../office/officeFurniturePalette";
 
 const GRID_LINE_COLOR = 0x0f172a;

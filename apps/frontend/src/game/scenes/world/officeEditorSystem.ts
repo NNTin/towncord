@@ -5,7 +5,7 @@ import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
   type OfficeColorAdjust,
-} from "../office/colors";
+} from "../../office/colors";
 import { FURNITURE_PALETTE_ITEMS } from "../../office/officeFurniturePalette";
 import type { OfficeEditorToolId } from "../../events";
 

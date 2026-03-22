@@ -3,7 +3,7 @@ import {
   createOfficeSceneBootstrap,
   getOfficeSceneBootstrap,
 } from "../bootstrap";
-import { resolveOfficeTileTint } from "../colors";
+import { resolveOfficeTileTint } from "../../../office/colors";
 
 describe("createOfficeSceneBootstrap", () => {
   test("maps the checked-in Donarg office layout into scene data", () => {

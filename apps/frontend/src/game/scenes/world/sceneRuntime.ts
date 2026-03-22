@@ -9,10 +9,10 @@ import type {
 import type { TerrainSystem } from "../../terrain";
 import type { OfficeLayoutRenderable } from "../../scenes/office/render";
 import type { OfficeTileColor } from "../../office/model";
+import type { OfficeColorAdjust } from "../../office/colors";
 import type { TownOfficeRegion } from "../../town/layout";
 import type { WorldNavigationService } from "./navigation";
 import { TerrainPaintSession } from "./terrainPaintSession";
-import type { OfficeColorAdjust } from "../../scenes/office/colors";
 
 export type WorldSceneMovementKeys = Record<
   "W" | "A" | "S" | "D",

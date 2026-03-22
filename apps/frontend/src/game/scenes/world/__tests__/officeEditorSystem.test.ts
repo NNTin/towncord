@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { OfficeEditorSystem } from "../officeEditorSystem";
 import type { OfficeSceneLayout } from "../../office/bootstrap";
-import { resolveOfficeTileTint } from "../../office/colors";
+import { resolveOfficeTileTint } from "../../../office/colors";
 
 describe("OfficeEditorSystem floor editing", () => {
   test("stores the active floor pattern and raw color adjust when painting", () => {

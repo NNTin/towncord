@@ -5,7 +5,6 @@ import {
   OFFICE_SET_EDITOR_TOOL_EVENT,
   SELECT_TERRAIN_TOOL_EVENT,
   type OfficeFloorPickedPayload,
-  type OfficeSetEditorToolPayload,
   type RuntimePerfPayload,
   type ZoomChangedPayload,
 } from "../events";
@@ -19,6 +18,10 @@ import {
   type BloomseedSidebarBridgeProps,
   type ZoomControlsProps,
 } from "./bloomseedUiBridgeHooks";
+import {
+  buildOfficeEditorToolPayload,
+  type OfficeEditorBridgeState,
+} from "./officeEditorToolPayload";
 
 type BloomseedUiBridge = {
   gameRootRef: MutableRefObject<HTMLDivElement | null>;
@@ -26,10 +29,10 @@ type BloomseedUiBridge = {
   onGameRootDrop: (event: DragEvent<HTMLDivElement>) => void;
   sidebarProps: BloomseedSidebarBridgeProps | null;
   zoomProps: ZoomControlsProps | null;
-  emitOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
 };
 
-export function useBloomseedUiBridge(options?: {
+export function useBloomseedUiBridge(options: {
+  officeToolState: OfficeEditorBridgeState;
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
 }): BloomseedUiBridge {
@@ -52,8 +55,8 @@ export function useBloomseedUiBridge(options?: {
     onTerrainTileInspected: terrainBridge.onTerrainTileInspected,
     onRuntimePerf: setRuntimePerf,
     onZoomChanged: setZoomState,
-    onOfficeLayoutChanged: options?.onOfficeLayoutChanged,
-    onOfficeFloorPicked: options?.onOfficeFloorPicked,
+    onOfficeLayoutChanged: options.onOfficeLayoutChanged,
+    onOfficeFloorPicked: options.onOfficeFloorPicked,
   });
   const dragDropHandlers = useBloomseedDragDrop({ gameRootRef, gameRef });
   const zoomProps = useBloomseedZoomControls({ gameRef, zoomState });
@@ -62,13 +65,22 @@ export function useBloomseedUiBridge(options?: {
     gameRef.current?.events.emit(SELECT_TERRAIN_TOOL_EVENT, terrainBridge.activeTerrainTool);
   }, [gameRef, terrainBridge.activeTerrainTool]);
 
+  useEffect(() => {
+    gameRef.current?.events.emit(OFFICE_SET_EDITOR_TOOL_EVENT, buildOfficeEditorToolPayload(options.officeToolState));
+  }, [
+    gameRef,
+    options.officeToolState.activeTool,
+    options.officeToolState.activeFloorMode,
+    options.officeToolState.activeTileColor,
+    options.officeToolState.activeFloorColor,
+    options.officeToolState.activeFloorPattern,
+    options.officeToolState.activeFurnitureId,
+  ]);
+
   return {
     gameRootRef,
     onGameRootDragOver: dragDropHandlers.onGameRootDragOver,
     onGameRootDrop: dragDropHandlers.onGameRootDrop,
-    emitOfficeEditorTool(payload) {
-      gameRef.current?.events.emit(OFFICE_SET_EDITOR_TOOL_EVENT, payload);
-    },
     sidebarProps: terrainBridge.sidebarProps,
     zoomProps,
   };

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useOfficeToolState } from "./app/useOfficeToolState";
 import { OfficeEditorDrawer } from "./components/OfficeEditorDrawer";
 import { BottomToolbar } from "./components/BottomToolbar";
@@ -16,15 +15,18 @@ function App(): JSX.Element {
     onGameRootDrop,
     sidebarProps,
     zoomProps,
-    emitOfficeEditorTool,
   } = useBloomseedUiBridge({
+    officeToolState: {
+      activeTool: officeToolState.activeTool,
+      activeFloorMode: officeToolState.activeFloorMode,
+      activeTileColor: officeToolState.activeTileColor,
+      activeFloorColor: officeToolState.activeFloorColor,
+      activeFloorPattern: officeToolState.activeFloorPattern,
+      activeFurnitureId: officeToolState.activeFurnitureId,
+    },
     onOfficeLayoutChanged: officeEditor.syncFromPhaser,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
   });
-
-  useEffect(() => {
-    emitOfficeEditorTool(officeToolState.editorToolPayload);
-  }, [emitOfficeEditorTool, officeToolState.editorToolPayload]);
 
   return (
     <main className="app">
