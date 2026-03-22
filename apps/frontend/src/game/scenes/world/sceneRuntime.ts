@@ -1,10 +1,13 @@
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../../assets/animationCatalog";
 import type { EntityRegistry } from "../../domain/entityRegistry";
-import type { OfficeFloorMode, SelectedTerrainToolPayload } from "../../events";
+import type {
+  OfficeFloorMode,
+  OfficeSetEditorToolPayload,
+  SelectedTerrainToolPayload,
+} from "../../events";
 import type { TerrainSystem } from "../../terrain";
 import type { OfficeLayoutRenderable } from "../../scenes/office/render";
-import type { OfficeEditorToolId } from "../../events";
 import type { OfficeTileColor } from "../../office/model";
 import type { TownOfficeRegion } from "../../town/layout";
 import type { WorldNavigationService } from "./navigation";
@@ -34,6 +37,64 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
   }
 }
 
+export function cloneOfficeEditorToolPayload(
+  payload: OfficeSetEditorToolPayload,
+): OfficeSetEditorToolPayload {
+  switch (payload.tool) {
+    case "floor":
+      return {
+        tool: "floor",
+        floorMode: payload.floorMode,
+        tileColor: payload.tileColor,
+        floorColor: payload.floorColor,
+        floorPattern: payload.floorPattern,
+      };
+    case "furniture":
+      return {
+        tool: "furniture",
+        furnitureId: payload.furnitureId,
+      };
+    case "wall":
+    case "erase":
+      return { tool: payload.tool };
+    default:
+      return { tool: null };
+  }
+}
+
+export function getOfficeEditorTool(
+  payload: OfficeSetEditorToolPayload,
+): OfficeSetEditorToolPayload["tool"] {
+  return payload.tool;
+}
+
+export function getOfficeFloorMode(payload: OfficeSetEditorToolPayload): OfficeFloorMode {
+  return payload.tool === "floor" ? payload.floorMode : "paint";
+}
+
+export function getOfficeTileColor(payload: OfficeSetEditorToolPayload): OfficeTileColor | null {
+  return payload.tool === "floor" ? payload.tileColor : null;
+}
+
+export function getOfficeFloorColor(payload: OfficeSetEditorToolPayload): OfficeColorAdjust | null {
+  return payload.tool === "floor" ? payload.floorColor : null;
+}
+
+export function getOfficeFloorPattern(payload: OfficeSetEditorToolPayload): string | null {
+  return payload.tool === "floor" ? payload.floorPattern : null;
+}
+
+export function getOfficeFurnitureId(payload: OfficeSetEditorToolPayload): string | null {
+  return payload.tool === "furniture" ? payload.furnitureId : null;
+}
+
+export function setOfficeFloorMode(
+  payload: OfficeSetEditorToolPayload,
+  floorMode: OfficeFloorMode,
+): OfficeSetEditorToolPayload {
+  return payload.tool === "floor" ? { ...payload, floorMode } : payload;
+}
+
 // Review: WorldSceneRuntime is a "bag of state" anti-pattern. It conflates at least
 // three unrelated concerns into a single class with no internal encapsulation:
 //
@@ -47,10 +108,9 @@ function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]
 //      shared runtime bag means any method in the scene can mutate them directly,
 //      with no ownership boundary.
 //
-//   3. Editor tool state (activeOfficeTool, activeFloorMode, activeTileColor,
-//      activeFloorColor, activeFloorPattern, activeFurnitureId) — these six fields
-//      are an exact mirror of the state owned by React's useOfficeToolState hook.
-//      Duplication creates two sources of truth that can diverge.
+//   3. Editor tool state (officeEditorToolPayload plus derived selectors) — the
+//      runtime stores the raw editor payload and derives tool-specific values from
+//      it instead of mirroring six separate fields.
 //
 //   4. Input / interaction state (isPanning, panStartX/Y, camStartX/Y, wasd,
 //      shiftKey, terrainPaintSession, isOfficePainting, officeDirty,
@@ -71,20 +131,7 @@ export class WorldSceneRuntime {
   public navigation: WorldNavigationService | null = null;
   public officeRenderable: OfficeLayoutRenderable | null = null;
   public officeRegion: TownOfficeRegion | null = null;
-  // Review: activeOfficeTool, activeFloorMode, activeTileColor, activeFloorColor,
-  // activeFloorPattern, and activeFurnitureId are a direct structural copy of the
-  // six useState variables in useOfficeToolState.ts (lines 41–48). This means the
-  // same logical concept — "what office tool is the user currently using" — lives
-  // simultaneously in two places: React state and this runtime bag. Any time the
-  // payload schema changes, both must be updated in lockstep. A single shared
-  // representation (e.g. storing the raw OfficeSetEditorToolPayload as-is) would
-  // eliminate the duplication and make the schema the only source of truth.
-  public activeOfficeTool: OfficeEditorToolId | null = null;
-  public activeFloorMode: OfficeFloorMode = "paint";
-  public activeTileColor: OfficeTileColor | null = null;
-  public activeFloorColor: OfficeColorAdjust | null = null;
-  public activeFloorPattern: string | null = null;
-  public activeFurnitureId: string | null = null;
+  public officeEditorToolPayload: OfficeSetEditorToolPayload = { tool: null };
   public isOfficePainting = false;
   public officeDirty = false;
 
@@ -112,12 +159,7 @@ export class WorldSceneRuntime {
     this.navigation = null;
     this.officeRenderable = null;
     this.officeRegion = null;
-    this.activeOfficeTool = null;
-    this.activeFloorMode = "paint";
-    this.activeTileColor = null;
-    this.activeFloorColor = null;
-    this.activeFloorPattern = null;
-    this.activeFurnitureId = null;
+    this.officeEditorToolPayload = { tool: null };
     this.isOfficePainting = false;
     this.officeDirty = false;
 

@@ -15,11 +15,9 @@ import {
   PLACE_TERRAIN_DROP_EVENT,
   PLAYER_PLACED_EVENT,
   RUNTIME_PERF_EVENT,
-  type OfficeFloorMode,
   SELECT_TERRAIN_TOOL_EVENT,
   TERRAIN_TILE_INSPECTED_EVENT,
   type OfficeFloorPickedPayload,
-  type OfficeEditorToolId,
   type OfficeLayoutChangedPayload,
   type OfficeSetEditorToolPayload,
   type PlaceObjectDropPayload,
@@ -32,7 +30,6 @@ import {
   SET_ZOOM_EVENT,
   type SetZoomPayload,
 } from "../events";
-import type { OfficeTileColor } from "../office/model";
 import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
@@ -47,13 +44,23 @@ import { TownCollisionGrid } from "../town/collisionGrid";
 import { loadTownOfficeRegion, worldToOfficeCell, officeCellToWorldPixel, TOWN_BASE_PX } from "../town/layout";
 import { renderOfficeLayout, type OfficeLayoutRenderable } from "./office/render";
 import type { TownOfficeRegion } from "../town/layout";
-import { WorldSceneRuntime, type WorldSceneMovementKeys } from "./world/sceneRuntime";
+import {
+  cloneOfficeEditorToolPayload,
+  getOfficeEditorTool,
+  getOfficeFloorColor,
+  getOfficeFloorMode,
+  getOfficeFloorPattern,
+  getOfficeFurnitureId,
+  getOfficeTileColor,
+  setOfficeFloorMode,
+  WorldSceneRuntime,
+  type WorldSceneMovementKeys,
+} from "./world/sceneRuntime";
 import { TerrainPaintSession } from "./world/terrainPaintSession";
 import type { MovementInput } from "./world/movementSystem";
 import type { WorldEntity, WorldSelectableActor } from "./world/types";
 import { EntitySystem } from "./world/entitySystem";
 import { OfficeEditorSystem } from "./world/officeEditorSystem";
-import type { OfficeColorAdjust } from "./office/colors";
 
 // Review: WorldScene is a God Object that violates the Single Responsibility Principle.
 // This file currently owns at least seven distinct concerns:
@@ -63,7 +70,7 @@ import type { OfficeColorAdjust } from "./office/colors";
 //   4. Terrain painting workflow (beginTerrainPaint, continueTerrainPainting, queueTerrainDropAtWorld)
 //   5. Office editing workflow (tryHandleOfficePointerDown, applyOfficeTool, pickOfficeFloor, rerenderOffice)
 //   6. Visual feedback / UI rendering (createSelectionBadge, syncTerrainBrushRenderPreviewTiles, syncOfficeCellHighlight)
-//   7. Editor tool state management (onSetOfficeEditorTool unpacks payload into rs.* fields)
+//   7. Editor tool state management (onSetOfficeEditorTool stores the current payload and the scene derives values from it)
 //
 // The correct fix is to extract dedicated managers, e.g.:
 //   - WorldSceneCameraManager  → zoom clamping, scrolling, centering
@@ -331,7 +338,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
-    if (!pointer || !this.rs.activeOfficeTool || !this.rs.officeRegion) {
+    if (!pointer || !getOfficeEditorTool(this.rs.officeEditorToolPayload) || !this.rs.officeRegion) {
       this.rs.officeCellHighlight?.setVisible(false);
       return;
     }
@@ -464,60 +471,8 @@ export class WorldScene extends Phaser.Scene {
     this.syncTerrainBrushPreviewFromPointer(this.input.activePointer);
   }
 
-  // Review: onSetOfficeEditorTool is a state synchronisation handler that unpacks the
-  // OfficeSetEditorToolPayload event into individual fields on WorldSceneRuntime. This
-  // means the scene now owns a complete copy of the editor tool state that React's
-  // useOfficeToolState already holds, creating two sources of truth for the same concept
-  // (active tool, floor mode, tile color, floor color, floor pattern, furniture ID).
-  //
-  // The duplication creates real risk: if the payload schema ever gains a new field (e.g.
-  // a brush size), both the React hook and this switch statement must be updated in lockstep,
-  // and there is no compile-time guarantee they remain in sync. A single source of truth
-  // is strongly preferred: either the scene reads the current tool from a shared domain
-  // service on demand, or the payload is stored as-is on the runtime (a single
-  // `activeToolPayload: OfficeSetEditorToolPayload` field) instead of being scattered
-  // across six separate rs.* fields.
-  //
-  // Also note: this handler directly mutates rs.activeFloorMode back to "paint" in the
-  // "furniture", "wall", "erase", and null cases. React's own useOfficeToolState already
-  // does the same reset via a useEffect. The behaviour is duplicated on both sides of the
-  // bridge, increasing the risk of divergence.
   private onSetOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
-    switch (payload.tool) {
-      case "floor":
-        this.rs.activeOfficeTool = "floor";
-        this.rs.activeFloorMode = payload.floorMode;
-        this.rs.activeTileColor = payload.tileColor;
-        this.rs.activeFloorColor = payload.floorColor;
-        this.rs.activeFloorPattern = payload.floorPattern;
-        this.rs.activeFurnitureId = null;
-        break;
-      case "furniture":
-        this.rs.activeOfficeTool = "furniture";
-        this.rs.activeTileColor = null;
-        this.rs.activeFloorMode = "paint";
-        this.rs.activeFloorColor = null;
-        this.rs.activeFloorPattern = null;
-        this.rs.activeFurnitureId = payload.furnitureId;
-        break;
-      case "wall":
-      case "erase":
-        this.rs.activeOfficeTool = payload.tool;
-        this.rs.activeTileColor = null;
-        this.rs.activeFloorMode = "paint";
-        this.rs.activeFloorColor = null;
-        this.rs.activeFloorPattern = null;
-        this.rs.activeFurnitureId = null;
-        break;
-      default:
-        this.rs.activeOfficeTool = null;
-        this.rs.activeTileColor = null;
-        this.rs.activeFloorMode = "paint";
-        this.rs.activeFloorColor = null;
-        this.rs.activeFloorPattern = null;
-        this.rs.activeFurnitureId = null;
-        break;
-    }
+    this.rs.officeEditorToolPayload = cloneOfficeEditorToolPayload(payload);
     this.syncOfficeCellHighlight(this.input.activePointer);
   }
 
@@ -525,18 +480,13 @@ export class WorldScene extends Phaser.Scene {
     this.game.events.emit(OFFICE_FLOOR_PICKED_EVENT, payload);
   }
 
-  // Review: pickOfficeFloor violates the Command-Query Separation (CQS) principle. It
-  // performs a tile lookup (a query), but also mutates `rs.isOfficePainting = false` and
-  // `rs.activeFloorMode = "paint"` as side effects of the "pick" action. These state
-  // mutations represent a tool-state concern (transitioning the floor tool from pick mode
-  // back to paint mode after a pick completes) that should belong to the editor state
-  // manager or be surfaced back to React via an event. As written, the pick operation
-  // silently reaches into the runtime bag and changes state that React believes it owns,
-  // creating a potential desync: React's useOfficeToolState.activeFloorMode remains "pick"
-  // while rs.activeFloorMode has been reset to "paint" inside the game engine.
   private pickOfficeFloor(worldX: number, worldY: number): boolean {
     const region = this.rs.officeRegion;
-    if (!region || this.rs.activeOfficeTool !== "floor" || this.rs.activeFloorMode !== "pick") {
+    if (
+      !region ||
+      getOfficeEditorTool(this.rs.officeEditorToolPayload) !== "floor" ||
+      getOfficeFloorMode(this.rs.officeEditorToolPayload) !== "pick"
+    ) {
       return false;
     }
 
@@ -557,7 +507,7 @@ export class WorldScene extends Phaser.Scene {
     });
 
     this.rs.isOfficePainting = false;
-    this.rs.activeFloorMode = "paint";
+    this.rs.officeEditorToolPayload = setOfficeFloorMode(this.rs.officeEditorToolPayload, "paint");
     return true;
   }
 
@@ -570,7 +520,8 @@ export class WorldScene extends Phaser.Scene {
    */
   private applyOfficeTool(worldX: number, worldY: number): boolean {
     const region = this.rs.officeRegion;
-    const tool = this.rs.activeOfficeTool;
+    const payload = this.rs.officeEditorToolPayload;
+    const tool = getOfficeEditorTool(payload);
     if (!region || !tool) return false;
 
     const cell = worldToOfficeCell(worldX, worldY, region);
@@ -579,10 +530,10 @@ export class WorldScene extends Phaser.Scene {
     const changed = this.officeEditorSystem.applyCommand(region.layout, {
       tool,
       cell,
-      tileColor: this.rs.activeTileColor,
-      floorColor: this.rs.activeFloorColor,
-      floorPattern: this.rs.activeFloorPattern,
-      furnitureId: this.rs.activeFurnitureId,
+      tileColor: getOfficeTileColor(payload),
+      floorColor: getOfficeFloorColor(payload),
+      floorPattern: getOfficeFloorPattern(payload),
+      furnitureId: getOfficeFurnitureId(payload),
     });
 
     if (changed) {
@@ -628,7 +579,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private tryHandleOfficePointerDown(pointer: Phaser.Input.Pointer): boolean {
-    if (!this.rs.activeOfficeTool) {
+    if (!getOfficeEditorTool(this.rs.officeEditorToolPayload)) {
       return false;
     }
 
@@ -692,7 +643,9 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private shouldContinueOfficePainting(pointer: Phaser.Input.Pointer): boolean {
-    return Boolean(this.rs.isOfficePainting && this.rs.activeOfficeTool && pointer.isDown);
+    return Boolean(
+      this.rs.isOfficePainting && getOfficeEditorTool(this.rs.officeEditorToolPayload) && pointer.isDown,
+    );
   }
 
   private continueOfficePainting(pointer: Phaser.Input.Pointer): void {

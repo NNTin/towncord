@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from "vitest";
 import { WorldScene } from "../../WorldScene";
 import { TerrainPaintSession } from "../terrainPaintSession";
 import { OFFICE_FLOOR_PICKED_EVENT } from "../../../events";
+import { getOfficeFloorMode } from "../sceneRuntime";
 
 vi.mock("phaser", () => {
   class Scene {
@@ -168,11 +169,13 @@ function createOfficePickSceneHarness(
       characters: [],
     },
   };
-  runtimeState(scene).activeOfficeTool = "floor";
-  runtimeState(scene).activeFloorMode = "pick";
-  runtimeState(scene).activeFloorColor = { h: 35, s: 30, b: 15, c: 0 };
-  runtimeState(scene).activeFloorPattern = "environment.floors.pattern-01";
-  runtimeState(scene).activeFurnitureId = null;
+  runtimeState(scene).officeEditorToolPayload = {
+    tool: "floor",
+    floorMode: "pick",
+    tileColor: null,
+    floorColor: { h: 35, s: 30, b: 15, c: 0 },
+    floorPattern: "environment.floors.pattern-01",
+  };
   runtimeState(scene).isOfficePainting = true;
   runtimeState(scene).officeDirty = false;
 
@@ -495,7 +498,7 @@ describe("WorldScene terrain painting", () => {
       floorColor: { h: 214, s: 30, b: -100, c: -55 },
       floorPattern: "environment.floors.pattern-03",
     });
-    expect(runtimeState(scene).activeFloorMode).toBe("paint");
+    expect(getOfficeFloorMode(runtimeState(scene).officeEditorToolPayload)).toBe("paint");
     expect(runtimeState(scene).isOfficePainting).toBe(false);
     expect(runtimeState(scene).officeDirty).toBe(false);
   });
@@ -509,7 +512,7 @@ describe("WorldScene terrain painting", () => {
     clickPrimaryPointer(scene);
 
     expect(emit).not.toHaveBeenCalled();
-    expect(runtimeState(scene).activeFloorMode).toBe("pick");
+    expect(getOfficeFloorMode(runtimeState(scene).officeEditorToolPayload)).toBe("pick");
     expect(runtimeState(scene).isOfficePainting).toBe(false);
     expect(runtimeState(scene).officeDirty).toBe(false);
   });
