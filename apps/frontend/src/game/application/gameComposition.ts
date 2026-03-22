@@ -1,22 +1,15 @@
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import { buildAnimationCatalog } from "../assets/animationCatalog";
 import type { EntityRegistry } from "../domain/entityRegistry";
+import type { BloomseedUiBootstrap } from "../protocol";
 import { isRecord } from "../utils/typeGuards";
 import { buildEntityRegistryFromCatalog } from "./entityRegistryBuilder";
-import {
-  listEntityPlaceables,
-  type PlaceableViewModel,
-} from "./placeableService";
+import { listEntityPlaceables } from "./placeableService";
 import { listTerrainPlaceables } from "./terrainPlaceableCatalog";
 
 type BloomseedWorldBootstrap = {
   catalog: AnimationCatalog;
   entityRegistry: EntityRegistry;
-};
-
-export type BloomseedUiBootstrap = {
-  catalog: AnimationCatalog;
-  placeables: PlaceableViewModel[];
 };
 
 type BloomseedBootstrap = {
@@ -25,7 +18,6 @@ type BloomseedBootstrap = {
 };
 
 export const BLOOMSEED_WORLD_BOOTSTRAP_REGISTRY_KEY = "bloomseed.worldBootstrap";
-export const BLOOMSEED_READY_EVENT = "bloomseedReady";
 
 export function getBloomseedWorldBootstrap(value: unknown): BloomseedWorldBootstrap | null {
   if (!isRecord(value)) return null;

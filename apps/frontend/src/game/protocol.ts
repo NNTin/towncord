@@ -1,3 +1,7 @@
+import type {
+  AnimationCatalog,
+  AnimationTrack,
+} from "./assets/animationCatalog";
 import type { EntityId } from "./domain/model";
 import {
   cloneOfficeColorAdjust,
@@ -16,6 +20,7 @@ import type {
 } from "./scenes/office/bootstrap";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
 import { isRecord } from "./utils/typeGuards";
+import type { PlaceableViewModel } from "./application/placeableService";
 
 export const PLACE_DRAG_MIME = "application/json";
 
@@ -28,6 +33,7 @@ export const UI_TO_RUNTIME_COMMANDS = {
 } as const;
 
 export const RUNTIME_TO_UI_EVENTS = {
+  BLOOMSEED_READY: "bloomseedReady",
   TERRAIN_TILE_INSPECTED: "terrainTileInspected",
   PLAYER_PLACED: "playerPlaced",
   PLAYER_STATE_CHANGED: "playerStateChanged",
@@ -43,6 +49,7 @@ export const SELECT_TERRAIN_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_T
 export const SET_ZOOM_EVENT = UI_TO_RUNTIME_COMMANDS.SET_ZOOM;
 export const OFFICE_SET_EDITOR_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
 
+export const BLOOMSEED_READY_EVENT = RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY;
 export const TERRAIN_TILE_INSPECTED_EVENT = RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED;
 export const PLAYER_PLACED_EVENT = RUNTIME_TO_UI_EVENTS.PLAYER_PLACED;
 export const PLAYER_STATE_CHANGED_EVENT = RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED;
@@ -152,6 +159,11 @@ export type RuntimePerfPayload = {
   terrainMs: number;
 };
 
+export type BloomseedUiBootstrap = {
+  catalog: AnimationCatalog;
+  placeables: PlaceableViewModel[];
+};
+
 export type UiToRuntimeCommandName =
   (typeof UI_TO_RUNTIME_COMMANDS)[keyof typeof UI_TO_RUNTIME_COMMANDS];
 
@@ -167,6 +179,7 @@ export type UiToRuntimeCommandPayloadByName = {
 };
 
 export type RuntimeToUiEventPayloadByName = {
+  [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: BloomseedUiBootstrap;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED]: TerrainTileInspectedPayload;
   [RUNTIME_TO_UI_EVENTS.PLAYER_PLACED]: PlayerPlacedPayload;
   [RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED]: PlayerStateChangedPayload;
@@ -208,6 +221,10 @@ export const BLOOMSEED_UI_RUNTIME_PROTOCOL = {
     },
   } satisfies Record<UiToRuntimeCommandName, ProtocolEntryMetadata>,
   events: {
+    [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: {
+      stability: "stable",
+      description: "Stable runtime bootstrap event that delivers the UI-facing startup snapshot to React.",
+    },
     [RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED]: {
       stability: "stable",
       description: "Stable terrain inspection event surfaced to React sidebar consumers.",
@@ -250,6 +267,8 @@ type ProtocolHost = {
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 
 const OFFICE_TILE_COLOR_SET = new Set<string>(OFFICE_TILE_COLORS);
+const ANIMATION_ENTITY_TYPE_SET = new Set(["player", "mobs", "props", "tilesets"]);
+const SPRITE_DIRECTION_SET = new Set(["up", "down", "side", "right"]);
 const OFFICE_SCENE_TILE_KIND_SET = new Set(["void", "floor", "wall"]);
 const OFFICE_SCENE_FURNITURE_CATEGORY_SET = new Set([
   "chairs",
@@ -368,6 +387,80 @@ function isOfficeSceneLayout(value: unknown): value is OfficeSceneLayout {
   );
 }
 
+function isAnimationTrack(value: unknown): value is AnimationTrack {
+  if (!isRecord(value) || !isRecord(value.keyByDirection)) {
+    return false;
+  }
+
+  return (
+    typeof value.id === "string" &&
+    typeof value.label === "string" &&
+    typeof value.entityType === "string" &&
+    ANIMATION_ENTITY_TYPE_SET.has(value.entityType) &&
+    typeof value.directional === "boolean" &&
+    Object.entries(value.keyByDirection).every(
+      ([direction, key]) =>
+        SPRITE_DIRECTION_SET.has(direction) &&
+        typeof key === "string",
+    ) &&
+    (value.undirectedKey == null || typeof value.undirectedKey === "string") &&
+    Array.isArray(value.equipmentCompatible) &&
+    value.equipmentCompatible.every((equipmentId) => typeof equipmentId === "string")
+  );
+}
+
+function isAnimationCatalog(value: unknown): value is AnimationCatalog {
+  if (!isRecord(value) || !(value.tracksByPath instanceof Map)) {
+    return false;
+  }
+
+  const stringLists = [
+    value.entityTypes,
+    value.playerModels,
+    value.mobFamilies,
+    value.propFamilies,
+    value.tilesetFamilies,
+    value.officeCharacterPalettes,
+    value.officeCharacterIds,
+    value.officeEnvironmentGroups,
+    value.officeFurnitureGroups,
+  ];
+
+  return (
+    stringLists.every(
+      (list) => Array.isArray(list) && list.every((entry) => typeof entry === "string"),
+    ) &&
+    Array.from(value.tracksByPath.entries()).every(
+      ([path, tracks]) =>
+        typeof path === "string" &&
+        Array.isArray(tracks) &&
+        tracks.every(isAnimationTrack),
+    )
+  );
+}
+
+function isPlaceableViewModel(value: unknown): value is PlaceableViewModel {
+  if (
+    !isRecord(value) ||
+    typeof value.id !== "string" ||
+    typeof value.label !== "string" ||
+    typeof value.groupKey !== "string" ||
+    typeof value.groupLabel !== "string"
+  ) {
+    return false;
+  }
+
+  if (value.type === "entity") {
+    return typeof value.entityId === "string";
+  }
+
+  if (value.type === "terrain") {
+    return typeof value.materialId === "string" && typeof value.brushId === "string";
+  }
+
+  return false;
+}
+
 function normalizePlaceDragPayloadInternal(value: unknown): PlaceDragPayload | undefined {
   if (!isRecord(value)) return undefined;
 
@@ -392,7 +485,7 @@ function normalizePlaceDragPayloadInternal(value: unknown): PlaceDragPayload | u
   }
 
   // Backward-compatible legacy payload: { entityId }
-  if (typeof value.entityId === "string") {
+  if (!("type" in value) && typeof value.entityId === "string") {
     return {
       type: "entity",
       entityId: value.entityId,
@@ -691,8 +784,26 @@ export function normalizeOfficeLayoutChangedPayload(
   }
 
   return {
-    layout: value.layout,
+    layout: structuredClone(value.layout),
   };
+}
+
+export function normalizeBloomseedUiBootstrapPayload(
+  value: unknown,
+): BloomseedUiBootstrap | undefined {
+  if (
+    !isRecord(value) ||
+    !isAnimationCatalog(value.catalog) ||
+    !Array.isArray(value.placeables) ||
+    !value.placeables.every(isPlaceableViewModel)
+  ) {
+    return undefined;
+  }
+
+  return structuredClone({
+    catalog: value.catalog,
+    placeables: value.placeables,
+  });
 }
 
 const uiToRuntimeCommandNormalizers = {
@@ -706,6 +817,7 @@ const uiToRuntimeCommandNormalizers = {
 };
 
 const runtimeToUiEventNormalizers = {
+  [RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY]: normalizeBloomseedUiBootstrapPayload,
   [RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED]: normalizeTerrainTileInspectedPayload,
   [RUNTIME_TO_UI_EVENTS.PLAYER_PLACED]: normalizePlayerPlacedPayload,
   [RUNTIME_TO_UI_EVENTS.PLAYER_STATE_CHANGED]: normalizePlayerStateChangedPayload,

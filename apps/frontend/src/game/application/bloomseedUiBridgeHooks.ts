@@ -3,6 +3,7 @@ import type { DragEvent, MutableRefObject } from "react";
 import type Phaser from "phaser";
 import type { AnimationCatalog } from "../assets/animationCatalog";
 import {
+  type BloomseedUiBootstrap,
   PLACE_DRAG_MIME,
   RUNTIME_TO_UI_EVENTS,
   UI_TO_RUNTIME_COMMANDS,
@@ -22,10 +23,6 @@ import {
 } from "../protocol";
 import type { OfficeSceneLayout } from "../scenes/office/bootstrap";
 import { createGame } from "../phaser/createGame";
-import {
-  BLOOMSEED_READY_EVENT,
-  type BloomseedUiBootstrap,
-} from "./gameComposition";
 import type { PlaceableViewModel } from "./placeableService";
 
 export type BloomseedSidebarBridgeProps = {
@@ -134,7 +131,15 @@ export function useBloomseedGameLifecycle({
       onOfficeFloorPickedRef.current?.(payload);
     }
 
-    game.events.once(BLOOMSEED_READY_EVENT, handleBootstrap);
+    let unbindBootstrap = () => {};
+    unbindBootstrap = bindRuntimeToUiEvent(
+      game,
+      RUNTIME_TO_UI_EVENTS.BLOOMSEED_READY,
+      (payload) => {
+        handleBootstrap(payload);
+        unbindBootstrap();
+      },
+    );
     const unbindTerrainTileInspected = bindRuntimeToUiEvent(
       game,
       RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED,
@@ -162,6 +167,7 @@ export function useBloomseedGameLifecycle({
     );
 
     return () => {
+      unbindBootstrap();
       unbindTerrainTileInspected();
       unbindRuntimePerf();
       unbindZoomChanged();
