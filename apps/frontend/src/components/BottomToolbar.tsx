@@ -22,7 +22,7 @@ import {
   resolveOfficeFloorAppearance,
   tintToHexCss,
   type OfficeColorAdjust,
-} from "../game/scenes/office/colors";
+} from "../game/office/colors";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 

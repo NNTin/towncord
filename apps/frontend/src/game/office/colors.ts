@@ -1,4 +1,4 @@
-import { type OfficeTileColor } from "../../office/model";
+import { type OfficeTileColor } from "./model";
 
 export type OfficeColorAdjust = {
   h: number;

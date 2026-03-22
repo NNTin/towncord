@@ -1,27 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
-import type { OfficeLayoutTool } from "../components/BottomToolbar";
+import { useReducer } from "react";
 import type {
   OfficeFloorMode,
   OfficeFloorPickedPayload,
-  OfficeSetEditorToolPayload,
+  OfficeEditorToolId,
 } from "../game/events";
 import type { OfficeTileColor } from "../game/office/model";
-import { FLOOR_PATTERN_ITEMS } from "../game/office/officeTilePalette";
+import type { OfficeColorAdjust } from "../game/office/colors";
 import {
-  DEFAULT_FLOOR_COLOR_ADJUST,
-  cloneOfficeColorAdjust,
-  findOfficeTileColorPreset,
-  resolveOfficeTileColorAdjustPreset,
-  type OfficeColorAdjust,
-} from "../game/scenes/office/colors";
+  createOfficeToolStateData,
+  reduceOfficeToolState,
+  type OfficeToolStateData,
+} from "./officeToolState";
 
-const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
-
-type OfficeToolState = {
-  isLayoutPaintMode: boolean;
+type OfficeToolState = OfficeToolStateData & {
   toggleLayoutMode: () => void;
-  activeTool: OfficeLayoutTool | null;
-  onSelectTool: (tool: OfficeLayoutTool | null) => void;
+  activeTool: OfficeEditorToolId | null;
+  onSelectTool: (tool: OfficeEditorToolId | null) => void;
   activeFloorMode: OfficeFloorMode;
   onSelectFloorMode: (mode: OfficeFloorMode) => void;
   activeTileColor: OfficeTileColor | null;
@@ -33,101 +27,41 @@ type OfficeToolState = {
   activeFurnitureId: string | null;
   onSelectFurnitureId: (id: string) => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
-  editorToolPayload: OfficeSetEditorToolPayload;
 };
 
 export function useOfficeToolState(): OfficeToolState {
-  const [isLayoutPaintMode, setIsLayoutPaintMode] = useState(false);
-  const [activeTool, setActiveTool] = useState<OfficeLayoutTool | null>(null);
-  const [activeFloorMode, setActiveFloorMode] = useState<OfficeFloorMode>("paint");
-  const [activeTileColor, setActiveTileColor] = useState<OfficeTileColor | null>(null);
-  const [activeFloorColor, setActiveFloorColor] = useState<OfficeColorAdjust>(
-    () => ({ ...DEFAULT_FLOOR_COLOR_ADJUST }),
-  );
-  const [activeFloorPattern, setActiveFloorPattern] = useState<string | null>(DEFAULT_FLOOR_PATTERN);
-  const [activeFurnitureId, setActiveFurnitureId] = useState<string | null>(null);
-
-  function applyFloorColor(nextColor: OfficeColorAdjust): void {
-    const cloned = cloneOfficeColorAdjust(nextColor);
-    setActiveFloorColor(cloned);
-    setActiveTileColor(findOfficeTileColorPreset(cloned));
-  }
-
-  useEffect(() => {
-    if (!isLayoutPaintMode) {
-      setActiveTool(null);
-    }
-  }, [isLayoutPaintMode]);
-
-  useEffect(() => {
-    if (activeTool !== "floor") {
-      setActiveFloorMode("paint");
-    }
-  }, [activeTool]);
-
-  const editorToolPayload = useMemo<OfficeSetEditorToolPayload>(
-    () => {
-      switch (activeTool) {
-        case "floor":
-          return {
-            tool: "floor",
-            floorMode: activeFloorMode,
-            tileColor: activeTileColor,
-            floorColor: activeFloorColor,
-            floorPattern: activeFloorPattern,
-          };
-        case "furniture":
-          return {
-            tool: "furniture",
-            furnitureId: activeFurnitureId,
-          };
-        case "wall":
-        case "erase":
-          return { tool: activeTool };
-        default:
-          return { tool: null };
-      }
-    },
-    [activeTool, activeFloorMode, activeTileColor, activeFloorColor, activeFloorPattern, activeFurnitureId],
+  const [state, dispatch] = useReducer(
+    reduceOfficeToolState,
+    undefined,
+    createOfficeToolStateData,
   );
 
   return {
-    isLayoutPaintMode,
+    ...state,
+    activeTool: state.activeTool,
     toggleLayoutMode() {
-      setIsLayoutPaintMode((current) => !current);
+      dispatch({ type: "toggleLayoutMode" });
     },
-    activeTool,
     onSelectTool(tool) {
-      setActiveTool(tool);
+      dispatch({ type: "selectTool", tool: tool as OfficeEditorToolId | null });
     },
-    activeFloorMode,
     onSelectFloorMode(mode) {
-      setActiveFloorMode(mode);
-      setActiveTool("floor");
+      dispatch({ type: "selectFloorMode", mode });
     },
-    activeTileColor,
     onSelectTileColor(color) {
-      setActiveTileColor(color);
-      applyFloorColor(resolveOfficeTileColorAdjustPreset(color));
+      dispatch({ type: "selectTileColor", color });
     },
-    activeFloorColor,
     onSelectFloorColor(color) {
-      applyFloorColor(color);
+      dispatch({ type: "selectFloorColor", color });
     },
-    activeFloorPattern,
     onSelectFloorPattern(id) {
-      setActiveFloorPattern(id);
+      dispatch({ type: "selectFloorPattern", id });
     },
-    activeFurnitureId,
     onSelectFurnitureId(id) {
-      setActiveFurnitureId(id);
+      dispatch({ type: "selectFurnitureId", id });
     },
     onOfficeFloorPicked(payload) {
-      setActiveTool("floor");
-      setActiveFloorMode("paint");
-      setActiveFloorPattern(payload.floorPattern);
-      applyFloorColor(payload.floorColor ?? DEFAULT_FLOOR_COLOR_ADJUST);
+      dispatch({ type: "officeFloorPicked", payload });
     },
-    editorToolPayload,
   };
 }

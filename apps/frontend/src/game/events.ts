@@ -1,7 +1,7 @@
 import type { EntityId } from "./domain/model";
 import type { OfficeTileColor } from "./office/model";
 import type { TerrainBrushId, TerrainMaterialId } from "./terrain/contracts";
-import type { OfficeColorAdjust } from "./scenes/office/colors";
+import type { OfficeColorAdjust } from "./office/colors";
 import { isRecord } from "./utils/typeGuards";
 
 // React → Phaser commands

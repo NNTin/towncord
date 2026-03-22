@@ -1,0 +1,52 @@
+import { describe, expect, test } from "vitest";
+import { createOfficeToolStateData, reduceOfficeToolState } from "../officeToolState";
+
+describe("office tool state reducer", () => {
+  test("turning layout mode off clears the active tool and resets floor mode", () => {
+    const next = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        isLayoutPaintMode: true,
+        activeTool: "floor",
+        activeFloorMode: "pick",
+      },
+      { type: "toggleLayoutMode" },
+    );
+
+    expect(next.isLayoutPaintMode).toBe(false);
+    expect(next.activeTool).toBeNull();
+    expect(next.activeFloorMode).toBe("paint");
+  });
+
+  test("selecting a non-floor tool resets the floor sub-mode synchronously", () => {
+    const next = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        isLayoutPaintMode: true,
+        activeTool: "floor",
+        activeFloorMode: "pick",
+      },
+      { type: "selectTool", tool: "wall" },
+    );
+
+    expect(next.activeTool).toBe("wall");
+    expect(next.activeFloorMode).toBe("paint");
+  });
+
+  test("floor picks keep the paint tool active and synchronize floor color state", () => {
+    const next = reduceOfficeToolState(createOfficeToolStateData(), {
+      type: "officeFloorPicked",
+      payload: {
+        floorColor: { h: 214, s: 30, b: -100, c: -55 },
+        floorPattern: "environment.floors.pattern-03",
+      },
+    });
+
+    expect(next.activeTool).toBe("floor");
+    expect(next.activeFloorMode).toBe("paint");
+    expect(next.activeFloorPattern).toBe("environment.floors.pattern-03");
+    expect(next.activeFloorColor).toEqual({ h: 214, s: 30, b: -100, c: -55 });
+    expect(next.activeFloorColor).not.toBe(createOfficeToolStateData().activeFloorColor);
+    expect(next.activeTileColor).toBeNull();
+  });
+});
