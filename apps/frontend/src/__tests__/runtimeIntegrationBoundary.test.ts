@@ -7,7 +7,8 @@ const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const SRC_ROOT = path.resolve(TEST_DIR, "..");
 const SOURCE_FILE_EXTENSIONS = new Set([".ts", ".tsx"]);
 const FORBIDDEN_IMPORT_PATTERN = /\bfrom\s+["']phaser["']/;
-const FORBIDDEN_RUNTIME_ACCESS_PATTERN = /\bgame(?:Ref\.current)?\.events\b/;
+const FORBIDDEN_RUNTIME_ACCESS_PATTERN =
+  /\bgame(?:Ref(?:\?\.|\.)current)?(?:\?\.|\.)events\b/;
 const FORBIDDEN_PREVIEW_SCENE_IMPORT_PATTERN = /\bPreviewScene\b/;
 const GATEWAY_ENTRYPOINTS = new Set([
   path.join(SRC_ROOT, "game", "application", "runtimeGateway.ts"),
@@ -37,6 +38,15 @@ function collectSourceFiles(root: string): string[] {
 }
 
 describe("runtime integration boundaries", () => {
+  test("runtime access guard catches direct and optional-chaining event access", () => {
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("game.events.emit('preview:play')")).toBe(true);
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("game?.events.emit('preview:play')")).toBe(true);
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("gameRef.current.events.emit('preview:play')")).toBe(true);
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("gameRef.current?.events.emit('preview:play')")).toBe(true);
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("gameRef?.current?.events.emit('preview:play')")).toBe(true);
+    expect(FORBIDDEN_RUNTIME_ACCESS_PATTERN.test("runtime.events.emit('preview:play')")).toBe(false);
+  });
+
   test("only gateway entrypoints may import Phaser or wire preview/runtime events directly", () => {
     const rootsToScan = [
       path.join(SRC_ROOT, "app"),
