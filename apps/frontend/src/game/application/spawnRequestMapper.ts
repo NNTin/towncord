@@ -1,5 +1,4 @@
-import type { PlaceEntityDropPayload } from "../protocol";
-import type { EntityId } from "../domain/model";
+import type { EntityId } from "../world/entities/model";
 
 type SpawnRequest = {
   entityId: EntityId;
@@ -7,7 +6,11 @@ type SpawnRequest = {
   screenY: number;
 };
 
-export function mapDropPayloadToSpawnRequest(payload: PlaceEntityDropPayload): SpawnRequest {
+type PlaceEntityDropLike = SpawnRequest & {
+  type: "entity";
+};
+
+export function mapDropPayloadToSpawnRequest(payload: PlaceEntityDropLike): SpawnRequest {
   return {
     entityId: payload.entityId,
     screenX: payload.screenX,

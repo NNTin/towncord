@@ -1,11 +1,14 @@
-import { listMobDescriptors, type AnimationCatalog } from "../assets/animationCatalog";
+import {
+  listMobDescriptors,
+  type AnimationCatalog,
+} from "../content/asset-catalog/animationCatalog";
 import {
   buildArchetypeRuntimes,
   type NpcArchetypeSeed,
   type PlayerArchetypeSeed,
-} from "../domain/archetypes";
-import { RuntimeEntityRegistry } from "../domain/entityRegistry";
-import { createEntityVisualRef } from "../domain/model";
+} from "../world/entities/archetypes";
+import { RuntimeEntityRegistry } from "../world/entities/entityRegistry";
+import { createEntityVisualRef } from "../world/entities/model";
 
 function buildPlayerSeeds(catalog: AnimationCatalog): PlayerArchetypeSeed[] {
   return catalog.playerModels.map((model) => ({

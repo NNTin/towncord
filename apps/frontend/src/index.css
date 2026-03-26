@@ -1,16 +1,3 @@
-:root {
-  --pixel-bg: #1e1e2e;
-  --pixel-border: #4a4a6a;
-  --pixel-text: rgba(255, 255, 255, 0.8);
-  --pixel-shadow: 2px 2px 0px #0a0a14;
-  --pixel-accent: #5a8cff;
-  --pixel-btn-bg: rgba(255, 255, 255, 0.08);
-  --pixel-btn-hover-bg: rgba(255, 255, 255, 0.15);
-  --pixel-btn-disabled-opacity: 0.35;
-  --pixel-active-bg: rgba(90, 140, 255, 0.25);
-  --pixel-controls-z: 50;
-}
-
 :root,
 html,
 body,
@@ -26,8 +13,6 @@ body,
 
 body {
   overflow: hidden;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: #0f172a;
 }
 
 .app {

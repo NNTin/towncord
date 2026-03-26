@@ -1,4 +1,4 @@
-import type { PlaceTerrainDropPayload } from "../protocol";
+import type { PlaceTerrainDropPayload } from "../contracts/runtime";
 import type { TerrainCellCoord, TerrainEditOp } from "./contracts";
 import { TerrainEditRouter } from "./editRouter";
 import { TerrainGameplayGrid } from "./gameplayGrid";

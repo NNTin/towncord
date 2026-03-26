@@ -1,0 +1,52 @@
+:root {
+  --ui-font-body: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --ui-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  --ui-shell-bg: #0f172a;
+  --ui-sidebar-bg: rgba(15, 23, 42, 0.9);
+  --ui-drawer-bg: rgba(15, 23, 42, 0.96);
+  --ui-panel-bg: rgba(15, 23, 42, 0.5);
+  --ui-surface-strong: rgba(2, 6, 23, 0.6);
+  --ui-surface-muted: rgba(255, 255, 255, 0.05);
+
+  --ui-border-muted: rgba(255, 255, 255, 0.1);
+  --ui-border-strong: rgba(148, 163, 184, 0.2);
+
+  --ui-text-primary: #e2e8f0;
+  --ui-text-secondary: #cbd5e1;
+  --ui-text-muted: #94a3b8;
+  --ui-text-subtle: #64748b;
+  --ui-text-disabled: #475569;
+
+  --ui-accent-bg: #3b82f6;
+  --ui-accent-border: #60a5fa;
+  --ui-accent-soft: rgba(56, 189, 248, 0.18);
+  --ui-accent-strong: rgba(56, 189, 248, 0.75);
+  --ui-accent-text: #e0f2fe;
+
+  --ui-status-border: rgba(96, 165, 250, 0.45);
+  --ui-status-text: #bfdbfe;
+  --ui-error-bg: rgba(127, 29, 29, 0.35);
+  --ui-error-text: #fecaca;
+  --ui-warning-bg: rgba(120, 53, 15, 0.35);
+  --ui-warning-text: #fdba74;
+  --ui-editor-bg: #020617;
+  --ui-shadow-strong: 0 18px 60px rgba(2, 6, 23, 0.45);
+
+  --pixel-bg: #1e1e2e;
+  --pixel-border: #4a4a6a;
+  --pixel-text: rgba(255, 255, 255, 0.8);
+  --pixel-shadow: 2px 2px 0 #0a0a14;
+  --pixel-accent: #5a8cff;
+  --pixel-btn-bg: rgba(255, 255, 255, 0.08);
+  --pixel-btn-hover-bg: rgba(255, 255, 255, 0.15);
+  --pixel-btn-disabled-opacity: 0.35;
+  --pixel-active-bg: rgba(90, 140, 255, 0.25);
+  --pixel-controls-z: 50;
+}
+
+body {
+  background: var(--ui-shell-bg);
+  font-family: var(--ui-font-body);
+}

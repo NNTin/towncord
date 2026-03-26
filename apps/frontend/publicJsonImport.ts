@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import path from "node:path";
 
 export const PUBLIC_ASSETS_JSON_PREFIX = "public-assets-json:";
@@ -6,24 +7,55 @@ export function createPublicJsonImportModuleId(relativeAssetPath: string): strin
   return `\0${PUBLIC_ASSETS_JSON_PREFIX}${Buffer.from(relativeAssetPath).toString("base64url")}`;
 }
 
+export async function resolvePublicJsonImportFilePath(
+  relativeAssetPath: string,
+  options: {
+    publicAssetsRoot: string;
+    fallbackEntries: ReadonlyMap<string, string>;
+  },
+): Promise<string> {
+  const publicPath = path.resolve(options.publicAssetsRoot, relativeAssetPath);
+
+  try {
+    await fs.access(publicPath);
+    return publicPath;
+  } catch {
+    const fallbackPath = options.fallbackEntries.get(relativeAssetPath);
+
+    if (fallbackPath) {
+      return path.resolve(fallbackPath);
+    }
+
+    throw new Error(
+      `Missing public JSON asset "${relativeAssetPath}" under ${options.publicAssetsRoot}.`,
+    );
+  }
+}
+
 export function resolvePublicJsonImportRelativeAssetPath(
   filePath: string,
   options: {
     publicAssetsRoot: string;
-    fallbackEntries: ReadonlyArray<[string, string]>;
+    fallbackEntries: ReadonlyMap<string, string>;
   },
 ): string | null {
   const normalizedFilePath = path.resolve(filePath);
+  let matchedRelativeAssetPath: string | null = null;
 
-  for (const [relativeAssetPath, fallbackPath] of options.fallbackEntries) {
+  options.fallbackEntries.forEach((fallbackPath, relativeAssetPath) => {
+    if (matchedRelativeAssetPath !== null) {
+      return;
+    }
+
     if (normalizedFilePath === path.resolve(options.publicAssetsRoot, relativeAssetPath)) {
-      return relativeAssetPath;
+      matchedRelativeAssetPath = relativeAssetPath;
+      return;
     }
 
     if (normalizedFilePath === path.resolve(fallbackPath)) {
-      return relativeAssetPath;
+      matchedRelativeAssetPath = relativeAssetPath;
     }
-  }
+  });
 
-  return null;
+  return matchedRelativeAssetPath;
 }

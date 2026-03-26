@@ -1,5 +1,5 @@
 import { TERRAIN_PLACEABLES } from "../terrain/placeables";
-import type { TerrainPlaceableViewModel } from "./placeableService";
+import type { TerrainPlaceableViewModel } from "../contracts/runtime";
 
 export function listTerrainPlaceables(): TerrainPlaceableViewModel[] {
   return TERRAIN_PLACEABLES.map((placeable) => ({

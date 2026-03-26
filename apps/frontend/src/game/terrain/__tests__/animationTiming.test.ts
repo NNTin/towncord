@@ -3,7 +3,7 @@ import {
   getTerrainAnimationId,
   normalizeTerrainPhaseDurations,
   resolveTerrainPhaseIndex,
-} from "../renderer";
+} from "../../../engine/terrain/terrainRenderer";
 
 describe("terrain animation timing", () => {
   test("derives the animation id from a base frame name", () => {

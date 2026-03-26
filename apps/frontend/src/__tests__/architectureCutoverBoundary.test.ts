@@ -45,6 +45,12 @@ function collectSourceFiles(root: string): string[] {
 }
 
 describe("architecture cutover boundary", () => {
+  test("removes legacy top-level architecture buckets", () => {
+    expect(fs.existsSync(path.join(SRC_ROOT, "app"))).toBe(false);
+    expect(fs.existsSync(path.join(SRC_ROOT, "components"))).toBe(false);
+    expect(fs.existsSync(path.join(SRC_ROOT, "App.tsx"))).toBe(false);
+  });
+
   test("removes legacy bridge and protocol seam names from source", () => {
     const violations = collectSourceFiles(SRC_ROOT)
       .filter((filePath) => path.basename(filePath) !== "architectureCutoverBoundary.test.ts")

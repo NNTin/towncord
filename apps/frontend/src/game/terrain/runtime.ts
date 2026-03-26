@@ -1,9 +1,12 @@
 import {
   collectPhaseDurationsByAnimationId,
   readOptionalAnimationManifest,
-} from "../assets/animation";
-import { DEBUG_ANIMATIONS_JSON_KEY } from "../assets/preload";
-import { loadTerrainBootstrap, validateTerrainBootstrap } from "./bootstrap";
+} from "../content/preload/animation";
+import { DEBUG_ANIMATIONS_JSON_KEY } from "../content/preload/preload";
+import {
+  loadTerrainBootstrap,
+  validateTerrainBootstrap,
+} from "../application/runtime-compilation/terrain-surfaces/terrainBootstrap";
 import { TerrainCaseMapper } from "./caseMapper";
 import { TerrainChunkBuilder } from "./chunkBuilder";
 import { TerrainCommands } from "./commands";
@@ -15,26 +18,27 @@ import {
 import { TERRAIN_TEXTURE_KEY } from "./contracts";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainQueries } from "./queries";
-import { TerrainRenderer } from "./renderer";
 import type { TerrainRenderSurface } from "./renderSurface";
 import { TerrainMapStore } from "./store";
 import { TerrainTileResolver } from "./tileResolver";
 import { TerrainVisibleChunkResolver } from "./visibleChunkResolver";
+import {
+  TerrainRuntime,
+  type TerrainRuntimeOptions,
+} from "../../engine/terrain";
 
-type TerrainRuntime = {
-  store: TerrainMapStore;
-  chunkBuilder: TerrainChunkBuilder;
-  renderer: TerrainRenderer;
-  commands: TerrainCommands;
-  queries: TerrainQueries;
-  visibleChunks: TerrainVisibleChunkResolver;
-};
-
-export function createTerrainRuntime(scene: TerrainRenderSurface): TerrainRuntime {
+export function createTerrainRuntimeOptions(
+  scene: TerrainRenderSurface,
+): TerrainRuntimeOptions {
   const bootstrap = loadTerrainBootstrap();
   validateTerrainBootstrap(scene, bootstrap);
-  const debugAnimationManifest = readOptionalAnimationManifest(scene as unknown as Record<string, unknown>, DEBUG_ANIMATIONS_JSON_KEY);
-  const phaseDurationsByAnimationId = collectPhaseDurationsByAnimationId(debugAnimationManifest);
+  const debugAnimationManifest = readOptionalAnimationManifest(
+    scene as unknown as Record<string, unknown>,
+    DEBUG_ANIMATIONS_JSON_KEY,
+  );
+  const phaseDurationsByAnimationId = collectPhaseDurationsByAnimationId(
+    debugAnimationManifest,
+  );
 
   const store = new TerrainMapStore(bootstrap.gridSpec);
   const kernel = new MarchingSquaresKernel();
@@ -45,14 +49,15 @@ export function createTerrainRuntime(scene: TerrainRenderSurface): TerrainRuntim
     bootstrap.transition.insideMaterial,
   );
   const chunkBuilder = new TerrainChunkBuilder(store, tileResolver);
-  const renderer = new TerrainRenderer(
-    scene,
-    bootstrap.gridSpec,
-    TERRAIN_TEXTURE_KEY,
-    phaseDurationsByAnimationId,
+  const gameplayGrid = new TerrainGameplayGrid(
+    store,
+    DEFAULT_TERRAIN_MATERIAL_RULES,
   );
-  const gameplayGrid = new TerrainGameplayGrid(store, DEFAULT_TERRAIN_MATERIAL_RULES);
-  const commands = new TerrainCommands(new TerrainEditRouter(), store, gameplayGrid);
+  const commands = new TerrainCommands(
+    new TerrainEditRouter(),
+    store,
+    gameplayGrid,
+  );
   const queries = new TerrainQueries(store, gameplayGrid, tileResolver);
   const visibleChunks = new TerrainVisibleChunkResolver(
     store.chunkSize,
@@ -61,11 +66,19 @@ export function createTerrainRuntime(scene: TerrainRenderSurface): TerrainRuntim
   );
 
   return {
+    gridSpec: bootstrap.gridSpec,
     store,
     chunkBuilder,
-    renderer,
     commands,
     queries,
     visibleChunks,
+    textureKey: TERRAIN_TEXTURE_KEY,
+    animationPhaseDurationsById: phaseDurationsByAnimationId,
   };
+}
+
+export function createTerrainRuntime(
+  scene: TerrainRenderSurface,
+): TerrainRuntime {
+  return new TerrainRuntime(scene, createTerrainRuntimeOptions(scene));
 }

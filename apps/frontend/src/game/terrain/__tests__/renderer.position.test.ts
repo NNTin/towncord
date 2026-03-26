@@ -5,7 +5,7 @@ import {
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
   type TerrainGridSpec,
 } from "../contracts";
-import { TerrainRenderer } from "../renderer";
+import { TerrainRenderer } from "../../../engine/terrain/terrainRenderer";
 
 function createGridSpec(): TerrainGridSpec {
   return {

@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   normalizeTerrainPhaseDurations,
   resolveTerrainPhaseIndex,
-} from "../renderer";
+} from "../../../engine/terrain/terrainRenderer";
 
 describe("terrain timing helpers", () => {
   test("pads partial exported phase timings to the available variant count", () => {

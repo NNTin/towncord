@@ -79,7 +79,7 @@ Use strict settings for the frontend project:
 ## Authored Content Adapters
 
 - Runtime office bootstrap content is loaded through [`src/game/assets/officeContentRepository.ts`](./src/game/assets/officeContentRepository.ts), which currently reads checked-in/public Donarg office JSON snapshots.
-- Office layout editing and saving flows through [`src/app/officeLayoutApi.ts`](./src/app/officeLayoutApi.ts), which exposes a persistence adapter interface instead of letting hooks or components call Vite endpoints directly.
-- The current development-only persistence implementation lives in [`officeLayoutDevAdapter.ts`](./officeLayoutDevAdapter.ts) and is wired into [`vite.config.ts`](./vite.config.ts).
+- Office layout editing and saving now flows through [`src/data/structures/office-layout/officeLayoutPersistence.ts`](./src/data/structures/office-layout/officeLayoutPersistence.ts), while [`src/ui/editors/office-layout/draft-state/useOfficeLayoutEditor.ts`](./src/ui/editors/office-layout/draft-state/useOfficeLayoutEditor.ts) keeps ownership of editor workflow state.
+- The current development-only persistence implementation lives in [`data-dev/structures/office-layout/officeLayoutDevAdapter.ts`](./data-dev/structures/office-layout/officeLayoutDevAdapter.ts) and is wired into [`vite.config.ts`](./vite.config.ts).
 - Replacing the current Vite-backed workflow should mean swapping adapters:
   runtime content can move from the static repository to a backend-backed repository, and editor persistence can move from the development adapter to an HTTP, realtime, or collaborative adapter without rewriting the React editor logic.
