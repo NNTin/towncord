@@ -1,0 +1,3487 @@
+{
+  "generatedAt": "2026-03-26T22:25:02.715531+00:00",
+  "namespace": "donarg.office",
+  "animations": {
+    "characters.palette-0.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.read-down#0",
+        "characters.palette-0.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.read-right#0",
+        "characters.palette-0.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.read-up#0",
+        "characters.palette-0.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.type-down#0",
+        "characters.palette-0.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.type-right#0",
+        "characters.palette-0.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.type-up#0",
+        "characters.palette-0.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.walk-down#0",
+        "characters.palette-0.office-worker.walk-down#1",
+        "characters.palette-0.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.walk-right#0",
+        "characters.palette-0.office-worker.walk-right#1",
+        "characters.palette-0.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-0.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-0.office-worker.walk-up#0",
+        "characters.palette-0.office-worker.walk-up#1",
+        "characters.palette-0.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-0"
+    },
+    "characters.palette-1.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.read-down#0",
+        "characters.palette-1.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.read-right#0",
+        "characters.palette-1.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.read-up#0",
+        "characters.palette-1.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.type-down#0",
+        "characters.palette-1.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.type-right#0",
+        "characters.palette-1.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.type-up#0",
+        "characters.palette-1.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.walk-down#0",
+        "characters.palette-1.office-worker.walk-down#1",
+        "characters.palette-1.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.walk-right#0",
+        "characters.palette-1.office-worker.walk-right#1",
+        "characters.palette-1.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-1.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-1.office-worker.walk-up#0",
+        "characters.palette-1.office-worker.walk-up#1",
+        "characters.palette-1.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-1"
+    },
+    "characters.palette-2.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.read-down#0",
+        "characters.palette-2.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.read-right#0",
+        "characters.palette-2.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.read-up#0",
+        "characters.palette-2.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.type-down#0",
+        "characters.palette-2.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.type-right#0",
+        "characters.palette-2.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.type-up#0",
+        "characters.palette-2.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.walk-down#0",
+        "characters.palette-2.office-worker.walk-down#1",
+        "characters.palette-2.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.walk-right#0",
+        "characters.palette-2.office-worker.walk-right#1",
+        "characters.palette-2.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-2.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-2.office-worker.walk-up#0",
+        "characters.palette-2.office-worker.walk-up#1",
+        "characters.palette-2.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-2"
+    },
+    "characters.palette-3.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.read-down#0",
+        "characters.palette-3.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.read-right#0",
+        "characters.palette-3.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.read-up#0",
+        "characters.palette-3.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.type-down#0",
+        "characters.palette-3.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.type-right#0",
+        "characters.palette-3.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.type-up#0",
+        "characters.palette-3.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.walk-down#0",
+        "characters.palette-3.office-worker.walk-down#1",
+        "characters.palette-3.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.walk-right#0",
+        "characters.palette-3.office-worker.walk-right#1",
+        "characters.palette-3.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-3.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-3.office-worker.walk-up#0",
+        "characters.palette-3.office-worker.walk-up#1",
+        "characters.palette-3.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-3"
+    },
+    "characters.palette-4.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.read-down#0",
+        "characters.palette-4.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.read-right#0",
+        "characters.palette-4.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.read-up#0",
+        "characters.palette-4.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.type-down#0",
+        "characters.palette-4.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.type-right#0",
+        "characters.palette-4.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.type-up#0",
+        "characters.palette-4.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.walk-down#0",
+        "characters.palette-4.office-worker.walk-down#1",
+        "characters.palette-4.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.walk-right#0",
+        "characters.palette-4.office-worker.walk-right#1",
+        "characters.palette-4.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-4.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-4.office-worker.walk-up#0",
+        "characters.palette-4.office-worker.walk-up#1",
+        "characters.palette-4.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-4"
+    },
+    "characters.palette-5.office-worker.read-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.read-down#0",
+        "characters.palette-5.office-worker.read-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.read-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.read-right#0",
+        "characters.palette-5.office-worker.read-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.read-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.read-up#0",
+        "characters.palette-5.office-worker.read-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.type-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.type-down#0",
+        "characters.palette-5.office-worker.type-down#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.type-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.type-right#0",
+        "characters.palette-5.office-worker.type-right#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.type-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.type-up#0",
+        "characters.palette-5.office-worker.type-up#1"
+      ],
+      "durationsMs": [
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 2,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.walk-down": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.walk-down#0",
+        "characters.palette-5.office-worker.walk-down#1",
+        "characters.palette-5.office-worker.walk-down#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.walk-right": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.walk-right#0",
+        "characters.palette-5.office-worker.walk-right#1",
+        "characters.palette-5.office-worker.walk-right#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "characters.palette-5.office-worker.walk-up": {
+      "atlasKey": "donarg.office.characters",
+      "frames": [
+        "characters.palette-5.office-worker.walk-up#0",
+        "characters.palette-5.office-worker.walk-up#1",
+        "characters.palette-5.office-worker.walk-up#2"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100
+      ],
+      "category": "characters",
+      "frameCount": 3,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/office-worker.aseprite",
+      "paletteVariant": "palette-5"
+    },
+    "environment.floors.pattern-01": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-01#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-02": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-02#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-03": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-03#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-04": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-04#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-05": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-05#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-06": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-06#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.floors.pattern-07": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.floors.pattern-07#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/environment/floors.aseprite"
+    },
+    "environment.walls.mask-00": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-00#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-01": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-01#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-02": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-02#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-03": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-03#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-04": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-04#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-05": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-05#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-06": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-06#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-07": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-07#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-08": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-08#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-09": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-09#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-10": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-10#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-11": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-11#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-12": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-12#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-13": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-13#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-14": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-14#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "environment.walls.mask-15": {
+      "atlasKey": "donarg.office.environment",
+      "frames": [
+        "environment.walls.mask-15#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "environment",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/environment/walls.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-front": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-front#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-left": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-left#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-lg-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-lg-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-lg-front": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-lg-front#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-lg-left": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-lg-left#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-lg-right": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-lg-right#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-cushioned-right": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-cushioned-right#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-rotating-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-rotating-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-rotating-front": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-rotating-front#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-rotating-left": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-rotating-left#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.chair-rotating-right": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.chair-rotating-right#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.chairs.stool": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.chairs.stool#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/chairs.aseprite"
+    },
+    "furniture.decor.book-single-blue": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.book-single-blue#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.book-single-red": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.book-single-red#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.mat-chess-board": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.mat-chess-board#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.mat-circles": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.mat-circles#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.mat-square": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.mat-square#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.paper-front": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.paper-front#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.paper-side": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.paper-side#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.plant-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.plant-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.plant-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.plant-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.plant-3": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.plant-3#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.white-plant-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.white-plant-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.white-plant-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.white-plant-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.decor.white-plant-3": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.decor.white-plant-3#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/decor.aseprite"
+    },
+    "furniture.desks.coffee-table-lg": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.coffee-table-lg#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.counter-plastic-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.counter-plastic-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 48,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.counter-white-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.counter-white-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.counter-wood-md": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.counter-wood-md#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 48,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.table-plain-wood": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.table-plain-wood#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 48,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.table-wood": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.table-wood#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 48,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.table-wood-lg": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.table-wood-lg#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 64
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.table-wood-vertical": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.table-wood-vertical#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.desks.wood-cofee-table": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.desks.wood-cofee-table#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/desks.aseprite"
+    },
+    "furniture.electronics.full-computer-coffee-off": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.full-computer-coffee-off#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.full-computer-coffee-on": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.full-computer-coffee-on#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.laptop-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.laptop-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.laptop-front-off": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.laptop-front-off#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.laptop-front-on": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.laptop-front-on#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.laptop-left": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.laptop-left#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.laptop-right": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.laptop-right#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-crt-back": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-crt-back#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-crt-off": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-crt-off#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-crt-on": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-crt-on#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-front-off": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-front-off#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.monitor-front-on": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.monitor-front-on#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.printer-desktop": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.printer-desktop#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.server": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.server#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.electronics.telephone": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.electronics.telephone#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/electronics.aseprite"
+    },
+    "furniture.misc.bin": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.bin#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.misc.coffee-machine": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.coffee-machine#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.misc.coffee-mug": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.coffee-mug#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.misc.microwave": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.microwave#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.misc.vending-machine": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.vending-machine#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.misc.water-cooler": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.misc.water-cooler#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/misc.aseprite"
+    },
+    "furniture.storage.bookshelf-tall": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.bookshelf-tall#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.cabinet-tall": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.cabinet-tall#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crate": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crate#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crates": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crates#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crates-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crates-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crates-3": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crates-3#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crates-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crates-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.crates-sm-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.crates-sm-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.fridge": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.fridge#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.full-bookshelf-tall": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.full-bookshelf-tall#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.full-cabinet-tall": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.full-cabinet-tall#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.full-white-bookshelf-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.full-white-bookshelf-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.full-white-bookshelf-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.full-white-bookshelf-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.full-wooden-bookshelf-small": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.full-wooden-bookshelf-small#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.white-bookshelf-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.white-bookshelf-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.white-bookshelf-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.white-bookshelf-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.storage.wooden-bookshelf-small": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.storage.wooden-bookshelf-small#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/storage.aseprite"
+    },
+    "furniture.wall.chalkboard-wall-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.chalkboard-wall-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.chart-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.chart-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.chart-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.chart-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.chart-sm-1": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.chart-sm-1#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.chart-sm-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.chart-sm-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.clock-wall-color": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.clock-wall-color#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.painting-landscape": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.painting-landscape#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.painting-landscape-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.painting-landscape-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.painting-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.painting-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.painting-sm-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.painting-sm-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.painting-sm-3": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.painting-sm-3#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.text-frame": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.text-frame#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.white-window-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.white-window-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.white-window-sm-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.white-window-sm-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.window-double-white": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.window-double-white#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.window-double-white-2": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.window-double-white-2#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.window-double-wood": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.window-double-wood#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    },
+    "furniture.wall.wood-window-sm": {
+      "atlasKey": "donarg.office.furniture",
+      "frames": [
+        "furniture.wall.wood-window-sm#0"
+      ],
+      "durationsMs": [
+        100
+      ],
+      "phaseDurationsMs": [
+        100
+      ],
+      "category": "furniture",
+      "frameCount": 1,
+      "frameSize": {
+        "w": 16,
+        "h": 32
+      },
+      "sourceFile": "aseprite/furniture/wall.aseprite"
+    }
+  }
+}
