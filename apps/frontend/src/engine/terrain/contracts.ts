@@ -5,6 +5,12 @@ const TERRAIN_TILE_SCALE = 1;
 export const DEFAULT_TERRAIN_ANIMATION_FRAME_MS = 120;
 export const TERRAIN_CELL_WORLD_SIZE = TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
 export const TERRAIN_RENDER_GRID_WORLD_OFFSET = TERRAIN_CELL_WORLD_SIZE * 0.5;
+
+// Terrain render-layer contract:
+// - Terrain must always render *below* office floors and entity layers.
+// - Static terrain tiles must render *behind* animated terrain tiles.
+// - Depth values are negative to leave space for additional layers above terrain.
+// If you change these values, ensure the global render-layer ordering remains valid.
 export const TERRAIN_STATIC_DEPTH = -1_000;
 export const TERRAIN_ANIMATED_DEPTH = -999;
 

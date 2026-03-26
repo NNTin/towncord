@@ -11,7 +11,7 @@ export async function resolvePublicJsonImportFilePath(
   relativeAssetPath: string,
   options: {
     publicAssetsRoot: string;
-    fallbackEntries: ReadonlyArray<[string, string]>;
+    fallbackEntries: ReadonlyMap<string, string>;
   },
 ): Promise<string> {
   const publicPath = path.resolve(options.publicAssetsRoot, relativeAssetPath);
@@ -20,10 +20,7 @@ export async function resolvePublicJsonImportFilePath(
     await fs.access(publicPath);
     return publicPath;
   } catch {
-    const fallbackPath = options.fallbackEntries.find(
-      ([candidateRelativeAssetPath]) =>
-        candidateRelativeAssetPath === relativeAssetPath,
-    )?.[1];
+    const fallbackPath = options.fallbackEntries.get(relativeAssetPath);
 
     if (fallbackPath) {
       return path.resolve(fallbackPath);
@@ -39,7 +36,7 @@ export function resolvePublicJsonImportRelativeAssetPath(
   filePath: string,
   options: {
     publicAssetsRoot: string;
-    fallbackEntries: ReadonlyArray<[string, string]>;
+    fallbackEntries: ReadonlyMap<string, string>;
   },
 ): string | null {
   const normalizedFilePath = path.resolve(filePath);

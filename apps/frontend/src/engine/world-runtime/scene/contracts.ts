@@ -27,10 +27,6 @@ export type PreloadSceneLifecycleAdapter = {
  * The engine-owned world scene shell calls these methods in the correct order
  * and at the correct Phaser lifecycle moments. The adapter owns game-specific
  * bootstrap, assembly construction, protocol binding, and input delegation.
- *
- * The engine-owned world scene shell calls these methods in the correct order
- * and at the correct Phaser lifecycle moments. The adapter owns game-specific
- * bootstrap, assembly construction, protocol binding, and input delegation.
  */
 export type WorldSceneLifecycleAdapter = {
   /**

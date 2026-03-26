@@ -1,9 +1,7 @@
 import { PLACE_DRAG_MIME, serializePlaceDragPayload } from "../../../game";
 import type {
-  EntityPlaceableViewModel,
   PlaceDragPayload,
   PlaceableViewModel,
-  TerrainPlaceableViewModel,
   TerrainToolSelection,
 } from "../../../game/contracts/runtime";
 import type { PlaceablesPanelViewModel } from "../contracts";
@@ -12,15 +10,14 @@ function toPlaceDragPayload(placeable: PlaceableViewModel): PlaceDragPayload {
   if (placeable.type === "entity") {
     return {
       type: "entity",
-      entityId: (placeable as EntityPlaceableViewModel).entityId,
+      entityId: placeable.entityId,
     };
   }
 
-  const terrain = placeable as TerrainPlaceableViewModel;
   return {
     type: "terrain",
-    materialId: terrain.materialId,
-    brushId: terrain.brushId,
+    materialId: placeable.materialId,
+    brushId: placeable.brushId,
   };
 }
 
@@ -32,10 +29,8 @@ function resolveActiveTerrainToolId(
     placeables.find(
       (placeable) =>
         placeable.type === "terrain" &&
-        activeTerrainTool?.brushId ===
-          (placeable as TerrainPlaceableViewModel).brushId &&
-        activeTerrainTool?.materialId ===
-          (placeable as TerrainPlaceableViewModel).materialId,
+        activeTerrainTool?.brushId === placeable.brushId &&
+        activeTerrainTool?.materialId === placeable.materialId,
     )?.id ?? null
   );
 }
@@ -65,19 +60,18 @@ export function createPlaceablesSidebarBridge({
       event.dataTransfer.effectAllowed = "copy";
     },
     onSelectTerrainTool(placeable) {
-      const terrain = placeable as TerrainPlaceableViewModel;
       if (
         activeTerrainTool &&
-        activeTerrainTool.brushId === terrain.brushId &&
-        activeTerrainTool.materialId === terrain.materialId
+        activeTerrainTool.brushId === placeable.brushId &&
+        activeTerrainTool.materialId === placeable.materialId
       ) {
         onSelectTerrainTool(null);
         return;
       }
 
       onSelectTerrainTool({
-        materialId: terrain.materialId,
-        brushId: terrain.brushId,
+        materialId: placeable.materialId,
+        brushId: placeable.brushId,
       });
     },
   };

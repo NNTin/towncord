@@ -46,9 +46,9 @@ describe("public json import helpers", () => {
         path.join(PUBLIC_ASSETS_ROOT, relativeAssetPath),
         {
           publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-          fallbackEntries: [
+          fallbackEntries: new Map([
             [relativeAssetPath, path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json")],
-          ],
+          ]),
         },
       ),
     ).toBe(relativeAssetPath);
@@ -58,9 +58,9 @@ describe("public json import helpers", () => {
         path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json"),
         {
           publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-          fallbackEntries: [
+          fallbackEntries: new Map([
             [relativeAssetPath, path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json")],
-          ],
+          ]),
         },
       ),
     ).toBe(relativeAssetPath);
@@ -78,7 +78,7 @@ describe("public json import helpers", () => {
     expect(
       await resolvePublicJsonImportFilePath(relativeAssetPath, {
         publicAssetsRoot,
-        fallbackEntries: [[relativeAssetPath, fallbackPath]],
+        fallbackEntries: new Map([[relativeAssetPath, fallbackPath]]),
       }),
     ).toBe(path.resolve(fallbackPath));
   });
@@ -89,7 +89,7 @@ describe("public json import helpers", () => {
     await expect(
       resolvePublicJsonImportFilePath("terrain/rulesets/phase1.json", {
         publicAssetsRoot,
-        fallbackEntries: [],
+        fallbackEntries: new Map(),
       }),
     ).rejects.toThrow(
       `Missing public JSON asset "terrain/rulesets/phase1.json" under ${publicAssetsRoot}.`,

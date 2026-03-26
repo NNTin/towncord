@@ -7,7 +7,7 @@ type SpawnRequest = {
 };
 
 type PlaceEntityDropLike = SpawnRequest & {
-  type?: "entity";
+  type: "entity";
 };
 
 export function mapDropPayloadToSpawnRequest(payload: PlaceEntityDropLike): SpawnRequest {

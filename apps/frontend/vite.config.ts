@@ -56,7 +56,7 @@ function publicJsonImportPlugin(): Plugin {
       ).toString("utf8");
       const filePath = await resolvePublicJsonImportFilePath(relativeAssetPath, {
         publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-        fallbackEntries: Array.from(PUBLIC_JSON_FALLBACKS.entries()),
+        fallbackEntries: PUBLIC_JSON_FALLBACKS,
       });
       const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as unknown;
@@ -74,7 +74,7 @@ function publicJsonImportPlugin(): Plugin {
       const invalidateFromFilePath = (filePath: string): void => {
         const relativeAssetPath = resolvePublicJsonImportRelativeAssetPath(filePath, {
           publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-          fallbackEntries: Array.from(PUBLIC_JSON_FALLBACKS.entries()),
+          fallbackEntries: PUBLIC_JSON_FALLBACKS,
         });
 
         if (relativeAssetPath) {

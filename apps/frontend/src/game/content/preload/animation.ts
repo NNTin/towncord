@@ -325,7 +325,7 @@ export function readOptionalAnimationManifest(
   scene: Record<string, unknown>,
   manifestKey: string,
 ): PublicAnimationManifest | null {
-  const cache = (scene.cache as Phaser.Scene["cache"] | undefined)?.json;
+  const cache = (scene["cache"] as Phaser.Scene["cache"] | undefined)?.json;
   if (!cache || typeof cache.exists !== "function" || typeof cache.get !== "function") {
     return null;
   }
