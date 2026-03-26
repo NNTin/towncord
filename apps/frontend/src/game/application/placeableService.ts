@@ -1,6 +1,12 @@
-import { type EntityRegistry } from "../domain/entityRegistry";
-import type { EntityId, EntityKind } from "../domain/model";
-import type { TerrainBrushId, TerrainMaterialId } from "../terrain/contracts";
+import type { EntityRegistry } from "../world/entities/entityRegistry";
+import type { EntityKind } from "../world/entities/model";
+import type { EntityPlaceableViewModel } from "../contracts/runtime";
+
+export type {
+  EntityPlaceableViewModel,
+  PlaceableViewModel,
+  TerrainPlaceableViewModel,
+} from "../contracts/runtime";
 
 const KIND_LABEL_OVERRIDES: Record<string, string> = {
   npc: "Mobs",
@@ -18,27 +24,6 @@ function formatKindLabel(kind: string): string {
 function resolvePlaceableGroupLabel(kind: EntityKind): string {
   return KIND_LABEL_OVERRIDES[kind] ?? formatKindLabel(kind);
 }
-
-export type EntityPlaceableViewModel = {
-  id: string;
-  type: "entity";
-  entityId: EntityId;
-  label: string;
-  groupKey: string;
-  groupLabel: string;
-};
-
-export type TerrainPlaceableViewModel = {
-  id: string;
-  type: "terrain";
-  materialId: TerrainMaterialId;
-  brushId: TerrainBrushId;
-  label: string;
-  groupKey: string;
-  groupLabel: string;
-};
-
-export type PlaceableViewModel = EntityPlaceableViewModel | TerrainPlaceableViewModel;
 
 export function listEntityPlaceables(registry: EntityRegistry): EntityPlaceableViewModel[] {
   return registry.listPlaceables().map((definition) => ({

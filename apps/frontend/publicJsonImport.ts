@@ -1,9 +1,38 @@
+import fs from "node:fs/promises";
 import path from "node:path";
 
 export const PUBLIC_ASSETS_JSON_PREFIX = "public-assets-json:";
 
 export function createPublicJsonImportModuleId(relativeAssetPath: string): string {
   return `\0${PUBLIC_ASSETS_JSON_PREFIX}${Buffer.from(relativeAssetPath).toString("base64url")}`;
+}
+
+export async function resolvePublicJsonImportFilePath(
+  relativeAssetPath: string,
+  options: {
+    publicAssetsRoot: string;
+    fallbackEntries: ReadonlyArray<[string, string]>;
+  },
+): Promise<string> {
+  const publicPath = path.resolve(options.publicAssetsRoot, relativeAssetPath);
+
+  try {
+    await fs.access(publicPath);
+    return publicPath;
+  } catch {
+    const fallbackPath = options.fallbackEntries.find(
+      ([candidateRelativeAssetPath]) =>
+        candidateRelativeAssetPath === relativeAssetPath,
+    )?.[1];
+
+    if (fallbackPath) {
+      return path.resolve(fallbackPath);
+    }
+
+    throw new Error(
+      `Missing public JSON asset "${relativeAssetPath}" under ${options.publicAssetsRoot}.`,
+    );
+  }
 }
 
 export function resolvePublicJsonImportRelativeAssetPath(

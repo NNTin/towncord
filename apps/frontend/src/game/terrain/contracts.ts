@@ -1,69 +1,21 @@
-import { RENDER_LAYERS } from "../renderLayers";
-
-export const TERRAIN_CHUNK_SIZE = 32 as const;
-export const TERRAIN_TEXTURE_KEY = "debug.tilesets";
-const TERRAIN_TILE_FRAME_SIZE = 16;
-const TERRAIN_TILE_SCALE = 1;
-export const DEFAULT_TERRAIN_ANIMATION_FRAME_MS = 120;
-export const TERRAIN_CELL_WORLD_SIZE = TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
-export const TERRAIN_RENDER_GRID_WORLD_OFFSET = TERRAIN_CELL_WORLD_SIZE * 0.5;
-/** Static tiles sit at {@link RENDER_LAYERS}.TERRAIN_STATIC; animated tiles sit one slot above so they always draw on top within the same chunk. */
-export const TERRAIN_STATIC_DEPTH = RENDER_LAYERS.TERRAIN_STATIC;
-export const TERRAIN_ANIMATED_DEPTH = RENDER_LAYERS.TERRAIN_ANIMATED;
-
-export type TerrainChunkSize = typeof TERRAIN_CHUNK_SIZE;
-export type TerrainMaterialId = string;
-export type TerrainBrushId = string;
-
-export type TerrainGridSpec = {
-  width: number;
-  height: number;
-  chunkSize: TerrainChunkSize;
-  defaultMaterial: TerrainMaterialId;
-  materials: TerrainMaterialId[];
-  cells: TerrainMaterialId[];
-};
-
-export type TerrainChunkCoord = {
-  chunkX: number;
-  chunkY: number;
-};
-
-export type TerrainChunkId = `${number},${number}`;
-
-export type TerrainChunkState = TerrainChunkCoord & {
-  id: TerrainChunkId;
-  dirty: boolean;
-  revision: number;
-};
-
-export type TerrainCellCoord = {
-  cellX: number;
-  cellY: number;
-};
-
-export type TerrainEditOp = {
-  materialId: TerrainMaterialId;
-  brushId: TerrainBrushId;
-  center: TerrainCellCoord;
-};
-
-export type TerrainRenderTile = {
-  cellX: number;
-  cellY: number;
-  caseId: number;
-  frame: string;
-  rotate90: 0 | 1 | 2 | 3;
-  flipX: boolean;
-  flipY: boolean;
-};
-
-export type TerrainChunkRenderPayload = TerrainChunkCoord & {
-  id: TerrainChunkId;
-  revision: number;
-  tiles: TerrainRenderTile[];
-};
-
-export function toTerrainChunkId(chunkX: number, chunkY: number): TerrainChunkId {
-  return `${chunkX},${chunkY}`;
-}
+export {
+  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+  TERRAIN_CELL_WORLD_SIZE,
+  TERRAIN_CHUNK_SIZE,
+  TERRAIN_RENDER_GRID_WORLD_OFFSET,
+  TERRAIN_STATIC_DEPTH,
+  TERRAIN_TEXTURE_KEY,
+  TERRAIN_ANIMATED_DEPTH,
+  toTerrainChunkId,
+  type TerrainBrushId,
+  type TerrainCellCoord,
+  type TerrainChunkCoord,
+  type TerrainChunkId,
+  type TerrainChunkRenderPayload,
+  type TerrainChunkSize,
+  type TerrainChunkState,
+  type TerrainEditOp,
+  type TerrainGridSpec,
+  type TerrainMaterialId,
+  type TerrainRenderTile,
+} from "../../engine/terrain";

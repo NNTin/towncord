@@ -3,10 +3,11 @@ import path from "node:path";
 import { defineConfig } from "vite";
 import type { Plugin, ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react";
-import { createOfficeLayoutDevAdapter } from "./officeLayoutDevAdapter";
+import { createOfficeLayoutDevAdapter } from "./data-dev/structures/office-layout/officeLayoutDevAdapter";
 import {
   PUBLIC_ASSETS_JSON_PREFIX,
   createPublicJsonImportModuleId,
+  resolvePublicJsonImportFilePath,
   resolvePublicJsonImportRelativeAssetPath,
 } from "./publicJsonImport";
 
@@ -33,22 +34,6 @@ const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   ],
 ]);
 
-async function resolvePublicJsonPath(relativeAssetPath: string): Promise<string> {
-  const publicPath = path.resolve(PUBLIC_ASSETS_ROOT, relativeAssetPath);
-
-  try {
-    await fs.access(publicPath);
-    return publicPath;
-  } catch (error) {
-    const fallbackPath = PUBLIC_JSON_FALLBACKS.get(relativeAssetPath);
-    if (!fallbackPath) {
-      throw error;
-    }
-
-    return fallbackPath;
-  }
-}
-
 function publicJsonImportPlugin(): Plugin {
   return {
     name: "towncord-public-json-import",
@@ -69,7 +54,10 @@ function publicJsonImportPlugin(): Plugin {
         id.slice(`\0${PUBLIC_ASSETS_JSON_PREFIX}`.length),
         "base64url",
       ).toString("utf8");
-      const filePath = await resolvePublicJsonPath(relativeAssetPath);
+      const filePath = await resolvePublicJsonImportFilePath(relativeAssetPath, {
+        publicAssetsRoot: PUBLIC_ASSETS_ROOT,
+        fallbackEntries: Array.from(PUBLIC_JSON_FALLBACKS.entries()),
+      });
       const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as unknown;
       return `export default ${JSON.stringify(parsed)};`;

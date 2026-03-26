@@ -1,4 +1,4 @@
-import type { TerrainTileInspectedPayload } from "../protocol";
+import type { TerrainTileInspectedPayload } from "../contracts/runtime";
 import { TERRAIN_TEXTURE_KEY, type TerrainMaterialId, type TerrainRenderTile } from "./contracts";
 import { TerrainCaseMapper } from "./caseMapper";
 import { MarchingSquaresKernel, type TerrainMaterialLookup } from "./marchingSquaresKernel";

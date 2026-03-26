@@ -1,5 +1,10 @@
-import { supportsRun, supportsWalk, type ActionContext, type EntityBehavior } from "../domain/capabilities";
-import type { EntityAction } from "../domain/model";
+import {
+  supportsRun,
+  supportsWalk,
+  type ActionContext,
+  type EntityBehavior,
+} from "../world/entities/capabilities";
+import type { EntityAction } from "../world/entities/model";
 
 type ActionResolverInput = {
   isMoving: boolean;

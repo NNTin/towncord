@@ -1,4 +1,4 @@
-import type { PlaceTerrainDropPayload } from "../protocol";
+import type { PlaceTerrainDropPayload } from "../contracts/runtime";
 import { TERRAIN_CELL_WORLD_SIZE, type TerrainEditOp } from "./contracts";
 
 export class TerrainEditRouter {

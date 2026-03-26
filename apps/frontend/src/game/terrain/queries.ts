@@ -1,7 +1,7 @@
 import type {
   PlaceTerrainDropPayload,
   TerrainTileInspectedPayload,
-} from "../protocol";
+} from "../contracts/runtime";
 import type { TerrainRenderTile } from "./contracts";
 import { resolveTerrainEditMaterial } from "./editPolicy";
 import { TerrainGameplayGrid } from "./gameplayGrid";
