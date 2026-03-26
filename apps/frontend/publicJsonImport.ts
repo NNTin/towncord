@@ -40,16 +40,22 @@ export function resolvePublicJsonImportRelativeAssetPath(
   },
 ): string | null {
   const normalizedFilePath = path.resolve(filePath);
+  let matchedRelativeAssetPath: string | null = null;
 
-  for (const [relativeAssetPath, fallbackPath] of options.fallbackEntries) {
+  options.fallbackEntries.forEach((fallbackPath, relativeAssetPath) => {
+    if (matchedRelativeAssetPath !== null) {
+      return;
+    }
+
     if (normalizedFilePath === path.resolve(options.publicAssetsRoot, relativeAssetPath)) {
-      return relativeAssetPath;
+      matchedRelativeAssetPath = relativeAssetPath;
+      return;
     }
 
     if (normalizedFilePath === path.resolve(fallbackPath)) {
-      return relativeAssetPath;
+      matchedRelativeAssetPath = relativeAssetPath;
     }
-  }
+  });
 
-  return null;
+  return matchedRelativeAssetPath;
 }
