@@ -1,7 +1,9 @@
 import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json";
 import type { TerrainRulesetFile } from "../../../data";
-import type { TerrainBrushId, TerrainMaterialId } from "../../terrain/contracts";
+import { DEFAULT_TERRAIN_ANIMATION_FRAME_MS, type TerrainBrushId, type TerrainMaterialId } from "../../terrain/contracts";
 import { DEBUG_TERRAIN_ATLAS_FRAMES } from "./debugTerrainAtlas";
+
+export { DEFAULT_TERRAIN_ANIMATION_FRAME_MS };
 
 export type TerrainToolbarPreviewFrame = {
   frameKey: string;

@@ -4,6 +4,7 @@ import {
   ATLAS_IMAGE_URL,
   ATLAS_W,
   DEFAULT_FLOOR_COLOR_ADJUST,
+  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ENVIRONMENT_ATLAS_FRAMES,
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_IMAGE_URL,
@@ -231,24 +232,15 @@ function TintedAtlasSprite({
 
 function TerrainPreviewSprite({
   item,
+  tick,
 }: {
   item: TerrainToolbarPreviewItem;
+  tick: number;
 }): JSX.Element {
-  const [phaseIndex, setPhaseIndex] = useState(0);
-
-  useEffect(() => {
-    setPhaseIndex(0);
-    if (item.animationFrames.length <= 1) {
-      return undefined;
-    }
-
-    const timer = window.setInterval(() => {
-      setPhaseIndex((current) => (current + 1) % item.animationFrames.length);
-    }, 120);
-
-    return () => window.clearInterval(timer);
-  }, [item.animationFrames.length, item.id]);
-
+  const phaseIndex =
+    item.animationFrames.length > 1
+      ? tick % item.animationFrames.length
+      : 0;
   const frame = item.animationFrames[phaseIndex] ?? item.representativeFrame;
   return <TerrainAtlasSprite frame={frame} />;
 }
@@ -463,6 +455,23 @@ function TerrainSubPanel({
   activeTerrainTool: TerrainToolSelection;
   onSelectTerrainTool: ((tool: TerrainToolSelection) => void) | undefined;
 }): JSX.Element {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const hasAnimated = TERRAIN_TOOLBAR_PREVIEW_ITEMS.some(
+      (item) => item.animationFrames.length > 1,
+    );
+    if (!hasAnimated) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setTick((t) => t + 1);
+    }, DEFAULT_TERRAIN_ANIMATION_FRAME_MS);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <div style={subPanel}>
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
@@ -496,7 +505,7 @@ function TerrainSubPanel({
                 padding: 2,
               }}
             >
-              <TerrainPreviewSprite item={item} />
+              <TerrainPreviewSprite item={item} tick={tick} />
             </button>
           );
         })}

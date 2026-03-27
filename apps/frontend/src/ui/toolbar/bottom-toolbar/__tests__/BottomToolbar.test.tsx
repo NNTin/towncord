@@ -115,6 +115,8 @@ describe("BottomToolbar", () => {
   });
 
   test("the Terrain panel shows animated brush thumbnails", () => {
+    vi.useFakeTimers();
+
     const props = {
       ...baseProps,
       activeTerrainTool: {
@@ -131,5 +133,7 @@ describe("BottomToolbar", () => {
     act(() => {
       root.unmount();
     });
+
+    vi.useRealTimers();
   });
 });
