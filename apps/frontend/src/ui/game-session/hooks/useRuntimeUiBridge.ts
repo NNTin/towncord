@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MutableRefObject } from "react";
 import type { OfficeFloorPickedPayload } from "../../../game/contracts/office-editor";
+import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import { buildOfficeEditorToolPayload } from "../../../game";
 import type { OfficeEditorBridgeState, TerrainSeedDocument } from "../../../game";
@@ -22,6 +23,8 @@ type RuntimeUiBridge = {
   sidebarViewModel: SidebarViewModel | null;
   zoomViewModel: ZoomControlsViewModel | null;
   terrainSeedSnapshot: TerrainSeedDocument | null;
+  activeTerrainTool: TerrainToolSelection;
+  onSelectTerrainTool: (tool: TerrainToolSelection) => void;
 };
 
 export function useRuntimeUiBridge(options: {
@@ -29,6 +32,7 @@ export function useRuntimeUiBridge(options: {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onTerrainSeedChanged?: (seed: TerrainSeedDocument) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
+  onClearOfficeTool?: () => void;
 }): RuntimeUiBridge {
   const runtimeSync = useRuntimeSyncAdapter();
   const [terrainSeedSnapshot, setTerrainSeedSnapshot] =
@@ -50,6 +54,17 @@ export function useRuntimeUiBridge(options: {
     sessionRef,
     zoomState: runtimeSync.zoomState,
   });
+
+  const onSelectTerrainTool = useCallback(
+    (tool: TerrainToolSelection) => {
+      if (tool) {
+        options.onClearOfficeTool?.();
+      }
+
+      runtimeSync.onSelectTerrainTool(tool);
+    },
+    [options.onClearOfficeTool, runtimeSync.onSelectTerrainTool],
+  );
 
   useEffect(() => {
     sessionRef.current?.selectTerrainTool(runtimeSync.activeTerrainTool);
@@ -79,7 +94,7 @@ export function useRuntimeUiBridge(options: {
       placeablesPanel: createPlaceablesSidebarBridge({
         placeables: projection.placeables,
         activeTerrainTool: runtimeSync.activeTerrainTool,
-        onSelectTerrainTool: runtimeSync.onSelectTerrainTool,
+        onSelectTerrainTool,
       }),
       previewPanel: {
         catalog: projection.catalog,
@@ -91,8 +106,8 @@ export function useRuntimeUiBridge(options: {
   }, [
     runtimeSync.activeTerrainTool,
     runtimeSync.onClearInspectedTile,
-    runtimeSync.onSelectTerrainTool,
     runtimeSync.runtimeSidebarProjection,
+    onSelectTerrainTool,
   ]);
 
   return {
@@ -101,5 +116,7 @@ export function useRuntimeUiBridge(options: {
     sidebarViewModel,
     zoomViewModel,
     terrainSeedSnapshot,
+    activeTerrainTool: runtimeSync.activeTerrainTool,
+    onSelectTerrainTool,
   };
 }

@@ -20,6 +20,8 @@ function App(): JSX.Element {
   const {
     layoutSaveState,
     officeEditor,
+    activeTerrainTool,
+    onSelectTerrainTool,
     runtimeRootRef,
     runtimeRootBindings,
     sidebarViewModel,
@@ -70,6 +72,8 @@ function App(): JSX.Element {
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
         activeFurnitureId={officeToolState.activeFurnitureId}
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
+        activeTerrainTool={activeTerrainTool}
+        onSelectTerrainTool={onSelectTerrainTool}
         onResetLayout={layoutSaveState.reset}
         onSaveLayout={() => void layoutSaveState.save()}
         canResetLayout={layoutSaveState.canReset}
