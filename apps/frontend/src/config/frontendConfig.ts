@@ -5,6 +5,9 @@ export type FrontendConfig = {
   officeLayout: {
     persistenceMode: "development" | "disabled";
   };
+  terrainSeed: {
+    persistenceMode: "development" | "disabled";
+  };
 };
 
 type FrontendEnv = Pick<ImportMetaEnv, "DEV">;
@@ -15,6 +18,9 @@ export function createFrontendConfig(env: FrontendEnv): FrontendConfig {
       logContentPersistenceEvents: false,
     },
     officeLayout: {
+      persistenceMode: env.DEV ? "development" : "disabled",
+    },
+    terrainSeed: {
       persistenceMode: env.DEV ? "development" : "disabled",
     },
   };

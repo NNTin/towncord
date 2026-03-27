@@ -591,7 +591,7 @@ export function BottomToolbar({
               onMouseEnter={() => setHovered("save")}
               onMouseLeave={() => setHovered(null)}
               style={resolveButtonStyle("save", { disabled: !canSaveLayout })}
-              title="Save office layout JSON"
+              title="Save combined layout data"
             >
               {isSavingLayout ? "Saving..." : "Save"}
             </button>

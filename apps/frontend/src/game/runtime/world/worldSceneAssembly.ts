@@ -11,7 +11,8 @@ import {
   createTerrainNavigationService,
   type WorldNavigationService,
 } from "../../../engine";
-import { createTerrainRuntimeOptions } from "../../terrain/runtime";
+import { createTerrainRuntimeContext } from "../../terrain/runtime";
+import { syncFromRuntimeTerrain } from "../../content/document-export";
 import { EntitySystem } from "./entitySystem";
 import type { MovementInput } from "./movementSystem";
 import { WorldSceneCommandBindings } from "./worldSceneCommandBindings";
@@ -51,11 +52,15 @@ export class WorldSceneAssembly {
   public readonly inputRouter: WorldRuntimeInputRouter;
 
   private terrainRuntime: TerrainRuntime | null = null;
+  private terrainRuntimeContext:
+    | ReturnType<typeof createTerrainRuntimeContext>
+    | null = null;
   private entitySystem: EntitySystem | null = null;
   private entityRegistry: EntityRegistry | null = null;
   private navigation: WorldNavigationService | null = null;
   private wasd: WorldSceneMovementKeys | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
+  private hasEmittedTerrainSeedSnapshot = false;
 
   constructor(scene: Phaser.Scene) {
     this.projections = new WorldSceneProjectionEmitter({
@@ -86,6 +91,8 @@ export class WorldSceneAssembly {
       },
       this.projections,
     );
+
+    this.terrainRuntimeContext = createTerrainRuntimeContext(scene);
 
     this.selectionController = new WorldSceneSelectionController(
       {
@@ -177,6 +184,10 @@ export class WorldSceneAssembly {
    */
   public boot(scene: Phaser.Scene, options: WorldSceneBootOptions): void {
     const { worldBootstrap, officeBootstrap } = options;
+    const terrainRuntimeContext = this.terrainRuntimeContext;
+    if (!terrainRuntimeContext) {
+      throw new Error("Terrain runtime context was not initialized.");
+    }
 
     this.entityRegistry = worldBootstrap?.entityRegistry ?? null;
 
@@ -189,7 +200,12 @@ export class WorldSceneAssembly {
 
     this.terrainRuntime = new TerrainRuntime(
       scene,
-      createTerrainRuntimeOptions(scene),
+      {
+        ...terrainRuntimeContext.runtimeOptions,
+        onTerrainChanged: () => {
+          this.emitTerrainSeedSnapshot();
+        },
+      },
     );
     const officeRegion = this.officeRuntime.bootstrap(officeBootstrap.layout);
     const collisionGrid = new UnifiedCollisionMap(
@@ -229,6 +245,11 @@ export class WorldSceneAssembly {
   public update(delta: number): void {
     const updateStart = performance.now();
 
+    if (!this.hasEmittedTerrainSeedSnapshot) {
+      this.emitTerrainSeedSnapshot();
+      this.hasEmittedTerrainSeedSnapshot = true;
+    }
+
     const terrainStart = performance.now();
     this.terrainRuntime?.update();
     const terrainMs = performance.now() - terrainStart;
@@ -261,6 +282,22 @@ export class WorldSceneAssembly {
     this.navigation = null;
     this.wasd = null;
     this.shiftKey = null;
+    this.terrainRuntimeContext = null;
+    this.hasEmittedTerrainSeedSnapshot = false;
+  }
+
+  private emitTerrainSeedSnapshot(): void {
+    const terrainRuntimeContext = this.terrainRuntimeContext;
+    if (!terrainRuntimeContext) {
+      return;
+    }
+
+    this.projections.emitTerrainSeedChanged({
+      seed: syncFromRuntimeTerrain(
+        terrainRuntimeContext.seedDocument,
+        terrainRuntimeContext.runtimeOptions.store,
+      ),
+    });
   }
 
   private resolveMovementInput(

@@ -10,6 +10,9 @@ describe("frontendConfig", () => {
       officeLayout: {
         persistenceMode: "development",
       },
+      terrainSeed: {
+        persistenceMode: "development",
+      },
     });
 
     expect(createFrontendConfig({ DEV: false })).toEqual({
@@ -17,6 +20,9 @@ describe("frontendConfig", () => {
         logContentPersistenceEvents: false,
       },
       officeLayout: {
+        persistenceMode: "disabled",
+      },
+      terrainSeed: {
         persistenceMode: "disabled",
       },
     });

@@ -16,6 +16,12 @@ export {
   type OfficeLayoutPersistenceAdapter,
   type OfficeLayoutPersistenceSnapshot,
 } from "./application/use-cases/officeLayoutEditorService";
+export {
+  createTerrainSeedEditorService,
+  type TerrainSeedEditorService,
+  type TerrainSeedPersistenceAdapter,
+  type TerrainSeedPersistenceSnapshot,
+} from "./application/use-cases/terrainSeedEditorService";
 export { createPreviewRuntimeAdapter } from "./application/use-cases/previewRuntimeBridge";
 export {
   selectRuntimeSidebarProjection,
@@ -35,6 +41,10 @@ export {
   formatOfficeLayout,
   syncFromRuntimeLayout,
 } from "./content/document-export";
+export {
+  formatTerrainSeed,
+  syncFromRuntimeTerrain,
+} from "./content/document-export";
 export type {
   OfficeLayoutColorAdjust,
   OfficeSceneBootstrap,
@@ -47,6 +57,9 @@ export type {
   OfficeSceneTile,
   OfficeSceneTileKind,
 } from "./contracts/office-scene";
+export type {
+  TerrainSeedDocument,
+} from "../data";
 export type {
   GameSession,
   GameSessionNotifications,

@@ -19,6 +19,9 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
   let bootstrapSnapshot:
     | Parameters<NonNullable<GameSessionNotifications["onBootstrap"]>>[0]
     | null = null;
+  let terrainSeedSnapshot:
+    | Parameters<NonNullable<GameSessionNotifications["onTerrainSeedChanged"]>>[0]
+    | null = null;
   let destroyed = false;
 
   const forEachSubscriber = (
@@ -71,6 +74,16 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         subscriber.onOfficeLayoutChanged?.(payload.layout),
       ),
   );
+  const unbindTerrainSeedChanged = bindRuntimeToUiEvent(
+    runtime,
+    RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
+    (payload) => {
+      terrainSeedSnapshot = payload.seed;
+      forEachSubscriber((subscriber) =>
+        subscriber.onTerrainSeedChanged?.(payload.seed),
+      );
+    },
+  );
   const unbindOfficeFloorPicked = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED,
@@ -92,6 +105,7 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     unbindRuntimeDiagnostics();
     unbindZoomChanged();
     unbindOfficeLayoutChanged();
+    unbindTerrainSeedChanged();
     unbindOfficeFloorPicked();
     runtime.destroy(true);
   };
@@ -105,6 +119,9 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       subscribers.add(notifications);
       if (bootstrapSnapshot) {
         notifications.onBootstrap?.(bootstrapSnapshot);
+      }
+      if (terrainSeedSnapshot) {
+        notifications.onTerrainSeedChanged?.(terrainSeedSnapshot);
       }
 
       return () => {

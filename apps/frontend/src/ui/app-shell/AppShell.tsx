@@ -9,6 +9,7 @@ import { ZoomControls } from "../toolbar/zoom-controls/ZoomControls";
 function App(): JSX.Element {
   const officeToolState = useOfficeToolState();
   const {
+    layoutSaveState,
     officeEditor,
     runtimeRootRef,
     runtimeRootBindings,
@@ -23,21 +24,18 @@ function App(): JSX.Element {
       {sidebarViewModel ? <SidebarAccordion sidebar={sidebarViewModel} /> : null}
       {officeEditor.isOpen ? (
         <OfficeEditorDrawer
-          canReload={officeEditor.isAvailable && !officeEditor.isLoading && !officeEditor.isSaving}
+          canReload={officeEditor.isAvailable && !officeEditor.isLoading && !layoutSaveState.isSaving}
           canReset={officeEditor.canReset}
-          canSave={officeEditor.canSave}
-          error={officeEditor.error}
+          error={layoutSaveState.error}
           parseError={officeEditor.parseError}
           isLoading={officeEditor.isLoading}
-          isSaving={officeEditor.isSaving}
           jsonText={officeEditor.jsonText}
           onChangeJsonText={officeEditor.onChangeJsonText}
           onReload={() => void officeEditor.reload()}
-          onReset={officeEditor.reset}
-          onSave={() => void officeEditor.save()}
+          onReset={layoutSaveState.reset}
           parsedDocument={officeEditor.parsedDocument}
           sourcePath={officeEditor.sourcePath}
-          statusText={officeEditor.statusText}
+          statusText={layoutSaveState.statusText}
           updatedAt={officeEditor.updatedAt}
         />
       ) : null}
@@ -59,13 +57,13 @@ function App(): JSX.Element {
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
         activeFurnitureId={officeToolState.activeFurnitureId}
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
-        onResetLayout={officeEditor.reset}
-        onSaveLayout={() => void officeEditor.save()}
-        canResetLayout={officeEditor.canReset}
-        canSaveLayout={officeEditor.canSave}
-        isLayoutDirty={officeEditor.isDirty}
-        isSavingLayout={officeEditor.isSaving}
-        layoutStatusText={officeEditor.statusText}
+        onResetLayout={layoutSaveState.reset}
+        onSaveLayout={() => void layoutSaveState.save()}
+        canResetLayout={layoutSaveState.canReset}
+        canSaveLayout={layoutSaveState.canSave}
+        isLayoutDirty={layoutSaveState.isDirty}
+        isSavingLayout={layoutSaveState.isSaving}
+        layoutStatusText={layoutSaveState.statusText}
       />
       <RuntimeHost
         runtimeRootRef={runtimeRootRef}

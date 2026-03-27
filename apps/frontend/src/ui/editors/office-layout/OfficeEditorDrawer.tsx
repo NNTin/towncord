@@ -3,16 +3,13 @@ import type { OfficeLayoutDocument } from "../../../game";
 type Props = {
   canReload: boolean;
   canReset: boolean;
-  canSave: boolean;
   error: string | null;
   parseError: string | null;
   isLoading: boolean;
-  isSaving: boolean;
   jsonText: string;
   onChangeJsonText: (next: string) => void;
   onReload: () => void;
   onReset: () => void;
-  onSave: () => void;
   parsedDocument: OfficeLayoutDocument | null;
   sourcePath: string | null;
   statusText: string;
@@ -56,16 +53,13 @@ function formatTimestamp(value: string | null): string {
 export function OfficeEditorDrawer({
   canReload,
   canReset,
-  canSave,
   error,
   parseError,
   isLoading,
-  isSaving,
   jsonText,
   onChangeJsonText,
   onReload,
   onReset,
-  onSave,
   parsedDocument,
   sourcePath,
   statusText,
@@ -113,9 +107,6 @@ export function OfficeEditorDrawer({
         </button>
         <button type="button" disabled={!canReset} onClick={onReset} style={actionBtnStyle}>
           Reset
-        </button>
-        <button type="button" disabled={!canSave} onClick={onSave} style={actionBtnStyle}>
-          {isSaving ? "Saving..." : "Save"}
         </button>
       </div>
 

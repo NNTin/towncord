@@ -1,35 +1,36 @@
 import fs from "node:fs/promises";
+import path from "node:path";
 import type { Plugin, ViteDevServer } from "vite";
 import { createPublicJsonImportModuleId } from "../../../publicJsonImport";
-import { OFFICE_LAYOUT_DEV_ROUTE } from "../../../src/data/structures/office-layout/officeLayoutContracts";
+import { TERRAIN_SEED_DEV_ROUTE } from "../../../src/data/world-seeds/terrainSeedContracts";
 import {
-  isOfficeLayoutDocument,
-  type OfficeLayoutDocument,
-} from "../../../src/data/structures/office-layout/officeLayoutDocument";
+  isTerrainSeedDocument,
+  type TerrainSeedDocument,
+} from "../../../src/data/world-seeds/terrainSeedDocument";
 
-type OfficeLayoutFileSystemAdapter = {
-  read(): Promise<OfficeLayoutDocument>;
+type TerrainSeedFileSystemAdapter = {
+  read(): Promise<TerrainSeedDocument>;
   readMetadata(): Promise<{
     path: string;
     updatedAt: string;
   }>;
-  write(layout: OfficeLayoutDocument): Promise<void>;
+  write(seed: TerrainSeedDocument): Promise<void>;
 };
 
-type OfficeLayoutDevAdapterOptions = {
-  canonicalLayoutPath: string;
+type TerrainSeedDevAdapterOptions = {
+  canonicalSeedPath: string;
 };
 
-function createOfficeLayoutFileSystemAdapter(
-  options: OfficeLayoutDevAdapterOptions,
-): OfficeLayoutFileSystemAdapter {
-  async function read(): Promise<OfficeLayoutDocument> {
-    const raw = await fs.readFile(options.canonicalLayoutPath, "utf8");
+function createTerrainSeedFileSystemAdapter(
+  options: TerrainSeedDevAdapterOptions,
+): TerrainSeedFileSystemAdapter {
+  async function read(): Promise<TerrainSeedDocument> {
+    const raw = await fs.readFile(options.canonicalSeedPath, "utf8");
     const parsed = JSON.parse(raw) as unknown;
 
-    if (!isOfficeLayoutDocument(parsed)) {
+    if (!isTerrainSeedDocument(parsed)) {
       throw new Error(
-        "Canonical office layout JSON does not match the expected document shape.",
+        "Canonical terrain seed JSON does not match the expected document shape.",
       );
     }
 
@@ -39,20 +40,20 @@ function createOfficeLayoutFileSystemAdapter(
   return {
     read,
     async readMetadata() {
-      const stat = await fs.stat(options.canonicalLayoutPath);
+      const stat = await fs.stat(options.canonicalSeedPath);
       return {
-        path: options.canonicalLayoutPath,
+        path: options.canonicalSeedPath,
         updatedAt: stat.mtime.toISOString(),
       };
     },
-    async write(layout) {
-      if (!isOfficeLayoutDocument(layout)) {
-        throw new Error("Refusing to persist an invalid office layout document.");
+    async write(seed) {
+      if (!isTerrainSeedDocument(seed)) {
+        throw new Error("Refusing to persist an invalid terrain seed document.");
       }
 
       await fs.writeFile(
-        options.canonicalLayoutPath,
-        `${JSON.stringify(layout, null, 2)}\n`,
+        options.canonicalSeedPath,
+        `${JSON.stringify(seed, null, 2)}\n`,
         "utf8",
       );
     },
@@ -69,14 +70,16 @@ async function readBody(req: NodeJS.ReadableStream): Promise<string> {
   return Buffer.concat(chunks).toString("utf8");
 }
 
-export function createOfficeLayoutDevAdapter(
-  options: OfficeLayoutDevAdapterOptions,
+export function createTerrainSeedDevAdapter(
+  options: TerrainSeedDevAdapterOptions,
 ): Plugin {
-  const fileSystemAdapter = createOfficeLayoutFileSystemAdapter(options);
-  const invalidateOfficeLayoutModule = (server: ViteDevServer): void => {
-    const module = server.moduleGraph.getModuleById(
-      createPublicJsonImportModuleId("office/default-layout.json"),
-    );
+  const fileSystemAdapter = createTerrainSeedFileSystemAdapter(options);
+  const terrainSeedModuleId = createPublicJsonImportModuleId(
+    "terrain/seeds/phase1.json",
+  );
+
+  const invalidateTerrainSeedModule = (server: ViteDevServer): void => {
+    const module = server.moduleGraph.getModuleById(terrainSeedModuleId);
 
     if (module) {
       server.moduleGraph.invalidateModule(module);
@@ -84,9 +87,15 @@ export function createOfficeLayoutDevAdapter(
   };
 
   return {
-    name: "towncord-office-layout-dev-api",
+    name: "towncord-terrain-seed-dev-api",
     configureServer(server: ViteDevServer) {
-      server.middlewares.use(OFFICE_LAYOUT_DEV_ROUTE, async (req, res) => {
+      server.watcher.on("change", (filePath) => {
+        if (path.resolve(filePath) === path.resolve(options.canonicalSeedPath)) {
+          invalidateTerrainSeedModule(server);
+        }
+      });
+
+      server.middlewares.use(TERRAIN_SEED_DEV_ROUTE, async (req, res) => {
         const sendJson = (
           statusCode: number,
           payload: Record<string, unknown>,
@@ -98,7 +107,7 @@ export function createOfficeLayoutDevAdapter(
 
         try {
           if (req.method === "GET") {
-            const [layout, metadata] = await Promise.all([
+            const [seed, metadata] = await Promise.all([
               fileSystemAdapter.read(),
               fileSystemAdapter.readMetadata(),
             ]);
@@ -106,7 +115,7 @@ export function createOfficeLayoutDevAdapter(
             sendJson(200, {
               path: metadata.path,
               updatedAt: metadata.updatedAt,
-              layout,
+              document: seed,
             });
             return;
           }
@@ -114,18 +123,18 @@ export function createOfficeLayoutDevAdapter(
           if (req.method === "PUT") {
             const body = await readBody(req);
             const parsed = JSON.parse(body) as unknown;
-            if (!isOfficeLayoutDocument(parsed)) {
-              sendJson(400, { error: "Invalid office layout document." });
+            if (!isTerrainSeedDocument(parsed)) {
+              sendJson(400, { error: "Invalid terrain seed document." });
               return;
             }
 
             await fileSystemAdapter.write(parsed);
-            invalidateOfficeLayoutModule(server);
+            invalidateTerrainSeedModule(server);
             const metadata = await fileSystemAdapter.readMetadata();
             sendJson(200, {
               path: metadata.path,
               updatedAt: metadata.updatedAt,
-              layout: parsed,
+              document: parsed,
             });
             return;
           }
@@ -141,7 +150,7 @@ export function createOfficeLayoutDevAdapter(
           const message =
             error instanceof Error
               ? error.message
-              : "Unknown office layout API error.";
+              : "Unknown terrain seed API error.";
           sendJson(500, { error: message });
         }
       });

@@ -56,7 +56,7 @@ type TerrainRuntimeChunkBuilder = {
 
 type TerrainRuntimeCommands = {
   queueDrop(payload: TerrainRuntimeDropPayload, worldX: number, worldY: number): void;
-  flushPendingDrops(onError: (error: unknown) => void): void;
+  flushPendingDrops(onError: (error: unknown) => void): TerrainCellCoord[];
   clearPendingDrops(): void;
 };
 
@@ -86,6 +86,7 @@ export type TerrainRuntimeOptions = {
   commands: TerrainRuntimeCommands;
   queries: TerrainRuntimeQueries;
   visibleChunks: TerrainRuntimeVisibleChunks;
+  onTerrainChanged?: (changedCells: readonly TerrainCellCoord[]) => void;
   textureKey?: string;
   animationPhaseDurationsById?: Readonly<Record<string, readonly number[]>>;
   fallbackPhaseDurationMs?: number;
@@ -127,7 +128,12 @@ export class TerrainRuntime {
     this.renderer.setVisibleChunkIds(
       this.options.visibleChunks.resolveVisibleChunkIds(this.scene.cameras.main.worldView),
     );
-    this.options.commands.flushPendingDrops((error) => this.handleEditError(error));
+    const changedCells = this.options.commands.flushPendingDrops((error) =>
+      this.handleEditError(error),
+    );
+    if (changedCells.length > 0) {
+      this.options.onTerrainChanged?.(changedCells);
+    }
     this.syncDirtyChunks();
     this.renderer.updateAnimation();
   }

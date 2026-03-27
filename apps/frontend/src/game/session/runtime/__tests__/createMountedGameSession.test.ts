@@ -78,23 +78,44 @@ describe("createMountedGameSession", () => {
     const runtimeHost = createRuntimeHost();
     const session = createMountedGameSession(runtimeHost as never);
     const bootstrap = createBootstrapPayload();
+    const terrainSeed = {
+      seed: {
+        width: 2,
+        height: 1,
+        chunkSize: 32,
+        defaultMaterial: "grass",
+        materials: ["grass"],
+        legend: {
+          ".": "grass",
+        },
+        rows: [".."],
+      },
+    };
     const firstSubscriber = {
       onBootstrap: vi.fn(),
+      onTerrainSeedChanged: vi.fn(),
     };
 
     session.subscribe(firstSubscriber);
     runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, terrainSeed);
 
     const lateSubscriber = {
       onBootstrap: vi.fn(),
+      onTerrainSeedChanged: vi.fn(),
     };
     session.subscribe(lateSubscriber);
     runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, terrainSeed);
 
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledTimes(1);
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
     expect(lateSubscriber.onBootstrap).toHaveBeenCalledTimes(1);
     expect(lateSubscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
+    expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledTimes(2);
+    expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
+    expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledTimes(2);
+    expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
   });
 
   test("supports unsubscribe and dispatches runtime commands through transport", () => {

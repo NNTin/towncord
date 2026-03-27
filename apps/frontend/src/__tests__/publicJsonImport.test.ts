@@ -12,10 +12,6 @@ import {
 const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
 const FRONTEND_ROOT = path.resolve(TEST_DIR, "../..");
 const PUBLIC_ASSETS_ROOT = path.join(FRONTEND_ROOT, "public", "assets");
-const DONARG_OFFICE_ASSETS_ROOT = path.resolve(
-  FRONTEND_ROOT,
-  "../../packages/donarg-office-assets/assets",
-);
 const TEMP_DIRECTORIES: string[] = [];
 
 afterEach(async () => {
@@ -38,8 +34,8 @@ async function createTemporaryPublicAssetsRoot(): Promise<string> {
 }
 
 describe("public json import helpers", () => {
-  test("resolve the canonical and public layout paths to the same virtual module", () => {
-    const relativeAssetPath = "donarg-office/default-layout.json";
+  test("resolve the office layout path to the same virtual module", () => {
+    const relativeAssetPath = "office/default-layout.json";
 
     expect(
       resolvePublicJsonImportRelativeAssetPath(
@@ -47,19 +43,7 @@ describe("public json import helpers", () => {
         {
           publicAssetsRoot: PUBLIC_ASSETS_ROOT,
           fallbackEntries: new Map([
-            [relativeAssetPath, path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json")],
-          ]),
-        },
-      ),
-    ).toBe(relativeAssetPath);
-
-    expect(
-      resolvePublicJsonImportRelativeAssetPath(
-        path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json"),
-        {
-          publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-          fallbackEntries: new Map([
-            [relativeAssetPath, path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json")],
+            [relativeAssetPath, path.join(PUBLIC_ASSETS_ROOT, relativeAssetPath)],
           ]),
         },
       ),
@@ -72,8 +56,8 @@ describe("public json import helpers", () => {
 
   test("falls back to the canonical office layout path when the public copy is absent", async () => {
     const publicAssetsRoot = await createTemporaryPublicAssetsRoot();
-    const relativeAssetPath = "donarg-office/default-layout.json";
-    const fallbackPath = path.join(DONARG_OFFICE_ASSETS_ROOT, "default-layout.json");
+    const relativeAssetPath = "office/default-layout.json";
+    const fallbackPath = path.join(PUBLIC_ASSETS_ROOT, relativeAssetPath);
 
     expect(
       await resolvePublicJsonImportFilePath(relativeAssetPath, {
