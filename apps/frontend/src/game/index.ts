@@ -18,6 +18,7 @@ export {
 } from "./application/use-cases/officeLayoutEditorService";
 export {
   createTerrainSeedEditorService,
+  type TerrainSeedDocument,
   type TerrainSeedEditorService,
   type TerrainSeedPersistenceAdapter,
   type TerrainSeedPersistenceSnapshot,
@@ -40,8 +41,6 @@ export {
 export {
   formatOfficeLayout,
   syncFromRuntimeLayout,
-} from "./content/document-export";
-export {
   formatTerrainSeed,
   syncFromRuntimeTerrain,
 } from "./content/document-export";
@@ -57,9 +56,6 @@ export type {
   OfficeSceneTile,
   OfficeSceneTileKind,
 } from "./contracts/office-scene";
-export type {
-  TerrainSeedDocument,
-} from "../data";
 export type {
   GameSession,
   GameSessionNotifications,
