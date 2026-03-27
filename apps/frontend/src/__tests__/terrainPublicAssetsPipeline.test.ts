@@ -18,18 +18,16 @@ const PUBLIC_ASSET_PIPELINE_PATH = path.join(
   "export_public_assets.py",
 );
 const TERRAIN_SEED_SOURCE_PATH = path.join(
-  WORKSPACE_ROOT,
-  "packages",
-  "public-assets",
+  FRONTEND_ROOT,
+  "public",
   "assets",
   "terrain",
   "seeds",
   "phase1.json",
 );
 const TERRAIN_RULESET_SOURCE_PATH = path.join(
-  WORKSPACE_ROOT,
-  "packages",
-  "public-assets",
+  FRONTEND_ROOT,
+  "public",
   "assets",
   "terrain",
   "rulesets",
