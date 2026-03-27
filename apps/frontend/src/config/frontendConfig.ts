@@ -1,5 +1,6 @@
 export type FrontendConfig = {
   features: {
+    debugUiEnabledByDefault: boolean;
     logContentPersistenceEvents: boolean;
   };
   officeLayout: {
@@ -15,6 +16,7 @@ type FrontendEnv = Pick<ImportMetaEnv, "DEV">;
 export function createFrontendConfig(env: FrontendEnv): FrontendConfig {
   return {
     features: {
+      debugUiEnabledByDefault: env.DEV,
       logContentPersistenceEvents: false,
     },
     officeLayout: {

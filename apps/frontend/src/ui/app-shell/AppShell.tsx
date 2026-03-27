@@ -1,12 +1,21 @@
+import { Suspense, lazy } from "react";
 import { RuntimeHost } from "../game-session/host/RuntimeHost";
 import { useGameSession } from "../game-session/hooks/useGameSession";
 import { OfficeEditorDrawer } from "../editors/office-layout/OfficeEditorDrawer";
-import { SidebarAccordion } from "../sidebar/shell/SidebarAccordion";
 import { useOfficeToolState } from "../state/tool-drafts/useOfficeToolState";
 import { BottomToolbar } from "../toolbar/bottom-toolbar/BottomToolbar";
 import { ZoomControls } from "../toolbar/zoom-controls/ZoomControls";
+import { useDebugUiEnabled } from "./debugMode";
+
+const LazySidebarAccordion = lazy(async () => {
+  const module = await import("../sidebar/shell/SidebarAccordion");
+  return {
+    default: module.SidebarAccordion,
+  };
+});
 
 function App(): JSX.Element {
+  const isDebugUiEnabled = useDebugUiEnabled();
   const officeToolState = useOfficeToolState();
   const {
     layoutSaveState,
@@ -21,7 +30,11 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {sidebarViewModel ? <SidebarAccordion sidebar={sidebarViewModel} /> : null}
+      {isDebugUiEnabled && sidebarViewModel ? (
+        <Suspense fallback={null}>
+          <LazySidebarAccordion sidebar={sidebarViewModel} />
+        </Suspense>
+      ) : null}
       {officeEditor.isOpen ? (
         <OfficeEditorDrawer
           canReload={officeEditor.isAvailable && !officeEditor.isLoading && !layoutSaveState.isSaving}
