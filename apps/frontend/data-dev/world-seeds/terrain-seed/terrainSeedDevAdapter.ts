@@ -19,6 +19,7 @@ type TerrainSeedFileSystemAdapter = {
 
 type TerrainSeedDevAdapterOptions = {
   canonicalSeedPath: string;
+  relativeAssetPath: string;
 };
 
 function createTerrainSeedFileSystemAdapter(
@@ -75,7 +76,7 @@ export function createTerrainSeedDevAdapter(
 ): Plugin {
   const fileSystemAdapter = createTerrainSeedFileSystemAdapter(options);
   const terrainSeedModuleId = createPublicJsonImportModuleId(
-    "terrain/seeds/phase1.json",
+    options.relativeAssetPath,
   );
 
   const invalidateTerrainSeedModule = (server: ViteDevServer): void => {

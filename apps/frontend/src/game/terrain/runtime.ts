@@ -39,9 +39,9 @@ export type TerrainRuntimeContext = {
 export function createTerrainRuntimeContext(
   scene: TerrainRenderSurface,
 ): TerrainRuntimeContext {
-  const bootstrap = loadTerrainBootstrap();
-  validateTerrainBootstrap(scene, bootstrap);
   const terrainContent = terrainContentRepository.read();
+  const bootstrap = loadTerrainBootstrap(terrainContent.seed, terrainContent.ruleset);
+  validateTerrainBootstrap(scene, bootstrap);
   const debugAnimationManifest = readOptionalAnimationManifest(
     scene as unknown as Record<string, unknown>,
     DEBUG_ANIMATIONS_JSON_KEY,
