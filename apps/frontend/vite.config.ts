@@ -102,6 +102,7 @@ export default defineConfig(({ command }) => ({
     command === "serve"
       ? createTerrainSeedDevAdapter({
           canonicalSeedPath: TERRAIN_SEED_PATH,
+          relativeAssetPath: "terrain/seeds/phase1.json",
         })
       : null,
   ].filter(Boolean),

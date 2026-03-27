@@ -75,6 +75,7 @@ function App(): JSX.Element {
         canResetLayout={layoutSaveState.canReset}
         canSaveLayout={layoutSaveState.canSave}
         isLayoutDirty={layoutSaveState.isDirty}
+        isTerrainDirty={layoutSaveState.isTerrainDirty}
         isSavingLayout={layoutSaveState.isSaving}
         layoutStatusText={layoutSaveState.statusText}
       />
