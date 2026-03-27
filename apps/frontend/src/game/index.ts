@@ -16,6 +16,13 @@ export {
   type OfficeLayoutPersistenceAdapter,
   type OfficeLayoutPersistenceSnapshot,
 } from "./application/use-cases/officeLayoutEditorService";
+export {
+  createTerrainSeedEditorService,
+  type TerrainSeedDocument,
+  type TerrainSeedEditorService,
+  type TerrainSeedPersistenceAdapter,
+  type TerrainSeedPersistenceSnapshot,
+} from "./application/use-cases/terrainSeedEditorService";
 export { createPreviewRuntimeAdapter } from "./application/use-cases/previewRuntimeBridge";
 export {
   selectRuntimeSidebarProjection,
@@ -34,6 +41,8 @@ export {
 export {
   formatOfficeLayout,
   syncFromRuntimeLayout,
+  formatTerrainSeed,
+  syncFromRuntimeTerrain,
 } from "./content/document-export";
 export type {
   OfficeLayoutColorAdjust,

@@ -1,14 +1,24 @@
+import { Suspense, lazy } from "react";
 import { RuntimeHost } from "../game-session/host/RuntimeHost";
 import { useGameSession } from "../game-session/hooks/useGameSession";
 import { OfficeEditorDrawer } from "../editors/office-layout/OfficeEditorDrawer";
-import { SidebarAccordion } from "../sidebar/shell/SidebarAccordion";
 import { useOfficeToolState } from "../state/tool-drafts/useOfficeToolState";
 import { BottomToolbar } from "../toolbar/bottom-toolbar/BottomToolbar";
 import { ZoomControls } from "../toolbar/zoom-controls/ZoomControls";
+import { useDebugUiEnabled } from "./debugMode";
+
+const LazySidebarAccordion = lazy(async () => {
+  const module = await import("../sidebar/shell/SidebarAccordion");
+  return {
+    default: module.SidebarAccordion,
+  };
+});
 
 function App(): JSX.Element {
+  const isDebugUiEnabled = useDebugUiEnabled();
   const officeToolState = useOfficeToolState();
   const {
+    layoutSaveState,
     officeEditor,
     runtimeRootRef,
     runtimeRootBindings,
@@ -20,24 +30,25 @@ function App(): JSX.Element {
 
   return (
     <main className="app">
-      {sidebarViewModel ? <SidebarAccordion sidebar={sidebarViewModel} /> : null}
+      {isDebugUiEnabled && sidebarViewModel ? (
+        <Suspense fallback={null}>
+          <LazySidebarAccordion sidebar={sidebarViewModel} />
+        </Suspense>
+      ) : null}
       {officeEditor.isOpen ? (
         <OfficeEditorDrawer
-          canReload={officeEditor.isAvailable && !officeEditor.isLoading && !officeEditor.isSaving}
+          canReload={officeEditor.isAvailable && !officeEditor.isLoading && !layoutSaveState.isSaving}
           canReset={officeEditor.canReset}
-          canSave={officeEditor.canSave}
-          error={officeEditor.error}
+          error={layoutSaveState.error}
           parseError={officeEditor.parseError}
           isLoading={officeEditor.isLoading}
-          isSaving={officeEditor.isSaving}
           jsonText={officeEditor.jsonText}
           onChangeJsonText={officeEditor.onChangeJsonText}
           onReload={() => void officeEditor.reload()}
-          onReset={officeEditor.reset}
-          onSave={() => void officeEditor.save()}
+          onReset={layoutSaveState.reset}
           parsedDocument={officeEditor.parsedDocument}
           sourcePath={officeEditor.sourcePath}
-          statusText={officeEditor.statusText}
+          statusText={layoutSaveState.statusText}
           updatedAt={officeEditor.updatedAt}
         />
       ) : null}
@@ -59,13 +70,14 @@ function App(): JSX.Element {
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
         activeFurnitureId={officeToolState.activeFurnitureId}
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
-        onResetLayout={officeEditor.reset}
-        onSaveLayout={() => void officeEditor.save()}
-        canResetLayout={officeEditor.canReset}
-        canSaveLayout={officeEditor.canSave}
-        isLayoutDirty={officeEditor.isDirty}
-        isSavingLayout={officeEditor.isSaving}
-        layoutStatusText={officeEditor.statusText}
+        onResetLayout={layoutSaveState.reset}
+        onSaveLayout={() => void layoutSaveState.save()}
+        canResetLayout={layoutSaveState.canReset}
+        canSaveLayout={layoutSaveState.canSave}
+        isLayoutDirty={layoutSaveState.isDirty}
+        isTerrainDirty={layoutSaveState.isTerrainDirty}
+        isSavingLayout={layoutSaveState.isSaving}
+        layoutStatusText={layoutSaveState.statusText}
       />
       <RuntimeHost
         runtimeRootRef={runtimeRootRef}

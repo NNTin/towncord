@@ -94,6 +94,7 @@ describe("public game surface boundary", () => {
       "./application/command-handlers/officeEditorToolPayload",
       "./application/command-handlers/placeDragPayload",
       "./application/use-cases/officeLayoutEditorService",
+      "./application/use-cases/terrainSeedEditorService",
       "./application/use-cases/previewRuntimeBridge",
       "./application/projections/runtimeSidebarProjection",
       "./application/transactions/runtimeBridgeState",

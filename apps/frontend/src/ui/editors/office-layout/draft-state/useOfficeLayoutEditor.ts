@@ -117,11 +117,12 @@ export function useOfficeLayoutEditor(
     try {
       applySnapshot(await service.save(parsed.document));
     } catch (nextError) {
-      setError(
+      const message =
         nextError instanceof Error
           ? nextError.message
-          : "Failed to save the canonical office layout.",
-      );
+          : "Failed to save the canonical office layout.";
+      setError(message);
+      throw nextError instanceof Error ? nextError : new Error(message);
     } finally {
       setIsSaving(false);
     }

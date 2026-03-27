@@ -4,6 +4,7 @@ import { defineConfig } from "vite";
 import type { Plugin, ViteDevServer } from "vite";
 import react from "@vitejs/plugin-react";
 import { createOfficeLayoutDevAdapter } from "./data-dev/structures/office-layout/officeLayoutDevAdapter";
+import { createTerrainSeedDevAdapter } from "./data-dev/world-seeds/terrain-seed/terrainSeedDevAdapter";
 import {
   PUBLIC_ASSETS_JSON_PREFIX,
   createPublicJsonImportModuleId,
@@ -14,20 +15,20 @@ import {
 const PUBLIC_ASSETS_ROOT = path.resolve(__dirname, "./public/assets");
 const OFFICE_LAYOUT_PATH = path.resolve(
   __dirname,
-  "../../packages/donarg-office-assets/assets/default-layout.json",
+  "./public/assets/office/default-layout.json",
+);
+const TERRAIN_SEED_PATH = path.resolve(
+  __dirname,
+  "./public/assets/terrain/seeds/phase1.json",
 );
 const DONARG_OFFICE_ASSETS_ROOT = path.resolve(
   __dirname,
   "../../packages/donarg-office-assets/assets",
 );
-const PUBLIC_OFFICE_LAYOUT_PATH = path.resolve(
-  __dirname,
-  "./public/assets/donarg-office/default-layout.json",
-);
 
 const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   ["donarg-office/atlas.json", path.resolve(DONARG_OFFICE_ASSETS_ROOT, "atlas.json")],
-  ["donarg-office/default-layout.json", OFFICE_LAYOUT_PATH],
+  ["office/default-layout.json", OFFICE_LAYOUT_PATH],
   [
     "donarg-office/furniture-catalog.json",
     path.resolve(DONARG_OFFICE_ASSETS_ROOT, "furniture/furniture-catalog.json"),
@@ -96,7 +97,12 @@ export default defineConfig(({ command }) => ({
     command === "serve"
       ? createOfficeLayoutDevAdapter({
           canonicalLayoutPath: OFFICE_LAYOUT_PATH,
-          publicLayoutPath: PUBLIC_OFFICE_LAYOUT_PATH,
+        })
+      : null,
+    command === "serve"
+      ? createTerrainSeedDevAdapter({
+          canonicalSeedPath: TERRAIN_SEED_PATH,
+          relativeAssetPath: "terrain/seeds/phase1.json",
         })
       : null,
   ].filter(Boolean),

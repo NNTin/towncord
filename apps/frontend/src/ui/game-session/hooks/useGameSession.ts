@@ -5,6 +5,7 @@ import type {
 } from "../../../game/contracts/office-editor";
 import type { OfficeColorAdjust, OfficeTileColor } from "../../../game/contracts/content";
 import { useOfficeLayoutEditor } from "../../editors/office-layout/draft-state/useOfficeLayoutEditor";
+import { useLayoutSaveState } from "./useLayoutSaveState";
 import { useRuntimeUiBridge } from "./useRuntimeUiBridge";
 
 type OfficeToolStateBridge = {
@@ -35,8 +36,13 @@ export function useGameSession({ officeToolState }: UseGameSessionOptions) {
     onOfficeLayoutChanged: officeEditor.syncFromRuntime,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
   });
+  const layoutSaveState = useLayoutSaveState({
+    officeEditor,
+    terrainSeedSnapshot: runtimeBridge.terrainSeedSnapshot,
+  });
 
   return {
+    layoutSaveState,
     officeEditor,
     ...runtimeBridge,
   };

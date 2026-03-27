@@ -21,6 +21,19 @@ describe("WorldSceneProjectionEmitter", () => {
       minZoom: 1,
       maxZoom: 16,
     });
+    projections.emitTerrainSeedChanged({
+      seed: {
+        width: 2,
+        height: 1,
+        chunkSize: 32,
+        defaultMaterial: "grass",
+        materials: ["grass"],
+        legend: {
+          ".": "grass",
+        },
+        rows: [".."],
+      },
+    });
 
     expect(emit).toHaveBeenNthCalledWith(
       1,
@@ -31,6 +44,19 @@ describe("WorldSceneProjectionEmitter", () => {
       zoom: 3,
       minZoom: 1,
       maxZoom: 16,
+    });
+    expect(emit).toHaveBeenCalledWith(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, {
+      seed: {
+        width: 2,
+        height: 1,
+        chunkSize: 32,
+        defaultMaterial: "grass",
+        materials: ["grass"],
+        legend: {
+          ".": "grass",
+        },
+        rows: [".."],
+      },
     });
   });
 });

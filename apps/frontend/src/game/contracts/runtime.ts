@@ -1,6 +1,7 @@
 import type { EntityId } from "../world/entities/model";
 import type { TerrainBrushId, TerrainMaterialId } from "../terrain/contracts";
 import type { AnimationCatalog } from "./content";
+import type { TerrainSeedDocument } from "../../data";
 
 export type TerrainToolSelection = {
   materialId: TerrainMaterialId;
@@ -86,6 +87,10 @@ export type TerrainTileInspectedPayload = {
   rotate90: 0 | 1 | 2 | 3;
   flipX: boolean;
   flipY: boolean;
+};
+
+export type TerrainSeedChangedPayload = {
+  seed: TerrainSeedDocument;
 };
 
 export type RuntimePerfPayload = {

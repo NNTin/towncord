@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { MutableRefObject } from "react";
 import type { OfficeFloorPickedPayload } from "../../../game/contracts/office-editor";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
+import type { TerrainSeedDocument } from "../../../game";
 import type {
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
@@ -37,6 +38,7 @@ type RuntimeGatewayLifecycleOptions = {
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onZoomChanged: (payload: RuntimeZoomState) => void;
   onOfficeLayoutChanged?: ((layout: OfficeSceneLayout) => void) | undefined;
+  onTerrainSeedChanged?: ((seed: TerrainSeedDocument) => void) | undefined;
   onOfficeFloorPicked?:
     | ((payload: OfficeFloorPickedPayload) => void)
     | undefined;
@@ -55,6 +57,7 @@ export function useRuntimeGatewayLifecycle({
   onRuntimeDiagnostics,
   onZoomChanged,
   onOfficeLayoutChanged,
+  onTerrainSeedChanged,
   onOfficeFloorPicked,
 }: RuntimeGatewayLifecycleOptions): {
   runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
@@ -67,6 +70,7 @@ export function useRuntimeGatewayLifecycle({
   const onRuntimeDiagnosticsRef = useLatestRef(onRuntimeDiagnostics);
   const onZoomChangedRef = useLatestRef(onZoomChanged);
   const onOfficeLayoutChangedRef = useLatestRef(onOfficeLayoutChanged);
+  const onTerrainSeedChangedRef = useLatestRef(onTerrainSeedChanged);
   const onOfficeFloorPickedRef = useLatestRef(onOfficeFloorPicked);
 
   useEffect(() => {
@@ -92,6 +96,9 @@ export function useRuntimeGatewayLifecycle({
       },
       onOfficeLayoutChanged(layout) {
         onOfficeLayoutChangedRef.current?.(layout);
+      },
+      onTerrainSeedChanged(seed) {
+        onTerrainSeedChangedRef.current?.(seed);
       },
       onOfficeFloorPicked(payload) {
         onOfficeFloorPickedRef.current?.(payload);

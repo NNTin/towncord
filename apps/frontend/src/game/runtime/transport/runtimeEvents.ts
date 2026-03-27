@@ -13,6 +13,7 @@ import type {
   PlaceableViewModel,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
 } from "../../contracts/runtime";
@@ -22,6 +23,7 @@ import type {
   OfficeSceneLayout,
   OfficeSceneTile,
 } from "../../contracts/office-scene";
+import { isTerrainSeedDocument } from "../../../data";
 import { isRecord } from "../../utils/typeGuards";
 import type { RuntimeEventHost } from "./host";
 
@@ -35,6 +37,7 @@ export type {
   PlayerStateChangedPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
 } from "../../contracts/runtime";
@@ -48,6 +51,7 @@ export const RUNTIME_TO_UI_EVENTS = {
   ZOOM_CHANGED: "zoomChanged",
   OFFICE_FLOOR_PICKED: "officeFloorPicked",
   OFFICE_LAYOUT_CHANGED: "officeLayoutChanged",
+  TERRAIN_SEED_CHANGED: "terrainSeedChanged",
 } as const;
 
 export const RUNTIME_READY_EVENT = RUNTIME_TO_UI_EVENTS.RUNTIME_READY;
@@ -62,6 +66,8 @@ export const OFFICE_FLOOR_PICKED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED;
 export const OFFICE_LAYOUT_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED;
+export const TERRAIN_SEED_CHANGED_EVENT =
+  RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED;
 
 export type RuntimeToUiEventName =
   (typeof RUNTIME_TO_UI_EVENTS)[keyof typeof RUNTIME_TO_UI_EVENTS];
@@ -75,6 +81,7 @@ export type RuntimeToUiEventPayloadByName = {
   [RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED]: ZoomChangedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED]: OfficeFloorPickedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]: OfficeLayoutChangedPayload;
+  [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]: TerrainSeedChangedPayload;
 };
 
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
@@ -470,6 +477,18 @@ export function normalizeOfficeLayoutChangedPayload(
   };
 }
 
+export function normalizeTerrainSeedChangedPayload(
+  value: unknown,
+): TerrainSeedChangedPayload | undefined {
+  if (!isRecord(value) || !isTerrainSeedDocument(value.seed)) {
+    return undefined;
+  }
+
+  return {
+    seed: structuredClone(value.seed),
+  };
+}
+
 export function normalizeRuntimeBootstrapPayload(
   value: unknown,
 ): RuntimeBootstrapPayload | undefined {
@@ -500,6 +519,8 @@ const runtimeToUiEventNormalizers = {
   [RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED]: normalizeOfficeFloorPickedPayload,
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]:
     normalizeOfficeLayoutChangedPayload,
+  [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]:
+    normalizeTerrainSeedChangedPayload,
 } satisfies {
   [K in RuntimeToUiEventName]: PayloadNormalizer<
     RuntimeToUiEventPayloadByName[K]

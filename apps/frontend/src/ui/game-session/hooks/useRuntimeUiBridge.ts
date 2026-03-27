@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { MutableRefObject } from "react";
 import type { OfficeFloorPickedPayload } from "../../../game/contracts/office-editor";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import { buildOfficeEditorToolPayload } from "../../../game";
-import type { OfficeEditorBridgeState } from "../../../game";
+import type { OfficeEditorBridgeState, TerrainSeedDocument } from "../../../game";
 import type {
   RuntimeRootBindings,
   SidebarViewModel,
@@ -21,20 +21,28 @@ type RuntimeUiBridge = {
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
   zoomViewModel: ZoomControlsViewModel | null;
+  terrainSeedSnapshot: TerrainSeedDocument | null;
 };
 
 export function useRuntimeUiBridge(options: {
   officeToolState: OfficeEditorBridgeState;
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
+  onTerrainSeedChanged?: (seed: TerrainSeedDocument) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
 }): RuntimeUiBridge {
   const runtimeSync = useRuntimeSyncAdapter();
+  const [terrainSeedSnapshot, setTerrainSeedSnapshot] =
+    useState<TerrainSeedDocument | null>(null);
   const { runtimeRootRef, sessionRef } = useRuntimeGatewayLifecycle({
     onBootstrap: runtimeSync.onBootstrap,
     onTerrainTileInspected: runtimeSync.onTerrainTileInspected,
     onRuntimeDiagnostics: runtimeSync.onRuntimeDiagnostics,
     onZoomChanged: runtimeSync.onZoomChanged,
     onOfficeLayoutChanged: options.onOfficeLayoutChanged,
+    onTerrainSeedChanged(seed) {
+      setTerrainSeedSnapshot(seed);
+      options.onTerrainSeedChanged?.(seed);
+    },
     onOfficeFloorPicked: options.onOfficeFloorPicked,
   });
   const { runtimeRootBindings, zoomViewModel } = useRuntimeInteractionAdapter({
@@ -92,5 +100,6 @@ export function useRuntimeUiBridge(options: {
     runtimeRootBindings,
     sidebarViewModel,
     zoomViewModel,
+    terrainSeedSnapshot,
   };
 }

@@ -1,6 +1,6 @@
 import type { ContentRepository } from "../../contracts/contentInterfaces";
 import type { OfficeSceneTile } from "../../officeLayoutContract";
-import defaultLayoutDataJson from "public-assets-json:donarg-office/default-layout.json";
+import defaultLayoutDataJson from "public-assets-json:office/default-layout.json";
 import { donargFurnitureCatalogData } from "./donargOfficeFurnitureCatalog";
 
 export type DonargLayoutColor = {

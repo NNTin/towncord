@@ -10,7 +10,12 @@ vi.mock("../useRuntimeUiBridge", () => ({
   useRuntimeUiBridge: vi.fn(),
 }));
 
+vi.mock("../useLayoutSaveState", () => ({
+  useLayoutSaveState: vi.fn(),
+}));
+
 import { useOfficeLayoutEditor } from "../../../editors/office-layout/draft-state/useOfficeLayoutEditor";
+import { useLayoutSaveState } from "../useLayoutSaveState";
 import { useRuntimeUiBridge } from "../useRuntimeUiBridge";
 import { useGameSession } from "../useGameSession";
 
@@ -29,6 +34,17 @@ describe("useGameSession", () => {
       syncFromRuntime: vi.fn(),
       isOpen: false,
       toggleOpen: vi.fn(),
+    };
+    const layoutSaveState = {
+      canSave: true,
+      canReset: true,
+      error: null,
+      isAvailable: true,
+      isDirty: false,
+      isSaving: false,
+      reset: vi.fn(),
+      save: vi.fn(),
+      statusText: "Synced",
     };
     const runtimeBridge = {
       runtimeRootRef: { current: null },
@@ -68,10 +84,20 @@ describe("useGameSession", () => {
         onZoomIn: vi.fn(),
         onZoomOut: vi.fn(),
       },
+      terrainSeedSnapshot: {
+        width: 2,
+        height: 2,
+        chunkSize: 8,
+        defaultMaterial: "soil",
+        materials: ["soil"],
+        legend: { ".": "soil" },
+        rows: ["..", ".."],
+      },
     };
 
     vi.mocked(useOfficeLayoutEditor).mockReturnValue(officeEditor as never);
     vi.mocked(useRuntimeUiBridge).mockReturnValue(runtimeBridge as never);
+    vi.mocked(useLayoutSaveState).mockReturnValue(layoutSaveState as never);
 
     let result: ReturnType<typeof useGameSession> | null = null;
 
@@ -94,7 +120,12 @@ describe("useGameSession", () => {
       onOfficeLayoutChanged: officeEditor.syncFromRuntime,
       onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
     });
+    expect(useLayoutSaveState).toHaveBeenCalledWith({
+      officeEditor,
+      terrainSeedSnapshot: runtimeBridge.terrainSeedSnapshot,
+    });
     expect(result).toEqual({
+      layoutSaveState,
       officeEditor,
       ...runtimeBridge,
     });

@@ -71,6 +71,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeUpdate: vi.fn(),
   placementHandlePlaceEntityDrop: vi.fn(),
   projectionEmit: vi.fn(),
+  projectionEmitTerrainSeedChanged: vi.fn(),
   selectionCreateSelectionBadge: vi.fn(),
   selectionDispose: vi.fn(),
   selectionHandleSelectionAndInspect: vi.fn(),
@@ -140,35 +141,56 @@ vi.mock("../../../application/runtime-compilation/structure-surfaces/officeScene
 }));
 
 vi.mock("../../../terrain/runtime", () => ({
-  createTerrainRuntimeOptions: vi.fn(() => ({
-    gridSpec: {
+  createTerrainRuntimeContext: vi.fn(() => ({
+    seedDocument: {
       width: 1,
       height: 1,
       chunkSize: 1,
       defaultMaterial: "ground",
       materials: ["ground"],
-      cells: ["ground"],
+      legend: {
+        ".": "ground",
+      },
+      rows: ["."],
     },
-    store: {
-      hasDirtyChunks: vi.fn(() => false),
-      consumeDirtyChunks: vi.fn(() => []),
+    runtimeOptions: {
+      gridSpec: {
+        width: 1,
+        height: 1,
+        chunkSize: 1,
+        defaultMaterial: "ground",
+        materials: ["ground"],
+        cells: ["ground"],
+      },
+      store: {
+        hasDirtyChunks: vi.fn(() => false),
+        consumeDirtyChunks: vi.fn(() => []),
+        getCellMaterial: vi.fn(() => "ground"),
+      },
+      chunkBuilder: {
+        buildChunkPayload: vi.fn(),
+      },
+      commands: {
+        queueDrop: vi.fn(),
+        flushPendingDrops: vi.fn(() => []),
+        clearPendingDrops: vi.fn(),
+      },
+      queries: {
+        getGameplayGrid: vi.fn(() => assemblyMocks.terrainGrid),
+        previewPaintAtWorld: vi.fn(() => []),
+        inspectAtWorld: vi.fn(() => null),
+      },
+      visibleChunks: {
+        resolveVisibleChunkIds: vi.fn(() => []),
+      },
     },
-    chunkBuilder: {
-      buildChunkPayload: vi.fn(),
-    },
-    commands: {
-      queueDrop: vi.fn(),
-      flushPendingDrops: vi.fn(),
-      clearPendingDrops: vi.fn(),
-    },
-    queries: {
-      getGameplayGrid: vi.fn(() => assemblyMocks.terrainGrid),
-      previewPaintAtWorld: vi.fn(() => []),
-      inspectAtWorld: vi.fn(() => null),
-    },
-    visibleChunks: {
-      resolveVisibleChunkIds: vi.fn(() => []),
-    },
+  })),
+}));
+
+vi.mock("../../../content/document-export", () => ({
+  syncFromRuntimeTerrain: vi.fn((seed) => ({
+    ...seed,
+    rows: ["."],
   })),
 }));
 
@@ -231,6 +253,8 @@ vi.mock("../entitySystem", () => ({
 vi.mock("../worldSceneProjections", () => ({
   WorldSceneProjectionEmitter: class {
     public emitPlayerStateChanged = assemblyMocks.projectionEmit;
+    public emitTerrainSeedChanged =
+      assemblyMocks.projectionEmitTerrainSeedChanged;
   },
 }));
 

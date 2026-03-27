@@ -7,6 +7,7 @@ import type {
   PlaceDragPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
   SelectedTerrainToolPayload,
@@ -31,6 +32,12 @@ export type RuntimeTerrainProjectionPort = {
   onTerrainTileInspected?: (payload: RuntimeTerrainInspection) => void;
 };
 
+export type RuntimeTerrainDocumentProjectionPort = {
+  onTerrainSeedChanged?: (
+    payload: TerrainSeedChangedPayload["seed"],
+  ) => void;
+};
+
 export type RuntimeDiagnosticsProjectionPort = {
   onRuntimeDiagnostics?: (payload: RuntimeDiagnostics) => void;
 };
@@ -46,6 +53,7 @@ export type RuntimeOfficeProjectionPort = {
 
 export type GameSessionNotifications = RuntimeLifecycleProjectionPort &
   RuntimeTerrainProjectionPort &
+  RuntimeTerrainDocumentProjectionPort &
   RuntimeDiagnosticsProjectionPort &
   RuntimeCameraProjectionPort &
   RuntimeOfficeProjectionPort;

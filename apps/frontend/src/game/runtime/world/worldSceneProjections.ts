@@ -6,6 +6,7 @@ import type {
   PlayerPlacedPayload,
   PlayerStateChangedPayload,
   RuntimePerfPayload,
+  TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
 } from "../../contracts/runtime";
@@ -58,6 +59,10 @@ export class WorldSceneProjectionEmitter {
 
   public emitOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, payload);
+  }
+
+  public emitTerrainSeedChanged(payload: TerrainSeedChangedPayload): void {
+    this.emitProjection(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, payload);
   }
 
   private emitProjection<K extends RuntimeToUiEventName>(

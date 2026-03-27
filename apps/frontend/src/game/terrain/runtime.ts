@@ -26,11 +26,21 @@ import {
   TerrainRuntime,
   type TerrainRuntimeOptions,
 } from "../../engine/terrain";
+import type { TerrainSeedDocument } from "../../data";
+import { terrainContentRepository } from "../content/asset-catalog/terrainContentRepository";
 
-export function createTerrainRuntimeOptions(
+export type TerrainRuntimeContext = {
+  seedDocument: TerrainSeedDocument;
+  runtimeOptions: Omit<TerrainRuntimeOptions, "store"> & {
+    store: TerrainMapStore;
+  };
+};
+
+export function createTerrainRuntimeContext(
   scene: TerrainRenderSurface,
-): TerrainRuntimeOptions {
-  const bootstrap = loadTerrainBootstrap();
+): TerrainRuntimeContext {
+  const terrainContent = terrainContentRepository.read();
+  const bootstrap = loadTerrainBootstrap(terrainContent.seed, terrainContent.ruleset);
   validateTerrainBootstrap(scene, bootstrap);
   const debugAnimationManifest = readOptionalAnimationManifest(
     scene as unknown as Record<string, unknown>,
@@ -66,15 +76,24 @@ export function createTerrainRuntimeOptions(
   );
 
   return {
-    gridSpec: bootstrap.gridSpec,
-    store,
-    chunkBuilder,
-    commands,
-    queries,
-    visibleChunks,
-    textureKey: TERRAIN_TEXTURE_KEY,
-    animationPhaseDurationsById: phaseDurationsByAnimationId,
+    seedDocument: terrainContent.seed,
+    runtimeOptions: {
+      gridSpec: bootstrap.gridSpec,
+      store,
+      chunkBuilder,
+      commands,
+      queries,
+      visibleChunks,
+      textureKey: TERRAIN_TEXTURE_KEY,
+      animationPhaseDurationsById: phaseDurationsByAnimationId,
+    },
   };
+}
+
+export function createTerrainRuntimeOptions(
+  scene: TerrainRenderSurface,
+): TerrainRuntimeOptions {
+  return createTerrainRuntimeContext(scene).runtimeOptions;
 }
 
 export function createTerrainRuntime(

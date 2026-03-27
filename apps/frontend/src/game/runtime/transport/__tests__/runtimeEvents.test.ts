@@ -5,6 +5,7 @@ import {
   RUNTIME_TO_UI_EVENTS,
   type OfficeLayoutChangedPayload,
   type RuntimeBootstrapPayload,
+  type TerrainSeedChangedPayload,
 } from "../runtimeEvents";
 
 type Listener = (payload: unknown) => void;
@@ -127,6 +128,23 @@ function createBootstrapPayload(): RuntimeBootstrapPayload {
   };
 }
 
+function createTerrainSeedPayload(): TerrainSeedChangedPayload {
+  return {
+    seed: {
+      width: 2,
+      height: 1,
+      chunkSize: 32,
+      defaultMaterial: "grass",
+      materials: ["grass", "water"],
+      legend: {
+        ".": "grass",
+        "~": "water",
+      },
+      rows: [".~"],
+    },
+  };
+}
+
 describe("runtimeEvents transport", () => {
   test("bindRuntimeToUiEvent normalizes zoom payloads before delivery", () => {
     const { host } = createHost();
@@ -178,5 +196,21 @@ describe("runtimeEvents transport", () => {
     expect(received?.catalog).not.toBe(payload.catalog);
     expect(received?.catalog.tracksByPath).not.toBe(payload.catalog.tracksByPath);
     expect(received?.placeables).not.toBe(payload.placeables);
+  });
+
+  test("emits terrain seed snapshots as cloned documents", () => {
+    const { host } = createHost();
+    const handler = vi.fn();
+    const payload = createTerrainSeedPayload();
+
+    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, handler);
+    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, payload);
+
+    const received = handler.mock.calls[0]?.[0];
+    expect(received).toEqual(payload);
+    expect(received?.seed).not.toBe(payload.seed);
+
+    payload.seed.rows[0] = "~~";
+    expect(received?.seed.rows[0]).toBe(".~");
   });
 });

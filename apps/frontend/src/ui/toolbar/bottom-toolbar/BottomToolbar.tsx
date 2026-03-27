@@ -51,6 +51,7 @@ type PersistenceProps = {
   canResetLayout?: boolean;
   canSaveLayout?: boolean;
   isLayoutDirty?: boolean;
+  isTerrainDirty?: boolean;
   isSavingLayout?: boolean;
   layoutStatusText?: string | null;
 };
@@ -511,6 +512,7 @@ export function BottomToolbar({
   canResetLayout = false,
   canSaveLayout = false,
   isLayoutDirty = false,
+  isTerrainDirty = false,
   isSavingLayout = false,
   layoutStatusText = null,
 }: BottomToolbarProps): JSX.Element {
@@ -591,7 +593,7 @@ export function BottomToolbar({
               onMouseEnter={() => setHovered("save")}
               onMouseLeave={() => setHovered(null)}
               style={resolveButtonStyle("save", { disabled: !canSaveLayout })}
-              title="Save office layout JSON"
+              title="Save combined layout data"
             >
               {isSavingLayout ? "Saving..." : "Save"}
             </button>
@@ -602,7 +604,11 @@ export function BottomToolbar({
               onMouseEnter={() => setHovered("reset")}
               onMouseLeave={() => setHovered(null)}
               style={resolveButtonStyle("reset", { disabled: !canResetLayout })}
-              title="Reset unsaved office layout changes"
+              title={
+                isTerrainDirty
+                  ? "Reset office layout changes; terrain edits can only be committed via Save"
+                  : "Reset unsaved office layout changes"
+              }
             >
               Reset
             </button>
