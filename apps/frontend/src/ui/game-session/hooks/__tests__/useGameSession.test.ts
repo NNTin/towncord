@@ -28,6 +28,7 @@ describe("useGameSession", () => {
       activeFloorColor: { h: 214, s: 30, b: -100, c: -55 },
       activeFloorPattern: "environment.floors.pattern-03",
       activeFurnitureId: "desk-01",
+      onSelectTool: vi.fn(),
       onOfficeFloorPicked: vi.fn(),
     };
     const officeEditor = {
@@ -77,6 +78,11 @@ describe("useGameSession", () => {
         },
         runtimeDiagnostics: null,
       },
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+      },
+      onSelectTerrainTool: vi.fn(),
       zoomViewModel: {
         zoom: 1,
         minZoom: 0.5,
@@ -119,6 +125,7 @@ describe("useGameSession", () => {
       },
       onOfficeLayoutChanged: officeEditor.syncFromRuntime,
       onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
+      onClearOfficeTool: expect.any(Function),
     });
     expect(useLayoutSaveState).toHaveBeenCalledWith({
       officeEditor,

@@ -15,6 +15,7 @@ type OfficeToolStateBridge = {
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
   activeFurnitureId: string | null;
+  onSelectTool: (tool: OfficeEditorToolId | null) => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
 };
 
@@ -35,6 +36,9 @@ export function useGameSession({ officeToolState }: UseGameSessionOptions) {
     },
     onOfficeLayoutChanged: officeEditor.syncFromRuntime,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,
+    onClearOfficeTool() {
+      officeToolState.onSelectTool(null);
+    },
   });
   const layoutSaveState = useLayoutSaveState({
     officeEditor,

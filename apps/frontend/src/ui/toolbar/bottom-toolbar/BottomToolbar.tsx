@@ -1,25 +1,33 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ATLAS_H,
   ATLAS_IMAGE_URL,
   ATLAS_W,
   DEFAULT_FLOOR_COLOR_ADJUST,
+  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ENVIRONMENT_ATLAS_FRAMES,
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_IMAGE_URL,
   ENVIRONMENT_ATLAS_W,
+  DEBUG_TERRAIN_ATLAS_H,
+  DEBUG_TERRAIN_ATLAS_IMAGE_URL,
+  DEBUG_TERRAIN_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
   resolveOfficeFloorAppearance,
+  TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   tintToHexCss,
   type FurniturePaletteItem,
   type OfficeColorAdjust,
   type OfficeTileColor,
+  type TerrainToolbarPreviewFrame,
+  type TerrainToolbarPreviewItem,
 } from "../../../game/contracts/content";
 import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
+import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -43,6 +51,8 @@ type ToolSelectionProps = {
   onSelectFloorPattern?: (id: string) => void;
   activeFurnitureId?: string | null;
   onSelectFurnitureId?: (id: string) => void;
+  activeTerrainTool?: TerrainToolSelection;
+  onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
 };
 
 type PersistenceProps = {
@@ -177,6 +187,17 @@ function EnvironmentAtlasSprite({ frame }: { frame: AtlasFrame }): JSX.Element {
   );
 }
 
+function TerrainAtlasSprite({ frame }: { frame: TerrainToolbarPreviewFrame }): JSX.Element {
+  return (
+    <AtlasSprite
+      atlasUrl={DEBUG_TERRAIN_ATLAS_IMAGE_URL}
+      atlasW={DEBUG_TERRAIN_ATLAS_W}
+      atlasH={DEBUG_TERRAIN_ATLAS_H}
+      frame={frame.atlasFrame}
+    />
+  );
+}
+
 function TintedAtlasSprite({
   frame,
   tint,
@@ -207,6 +228,21 @@ function TintedAtlasSprite({
       />
     </div>
   );
+}
+
+function TerrainPreviewSprite({
+  item,
+  tick,
+}: {
+  item: TerrainToolbarPreviewItem;
+  tick: number;
+}): JSX.Element {
+  const phaseIndex =
+    item.animationFrames.length > 1
+      ? tick % item.animationFrames.length
+      : 0;
+  const frame = item.animationFrames[phaseIndex] ?? item.representativeFrame;
+  return <TerrainAtlasSprite frame={frame} />;
 }
 
 // ─── Sub-panels ───────────────────────────────────────────────────────────────
@@ -412,6 +448,72 @@ function WallSubPanel(): JSX.Element {
   );
 }
 
+function TerrainSubPanel({
+  activeTerrainTool,
+  onSelectTerrainTool,
+}: {
+  activeTerrainTool: TerrainToolSelection;
+  onSelectTerrainTool: ((tool: TerrainToolSelection) => void) | undefined;
+}): JSX.Element {
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const hasAnimated = TERRAIN_TOOLBAR_PREVIEW_ITEMS.some(
+      (item) => item.animationFrames.length > 1,
+    );
+    if (!hasAnimated) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setTick((t) => t + 1);
+    }, DEFAULT_TERRAIN_ANIMATION_FRAME_MS);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <div style={subPanel}>
+      <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
+        Terrain
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {TERRAIN_TOOLBAR_PREVIEW_ITEMS.map((item) => {
+          const isSelected =
+            activeTerrainTool?.brushId === item.brushId &&
+            activeTerrainTool?.materialId === item.materialId;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              title={item.label}
+              onClick={() => {
+                if (isSelected) {
+                  onSelectTerrainTool?.(null);
+                  return;
+                }
+
+                onSelectTerrainTool?.({
+                  materialId: item.materialId,
+                  brushId: item.brushId,
+                });
+              }}
+              style={{
+                background: isSelected ? "var(--pixel-active-bg)" : "var(--pixel-btn-bg)",
+                border: isSelected ? "2px solid var(--pixel-accent)" : "2px solid transparent",
+                cursor: "pointer",
+                padding: 2,
+              }}
+            >
+              <TerrainPreviewSprite item={item} tick={tick} />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function FurnitureSubPanel({
   activeFurnitureId,
   onSelectFurnitureId,
@@ -483,12 +585,10 @@ function FurnitureSubPanel({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-const LAYOUT_TOOLS: { key: OfficeLayoutTool; label: string }[] = [
-  { key: "floor", label: "Floor" },
-  { key: "wall", label: "Wall" },
-  { key: "erase", label: "Erase" },
-  { key: "furniture", label: "Furniture" },
-];
+const DEFAULT_TERRAIN_PREVIEW =
+  TERRAIN_TOOLBAR_PREVIEW_ITEMS.find((item) => item.brushId === "ground") ??
+  TERRAIN_TOOLBAR_PREVIEW_ITEMS[0] ??
+  null;
 
 export function BottomToolbar({
   isLayoutMode,
@@ -507,6 +607,8 @@ export function BottomToolbar({
   onSelectFloorPattern,
   activeFurnitureId,
   onSelectFurnitureId,
+  activeTerrainTool = null,
+  onSelectTerrainTool,
   onResetLayout,
   onSaveLayout,
   canResetLayout = false,
@@ -533,7 +635,32 @@ export function BottomToolbar({
   }
 
   function handleToolClick(tool: OfficeLayoutTool): void {
+    onSelectTerrainTool?.(null);
     onSelectTool?.(activeTool === tool ? null : tool);
+  }
+
+  function handleTerrainButtonClick(): void {
+    if (activeTerrainTool) {
+      onSelectTerrainTool?.(null);
+      return;
+    }
+
+    if (!DEFAULT_TERRAIN_PREVIEW) {
+      return;
+    }
+
+    onSelectTerrainTool?.({
+      materialId: DEFAULT_TERRAIN_PREVIEW.materialId,
+      brushId: DEFAULT_TERRAIN_PREVIEW.brushId,
+    });
+  }
+
+  function handleToggleLayoutMode(): void {
+    if (isLayoutMode) {
+      onSelectTerrainTool?.(null);
+    }
+
+    onToggleLayoutMode();
   }
 
   return (
@@ -551,6 +678,12 @@ export function BottomToolbar({
           onSelectFloorMode={onSelectFloorMode}
         />
       )}
+      {isLayoutMode && activeTerrainTool && (
+        <TerrainSubPanel
+          activeTerrainTool={activeTerrainTool}
+          onSelectTerrainTool={onSelectTerrainTool}
+        />
+      )}
       {isLayoutMode && activeTool === "wall" && <WallSubPanel />}
       {isLayoutMode && activeTool === "furniture" && (
         <FurnitureSubPanel activeFurnitureId={activeFurnitureId} onSelectFurnitureId={onSelectFurnitureId} />
@@ -559,7 +692,8 @@ export function BottomToolbar({
       {/* Button row */}
       <div style={panelRow}>
         <button
-          onClick={onToggleLayoutMode}
+          type="button"
+          onClick={handleToggleLayoutMode}
           onMouseEnter={() => setHovered("layout")}
           onMouseLeave={() => setHovered(null)}
           style={resolveButtonStyle("layout", { active: isLayoutMode })}
@@ -570,19 +704,56 @@ export function BottomToolbar({
 
         {isLayoutMode && (
           <>
-            {LAYOUT_TOOLS.map(({ key, label }) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => handleToolClick(key)}
-                onMouseEnter={() => setHovered(key)}
-                onMouseLeave={() => setHovered(null)}
-                style={resolveButtonStyle(key, { active: activeTool === key })}
-                title={`${label} tool`}
-              >
-                {label}
-              </button>
-            ))}
+            <button
+              type="button"
+              onClick={() => handleToolClick("floor")}
+              onMouseEnter={() => setHovered("floor")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("floor", { active: activeTool === "floor" })}
+              title="Floor tool"
+            >
+              Floor
+            </button>
+            <button
+              type="button"
+              onClick={handleTerrainButtonClick}
+              onMouseEnter={() => setHovered("terrain")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("terrain", { active: Boolean(activeTerrainTool) })}
+              title="Terrain tool"
+            >
+              Terrain
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToolClick("wall")}
+              onMouseEnter={() => setHovered("wall")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("wall", { active: activeTool === "wall" })}
+              title="Wall tool"
+            >
+              Wall
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToolClick("erase")}
+              onMouseEnter={() => setHovered("erase")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("erase", { active: activeTool === "erase" })}
+              title="Erase tool"
+            >
+              Erase
+            </button>
+            <button
+              type="button"
+              onClick={() => handleToolClick("furniture")}
+              onMouseEnter={() => setHovered("furniture")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("furniture", { active: activeTool === "furniture" })}
+              title="Furniture tool"
+            >
+              Furniture
+            </button>
 
             <div style={divider} />
 
