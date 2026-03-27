@@ -47,3 +47,15 @@ export type {
   SpriteDirection,
   TilesetFamily,
 } from "../content/asset-catalog/animationCatalog";
+export {
+  DEBUG_TERRAIN_ATLAS_H,
+  DEBUG_TERRAIN_ATLAS_IMAGE_URL,
+  DEBUG_TERRAIN_ATLAS_W,
+} from "../content/asset-catalog/debugTerrainAtlas";
+export {
+  TERRAIN_TOOLBAR_PREVIEW_ITEMS,
+} from "../content/asset-catalog/terrainToolbarPreviewCatalog";
+export type {
+  TerrainToolbarPreviewFrame,
+  TerrainToolbarPreviewItem,
+} from "../content/asset-catalog/terrainToolbarPreviewCatalog";

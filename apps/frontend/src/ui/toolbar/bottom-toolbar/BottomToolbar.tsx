@@ -8,29 +8,25 @@ import {
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_IMAGE_URL,
   ENVIRONMENT_ATLAS_W,
+  DEBUG_TERRAIN_ATLAS_H,
+  DEBUG_TERRAIN_ATLAS_IMAGE_URL,
+  DEBUG_TERRAIN_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
   resolveOfficeFloorAppearance,
+  TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   tintToHexCss,
   type FurniturePaletteItem,
   type OfficeColorAdjust,
   type OfficeTileColor,
+  type TerrainToolbarPreviewFrame,
+  type TerrainToolbarPreviewItem,
 } from "../../../game/contracts/content";
 import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
-import {
-  DEBUG_TERRAIN_ATLAS_H,
-  DEBUG_TERRAIN_ATLAS_IMAGE_URL,
-  DEBUG_TERRAIN_ATLAS_W,
-} from "../../../game/content/asset-catalog/debugTerrainAtlas";
-import {
-  TERRAIN_TOOLBAR_PREVIEW_ITEMS,
-  type TerrainToolbarPreviewFrame,
-  type TerrainToolbarPreviewItem,
-} from "../../../game/content/asset-catalog/terrainToolbarPreviewCatalog";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
