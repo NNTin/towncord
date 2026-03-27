@@ -39,8 +39,8 @@ Asset exports (`assets:public`) are orchestrated **only** from the root `package
 ## Common commands
 
 ```bash
-# Install dependencies (also runs contracts:generate via postinstall)
-npm install
+# Initialize submodules and install dependencies (also runs contracts:generate via postinstall)
+npm run bootstrap
 
 # Dev server
 npm run dev:frontend
