@@ -1,5 +1,109 @@
 #!/bin/sh
 
+package_lock_is_staged() {
+  ! git diff --cached --quiet -- package-lock.json
+}
+
+list_package_submodule_paths() {
+  git config --file .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null |
+    while read -r _submodule_key submodule_path; do
+      case "$submodule_path" in
+        packages/*)
+          printf '%s\n' "$submodule_path"
+          ;;
+      esac
+    done
+}
+
+is_package_submodule_path() {
+  candidate_path=$1
+
+  while IFS= read -r package_path; do
+    [ -n "$package_path" ] || continue
+
+    case "$candidate_path" in
+      "$package_path"|"$package_path"/*)
+        return 0
+        ;;
+    esac
+  done <<EOF
+$PACKAGE_SUBMODULE_PATHS
+EOF
+
+  return 1
+}
+
+validate_package_lock_submodules() {
+  PACKAGE_SUBMODULE_PATHS=$(list_package_submodule_paths)
+
+  [ -n "$PACKAGE_SUBMODULE_PATHS" ] || return 0
+
+  missing_submodules=""
+  conflicted_submodules=""
+
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+
+    status_prefix=${line%"${line#?}"}
+    remainder=${line#?}
+    submodule_path=${remainder#* }
+    submodule_path=${submodule_path%% *}
+
+    [ -n "$submodule_path" ] || continue
+
+    if ! is_package_submodule_path "$submodule_path"; then
+      continue
+    fi
+
+    case "$status_prefix" in
+      -)
+        missing_submodules="${missing_submodules}${submodule_path}
+"
+        ;;
+      U)
+        conflicted_submodules="${conflicted_submodules}${submodule_path}
+"
+        ;;
+    esac
+  done <<EOF
+$(git submodule status --recursive 2>/dev/null || true)
+EOF
+
+  if [ -z "$missing_submodules$conflicted_submodules" ]; then
+    return 0
+  fi
+
+  echo ""
+  echo "❌ package-lock.json cannot be committed."
+  echo ""
+  echo "The staged package-lock.json is missing dependencies for the git submodules."
+  echo "Initialize the submodules recursively, regenerate the lockfile, and restage it."
+
+  if [ -n "$missing_submodules" ]; then
+    echo ""
+    echo "Missing submodules:"
+    printf '%s' "$missing_submodules" | sed 's/^/  - /'
+  fi
+
+  if [ -n "$conflicted_submodules" ]; then
+    echo ""
+    echo "Submodules with merge conflicts:"
+    printf '%s' "$conflicted_submodules" | sed 's/^/  - /'
+  fi
+
+  echo ""
+  echo "Run:"
+  echo "  git submodule update --init --recursive"
+  echo "  npm install"
+  echo "  git add package-lock.json"
+  echo ""
+  exit 1
+}
+
+if package_lock_is_staged; then
+  validate_package_lock_submodules
+fi
+
 # Gitleaks pre-commit hook
 # Scans staged files for secrets before allowing commit
 
