@@ -61,6 +61,7 @@ export class WorldSceneAssembly {
   private wasd: WorldSceneMovementKeys | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
   private hasEmittedTerrainSeedSnapshot = false;
+  private hasPendingTerrainSnapshotChange = false;
 
   constructor(scene: Phaser.Scene) {
     this.projections = new WorldSceneProjectionEmitter({
@@ -203,7 +204,7 @@ export class WorldSceneAssembly {
       {
         ...terrainRuntimeContext.runtimeOptions,
         onTerrainChanged: () => {
-          this.emitTerrainSeedSnapshot();
+          this.hasPendingTerrainSnapshotChange = true;
         },
       },
     );
@@ -248,6 +249,10 @@ export class WorldSceneAssembly {
     if (!this.hasEmittedTerrainSeedSnapshot) {
       this.emitTerrainSeedSnapshot();
       this.hasEmittedTerrainSeedSnapshot = true;
+      this.hasPendingTerrainSnapshotChange = false;
+    } else if (this.hasPendingTerrainSnapshotChange) {
+      this.emitTerrainSeedSnapshot();
+      this.hasPendingTerrainSnapshotChange = false;
     }
 
     const terrainStart = performance.now();
@@ -284,6 +289,7 @@ export class WorldSceneAssembly {
     this.shiftKey = null;
     this.terrainRuntimeContext = null;
     this.hasEmittedTerrainSeedSnapshot = false;
+    this.hasPendingTerrainSnapshotChange = false;
   }
 
   private emitTerrainSeedSnapshot(): void {

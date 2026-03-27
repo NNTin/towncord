@@ -28,6 +28,7 @@ export type LayoutSaveState = {
   error: string | null;
   isAvailable: boolean;
   isDirty: boolean;
+  isTerrainDirty: boolean;
   isSaving: boolean;
   reset: () => void;
   save: () => Promise<void>;
@@ -150,6 +151,16 @@ export function useLayoutSaveState({
     terrainService,
   ]);
 
+  const reset = useCallback(() => {
+    officeEditor.reset();
+    // Reload the canonical terrain seed from disk to refresh the dirty-state
+    // baseline. Runtime terrain edits are not reverted here — they persist in
+    // the game runtime until the changes are saved or the page is reloaded.
+    void terrainService.load().then((snapshot) => {
+      setSavedTerrainSeedText(formatTerrainSeed(snapshot.document));
+    });
+  }, [officeEditor, terrainService]);
+
   const error =
     officeEditor.error ?? terrainSaveError ?? terrainLoadError ?? null;
 
@@ -161,12 +172,13 @@ export function useLayoutSaveState({
       officeEditor.parseError == null &&
       terrainIsReady &&
       isDirty,
-    canReset: officeEditor.canReset,
+    canReset: officeEditor.canReset || isTerrainDirty,
     error,
     isAvailable,
     isDirty,
+    isTerrainDirty,
     isSaving,
-    reset: officeEditor.reset,
+    reset,
     save,
     statusText: !isAvailable
       ? "Read-only"
