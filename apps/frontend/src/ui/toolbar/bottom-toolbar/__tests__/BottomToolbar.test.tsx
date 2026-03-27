@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { act } from "react";
+import type { ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { BottomToolbar } from "../BottomToolbar";
@@ -8,11 +9,12 @@ import { BottomToolbar } from "../BottomToolbar";
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
 
-const baseProps = {
+const baseProps: ComponentProps<typeof BottomToolbar> = {
   isLayoutMode: true,
   onToggleLayoutMode: vi.fn(),
   isJsonEditorOpen: false,
   onToggleJsonEditor: vi.fn(),
+  entityToolbarViewModel: null,
   activeTool: null as "floor" | "wall" | "erase" | "furniture" | null,
   onSelectTool: vi.fn(),
   activeFloorMode: "paint" as const,
@@ -70,6 +72,91 @@ afterEach(() => {
 });
 
 describe("BottomToolbar", () => {
+  test("shows the Entities panel outside layout mode and wires drag start through the toolbar view model", () => {
+    const onDragStart = vi.fn();
+    const props = {
+      ...baseProps,
+      isLayoutMode: false,
+      entityToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:player",
+            label: "Player",
+            placeables: [
+              {
+                id: "entity:player",
+                type: "entity" as const,
+                entityId: "player",
+                label: "Player Spawn",
+                groupKey: "entity:player",
+                groupLabel: "Player",
+              },
+            ],
+          },
+          {
+            key: "entity:npc",
+            label: "Mobs",
+            placeables: [
+              {
+                id: "entity:npc.greeter",
+                type: "entity" as const,
+                entityId: "npc.greeter",
+                label: "Greeter",
+                groupKey: "entity:npc",
+                groupLabel: "Mobs",
+              },
+            ],
+          },
+        ],
+        onDragStart,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Entity placeables").click();
+    });
+
+    expect(container.textContent).toContain("Entities");
+    expect(container.textContent).toContain("Player");
+    expect(container.textContent).toContain("Mobs");
+    expect(container.textContent).toContain("Player Spawn");
+    expect(container.textContent).toContain("Greeter");
+
+    const entry = Array.from(container.querySelectorAll("[draggable='true']")).find(
+      (element) => element.textContent?.includes("Player Spawn"),
+    );
+    if (!entry) {
+      throw new Error("Missing draggable entity entry");
+    }
+
+    const dragStartEvent = new Event("dragstart", { bubbles: true });
+    Object.defineProperty(dragStartEvent, "dataTransfer", {
+      value: {
+        setData: vi.fn(),
+        effectAllowed: "none",
+      },
+    });
+
+    act(() => {
+      entry.dispatchEvent(dragStartEvent);
+    });
+
+    expect(onDragStart).toHaveBeenCalledTimes(1);
+    expect(onDragStart.mock.calls[0]?.[1]).toEqual({
+      id: "entity:player",
+      type: "entity",
+      entityId: "player",
+      label: "Player Spawn",
+      groupKey: "entity:player",
+      groupLabel: "Player",
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   test("activating Terrain selects the ground brush", () => {
     const props = {
       ...baseProps,

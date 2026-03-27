@@ -6,6 +6,7 @@ import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import { buildOfficeEditorToolPayload } from "../../../game";
 import type { OfficeEditorBridgeState, TerrainSeedDocument } from "../../../game";
 import type {
+  EntityToolbarViewModel,
   RuntimeRootBindings,
   SidebarViewModel,
   ZoomControlsViewModel,
@@ -16,11 +17,13 @@ import {
   useRuntimeSyncAdapter,
 } from "./runtimeUiBridgeHooks";
 import { createPlaceablesSidebarBridge } from "../view-models/placeablesSidebarBridge";
+import { createToolbarEntityPaletteBridge } from "../view-models/toolbarEntityPaletteBridge";
 
 type RuntimeUiBridge = {
   runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
+  entityToolbarViewModel: EntityToolbarViewModel | null;
   zoomViewModel: ZoomControlsViewModel | null;
   terrainSeedSnapshot: TerrainSeedDocument | null;
   activeTerrainTool: TerrainToolSelection;
@@ -110,10 +113,22 @@ export function useRuntimeUiBridge(options: {
     onSelectTerrainTool,
   ]);
 
+  const entityToolbarViewModel = useMemo<EntityToolbarViewModel | null>(() => {
+    const projection = runtimeSync.runtimeSidebarProjection;
+    if (!projection) {
+      return null;
+    }
+
+    return createToolbarEntityPaletteBridge({
+      placeables: projection.placeables,
+    });
+  }, [runtimeSync.runtimeSidebarProjection]);
+
   return {
     runtimeRootRef,
     runtimeRootBindings,
     sidebarViewModel,
+    entityToolbarViewModel,
     zoomViewModel,
     terrainSeedSnapshot,
     activeTerrainTool: runtimeSync.activeTerrainTool,

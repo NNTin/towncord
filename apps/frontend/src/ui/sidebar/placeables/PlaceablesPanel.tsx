@@ -1,32 +1,7 @@
 import type { PlaceablesPanelViewModel } from "../../game-session/contracts";
+import { groupPlaceablesByGroup } from "../../game-session/view-models/placeablesBridge";
 import { useGroupedDisclosureState } from "../../state/panel-state";
 import { AccordionHeader } from "../shared/common";
-
-type PlaceableGroup = {
-  key: string;
-  label: string;
-  placeables: PlaceablesPanelViewModel["placeables"];
-};
-
-function groupPlaceablesByGroup(
-  placeables: PlaceablesPanelViewModel["placeables"],
-): PlaceableGroup[] {
-  const byGroup = new Map<string, PlaceableGroup>();
-
-  for (const placeable of placeables) {
-    if (!byGroup.has(placeable.groupKey)) {
-      byGroup.set(placeable.groupKey, {
-        key: placeable.groupKey,
-        label: placeable.groupLabel,
-        placeables: [],
-      });
-    }
-
-    byGroup.get(placeable.groupKey)!.placeables.push(placeable);
-  }
-
-  return [...byGroup.values()];
-}
 
 function DraggableEntry({
   label,

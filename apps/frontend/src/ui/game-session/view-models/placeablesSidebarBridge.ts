@@ -1,39 +1,12 @@
-import { PLACE_DRAG_MIME, serializePlaceDragPayload } from "../../../game";
 import type {
-  PlaceDragPayload,
   PlaceableViewModel,
   TerrainToolSelection,
 } from "../../../game/contracts/runtime";
 import type { PlaceablesPanelViewModel } from "../contracts";
-
-function toPlaceDragPayload(placeable: PlaceableViewModel): PlaceDragPayload {
-  if (placeable.type === "entity") {
-    return {
-      type: "entity",
-      entityId: placeable.entityId,
-    };
-  }
-
-  return {
-    type: "terrain",
-    materialId: placeable.materialId,
-    brushId: placeable.brushId,
-  };
-}
-
-function resolveActiveTerrainToolId(
-  placeables: PlaceableViewModel[],
-  activeTerrainTool: TerrainToolSelection,
-): string | null {
-  return (
-    placeables.find(
-      (placeable) =>
-        placeable.type === "terrain" &&
-        activeTerrainTool?.brushId === placeable.brushId &&
-        activeTerrainTool?.materialId === placeable.materialId,
-    )?.id ?? null
-  );
-}
+import {
+  resolveActiveTerrainToolId,
+  startPlaceableDrag,
+} from "./placeablesBridge";
 
 type CreatePlaceablesSidebarBridgeParams = {
   placeables: PlaceableViewModel[];
@@ -53,11 +26,7 @@ export function createPlaceablesSidebarBridge({
       activeTerrainTool,
     ),
     onDragStart(event, placeable) {
-      event.dataTransfer.setData(
-        PLACE_DRAG_MIME,
-        serializePlaceDragPayload(toPlaceDragPayload(placeable)),
-      );
-      event.dataTransfer.effectAllowed = "copy";
+      startPlaceableDrag(event, placeable);
     },
     onSelectTerrainTool(placeable) {
       if (
