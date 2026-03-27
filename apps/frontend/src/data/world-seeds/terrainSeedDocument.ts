@@ -45,7 +45,25 @@ export function isTerrainSeedDocument(value: unknown): value is TerrainSeedDocum
     if (glyph.length !== 1 || typeof material !== "string") {
       return false;
     }
+
+    if (!value.materials.includes(material)) {
+      return false;
+    }
   }
 
-  return value.rows.every((row) => typeof row === "string" && row.length === value.width);
+  const legendGlyphs = new Set(Object.keys(value.legend));
+
+  for (const row of value.rows) {
+    if (typeof row !== "string" || row.length !== value.width) {
+      return false;
+    }
+
+    for (const glyph of row) {
+      if (!legendGlyphs.has(glyph)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
