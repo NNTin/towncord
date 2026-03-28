@@ -247,6 +247,122 @@ function TerrainPreviewSprite({
   return <TerrainAtlasSprite frame={frame} />;
 }
 
+function titleCase(value: string): string {
+  return value
+    .split(/[\s_-]+/)
+    .filter(Boolean)
+    .map((part) => part[0]!.toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function buildBreadcrumbText(segments: string[]): string {
+  return segments.join(" > ");
+}
+
+function resolveFurnitureBreadcrumbs(item: FurniturePaletteItem): string[] {
+  const breadcrumbs = ["Layout", "Furniture", titleCase(item.category)];
+  if (item.groupId) {
+    breadcrumbs.push(titleCase(item.groupId));
+  }
+  breadcrumbs.push(item.label);
+  return breadcrumbs;
+}
+
+function resolveEntityBreadcrumbs(groupLabel: string, label: string): string[] {
+  const breadcrumbs = ["Entity", groupLabel];
+  if (label !== groupLabel) {
+    breadcrumbs.push(label);
+  }
+  return breadcrumbs;
+}
+
+function PreviewCard({
+  breadcrumbs,
+  description,
+  title,
+  visual,
+}: {
+  breadcrumbs: string[];
+  description: string;
+  title: string;
+  visual?: React.ReactNode;
+}): JSX.Element {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 10,
+        alignItems: "stretch",
+        border: "2px solid var(--pixel-border)",
+        background: "var(--pixel-bg)",
+        boxShadow: "var(--pixel-shadow)",
+        padding: 8,
+      }}
+    >
+      <div
+        style={{
+          minWidth: 72,
+          minHeight: 72,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "var(--pixel-btn-bg)",
+          border: "1px solid var(--pixel-border)",
+          padding: 4,
+          flexShrink: 0,
+        }}
+      >
+        {visual ?? (
+          <div
+            style={{
+              color: "var(--pixel-text)",
+              fontFamily: "monospace",
+              fontSize: 14,
+              opacity: 0.8,
+            }}
+          >
+            ⊕
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0 }}>
+        <div
+          style={{
+            color: "var(--pixel-text)",
+            fontFamily: "monospace",
+            fontSize: 11,
+            opacity: 0.7,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {buildBreadcrumbText(breadcrumbs)}
+        </div>
+        <div
+          style={{
+            color: "var(--pixel-text)",
+            fontFamily: "monospace",
+            fontSize: 13,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {title}
+        </div>
+        <div
+          style={{
+            color: "var(--pixel-text)",
+            fontFamily: "monospace",
+            fontSize: 11,
+            opacity: 0.8,
+            whiteSpace: "normal",
+          }}
+        >
+          {description}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Sub-panels ───────────────────────────────────────────────────────────────
 
 function ColorSlider({
@@ -305,12 +421,16 @@ function FloorPatternPreview({
   colorAdjust,
   selected,
   onClick,
+  onHover,
+  onClearHover,
 }: {
   patternId: string;
   atlasFrame?: { x: number; y: number; w: number; h: number };
   colorAdjust: OfficeColorAdjust;
   selected: boolean;
   onClick: () => void;
+  onHover?: () => void;
+  onClearHover?: () => void;
 }): JSX.Element {
   const frame = atlasFrame ?? ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"]?.frame;
   if (!frame) {
@@ -322,6 +442,10 @@ function FloorPatternPreview({
     <button
       type="button"
       title={patternId}
+      onMouseEnter={onHover}
+      onMouseLeave={onClearHover}
+      onFocus={onHover}
+      onBlur={onClearHover}
       onClick={onClick}
       style={{
         padding: 2,
@@ -357,6 +481,16 @@ function FloorSubPanel({
 }): JSX.Element {
   const previewColor = activeFloorColor ?? DEFAULT_FLOOR_COLOR_ADJUST;
   const [showColor, setShowColor] = useState(false);
+  const [hoveredPatternId, setHoveredPatternId] = useState<string | null>(null);
+  const [hoveredTileColor, setHoveredTileColor] = useState<OfficeTileColor | null>(null);
+  const previewPatternId =
+    hoveredPatternId ?? activeFloorPattern ?? FLOOR_PATTERN_ITEMS[0]?.id ?? null;
+  const previewPattern =
+    FLOOR_PATTERN_ITEMS.find((item) => item.id === previewPatternId) ??
+    FLOOR_PATTERN_ITEMS[0] ??
+    null;
+  const previewTileColor = hoveredTileColor ?? activeTileColor ?? null;
+  const previewAppearance = resolveOfficeFloorAppearance(previewColor, previewTileColor);
 
   function handlePresetSelect(color: OfficeTileColor): void {
     onSelectTileColor?.(color);
@@ -370,6 +504,30 @@ function FloorSubPanel({
 
   return (
     <div style={subPanel}>
+      <PreviewCard
+        breadcrumbs={[
+          "Layout",
+          "Floor",
+          previewPattern?.id ?? "Pattern",
+          previewTileColor ?? "Tint",
+        ]}
+        description="This is the floor tile style that will be painted into the scene."
+        title={previewPattern?.id ?? "Floor preview"}
+        visual={
+          previewPattern?.atlasFrame ? (
+            <TintedAtlasSprite frame={previewPattern.atlasFrame} tint={previewAppearance.tint} />
+          ) : (
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                background: tintToHexCss(previewAppearance.tint) ?? "var(--pixel-btn-bg)",
+              }}
+            />
+          )
+        }
+      />
+
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
         Pattern
       </div>
@@ -382,7 +540,12 @@ function FloorSubPanel({
               atlasFrame={item.atlasFrame}
               colorAdjust={previewColor}
               selected={activeFloorPattern === item.id}
-              onClick={() => onSelectFloorPattern?.(item.id)}
+              onHover={() => setHoveredPatternId(item.id)}
+              onClearHover={() => setHoveredPatternId(null)}
+              onClick={() => {
+                setHoveredPatternId(item.id);
+                onSelectFloorPattern?.(item.id);
+              }}
             />
           );
         })}
@@ -396,6 +559,10 @@ function FloorSubPanel({
             key={color}
             type="button"
             title={color}
+            onMouseEnter={() => setHoveredTileColor(color)}
+            onMouseLeave={() => setHoveredTileColor(null)}
+            onFocus={() => setHoveredTileColor(color)}
+            onBlur={() => setHoveredTileColor(null)}
             onClick={() => handlePresetSelect(color)}
             style={{
               padding: 2,
@@ -445,7 +612,12 @@ function WallSubPanel(): JSX.Element {
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
         Wall
       </div>
-      {previewFrame ? <EnvironmentAtlasSprite frame={previewFrame.frame} /> : null}
+      <PreviewCard
+        breadcrumbs={["Layout", "Wall"]}
+        description="Paint or erase wall tiles in the grid."
+        title="Wall placement"
+        visual={previewFrame ? <EnvironmentAtlasSprite frame={previewFrame.frame} /> : null}
+      />
     </div>
   );
 }
@@ -524,11 +696,35 @@ function FurnitureSubPanel({
   onSelectFurnitureId: ((id: string) => void) | undefined;
 }): JSX.Element {
   const [activeCategory, setActiveCategory] = useState<string>(FURNITURE_PALETTE_CATEGORIES[0] ?? "desks");
+  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
+  const selectedItem =
+    FURNITURE_PALETTE_ITEMS.find((item) => item.id === activeFurnitureId) ?? null;
+  useEffect(() => {
+    if (selectedItem) {
+      setActiveCategory(selectedItem.category);
+    }
+  }, [selectedItem]);
   const items = FURNITURE_PALETTE_ITEMS.filter((i) => i.category === activeCategory);
+  const previewItem =
+    FURNITURE_PALETTE_ITEMS.find((item) => item.id === hoveredItemId) ??
+    selectedItem ??
+    items.find((item) => item.id === activeFurnitureId) ??
+    items[0] ??
+    null;
 
   return (
     <div style={subPanel}>
-      {/* Category tabs */}
+      <PreviewCard
+        breadcrumbs={previewItem ? resolveFurnitureBreadcrumbs(previewItem) : ["Layout", "Furniture"]}
+        description={
+          previewItem
+            ? "This is the exact furniture asset and orientation that will be placed."
+            : "Choose a category to preview the furniture that will be placed."
+        }
+        title={previewItem?.label ?? "Furniture preview"}
+        visual={previewItem ? <FurnitureSprite item={previewItem} /> : null}
+      />
+
       <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
         {FURNITURE_PALETTE_CATEGORIES.map((cat) => (
           <button
@@ -547,7 +743,6 @@ function FurnitureSubPanel({
         ))}
       </div>
 
-      {/* Sprite grid */}
       <div
         style={{
           display: "flex",
@@ -565,6 +760,10 @@ function FurnitureSubPanel({
             key={item.id}
             type="button"
             title={item.label}
+            onMouseEnter={() => setHoveredItemId(item.id)}
+            onMouseLeave={() => setHoveredItemId(null)}
+            onFocus={() => setHoveredItemId(item.id)}
+            onBlur={() => setHoveredItemId(null)}
             onClick={() => onSelectFurnitureId?.(item.id)}
             style={{
               background: activeFurnitureId === item.id ? "var(--pixel-active-bg)" : "var(--pixel-btn-bg)",
@@ -590,11 +789,30 @@ function EntitiesSubPanel({
 }: {
   viewModel: EntityToolbarViewModel;
 }): JSX.Element {
+  const firstGroup = viewModel.groups[0] ?? null;
+  const firstPlaceable = firstGroup?.placeables[0] ?? null;
+  const [hoveredPlaceableId, setHoveredPlaceableId] = useState<string | null>(null);
+  const previewPlaceable =
+    viewModel.groups
+      .flatMap((group) => group.placeables)
+      .find((placeable) => placeable.id === hoveredPlaceableId) ??
+    firstPlaceable;
+
   return (
     <div style={{ ...subPanel, maxWidth: 420 }}>
-      <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
-        Entities
-      </div>
+      <PreviewCard
+        breadcrumbs={
+          previewPlaceable
+            ? resolveEntityBreadcrumbs(previewPlaceable.groupLabel, previewPlaceable.label)
+            : ["Entity"]
+        }
+        description={
+          previewPlaceable
+            ? "Preview the entity that will be dragged into the world."
+            : "Hover an entity to preview it."
+        }
+        title={previewPlaceable?.label ?? "Entity preview"}
+      />
       <div
         style={{
           display: "flex",
@@ -615,7 +833,12 @@ function EntitiesSubPanel({
                 <div
                   key={placeable.id}
                   draggable
+                  tabIndex={0}
                   title={`Spawn ${placeable.label}`}
+                  onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
+                  onMouseLeave={() => setHoveredPlaceableId(null)}
+                  onFocus={() => setHoveredPlaceableId(placeable.id)}
+                  onBlur={() => setHoveredPlaceableId(null)}
                   onDragStart={(event) => viewModel.onDragStart(event, placeable)}
                   style={{
                     background: "var(--pixel-btn-bg)",
@@ -721,6 +944,7 @@ export function BottomToolbar({
   }
 
   function handleToggleLayoutMode(): void {
+    setIsEntitiesPanelOpen(false);
     if (isLayoutMode) {
       onSelectTerrainTool?.(null);
     }
@@ -773,7 +997,14 @@ export function BottomToolbar({
         <button
           type="button"
           disabled={!entityToolbarViewModel}
-          onClick={() => setIsEntitiesPanelOpen((open) => !open)}
+          onClick={() => {
+            if (isLayoutMode) {
+              onSelectTool?.(null);
+              onToggleLayoutMode();
+            }
+
+            setIsEntitiesPanelOpen((open) => !open);
+          }}
           onMouseEnter={() => setHovered("entities")}
           onMouseLeave={() => setHovered(null)}
           style={resolveButtonStyle("entities", {
@@ -782,7 +1013,7 @@ export function BottomToolbar({
           })}
           title="Entity placeables"
         >
-          Entities
+          Entity
         </button>
 
         {isLayoutMode && (

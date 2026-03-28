@@ -16,6 +16,9 @@ export type FurniturePaletteItem = {
   id: string;
   label: string;
   category: string;
+  groupId?: string;
+  orientation?: string;
+  state?: string;
   atlasKey: string;
   atlasFrame: { x: number; y: number; w: number; h: number };
   footprintW: number;
@@ -126,6 +129,9 @@ function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
       footprintW,
       footprintH,
       placement: resolvePlacement(asset),
+      ...(asset.groupId ? { groupId: asset.groupId } : {}),
+      ...(asset.orientation ? { orientation: asset.orientation } : {}),
+      ...(asset.state ? { state: asset.state } : {}),
       ...resolveColors(asset),
     });
   }
