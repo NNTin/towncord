@@ -48,7 +48,8 @@ describe("entityRegistryBuilder", () => {
     });
     expect(readEntityVisualRef(chicken!.visualRef)).toBe("mobs/animals/chicken");
 
-    expect(listEntityPlaceables(registry)).toEqual([
+    const catalog = createCatalog();
+    expect(listEntityPlaceables(registry, catalog)).toEqual([
       {
         id: "entity:player.scout",
         type: "entity",
@@ -56,6 +57,7 @@ describe("entityRegistryBuilder", () => {
         label: "scout",
         groupKey: "entity:player",
         groupLabel: "Player",
+        previewFrameKey: null,
       },
       {
         id: "entity:npc.animals.chicken",
@@ -64,6 +66,7 @@ describe("entityRegistryBuilder", () => {
         label: "chicken",
         groupKey: "entity:npc",
         groupLabel: "Mobs",
+        previewFrameKey: null,
       },
       {
         id: "entity:npc.animals.cow",
@@ -72,6 +75,7 @@ describe("entityRegistryBuilder", () => {
         label: "cow",
         groupKey: "entity:npc",
         groupLabel: "Mobs",
+        previewFrameKey: null,
       },
     ]);
   });

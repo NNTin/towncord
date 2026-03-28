@@ -3,6 +3,9 @@ import {
   ATLAS_H,
   ATLAS_IMAGE_URL,
   ATLAS_W,
+  BLOOMSEED_ATLAS_H,
+  BLOOMSEED_ATLAS_IMAGE_URL,
+  BLOOMSEED_ATLAS_W,
   DEFAULT_FLOOR_COLOR_ADJUST,
   DEFAULT_WALL_COLOR_ADJUST,
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
@@ -20,6 +23,7 @@ import {
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
+  getBloomseedAtlasFrame,
   resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
   resolveOfficeWallAppearance,
@@ -203,6 +207,23 @@ function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element 
       atlasW={ATLAS_W}
       atlasH={ATLAS_H}
       frame={item.atlasFrame}
+    />
+  );
+}
+
+// Entity sprites are 64×64 px; scale to 0.5 so they display at 32×32 px like furniture thumbnails.
+const ENTITY_PREVIEW_SCALE = 0.5;
+
+function EntityPreviewSprite({ frameKey }: { frameKey: string }): JSX.Element | null {
+  const frame = getBloomseedAtlasFrame(frameKey);
+  if (!frame) return null;
+  return (
+    <AtlasSprite
+      atlasUrl={BLOOMSEED_ATLAS_IMAGE_URL}
+      atlasW={BLOOMSEED_ATLAS_W}
+      atlasH={BLOOMSEED_ATLAS_H}
+      frame={frame}
+      scale={ENTITY_PREVIEW_SCALE}
     />
   );
 }
@@ -1097,12 +1118,16 @@ function EntitiesSubPanel({
                     cursor: "grab",
                     fontFamily: "monospace",
                     fontSize: 12,
-                    padding: "5px 8px",
+                    padding: placeable.previewFrameKey ? "4px" : "5px 8px",
                     userSelect: "none",
                     whiteSpace: "nowrap",
                   }}
                 >
-                  ⊕ {placeable.label}
+                  {placeable.previewFrameKey ? (
+                    <EntityPreviewSprite frameKey={placeable.previewFrameKey} />
+                  ) : (
+                    `⊕ ${placeable.label}`
+                  )}
                 </div>
               ))}
             </div>
