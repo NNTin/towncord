@@ -162,6 +162,27 @@ function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneL
   };
 }
 
+function createFurnitureItem(overrides: Partial<OfficeSceneLayout["furniture"][number]> = {}) {
+  return {
+    id: "desk-1",
+    assetId: "asset-front",
+    label: "Desk Front",
+    category: "desk" as never,
+    placement: "floor" as const,
+    col: 0,
+    row: 0,
+    width: 1,
+    height: 1,
+    color: 0x334155,
+    accentColor: 0x94a3b8,
+    renderAsset: {
+      atlasKey: "asset-front",
+      atlasFrame: { x: 0, y: 0, w: 16, h: 16 },
+    },
+    ...overrides,
+  };
+}
+
 /** Returns only the image call results whose frame arg starts with "environment.walls.". */
 function findWallImages(scene: ReturnType<typeof createScene>): FakeDisplayObject[] {
   const results: FakeDisplayObject[] = [];
@@ -273,5 +294,53 @@ describe("renderOfficeLayout", () => {
 
     expect(scene.add.container.mock.calls.length).toBe(initialContainerCalls);
     expect(renderable.renderIndex.characters).toHaveLength(1);
+  });
+
+  test("refreshes existing furniture renders when partialUpdate changes position or asset", () => {
+    const scene = createScene();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        { kind: "floor", tileId: 0 },
+        { kind: "floor", tileId: 0 },
+      ],
+      furniture: [createFurnitureItem()],
+      characters: [],
+    };
+
+    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetX: 32,
+      worldOffsetY: 48,
+    });
+    const initialFurnitureContainer = scene.add.container.mock.results[2]?.value as FakeContainer;
+
+    renderable.partialUpdate({
+      ...layout,
+      furniture: [
+        createFurnitureItem({
+          label: "Desk Right",
+          assetId: "asset-right",
+          col: 1,
+          renderAsset: {
+            atlasKey: "asset-right",
+            atlasFrame: { x: 16, y: 0, w: 16, h: 16 },
+          },
+        }),
+      ],
+    });
+
+    expect(initialFurnitureContainer.destroyed).toBe(true);
+    expect(renderable.renderIndex.furniture[0]).toMatchObject({
+      label: "Desk Right",
+      bounds: expect.objectContaining({
+        x: 48,
+        y: 48,
+        width: 16,
+        height: 16,
+      }),
+    });
+    expect(scene.add.container.mock.calls[3]).toEqual([48, 48]);
   });
 });

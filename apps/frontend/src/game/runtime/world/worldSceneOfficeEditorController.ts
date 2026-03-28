@@ -10,6 +10,7 @@ import {
   anchoredGridCellToWorldPixel,
   worldToAnchoredGridCell,
   type AnchoredGridRegion,
+  type AnchoredGridCellCoord,
 } from "../../../engine/world-runtime/regions";
 import type { OfficeSceneLayout } from "../../contracts/office-scene";
 import {
@@ -116,6 +117,9 @@ export class WorldSceneOfficeEditorController {
   private isOfficePainting = false;
   private officeDirty = false;
   private selectedFurnitureId: string | null = null;
+  private isDraggingFurniture = false;
+  private dragFurnitureId: string | null = null;
+  private dragLastCell: AnchoredGridCellCoord | null = null;
 
   constructor(private readonly host: WorldSceneOfficeEditorControllerHost) {}
 
@@ -124,6 +128,9 @@ export class WorldSceneOfficeEditorController {
     this.isOfficePainting = false;
     this.officeDirty = false;
     this.selectedFurnitureId = null;
+    this.isDraggingFurniture = false;
+    this.dragFurnitureId = null;
+    this.dragLastCell = null;
   }
 
   public getOfficeFloorMode(): OfficeFloorMode {
@@ -136,6 +143,9 @@ export class WorldSceneOfficeEditorController {
       this.selectedFurnitureId = null;
     }
     this.isOfficePainting = false;
+    this.isDraggingFurniture = false;
+    this.dragFurnitureId = null;
+    this.dragLastCell = null;
     this.syncOfficeCellHighlight(this.host.getActivePointer());
   }
 
@@ -228,6 +238,49 @@ export class WorldSceneOfficeEditorController {
     highlight.setVisible(true);
   }
 
+  public isFurnitureDragging(): boolean {
+    return this.isDraggingFurniture;
+  }
+
+  public getDragMovePreview(
+    pointer: Phaser.Input.Pointer | null,
+  ): OfficeFurniturePlacementPreview | null {
+    if (!this.isDraggingFurniture || !this.dragFurnitureId) {
+      return null;
+    }
+
+    if (!pointer) {
+      this.dragLastCell = null;
+      return null;
+    }
+
+    if (!isPointerWithinGame(pointer)) {
+      this.dragLastCell = null;
+      return null;
+    }
+
+    const region = this.host.getOfficeRegion();
+    if (!region) {
+      this.dragLastCell = null;
+      return null;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
+    if (!cell) {
+      this.dragLastCell = null;
+      return null;
+    }
+
+    const preview = this.officeEditorSystem.previewFurnitureMove(
+      region.layout,
+      this.dragFurnitureId,
+      cell,
+    );
+    this.dragLastCell = preview ? cell : null;
+    return preview;
+  }
+
   public getFurniturePlacementPreview(
     pointer: Phaser.Input.Pointer | null,
   ): OfficeFurniturePlacementPreview | null {
@@ -307,6 +360,10 @@ export class WorldSceneOfficeEditorController {
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
+    if (this.isDraggingFurniture && pointer.isDown) {
+      return true;
+    }
+
     return Boolean(
       this.isOfficePainting &&
       getOfficeEditorTool(this.officeEditorToolPayload) &&
@@ -315,6 +372,11 @@ export class WorldSceneOfficeEditorController {
   }
 
   public continuePainting(pointer: Phaser.Input.Pointer): void {
+    if (this.isDraggingFurniture) {
+      // Drag position is tracked via getDragMovePreview called from syncHighlight
+      return;
+    }
+
     const region = this.host.getOfficeRegion();
     if (!region) {
       return;
@@ -326,6 +388,33 @@ export class WorldSceneOfficeEditorController {
 
   public endPainting(): void {
     this.isOfficePainting = false;
+    this.tryCommitDrag();
+  }
+
+  private tryCommitDrag(): void {
+    if (!this.isDraggingFurniture || !this.dragFurnitureId || !this.dragLastCell) {
+      this.isDraggingFurniture = false;
+      this.dragFurnitureId = null;
+      this.dragLastCell = null;
+      return;
+    }
+
+    const region = this.host.getOfficeRegion();
+    const furnitureId = this.dragFurnitureId;
+    const targetCell = this.dragLastCell;
+
+    this.isDraggingFurniture = false;
+    this.dragFurnitureId = null;
+    this.dragLastCell = null;
+
+    if (!region) {
+      return;
+    }
+
+    const moved = this.officeEditorSystem.moveFurniture(region.layout, furnitureId, targetCell);
+    if (moved) {
+      this.officeDirty = true;
+    }
   }
 
   private emitPickedOfficeFloor(payload: OfficeFloorPickedPayload): void {
@@ -347,10 +436,24 @@ export class WorldSceneOfficeEditorController {
     const hit = targets.find((target) => target.bounds.contains(worldPoint.x, worldPoint.y));
     if (!hit) {
       this.selectedFurnitureId = null;
+      this.isDraggingFurniture = false;
+      this.dragFurnitureId = null;
+      this.dragLastCell = null;
       return true;
     }
 
-    this.selectedFurnitureId = hit.id;
+    if (hit.id === this.selectedFurnitureId) {
+      // Clicking the already-selected furniture starts a drag
+      this.isDraggingFurniture = true;
+      this.dragFurnitureId = hit.id;
+      this.dragLastCell = null;
+    } else {
+      this.selectedFurnitureId = hit.id;
+      this.isDraggingFurniture = false;
+      this.dragFurnitureId = null;
+      this.dragLastCell = null;
+    }
+
     return true;
   }
 

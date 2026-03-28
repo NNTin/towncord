@@ -60,6 +60,8 @@ export class WorldSceneAssembly {
   private navigation: WorldNavigationService | null = null;
   private wasd: WorldSceneMovementKeys | null = null;
   private shiftKey: Phaser.Input.Keyboard.Key | null = null;
+  private rKey: Phaser.Input.Keyboard.Key | null = null;
+  private rKeyWasDown = false;
   private hasEmittedTerrainSeedSnapshot = false;
   private hasPendingTerrainSnapshotChange = false;
 
@@ -202,6 +204,9 @@ export class WorldSceneAssembly {
     this.shiftKey = scene.input.keyboard!.addKey(
       Phaser.Input.Keyboard.KeyCodes.SHIFT,
     );
+    this.rKey = scene.input.keyboard!.addKey(
+      Phaser.Input.Keyboard.KeyCodes.R,
+    );
 
     this.terrainRuntime = new TerrainRuntime(
       scene,
@@ -270,6 +275,12 @@ export class WorldSceneAssembly {
       );
     }
 
+    const rDown = this.rKey?.isDown ?? false;
+    if (rDown && !this.rKeyWasDown) {
+      this.officeRuntime.rotateSelectedFurniture();
+    }
+    this.rKeyWasDown = rDown;
+
     this.diagnostics.recordFrame(delta, updateStart, terrainMs);
     this.officeRuntime.update();
   }
@@ -291,6 +302,8 @@ export class WorldSceneAssembly {
     this.navigation = null;
     this.wasd = null;
     this.shiftKey = null;
+    this.rKey = null;
+    this.rKeyWasDown = false;
     this.terrainRuntimeContext = null;
     this.hasEmittedTerrainSeedSnapshot = false;
     this.hasPendingTerrainSnapshotChange = false;

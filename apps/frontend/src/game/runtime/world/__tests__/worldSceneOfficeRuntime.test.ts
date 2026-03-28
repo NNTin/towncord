@@ -68,42 +68,49 @@ vi.mock("../../../../engine", () => ({
   }),
 }));
 
-function createBootstrap(): OfficeSceneBootstrap {
+function createBootstrap(
+  layoutOverrides: Partial<OfficeSceneBootstrap["layout"]> = {},
+): OfficeSceneBootstrap {
+  const baseLayout: OfficeSceneBootstrap["layout"] = {
+    cols: 1,
+    rows: 1,
+    cellSize: 16,
+    tiles: [
+      {
+        kind: "void" as const,
+        tileId: 0,
+      },
+    ],
+    furniture: [
+      {
+        id: "desk-laptop",
+        assetId: laptop.id,
+        label: laptop.label,
+        category: laptop.category as never,
+        placement: laptop.placement,
+        col: 0,
+        row: 0,
+        width: laptop.footprintW,
+        height: laptop.footprintH,
+        color: laptop.color,
+        accentColor: laptop.accentColor,
+        renderAsset: {
+          atlasKey: laptop.atlasKey,
+          atlasFrame: { ...laptop.atlasFrame },
+        },
+      },
+    ],
+    characters: [],
+  };
+
   return {
     anchor: {
       x: 2,
       y: 3,
     },
     layout: {
-      cols: 1,
-      rows: 1,
-      cellSize: 16,
-      tiles: [
-        {
-          kind: "void" as const,
-          tileId: 0,
-        },
-      ],
-      furniture: [
-        {
-          id: "desk-laptop",
-          assetId: laptop.id,
-          label: laptop.label,
-          category: laptop.category as never,
-          placement: laptop.placement,
-          col: 0,
-          row: 0,
-          width: laptop.footprintW,
-          height: laptop.footprintH,
-          color: laptop.color,
-          accentColor: laptop.accentColor,
-          renderAsset: {
-            atlasKey: laptop.atlasKey,
-            atlasFrame: { ...laptop.atlasFrame },
-          },
-        },
-      ],
-      characters: [],
+      ...baseLayout,
+      ...layoutOverrides,
     },
   };
 }
@@ -318,6 +325,58 @@ describe("WorldSceneOfficeRuntime", () => {
     expect(previewGhost.setDisplaySize).toHaveBeenCalledWith(16, 16);
     expect(previewCell.setPosition).toHaveBeenCalledWith(32, 48);
     expect(previewLabel.setText).toHaveBeenCalledWith("Replace Laptop - Front - Off");
+  });
+
+  test("shows drag move preview ghost when dragging selected furniture and hides it on endPainting", () => {
+    const { previewGhost, runtime, scene } = createHarness();
+    const bootstrap = createBootstrap({
+      cols: 2,
+      tiles: [
+        { kind: "void" as const, tileId: 0 },
+        { kind: "void" as const, tileId: 0 },
+      ],
+    });
+
+    scene.input.activePointer = {
+      withinGame: true,
+      x: 36,
+      y: 52,
+    };
+
+    runtime.bootstrap(bootstrap);
+    runtime.handleSetEditorTool({ tool: null });
+
+    // First click: select furniture
+    runtime.tryHandlePointerDown({
+      button: 0,
+      isDown: true,
+      x: 36,
+      y: 52,
+    } as never);
+    expect(runtime.getSelectedFurnitureId()).toBe("desk-laptop");
+
+    // Second click on same furniture: start drag
+    runtime.tryHandlePointerDown({
+      button: 0,
+      isDown: true,
+      x: 36,
+      y: 52,
+    } as never);
+
+    // Sync highlight (simulates pointer move) — drag preview ghost should appear
+    // at the next grid cell instead of the same-cell no-op target.
+    runtime.syncHighlight({
+      withinGame: true,
+      isDown: true,
+      x: 52,
+      y: 52,
+    } as never);
+    expect(previewGhost.setVisible).toHaveBeenCalledWith(true);
+    expect(previewGhost.setPosition).toHaveBeenCalledWith(48, 48);
+
+    // End painting hides the drag preview immediately
+    runtime.endPainting();
+    expect(previewGhost.setVisible).toHaveBeenCalledWith(false);
   });
 
   test("rerenders and emits layout projections after office edits", () => {

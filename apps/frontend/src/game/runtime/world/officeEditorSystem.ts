@@ -49,7 +49,7 @@ export type OfficeFurniturePlacementPreview = {
   footprintW: number;
   footprintH: number;
   affectedFurniture: OfficeSceneFurniture[];
-  blockedReason: "out-of-bounds" | null;
+  blockedReason: "out-of-bounds" | "occupied" | null;
 };
 
 /**
@@ -383,6 +383,100 @@ export class OfficeEditorSystem {
     }
 
     return resolveFurnitureRotationVariant(furnitureId, rotationQuarterTurns);
+  }
+
+  public previewFurnitureMove(
+    layout: OfficeSceneLayout,
+    furnitureId: string,
+    targetCell: OfficeCellCoord,
+  ): OfficeFurniturePlacementPreview | null {
+    const furniture = layout.furniture.find((f) => f.id === furnitureId);
+    if (!furniture) {
+      return null;
+    }
+
+    const asset = FURNITURE_ALL_ITEMS.find((item) => item.id === furniture.assetId);
+    if (!asset) {
+      return null;
+    }
+
+    if (furniture.col === targetCell.col && furniture.row === targetCell.row) {
+      return null;
+    }
+
+    const blockedReason: "out-of-bounds" | null =
+      targetCell.col < 0 ||
+      targetCell.row < 0 ||
+      targetCell.col + furniture.width > layout.cols ||
+      targetCell.row + furniture.height > layout.rows
+        ? "out-of-bounds"
+        : null;
+
+    const affectedFurniture =
+      blockedReason === null
+        ? this.findOverlappingFurniture(
+            layout,
+            targetCell,
+            furniture.width,
+            furniture.height,
+          ).filter((f) => f.id !== furnitureId)
+        : [];
+    const moveBlockedReason =
+      blockedReason ?? (affectedFurniture.length > 0 ? "occupied" : null);
+
+    return {
+      kind: moveBlockedReason !== null ? "blocked" : "place",
+      anchorCell: targetCell,
+      asset,
+      footprintW: furniture.width,
+      footprintH: furniture.height,
+      affectedFurniture,
+      blockedReason: moveBlockedReason,
+    };
+  }
+
+  public moveFurniture(
+    layout: OfficeSceneLayout,
+    furnitureId: string,
+    targetCell: OfficeCellCoord,
+  ): boolean {
+    const index = layout.furniture.findIndex((f) => f.id === furnitureId);
+    if (index < 0) {
+      return false;
+    }
+
+    const furniture = layout.furniture[index];
+    if (!furniture) {
+      return false;
+    }
+
+    if (furniture.col === targetCell.col && furniture.row === targetCell.row) {
+      return false;
+    }
+
+    if (
+      targetCell.col < 0 ||
+      targetCell.row < 0 ||
+      targetCell.col + furniture.width > layout.cols ||
+      targetCell.row + furniture.height > layout.rows
+    ) {
+      return false;
+    }
+
+    const overlapping = this.findOverlappingFurniture(
+      layout,
+      targetCell,
+      furniture.width,
+      furniture.height,
+    ).filter((f) => f.id !== furnitureId);
+
+    if (overlapping.length > 0) {
+      return false;
+    }
+
+    furniture.col = targetCell.col;
+    furniture.row = targetCell.row;
+    return true;
   }
 
   private findOverlappingFurniture(
