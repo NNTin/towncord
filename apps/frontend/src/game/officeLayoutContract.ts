@@ -1,5 +1,6 @@
 export type {
   OfficeLayoutColorAdjust,
+  OfficeSceneAnchor,
   OfficeSceneBootstrap,
   OfficeSceneCharacter,
   OfficeSceneFurniture,

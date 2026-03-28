@@ -1,5 +1,9 @@
 {
   "version": 1,
+  "anchor": {
+    "x": 1,
+    "y": 1
+  },
   "cols": 21,
   "rows": 21,
   "tiles": [

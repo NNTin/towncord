@@ -50,4 +50,37 @@ describe("document export office layout translation", () => {
       characters: [],
     });
   });
+
+  test("preserves an existing anchor while syncing runtime layouts", () => {
+    const runtimeLayout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [{ kind: "floor", tileId: 0 }],
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      syncFromRuntimeLayout(runtimeLayout, {
+        version: 2,
+        cols: 1,
+        rows: 1,
+        cellSize: 16,
+        anchor: { x: 4, y: 7 },
+        tiles: [],
+        furniture: [],
+        characters: [],
+      }),
+    ).toEqual({
+      version: 2,
+      anchor: { x: 4, y: 7 },
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: runtimeLayout.tiles,
+      furniture: [],
+      characters: [],
+    });
+  });
 });

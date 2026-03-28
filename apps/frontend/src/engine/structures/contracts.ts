@@ -33,6 +33,11 @@ export type OfficeSceneFurnitureRenderAsset = {
   atlasFrame: { x: number; y: number; w: number; h: number };
 };
 
+export type OfficeSceneAnchor = {
+  x: number;
+  y: number;
+};
+
 export type OfficeSceneFurniture = {
   id: string;
   assetId: string;
@@ -69,4 +74,5 @@ export type OfficeSceneLayout = {
 
 export type OfficeSceneBootstrap = {
   layout: OfficeSceneLayout;
+  anchor: OfficeSceneAnchor;
 };

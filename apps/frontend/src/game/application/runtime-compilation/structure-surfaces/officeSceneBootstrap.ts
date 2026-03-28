@@ -16,6 +16,7 @@ import {
   type OfficeSceneContentRepository,
 } from "../../../content/asset-catalog/officeSceneContentRepository";
 import type {
+  OfficeSceneAnchor,
   OfficeSceneBootstrap,
   OfficeSceneCharacter,
   OfficeSceneFurniture,
@@ -39,6 +40,8 @@ export type {
 } from "../../../officeLayoutContract";
 
 const DONARG_TILE_WORLD_SIZE = 16;
+const DEFAULT_OFFICE_ANCHOR_X16 = 1;
+const DEFAULT_OFFICE_ANCHOR_Y16 = 1;
 const MAX_DERIVED_CHARACTERS = 6;
 const WALL_TILE_IDS = new Set([8]);
 const FLOOR_TILE_IDS = new Set([0, 1, 2, 6]);
@@ -67,7 +70,7 @@ export function createOfficeSceneBootstrap(
   repository: OfficeSceneContentRepository = officeSceneContentRepository,
 ): OfficeSceneBootstrap {
   if (repository === officeSceneContentRepository) {
-    return { layout: structuredClone(DEFAULT_OFFICE_SCENE_BOOTSTRAP.layout) };
+    return structuredClone(DEFAULT_OFFICE_SCENE_BOOTSTRAP);
   }
 
   const content = repository.read();
@@ -84,6 +87,7 @@ function buildOfficeSceneBootstrap(
   sourceCatalog: DonargFurnitureCatalogSource,
 ): OfficeSceneBootstrap {
   const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
+  const anchor = resolveOfficeSceneAnchor(sourceLayout.anchor);
   const tiles: OfficeSceneTile[] = sourceLayout.tiles.map((tile, index) =>
     normalizeOfficeSceneTile(tile, index, sourceLayout),
   );
@@ -110,6 +114,7 @@ function buildOfficeSceneBootstrap(
     : createDerivedCharacters(normalizedLayoutForCharacters, furniture);
 
   return {
+    anchor,
     layout: {
       cols: sourceLayout.cols,
       rows: sourceLayout.rows,
@@ -118,6 +123,38 @@ function buildOfficeSceneBootstrap(
       furniture,
       characters,
     },
+  };
+}
+
+function resolveOfficeSceneAnchor(anchor: unknown): OfficeSceneAnchor {
+  if (!isOfficeSceneAnchorRecord(anchor)) {
+    return {
+      x: DEFAULT_OFFICE_ANCHOR_X16,
+      y: DEFAULT_OFFICE_ANCHOR_Y16,
+    };
+  }
+
+  return {
+    x: anchor.x,
+    y: anchor.y,
+  };
+}
+
+function parseOfficeSceneAnchor(anchor: unknown): OfficeSceneAnchor | null {
+  if (anchor === undefined) {
+    return {
+      x: DEFAULT_OFFICE_ANCHOR_X16,
+      y: DEFAULT_OFFICE_ANCHOR_Y16,
+    };
+  }
+
+  if (!isOfficeSceneAnchorRecord(anchor)) {
+    return null;
+  }
+
+  return {
+    x: anchor.x,
+    y: anchor.y,
   };
 }
 
@@ -601,6 +638,7 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
     return null;
   }
 
+  const anchor = "anchor" in value ? (value as { anchor?: unknown }).anchor : undefined;
   const layout = value.layout;
   if (typeof layout !== "object" || layout === null) {
     return null;
@@ -626,14 +664,23 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
     return null;
   }
 
+  if (anchor !== undefined && !isOfficeSceneAnchorRecord(anchor)) {
+    return null;
+  }
+
   const cols = candidate.cols as number;
   const rows = candidate.rows as number;
   const cellSize = candidate.cellSize as number;
   const tiles = candidate.tiles;
   const furniture = candidate.furniture;
   const characters = candidate.characters;
+  const parsedAnchor = parseOfficeSceneAnchor(anchor);
+  if (!parsedAnchor) {
+    return null;
+  }
 
   return {
+    anchor: parsedAnchor,
     layout: {
       cols,
       rows,
@@ -661,4 +708,13 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
       characters: characters.map((item) => ({ ...item })),
     },
   };
+}
+
+function isOfficeSceneAnchorRecord(value: unknown): value is OfficeSceneAnchor {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Number.isFinite((value as OfficeSceneAnchor).x) &&
+    Number.isFinite((value as OfficeSceneAnchor).y)
+  );
 }

@@ -2,6 +2,7 @@ export * from "./content";
 export * from "./office-editor";
 export type {
   OfficeLayoutColorAdjust,
+  OfficeSceneAnchor,
   OfficeSceneBootstrap,
   OfficeSceneCharacter,
   OfficeSceneFurniture,
