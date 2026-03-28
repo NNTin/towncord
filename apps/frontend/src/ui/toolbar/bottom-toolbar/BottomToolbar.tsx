@@ -28,6 +28,7 @@ import {
 } from "../../../game/contracts/content";
 import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
+import type { EntityToolbarViewModel } from "../../game-session/contracts";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -39,6 +40,7 @@ type LayoutModeProps = {
 type ToolSelectionProps = {
   isJsonEditorOpen?: boolean;
   onToggleJsonEditor?: () => void;
+  entityToolbarViewModel?: EntityToolbarViewModel | null;
   activeTool?: OfficeLayoutTool | null;
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeFloorMode?: OfficeFloorMode | null;
@@ -583,6 +585,61 @@ function FurnitureSubPanel({
   );
 }
 
+function EntitiesSubPanel({
+  viewModel,
+}: {
+  viewModel: EntityToolbarViewModel;
+}): JSX.Element {
+  return (
+    <div style={{ ...subPanel, maxWidth: 420 }}>
+      <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
+        Entities
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          maxHeight: 220,
+          overflowY: "auto",
+          paddingRight: 2,
+        }}
+      >
+        {viewModel.groups.map((group) => (
+          <div key={group.key} style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
+              {group.label}
+            </div>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {group.placeables.map((placeable) => (
+                <div
+                  key={placeable.id}
+                  draggable
+                  title={`Spawn ${placeable.label}`}
+                  onDragStart={(event) => viewModel.onDragStart(event, placeable)}
+                  style={{
+                    background: "var(--pixel-btn-bg)",
+                    border: "2px solid transparent",
+                    color: "var(--pixel-text)",
+                    cursor: "grab",
+                    fontFamily: "monospace",
+                    fontSize: 12,
+                    padding: "5px 8px",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  ⊕ {placeable.label}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DEFAULT_TERRAIN_PREVIEW =
@@ -595,6 +652,7 @@ export function BottomToolbar({
   onToggleLayoutMode,
   isJsonEditorOpen = false,
   onToggleJsonEditor,
+  entityToolbarViewModel = null,
   activeTool = null,
   onSelectTool,
   activeFloorMode = "paint",
@@ -619,6 +677,13 @@ export function BottomToolbar({
   layoutStatusText = null,
 }: BottomToolbarProps): JSX.Element {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [isEntitiesPanelOpen, setIsEntitiesPanelOpen] = useState(false);
+
+  useEffect(() => {
+    if (!entityToolbarViewModel) {
+      setIsEntitiesPanelOpen(false);
+    }
+  }, [entityToolbarViewModel]);
 
   function resolveButtonStyle(
     key: string,
@@ -666,6 +731,9 @@ export function BottomToolbar({
   return (
     <div style={outerContainer}>
       {/* Sub-panels (appear above button row) */}
+      {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
+        <EntitiesSubPanel viewModel={entityToolbarViewModel} />
+      ) : null}
       {isLayoutMode && activeTool === "floor" && (
         <FloorSubPanel
           activeFloorMode={activeFloorMode}
@@ -702,8 +770,24 @@ export function BottomToolbar({
           Layout{isLayoutDirty ? "*" : ""}
         </button>
 
+        <button
+          type="button"
+          disabled={!entityToolbarViewModel}
+          onClick={() => setIsEntitiesPanelOpen((open) => !open)}
+          onMouseEnter={() => setHovered("entities")}
+          onMouseLeave={() => setHovered(null)}
+          style={resolveButtonStyle("entities", {
+            active: isEntitiesPanelOpen,
+            disabled: !entityToolbarViewModel,
+          })}
+          title="Entity placeables"
+        >
+          Entities
+        </button>
+
         {isLayoutMode && (
           <>
+            <div style={divider} />
             <button
               type="button"
               onClick={() => handleToolClick("floor")}

@@ -78,6 +78,10 @@ describe("useGameSession", () => {
         },
         runtimeDiagnostics: null,
       },
+      entityToolbarViewModel: {
+        groups: [],
+        onDragStart: vi.fn(),
+      },
       activeTerrainTool: {
         materialId: "ground",
         brushId: "ground",

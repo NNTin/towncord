@@ -1,6 +1,7 @@
 import type { DragEvent } from "react";
 import type { AnimationCatalog } from "../../game/contracts/content";
 import type {
+  EntityPlaceableViewModel,
   PlaceableViewModel,
   RuntimePerfPayload,
   TerrainPlaceableViewModel,
@@ -17,6 +18,20 @@ export type PlaceablesPanelViewModel = {
   activeTerrainToolId: string | null;
   onDragStart: (event: DragEvent, placeable: PlaceableViewModel) => void;
   onSelectTerrainTool: (placeable: TerrainPlaceableViewModel) => void;
+};
+
+export type PlaceableGroupViewModel<TPlaceable extends PlaceableViewModel> = {
+  key: string;
+  label: string;
+  placeables: TPlaceable[];
+};
+
+export type EntityToolbarViewModel = {
+  groups: PlaceableGroupViewModel<EntityPlaceableViewModel>[];
+  onDragStart: (
+    event: DragEvent,
+    placeable: EntityPlaceableViewModel,
+  ) => void;
 };
 
 export type PreviewPanelViewModel = {

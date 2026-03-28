@@ -73,6 +73,14 @@ function renderHarness() {
       },
       placeables: [
         {
+          id: "entity:player",
+          type: "entity" as const,
+          entityId: "player",
+          label: "Player Spawn",
+          groupKey: "entity:player",
+          groupLabel: "Player",
+        },
+        {
           id: "terrain.water.tile",
           type: "terrain" as const,
           materialId: "water",
@@ -167,6 +175,33 @@ describe("useRuntimeUiBridge", () => {
     expect(harness.selectTerrainTool).toHaveBeenCalledWith({
       materialId: "water",
       brushId: "water",
+    });
+
+    await harness.unmount();
+  });
+
+  test("projects entity placeables for the toolbar without terrain entries", async () => {
+    const harness = renderHarness();
+    const bridge = harness.getValue();
+
+    expect(bridge.entityToolbarViewModel).toEqual({
+      groups: [
+        {
+          key: "entity:player",
+          label: "Player",
+          placeables: [
+            {
+              id: "entity:player",
+              type: "entity",
+              entityId: "player",
+              label: "Player Spawn",
+              groupKey: "entity:player",
+              groupLabel: "Player",
+            },
+          ],
+        },
+      ],
+      onDragStart: expect.any(Function),
     });
 
     await harness.unmount();

@@ -21,6 +21,7 @@ function App(): JSX.Element {
     layoutSaveState,
     officeEditor,
     activeTerrainTool,
+    entityToolbarViewModel,
     onSelectTerrainTool,
     runtimeRootRef,
     runtimeRootBindings,
@@ -73,6 +74,7 @@ function App(): JSX.Element {
         activeFurnitureId={officeToolState.activeFurnitureId}
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
         activeTerrainTool={activeTerrainTool}
+        entityToolbarViewModel={entityToolbarViewModel}
         onSelectTerrainTool={onSelectTerrainTool}
         onResetLayout={layoutSaveState.reset}
         onSaveLayout={() => void layoutSaveState.save()}
