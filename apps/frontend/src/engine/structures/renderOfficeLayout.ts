@@ -234,8 +234,11 @@ function buildTileObjects(
       } else if (tile.kind === "wall") {
         const bitmask = computeWallBitmask(tiles, cols, rows, col, row);
         const maskId = String(bitmask).padStart(2, "0");
-        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, `environment.walls.mask-${maskId}#0`);
-        img.setDisplaySize(cellSize, cellSize);
+        // Wall sprites are 16×32 (twice as tall as a floor tile). Render at
+        // cellSize × cellSize*2, anchored so the sprite bottom aligns with the
+        // bottom edge of the grid cell (center-Y = top of the cell, i.e. y).
+        const img = scene.add.image(x + half, y, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, `environment.walls.mask-${maskId}#0`);
+        img.setDisplaySize(cellSize, cellSize * 2);
         if (typeof tile.tint === "number") {
           img.setTint(tile.tint);
         }
