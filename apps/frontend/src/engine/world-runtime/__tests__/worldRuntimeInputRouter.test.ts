@@ -48,7 +48,16 @@ describe("WorldRuntimeInputRouter", () => {
       expect(ctx.tryHandleOfficeSecondaryPointerDown).toHaveBeenCalledOnce();
     });
 
-    test("left-click lets office handle first", () => {
+    test("left-click with active terrain tool paints terrain before office gets a chance", () => {
+      ctx.hasActiveTerrainTool.mockReturnValue(true);
+      ctx.tryHandleOfficePointerDown.mockReturnValue(true);
+      router.onPointerDown(makePointer(0));
+      expect(ctx.beginTerrainPaint).toHaveBeenCalledOnce();
+      expect(ctx.tryHandleOfficePointerDown).not.toHaveBeenCalled();
+      expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
+    });
+
+    test("left-click lets office handle when no terrain tool is active", () => {
       ctx.tryHandleOfficePointerDown.mockReturnValue(true);
       router.onPointerDown(makePointer(0));
       expect(ctx.tryHandleOfficePointerDown).toHaveBeenCalledOnce();
@@ -56,7 +65,7 @@ describe("WorldRuntimeInputRouter", () => {
       expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
     });
 
-    test("left-click falls through to terrain if active tool", () => {
+    test("left-click falls through to terrain if active tool and office does not consume", () => {
       ctx.hasActiveTerrainTool.mockReturnValue(true);
       router.onPointerDown(makePointer(0));
       expect(ctx.beginTerrainPaint).toHaveBeenCalledOnce();
