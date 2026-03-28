@@ -64,7 +64,7 @@ export interface TerrainNavigationGrid {
   worldToCell(worldX: number, worldY: number): TerrainCell | null;
   isCellWalkable(cellX: number, cellY: number): boolean;
   cellToWorldCenter(cellX: number, cellY: number): TerrainWorldPoint | null;
-  findPath(start: TerrainCell, goal: TerrainCell): TerrainPath | null;
+  findPath(start: TerrainCell, goal: TerrainCell, isWalkable?: (cellX: number, cellY: number) => boolean): TerrainPath | null;
   getRevision(): number;
   clampWorldPoint(worldX: number, worldY: number): TerrainWorldPoint;
   isWorldWalkable(worldX: number, worldY: number): boolean;
@@ -82,10 +82,20 @@ export function createTerrainNavigationService(
   grid: TerrainNavigationGrid,
   collisionOverride?: WalkabilityOverride,
 ): WorldNavigationService {
+  function isCellWalkable(cellX: number, cellY: number): boolean {
+    if (!grid.isCellWalkable(cellX, cellY)) return false;
+    if (collisionOverride) {
+      const worldCenter = grid.cellToWorldCenter(cellX, cellY);
+      if (!worldCenter) return false;
+      if (!collisionOverride.isWorldWalkable(worldCenter.worldX, worldCenter.worldY)) return false;
+    }
+    return true;
+  }
+
   return {
     pickWanderTarget(subject, rng) {
       const start = grid.worldToCell(subject.position.x, subject.position.y);
-      if (!start || !grid.isCellWalkable(start.cellX, start.cellY)) {
+      if (!start || !isCellWalkable(start.cellX, start.cellY)) {
         return null;
       }
 
@@ -99,7 +109,7 @@ export function createTerrainNavigationService(
         const goalX = start.cellX + offsetX;
         const goalY = start.cellY + offsetY;
 
-        if (!grid.isCellWalkable(goalX, goalY)) {
+        if (!isCellWalkable(goalX, goalY)) {
           continue;
         }
 
@@ -108,7 +118,7 @@ export function createTerrainNavigationService(
           continue;
         }
 
-        if (!grid.findPath(start, { cellX: goalX, cellY: goalY })) {
+        if (!grid.findPath(start, { cellX: goalX, cellY: goalY }, isCellWalkable)) {
           continue;
         }
 
@@ -144,7 +154,7 @@ export function createTerrainNavigationService(
         return null;
       }
 
-      const path = grid.findPath(start, goal);
+      const path = grid.findPath(start, goal, isCellWalkable);
       if (!path) {
         return null;
       }
