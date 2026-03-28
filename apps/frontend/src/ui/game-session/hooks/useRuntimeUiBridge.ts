@@ -99,6 +99,7 @@ export function useRuntimeUiBridge(options: {
     options.officeToolState.activeTileColor,
     options.officeToolState.activeFloorColor,
     options.officeToolState.activeFloorPattern,
+    options.officeToolState.activeWallColor,
     options.officeToolState.activeFurnitureId,
     options.officeToolState.activeFurnitureRotationQuarterTurns,
   ]);

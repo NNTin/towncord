@@ -27,6 +27,7 @@ describe("useGameSession", () => {
       activeTileColor: "blue" as const,
       activeFloorColor: { h: 214, s: 30, b: -100, c: -55 },
       activeFloorPattern: "environment.floors.pattern-03",
+      activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
       activeFurnitureId: "desk-01",
       activeFurnitureRotationQuarterTurns: 1 as const,
       onSelectTool: vi.fn(),
@@ -130,6 +131,7 @@ describe("useGameSession", () => {
         activeTileColor: officeToolState.activeTileColor,
         activeFloorColor: officeToolState.activeFloorColor,
         activeFloorPattern: officeToolState.activeFloorPattern,
+        activeWallColor: officeToolState.activeWallColor,
         activeFurnitureId: officeToolState.activeFurnitureId,
         activeFurnitureRotationQuarterTurns:
           officeToolState.activeFurnitureRotationQuarterTurns,

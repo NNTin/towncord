@@ -55,6 +55,7 @@ describe("uiCommands transport", () => {
 
   test("validates and clones office editor tool payloads", () => {
     const floorColor = { h: 214, s: 30, b: -100, c: -55 };
+    const wallColor = { h: 214, s: 25, b: -54, c: 17 };
     const payload = normalizeOfficeSetEditorToolPayload({
       tool: "floor",
       floorMode: "pick",
@@ -86,6 +87,23 @@ describe("uiCommands transport", () => {
     });
     expect(
       normalizeOfficeSetEditorToolPayload({
+        tool: "wall",
+        wallColor,
+      }),
+    ).toEqual({
+      tool: "wall",
+      wallColor,
+    });
+    const wallPayload = normalizeOfficeSetEditorToolPayload({
+      tool: "wall",
+      wallColor,
+    });
+    expect(wallPayload?.tool).toBe("wall");
+    expect(wallPayload && wallPayload.tool === "wall" ? wallPayload.wallColor : null).not.toBe(
+      wallColor,
+    );
+    expect(
+      normalizeOfficeSetEditorToolPayload({
         tool: "floor",
         floorMode: "pick",
         tileColor: "teal",
@@ -98,6 +116,12 @@ describe("uiCommands transport", () => {
         tool: "furniture",
         furnitureId: "ASSET_107",
         rotationQuarterTurns: 5,
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "wall",
+        wallColor: { h: "214", s: 25, b: -54, c: 17 },
       }),
     ).toBeUndefined();
   });

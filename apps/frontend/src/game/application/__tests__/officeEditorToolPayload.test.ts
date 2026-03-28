@@ -10,6 +10,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeTileColor: "blue",
         activeFloorColor: { h: 214, s: 30, b: -100, c: -55 },
         activeFloorPattern: "environment.floors.pattern-03",
+        activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
       }),
@@ -30,6 +31,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeTileColor: null,
         activeFloorColor: { h: 35, s: 30, b: 15, c: 0 },
         activeFloorPattern: null,
+        activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: "desk-01",
         activeFurnitureRotationQuarterTurns: 2,
       }),
@@ -37,6 +39,24 @@ describe("buildOfficeEditorToolPayload", () => {
       tool: "furniture",
       furnitureId: "desk-01",
       rotationQuarterTurns: 2,
+    });
+  });
+
+  test("maps wall state into the editor payload", () => {
+    expect(
+      buildOfficeEditorToolPayload({
+        activeTool: "wall",
+        activeFloorMode: "paint",
+        activeTileColor: null,
+        activeFloorColor: { h: 35, s: 30, b: 15, c: 0 },
+        activeFloorPattern: null,
+        activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
+        activeFurnitureId: null,
+        activeFurnitureRotationQuarterTurns: 0,
+      }),
+    ).toEqual({
+      tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
     });
   });
 });

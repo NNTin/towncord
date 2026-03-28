@@ -34,6 +34,7 @@ function renderHarness() {
         activeTileColor: null,
         activeFloorColor: { h: 0, s: 0, b: 0, c: 0 },
         activeFloorPattern: null,
+        activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
       },

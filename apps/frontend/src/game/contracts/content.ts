@@ -14,9 +14,11 @@ export type {
 } from "../content/structures/furniturePalette";
 export {
   DEFAULT_FLOOR_COLOR_ADJUST,
+  DEFAULT_WALL_COLOR_ADJUST,
   cloneOfficeColorAdjust,
   findOfficeTileColorPreset,
   resolveOfficeFloorAppearance,
+  resolveOfficeWallAppearance,
   resolveOfficeTileColorAdjustPreset,
   tintToHexCss,
 } from "../content/structures/colors";

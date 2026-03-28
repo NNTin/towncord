@@ -18,6 +18,7 @@ type OfficeToolStateBridge = {
   activeTileColor: OfficeTileColor | null;
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
+  activeWallColor: OfficeColorAdjust;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectTool: (tool: OfficeEditorToolId | null) => void;
@@ -37,6 +38,7 @@ export function useGameSession({ officeToolState }: UseGameSessionOptions) {
       activeTileColor: officeToolState.activeTileColor,
       activeFloorColor: officeToolState.activeFloorColor,
       activeFloorPattern: officeToolState.activeFloorPattern,
+      activeWallColor: officeToolState.activeWallColor,
       activeFurnitureId: officeToolState.activeFurnitureId,
       activeFurnitureRotationQuarterTurns:
         officeToolState.activeFurnitureRotationQuarterTurns,

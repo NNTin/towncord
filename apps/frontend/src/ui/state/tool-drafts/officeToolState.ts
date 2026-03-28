@@ -5,6 +5,7 @@ import type {
 } from "../../../game/contracts/office-editor";
 import {
   DEFAULT_FLOOR_COLOR_ADJUST,
+  DEFAULT_WALL_COLOR_ADJUST,
   FLOOR_PATTERN_ITEMS,
   cloneOfficeColorAdjust,
   findOfficeTileColorPreset,
@@ -21,6 +22,7 @@ export type OfficeToolStateData = {
   activeTileColor: OfficeTileColor | null;
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
+  activeWallColor: OfficeColorAdjust;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
@@ -32,6 +34,7 @@ export type OfficeToolStateAction =
   | { type: "selectTileColor"; color: OfficeTileColor }
   | { type: "selectFloorColor"; color: OfficeColorAdjust }
   | { type: "selectFloorPattern"; id: string }
+  | { type: "selectWallColor"; color: OfficeColorAdjust }
   | { type: "selectFurnitureId"; id: string }
   | { type: "rotateFurnitureClockwise" }
   | { type: "officeFloorPicked"; payload: OfficeFloorPickedPayload };
@@ -46,6 +49,7 @@ export function createOfficeToolStateData(): OfficeToolStateData {
     activeTileColor: null,
     activeFloorColor: cloneOfficeColorAdjust(DEFAULT_FLOOR_COLOR_ADJUST),
     activeFloorPattern: DEFAULT_FLOOR_PATTERN,
+    activeWallColor: cloneOfficeColorAdjust(DEFAULT_WALL_COLOR_ADJUST),
     activeFurnitureId: null,
     activeFurnitureRotationQuarterTurns: 0,
   };
@@ -67,6 +71,15 @@ function applyPresetFloorColor(color: OfficeTileColor): Pick<
   "activeFloorColor" | "activeTileColor"
 > {
   return applyFloorColor(resolveOfficeTileColorAdjustPreset(color));
+}
+
+function applyWallColor(color: OfficeColorAdjust): Pick<
+  OfficeToolStateData,
+  "activeWallColor"
+> {
+  return {
+    activeWallColor: cloneOfficeColorAdjust(color),
+  };
 }
 
 export function reduceOfficeToolState(
@@ -134,6 +147,12 @@ export function reduceOfficeToolState(
       return {
         ...state,
         activeFloorPattern: action.id,
+      };
+
+    case "selectWallColor":
+      return {
+        ...state,
+        ...applyWallColor(action.color),
       };
 
     case "selectFurnitureId":

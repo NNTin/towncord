@@ -94,7 +94,10 @@ describe("WorldSceneOfficeEditorController", () => {
   test("syncs the office highlight when a tool is selected", () => {
     const { controller, highlight } = createControllerHarness();
 
-    controller.setOfficeEditorTool({ tool: "wall" });
+    controller.setOfficeEditorTool({
+      tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
+    });
 
     expect(highlight.setPosition).toHaveBeenCalledWith(0, 0);
     expect(highlight.setVisible).toHaveBeenCalledWith(true);
@@ -103,7 +106,10 @@ describe("WorldSceneOfficeEditorController", () => {
   test("marks pending layout changes once after a successful office edit", () => {
     const { controller, region } = createControllerHarness();
 
-    controller.setOfficeEditorTool({ tool: "wall" });
+    controller.setOfficeEditorTool({
+      tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
+    });
 
     expect(
       controller.tryHandlePointerDown({
@@ -114,6 +120,14 @@ describe("WorldSceneOfficeEditorController", () => {
       } as never),
     ).toBe(true);
     expect(region.layout.tiles[0]!.kind).toBe("wall");
+    expect(region.layout.tiles[0]!.tileId).toBe(8);
+    expect(region.layout.tiles[0]!.colorAdjust).toEqual({
+      h: 214,
+      s: 25,
+      b: -54,
+      c: 17,
+    });
+    expect(region.layout.tiles[0]!.tint).toBe(0x334155);
     expect(controller.consumePendingLayoutChange()).toBe(true);
     expect(controller.consumePendingLayoutChange()).toBe(false);
   });
@@ -204,7 +218,10 @@ describe("WorldSceneOfficeEditorController", () => {
       tileId: 8,
     };
 
-    controller.setOfficeEditorTool({ tool: "wall" });
+    controller.setOfficeEditorTool({
+      tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
+    });
 
     expect(
       controller.tryHandleSecondaryPointerDown({

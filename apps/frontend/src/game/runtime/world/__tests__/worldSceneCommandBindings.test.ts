@@ -81,6 +81,7 @@ describe("WorldSceneCommandBindings", () => {
     });
     runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL, {
       tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
     });
     runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION, {
       action: "rotate",
@@ -108,6 +109,7 @@ describe("WorldSceneCommandBindings", () => {
     });
     expect(handleSetOfficeEditorTool).toHaveBeenCalledWith({
       tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
     });
     expect(handleOfficeSelectionAction).toHaveBeenCalledWith({
       action: "rotate",

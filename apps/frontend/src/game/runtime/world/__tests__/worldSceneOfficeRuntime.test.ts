@@ -273,7 +273,10 @@ describe("WorldSceneOfficeRuntime", () => {
     };
 
     runtime.bootstrap(bootstrap);
-    runtime.handleSetEditorTool({ tool: "wall" });
+    runtime.handleSetEditorTool({
+      tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
+    });
 
     expect(
       runtime.tryHandleSecondaryPointerDown({
@@ -325,6 +328,7 @@ describe("WorldSceneOfficeRuntime", () => {
     runtime.bootstrap(bootstrap);
     runtime.handleSetEditorTool({
       tool: "wall",
+      wallColor: { h: 214, s: 25, b: -54, c: 17 },
     });
 
     expect(
