@@ -13,15 +13,18 @@ import {
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
+  canRotateFurniturePaletteItem,
   FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
+  resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
   TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   tintToHexCss,
   type FurniturePaletteItem,
+  type FurnitureRotationQuarterTurns,
   type OfficeColorAdjust,
   type OfficeTileColor,
   type TerrainToolbarPreviewFrame,
@@ -56,7 +59,9 @@ type ToolSelectionProps = {
   activeFloorPattern?: string | null;
   onSelectFloorPattern?: (id: string) => void;
   activeFurnitureId?: string | null;
+  activeFurnitureRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectFurnitureId?: (id: string) => void;
+  onRotateFurnitureClockwise?: () => void;
   activeTerrainTool?: TerrainToolSelection;
   onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
   selectedOfficePlaceable?: SelectedOfficePlaceableViewModel;
@@ -299,6 +304,12 @@ function resolveSelectedPlaceableBreadcrumbs(
   }
   breadcrumbs.push(selectedOfficePlaceable.label);
   return breadcrumbs;
+}
+
+function formatRotationLabel(
+  quarterTurns: FurnitureRotationQuarterTurns | number,
+): string {
+  return `${(quarterTurns % 4) * 90}°`;
 }
 
 function resolveEntityBreadcrumbs(groupLabel: string, label: string): string[] {
@@ -723,10 +734,17 @@ function TerrainSubPanel({
 
 function FurnitureSubPanel({
   activeFurnitureId,
+  activeFurnitureRotationQuarterTurns,
   onSelectFurnitureId,
+  onRotateFurnitureClockwise,
 }: {
   activeFurnitureId: string | null | undefined;
+  activeFurnitureRotationQuarterTurns:
+    | FurnitureRotationQuarterTurns
+    | null
+    | undefined;
   onSelectFurnitureId: ((id: string) => void) | undefined;
+  onRotateFurnitureClockwise: (() => void) | undefined;
 }): JSX.Element {
   const [activeCategory, setActiveCategory] = useState<string>(FURNITURE_PALETTE_CATEGORIES[0] ?? "desks");
   const [hoveredItemId, setHoveredItemId] = useState<string | null>(null);
@@ -738,12 +756,17 @@ function FurnitureSubPanel({
     }
   }, [selectedItem]);
   const items = FURNITURE_PALETTE_ITEMS.filter((i) => i.category === activeCategory);
-  const previewItem =
+  const previewSourceItem =
     FURNITURE_PALETTE_ITEMS.find((item) => item.id === hoveredItemId) ??
     selectedItem ??
     items.find((item) => item.id === activeFurnitureId) ??
     items[0] ??
     null;
+  const previewItem = resolveFurnitureRotationVariant(
+    previewSourceItem?.id ?? null,
+    activeFurnitureRotationQuarterTurns ?? 0,
+  );
+  const canRotatePreviewItem = canRotateFurniturePaletteItem(previewSourceItem?.id);
 
   return (
     <div style={subPanel}>
@@ -751,12 +774,54 @@ function FurnitureSubPanel({
         breadcrumbs={previewItem ? resolveFurnitureBreadcrumbs(previewItem) : ["Layout", "Furniture"]}
         description={
           previewItem
-            ? "This is the exact furniture asset and orientation that will be placed."
-            : "Choose a category to preview the furniture that will be placed."
+            ? "Choose the asset and rotation here. The final ghost preview follows your pointer inside the office scene."
+            : "Choose a category, then place and rotate furniture from the office scene preview."
         }
-        title={previewItem?.label ?? "Furniture preview"}
+        title={previewItem?.label ?? "Furniture details"}
         visual={previewItem ? <FurnitureSprite item={previewItem} /> : null}
       />
+
+      {previewItem ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: 6,
+            fontFamily: "monospace",
+            fontSize: 11,
+            color: "var(--pixel-text)",
+            opacity: 0.82,
+          }}
+        >
+          <div>Placement: {previewItem.placement}</div>
+          <div>
+            Footprint: {previewItem.footprintW}x{previewItem.footprintH}
+          </div>
+          <div>
+            Rotation: {formatRotationLabel(activeFurnitureRotationQuarterTurns ?? 0)}
+          </div>
+        </div>
+      ) : null}
+
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          disabled={!canRotatePreviewItem}
+          onClick={() => onRotateFurnitureClockwise?.()}
+          style={{
+            ...btnBase,
+            opacity: canRotatePreviewItem ? 1 : 0.5,
+            cursor: canRotatePreviewItem ? "pointer" : "default",
+          }}
+          title={
+            canRotatePreviewItem
+              ? "Rotate the pending furniture preview"
+              : "This furniture asset has no alternate orientation"
+          }
+        >
+          Rotate
+        </button>
+      </div>
 
       <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
         {FURNITURE_PALETTE_CATEGORIES.map((cat) => (
@@ -990,7 +1055,9 @@ export function BottomToolbar({
   activeFloorPattern,
   onSelectFloorPattern,
   activeFurnitureId,
+  activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
+  onRotateFurnitureClockwise,
   activeTerrainTool = null,
   onSelectTerrainTool,
   selectedOfficePlaceable,
@@ -1091,7 +1158,12 @@ export function BottomToolbar({
       )}
       {isLayoutMode && activeTool === "wall" && <WallSubPanel />}
       {isLayoutMode && activeTool === "furniture" && (
-        <FurnitureSubPanel activeFurnitureId={activeFurnitureId} onSelectFurnitureId={onSelectFurnitureId} />
+        <FurnitureSubPanel
+          activeFurnitureId={activeFurnitureId}
+          activeFurnitureRotationQuarterTurns={activeFurnitureRotationQuarterTurns}
+          onSelectFurnitureId={onSelectFurnitureId}
+          onRotateFurnitureClockwise={onRotateFurnitureClockwise}
+        />
       )}
 
       {/* Button row */}

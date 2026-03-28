@@ -27,7 +27,9 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFloorPattern: "environment.floors.pattern-01",
   onSelectFloorPattern: vi.fn(),
   activeFurnitureId: null,
+  activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
+  onRotateFurnitureClockwise: vi.fn(),
   activeTerrainTool: null as { materialId: string; brushId: string } | null,
   onSelectTerrainTool: vi.fn(),
   selectedOfficePlaceable: null,
@@ -240,6 +242,36 @@ describe("BottomToolbar", () => {
     expect(container.textContent).toContain(
       "Layout > Furniture > Electronics > Monitor > Monitor - Front - Off",
     );
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("shows furniture details plus pending rotation controls while scene preview owns placement", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      activeTool: "furniture" as const,
+      activeFurnitureId: selectedItem.id,
+      activeFurnitureRotationQuarterTurns: 1 as const,
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain("Rotation: 90°");
+    expect(container.textContent).toContain(
+      "ghost preview follows your pointer inside the office scene",
+    );
+
+    act(() => {
+      getButton(container, "Rotate the pending furniture preview").click();
+    });
+
+    expect(props.onRotateFurnitureClockwise).toHaveBeenCalledOnce();
 
     act(() => {
       root.unmount();

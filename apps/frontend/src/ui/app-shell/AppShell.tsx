@@ -75,7 +75,11 @@ function App(): JSX.Element {
         activeFloorPattern={officeToolState.activeFloorPattern}
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
         activeFurnitureId={officeToolState.activeFurnitureId}
+        activeFurnitureRotationQuarterTurns={
+          officeToolState.activeFurnitureRotationQuarterTurns
+        }
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
+        onRotateFurnitureClockwise={officeToolState.onRotateFurnitureClockwise}
         activeTerrainTool={activeTerrainTool}
         entityToolbarViewModel={entityToolbarViewModel}
         selectedOfficePlaceable={selectedOfficePlaceable}
