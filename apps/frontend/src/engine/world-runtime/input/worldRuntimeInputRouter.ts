@@ -38,12 +38,12 @@ export class WorldRuntimeInputRouter {
       return;
     }
 
-    if (this.context.tryHandleOfficePointerDown(pointer)) {
+    if (this.context.hasActiveTerrainTool()) {
+      this.context.beginTerrainPaint(pointer);
       return;
     }
 
-    if (this.context.hasActiveTerrainTool()) {
-      this.context.beginTerrainPaint(pointer);
+    if (this.context.tryHandleOfficePointerDown(pointer)) {
       return;
     }
 
