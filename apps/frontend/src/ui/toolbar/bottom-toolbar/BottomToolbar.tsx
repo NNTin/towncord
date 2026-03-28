@@ -1113,6 +1113,7 @@ export function BottomToolbar({
           onClick={() => {
             if (isLayoutMode) {
               onSelectTool?.(null);
+              onSelectTerrainTool?.(null);
               onToggleLayoutMode();
             }
 

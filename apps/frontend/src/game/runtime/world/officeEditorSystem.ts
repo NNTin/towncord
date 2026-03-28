@@ -99,6 +99,7 @@ export class OfficeEditorSystem {
     }
 
     tile.kind = "void";
+    tile.tileId = 0;
     delete tile.tint;
     delete tile.colorAdjust;
     delete tile.pattern;
