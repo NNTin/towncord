@@ -75,6 +75,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeDispose: vi.fn(),
   officeEndPainting: vi.fn(),
   officeHandleSetEditorTool: vi.fn(),
+  officeTryHandleSecondaryPointerDown: vi.fn(() => false),
   officeShouldContinuePainting: vi.fn(() => false),
   officeSyncHighlight: vi.fn(),
   officeTryHandlePointerDown: vi.fn(() => false),
@@ -272,6 +273,8 @@ vi.mock("../worldSceneOfficeRuntime", () => ({
   WorldSceneOfficeRuntime: class {
     public bootstrap = assemblyMocks.officeBootstrap;
     public tryHandlePointerDown = assemblyMocks.officeTryHandlePointerDown;
+    public tryHandleSecondaryPointerDown =
+      assemblyMocks.officeTryHandleSecondaryPointerDown;
     public shouldContinuePainting = assemblyMocks.officeShouldContinuePainting;
     public continuePainting = assemblyMocks.officeContinuePainting;
     public syncHighlight = assemblyMocks.officeSyncHighlight;

@@ -15,9 +15,15 @@ import { OfficeEditorSystem } from "./officeEditorSystem";
 
 type OfficeRegion = AnchoredGridRegion<OfficeSceneLayout>;
 
+type OfficeFurnitureTarget = {
+  id: string;
+  bounds: Phaser.Geom.Rectangle;
+};
+
 type WorldSceneOfficeEditorControllerHost = {
   getOfficeRegion: () => OfficeRegion | null;
   getOfficeCellHighlight: () => Phaser.GameObjects.Rectangle | null;
+  getOfficeFurnitureTargets: () => readonly OfficeFurnitureTarget[];
   getActivePointer: () => Phaser.Input.Pointer | null;
   getWorldPoint: (screenX: number, screenY: number) => { x: number; y: number };
   emitOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
@@ -77,6 +83,7 @@ export class WorldSceneOfficeEditorController {
   private officeEditorToolPayload: OfficeSetEditorToolPayload = { tool: null };
   private isOfficePainting = false;
   private officeDirty = false;
+  private selectedFurnitureId: string | null = null;
 
   constructor(private readonly host: WorldSceneOfficeEditorControllerHost) {}
 
@@ -84,6 +91,7 @@ export class WorldSceneOfficeEditorController {
     this.officeEditorToolPayload = { tool: null };
     this.isOfficePainting = false;
     this.officeDirty = false;
+    this.selectedFurnitureId = null;
   }
 
   public getOfficeFloorMode(): OfficeFloorMode {
@@ -92,7 +100,48 @@ export class WorldSceneOfficeEditorController {
 
   public setOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.officeEditorToolPayload = cloneOfficeEditorToolPayload(payload);
+    if (payload.tool !== null) {
+      this.selectedFurnitureId = null;
+    }
+    this.isOfficePainting = false;
     this.syncOfficeCellHighlight(this.host.getActivePointer());
+  }
+
+  public getSelectedFurnitureId(): string | null {
+    return this.selectedFurnitureId;
+  }
+
+  public clearSelectedFurniture(): void {
+    this.selectedFurnitureId = null;
+  }
+
+  public rotateSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.rotateFurniture(region.layout, furnitureId);
+    if (changed) {
+      this.officeDirty = true;
+    }
+    return changed;
+  }
+
+  public deleteSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.removeFurniture(region.layout, furnitureId);
+    if (changed) {
+      this.officeDirty = true;
+      this.selectedFurnitureId = null;
+    }
+    return changed;
   }
 
   public consumePendingLayoutChange(): boolean {
@@ -132,7 +181,7 @@ export class WorldSceneOfficeEditorController {
 
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
     if (!getOfficeEditorTool(this.officeEditorToolPayload)) {
-      return false;
+      return this.trySelectFurniture(pointer);
     }
 
     const region = this.host.getOfficeRegion();
@@ -151,6 +200,34 @@ export class WorldSceneOfficeEditorController {
     }
 
     return false;
+  }
+
+  public tryHandleSecondaryPointerDown(pointer: Phaser.Input.Pointer): boolean {
+    if (pointer.button !== 2) {
+      return false;
+    }
+
+    if (getOfficeEditorTool(this.officeEditorToolPayload) !== "wall") {
+      return false;
+    }
+
+    const region = this.host.getOfficeRegion();
+    if (!region) {
+      return false;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
+    if (!cell) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.removeWall(region.layout, cell);
+    if (changed) {
+      this.officeDirty = true;
+    }
+
+    return changed;
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
@@ -177,6 +254,28 @@ export class WorldSceneOfficeEditorController {
 
   private emitPickedOfficeFloor(payload: OfficeFloorPickedPayload): void {
     this.host.emitOfficeFloorPicked(payload);
+  }
+
+  private trySelectFurniture(pointer: Phaser.Input.Pointer): boolean {
+    const region = this.host.getOfficeRegion();
+    if (!region) {
+      return false;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    if (!worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region)) {
+      return false;
+    }
+
+    const targets = [...this.host.getOfficeFurnitureTargets()].reverse();
+    const hit = targets.find((target) => target.bounds.contains(worldPoint.x, worldPoint.y));
+    if (!hit) {
+      this.selectedFurnitureId = null;
+      return true;
+    }
+
+    this.selectedFurnitureId = hit.id;
+    return true;
   }
 
   private pickOfficeFloor(

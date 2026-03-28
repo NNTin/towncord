@@ -4,7 +4,10 @@ import {
   resolveOfficeFloorAppearance,
   type OfficeColorAdjust,
 } from "../../content/structures/colors";
-import { FURNITURE_PALETTE_ITEMS } from "../../content/structures/furniturePalette";
+import {
+  FURNITURE_ALL_ITEMS,
+  FURNITURE_PALETTE_ITEMS,
+} from "../../content/structures/furniturePalette";
 import type {
   OfficeSceneFurniture,
   OfficeSceneFurnitureCategory,
@@ -16,6 +19,7 @@ import type { OfficeEditorToolId } from "../../contracts/office-editor";
 // Monotonic counter for unique furniture placement IDs. Module-level so it
 // survives re-instantiation of OfficeEditorSystem across re-renders.
 let nextFurniturePlacementId = 1;
+const ROTATION_ORDER = ["front", "right", "back", "left"] as const;
 
 type OfficeEditorCommand = {
   tool: OfficeEditorToolId;
@@ -75,6 +79,69 @@ export class OfficeEditorSystem {
     }
 
     return false;
+  }
+
+  public removeFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
+    const nextFurniture = layout.furniture.filter((furniture) => furniture.id !== furnitureId);
+    if (nextFurniture.length === layout.furniture.length) {
+      return false;
+    }
+
+    layout.furniture = nextFurniture;
+    return true;
+  }
+
+  public removeWall(layout: OfficeSceneLayout, cell: OfficeCellCoord): boolean {
+    const idx = cell.row * layout.cols + cell.col;
+    const tile = layout.tiles[idx];
+    if (!tile || tile.kind !== "wall") {
+      return false;
+    }
+
+    tile.kind = "void";
+    delete tile.tint;
+    delete tile.colorAdjust;
+    delete tile.pattern;
+    return true;
+  }
+
+  public rotateFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
+    const index = layout.furniture.findIndex((furniture) => furniture.id === furnitureId);
+    if (index < 0) {
+      return false;
+    }
+
+    const current = layout.furniture[index];
+    if (!current) {
+      return false;
+    }
+
+    const currentAsset = FURNITURE_ALL_ITEMS.find((item) => item.id === current.assetId);
+    const nextAsset = this.resolveRotatedFurnitureAsset(currentAsset);
+    if (!currentAsset || !nextAsset || nextAsset.id === currentAsset.id) {
+      return false;
+    }
+
+    const rotatedFurniture: OfficeSceneFurniture = {
+      ...current,
+      assetId: nextAsset.id,
+      label: nextAsset.label,
+      category: nextAsset.category as OfficeSceneFurnitureCategory,
+      placement: nextAsset.placement,
+      width: nextAsset.footprintW,
+      height: nextAsset.footprintH,
+      color: nextAsset.color,
+      accentColor: nextAsset.accentColor,
+      ...(nextAsset.groupId ? { groupId: nextAsset.groupId } : {}),
+      ...(nextAsset.orientation ? { orientation: nextAsset.orientation } : {}),
+      ...(nextAsset.state ? { state: nextAsset.state } : {}),
+      renderAsset: {
+        atlasKey: nextAsset.atlasKey,
+        atlasFrame: { ...nextAsset.atlasFrame },
+      },
+    };
+    layout.furniture[index] = rotatedFurniture;
+    return true;
   }
 
   // -------------------------------------------------------------------------
@@ -198,6 +265,9 @@ export class OfficeEditorSystem {
       height: paletteItem.footprintH,
       color: paletteItem.color,
       accentColor: paletteItem.accentColor,
+      ...(paletteItem.groupId ? { groupId: paletteItem.groupId } : {}),
+      ...(paletteItem.orientation ? { orientation: paletteItem.orientation } : {}),
+      ...(paletteItem.state ? { state: paletteItem.state } : {}),
       renderAsset: {
         atlasKey: paletteItem.atlasKey,
         atlasFrame: { ...paletteItem.atlasFrame },
@@ -206,5 +276,43 @@ export class OfficeEditorSystem {
 
     layout.furniture.push(newFurniture);
     return true;
+  }
+
+  private resolveRotatedFurnitureAsset(
+    currentAsset: (typeof FURNITURE_ALL_ITEMS)[number] | undefined,
+  ): (typeof FURNITURE_ALL_ITEMS)[number] | null {
+    if (!currentAsset?.groupId || !currentAsset.orientation) {
+      return null;
+    }
+
+    const candidates = FURNITURE_ALL_ITEMS.filter(
+      (item) => item.groupId === currentAsset.groupId,
+    );
+    if (candidates.length < 2) {
+      return null;
+    }
+
+    const currentState = currentAsset.state ?? null;
+    const currentIndex = ROTATION_ORDER.indexOf(currentAsset.orientation as (typeof ROTATION_ORDER)[number]);
+    if (currentIndex < 0) {
+      return null;
+    }
+
+    for (let offset = 1; offset <= ROTATION_ORDER.length; offset += 1) {
+      const nextOrientation = ROTATION_ORDER[(currentIndex + offset) % ROTATION_ORDER.length];
+      const nextAsset =
+        candidates.find(
+          (item) =>
+            item.orientation === nextOrientation &&
+            (item.state ?? null) === currentState,
+        ) ??
+        candidates.find((item) => item.orientation === nextOrientation);
+
+      if (nextAsset) {
+        return nextAsset;
+      }
+    }
+
+    return null;
   }
 }

@@ -145,6 +145,8 @@ export class WorldSceneAssembly {
       },
       tryHandleOfficePointerDown: (pointer) =>
         this.officeRuntime.tryHandlePointerDown(pointer),
+      tryHandleOfficeSecondaryPointerDown: (pointer) =>
+        this.officeRuntime.tryHandleSecondaryPointerDown(pointer),
       hasActiveTerrainTool: () => this.terrainController.hasActiveTool(),
       beginTerrainPaint: (pointer) =>
         this.terrainController.beginPainting(pointer),

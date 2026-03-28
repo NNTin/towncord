@@ -5,6 +5,7 @@ function makeContext() {
   return {
     beginPan: vi.fn(),
     tryHandleOfficePointerDown: vi.fn(() => false),
+    tryHandleOfficeSecondaryPointerDown: vi.fn(() => false),
     hasActiveTerrainTool: vi.fn(() => false),
     beginTerrainPaint: vi.fn(),
     handleSelectionAndInspect: vi.fn(),
@@ -44,6 +45,7 @@ describe("WorldRuntimeInputRouter", () => {
       router.onPointerDown(makePointer(2));
       expect(ctx.beginPan).not.toHaveBeenCalled();
       expect(ctx.tryHandleOfficePointerDown).not.toHaveBeenCalled();
+      expect(ctx.tryHandleOfficeSecondaryPointerDown).toHaveBeenCalledOnce();
     });
 
     test("left-click lets office handle first", () => {

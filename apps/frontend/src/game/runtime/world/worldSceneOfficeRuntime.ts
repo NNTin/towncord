@@ -18,6 +18,10 @@ const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
 const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
+const OFFICE_SELECTION_HIGHLIGHT_FILL = 0xf59e0b;
+const OFFICE_SELECTION_HIGHLIGHT_ALPHA = 0.08;
+const OFFICE_SELECTION_HIGHLIGHT_STROKE_WIDTH = 2;
+const OFFICE_SELECTION_HIGHLIGHT_STROKE = 0xfbbf24;
 
 type OfficeRegion = AnchoredGridRegion<OfficeSceneBootstrap["layout"]>;
 
@@ -32,6 +36,7 @@ export class WorldSceneOfficeRuntime {
   private officeRenderable: OfficeLayoutRenderable | null = null;
   private officeRegion: OfficeRegion | null = null;
   private officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
+  private officeSelectionHighlight: Phaser.GameObjects.Rectangle | null = null;
 
   constructor(
     private readonly host: WorldSceneOfficeRuntimeHost,
@@ -40,6 +45,8 @@ export class WorldSceneOfficeRuntime {
     this.controller = new WorldSceneOfficeEditorController({
       getOfficeRegion: () => this.officeRegion,
       getOfficeCellHighlight: () => this.officeCellHighlight,
+      getOfficeFurnitureTargets: () =>
+        this.officeRenderable?.renderIndex.furniture ?? [],
       getActivePointer: this.host.getActivePointer,
       getWorldPoint: this.host.getWorldPoint,
       emitOfficeFloorPicked: (payload) =>
@@ -66,6 +73,8 @@ export class WorldSceneOfficeRuntime {
       },
     );
     this.createOfficeCellHighlight(officeRegion.layout.cellSize);
+    this.createOfficeSelectionHighlight(officeRegion.layout.cellSize);
+    this.syncSelectionHighlight();
     return officeRegion;
   }
 
@@ -77,12 +86,29 @@ export class WorldSceneOfficeRuntime {
     return this.controller.getOfficeFloorMode();
   }
 
+  public getSelectedFurnitureId(): string | null {
+    return this.controller.getSelectedFurnitureId();
+  }
+
   public handleSetEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.controller.setOfficeEditorTool(payload);
+    this.syncSelectionHighlight();
   }
 
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
-    return this.controller.tryHandlePointerDown(pointer);
+    const handled = this.controller.tryHandlePointerDown(pointer);
+    if (handled) {
+      this.syncSelectionHighlight();
+    }
+    return handled;
+  }
+
+  public tryHandleSecondaryPointerDown(pointer: Phaser.Input.Pointer): boolean {
+    const handled = this.controller.tryHandleSecondaryPointerDown(pointer);
+    if (handled) {
+      this.syncSelectionHighlight();
+    }
+    return handled;
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
@@ -97,6 +123,38 @@ export class WorldSceneOfficeRuntime {
     this.controller.endPainting();
   }
 
+  public rotateSelectedFurniture(): boolean {
+    const changed = this.controller.rotateSelectedFurniture();
+    if (changed) {
+      this.rerenderOffice();
+      this.syncSelectionHighlight();
+      if (this.officeRegion) {
+        this.projections.emitOfficeLayoutChanged({
+          layout: this.officeRegion.layout,
+        });
+      }
+      this.controller.consumePendingLayoutChange();
+    }
+
+    return changed;
+  }
+
+  public deleteSelectedFurniture(): boolean {
+    const changed = this.controller.deleteSelectedFurniture();
+    if (changed) {
+      this.rerenderOffice();
+      this.syncSelectionHighlight();
+      if (this.officeRegion) {
+        this.projections.emitOfficeLayoutChanged({
+          layout: this.officeRegion.layout,
+        });
+      }
+      this.controller.consumePendingLayoutChange();
+    }
+
+    return changed;
+  }
+
   public syncHighlight(pointer: Phaser.Input.Pointer | null): void {
     this.controller.syncOfficeCellHighlight(pointer);
   }
@@ -107,6 +165,7 @@ export class WorldSceneOfficeRuntime {
     }
 
     this.rerenderOffice();
+    this.syncSelectionHighlight();
     if (this.officeRegion) {
       this.projections.emitOfficeLayoutChanged({
         layout: this.officeRegion.layout,
@@ -120,6 +179,8 @@ export class WorldSceneOfficeRuntime {
     this.officeRenderable = null;
     this.officeCellHighlight?.destroy();
     this.officeCellHighlight = null;
+    this.officeSelectionHighlight?.destroy();
+    this.officeSelectionHighlight = null;
     this.officeRegion = null;
   }
 
@@ -143,6 +204,52 @@ export class WorldSceneOfficeRuntime {
     );
     highlight.setVisible(false);
     this.officeCellHighlight = highlight;
+  }
+
+  private createOfficeSelectionHighlight(cellSize: number): void {
+    this.officeSelectionHighlight?.destroy();
+
+    const highlight = this.host.scene.add.rectangle(
+      0,
+      0,
+      cellSize,
+      cellSize,
+      OFFICE_SELECTION_HIGHLIGHT_FILL,
+      OFFICE_SELECTION_HIGHLIGHT_ALPHA,
+    );
+    highlight.setOrigin(0, 0);
+    highlight.setDepth(RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT + 1);
+    highlight.setStrokeStyle(
+      OFFICE_SELECTION_HIGHLIGHT_STROKE_WIDTH,
+      OFFICE_SELECTION_HIGHLIGHT_STROKE,
+      1,
+    );
+    highlight.setVisible(false);
+    this.officeSelectionHighlight = highlight;
+  }
+
+  private syncSelectionHighlight(): void {
+    const highlight = this.officeSelectionHighlight;
+    const region = this.officeRegion;
+    const officeRenderable = this.officeRenderable;
+    const selectedFurnitureId = this.controller.getSelectedFurnitureId();
+
+    if (!highlight || !region || !officeRenderable || !selectedFurnitureId) {
+      highlight?.setVisible(false);
+      return;
+    }
+
+    const target = officeRenderable.renderIndex.furniture.find(
+      (furniture) => furniture.id === selectedFurnitureId,
+    );
+    if (!target) {
+      highlight.setVisible(false);
+      return;
+    }
+
+    highlight.setPosition(target.bounds.x, target.bounds.y);
+    highlight.setSize(target.bounds.width, target.bounds.height);
+    highlight.setVisible(true);
   }
 
   private rerenderOffice(): void {
