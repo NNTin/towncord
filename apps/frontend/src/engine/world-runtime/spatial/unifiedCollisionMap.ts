@@ -27,7 +27,10 @@ export class UnifiedCollisionMap {
     if (region) {
       const cell = worldToAnchoredGridCell(worldX, worldY, region);
       if (cell) {
-        return region.getCellKind(cell.col, cell.row) === "floor";
+        const kind = region.getCellKind(cell.col, cell.row);
+        if (kind === "floor") return true;
+        if (kind === "wall") return false;
+        // kind === "void" or null: erased/empty cell falls through to terrain
       }
     }
 
