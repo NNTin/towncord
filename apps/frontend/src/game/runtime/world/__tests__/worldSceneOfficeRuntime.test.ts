@@ -223,7 +223,6 @@ describe("WorldSceneOfficeRuntime", () => {
       expect.objectContaining({
         worldOffsetX: 32,
         worldOffsetY: 48,
-        depthAnchorRow: 3,
       }),
     );
     expect(scene.add.rectangle).toHaveBeenCalledTimes(2);

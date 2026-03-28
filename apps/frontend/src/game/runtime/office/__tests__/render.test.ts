@@ -25,8 +25,10 @@ vi.mock("phaser", () => {
 class FakeDisplayObject {
   public visible = true;
   public destroyed = false;
+  public depth = 0;
 
-  setDepth(_depth: number): this {
+  setDepth(depth: number): this {
+    this.depth = depth;
     return this;
   }
 
@@ -132,7 +134,9 @@ function createScene() {
   const add = {
     container: vi.fn(() => new FakeContainer()),
     graphics: vi.fn(() => new FakeGraphics()),
-    image: vi.fn(() => new FakeDisplayObject()),
+    image: vi.fn(
+      (_x: number, _y: number, _key: string, _frame?: string) => new FakeDisplayObject(),
+    ),
     ellipse: vi.fn(() => new FakeDisplayObject()),
     circle: vi.fn(() => new FakeDisplayObject()),
     rectangle: vi.fn(() => new FakeDisplayObject()),
@@ -158,7 +162,90 @@ function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneL
   };
 }
 
+/** Returns only the image call results whose frame arg starts with "environment.walls.". */
+function findWallImages(scene: ReturnType<typeof createScene>): FakeDisplayObject[] {
+  const results: FakeDisplayObject[] = [];
+  for (let i = 0; i < scene.add.image.mock.calls.length; i++) {
+    const args = scene.add.image.mock.calls[i];
+    const result = scene.add.image.mock.results[i];
+    if (!args || !result) continue;
+    const frame = args[3];
+    if (typeof frame === "string" && frame.startsWith("environment.walls.")) {
+      results.push(result.value as FakeDisplayObject);
+    }
+  }
+  return results;
+}
+
 describe("renderOfficeLayout", () => {
+  test("wall sprites are added as scene-level objects with y-sorted depth", () => {
+    // Wall at col=0, row=1 in a 2×2 grid with cellSize=16 and worldOffsetY=32.
+    // Expected depth = worldOffsetY + (row + 1) * cellSize = 32 + 2 * 16 = 64.
+    const scene = createScene();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: [
+        { kind: "floor", tileId: 0 },
+        { kind: "void", tileId: 0 },
+        { kind: "wall", tileId: 8 },
+        { kind: "floor", tileId: 0 },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetY: 32,
+    });
+
+    const wallImages = findWallImages(scene);
+    expect(wallImages).toHaveLength(1);
+    // The wall at row=1 must have depth 64 so it occludes entities above it.
+    expect(wallImages[0]?.depth).toBe(64);
+  });
+
+  test("wall sprite depths update when partialUpdate changes the tile layout", () => {
+    const scene = createScene();
+    const wallTile = { kind: "wall" as const, tileId: 8 };
+    const floorTile = { kind: "floor" as const, tileId: 0 };
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 2,
+      cellSize: 16,
+      tiles: [wallTile, floorTile],
+      furniture: [],
+      characters: [],
+    };
+
+    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetY: 0,
+    });
+
+    // Initial: one wall sprite at row=0 → depth = 0 + (0+1)*16 = 16.
+    const initialWallImages = findWallImages(scene);
+    expect(initialWallImages).toHaveLength(1);
+    const initialWallSprite = initialWallImages[0]!;
+    expect(initialWallSprite.depth).toBe(16);
+
+    // Move the wall to row=1; the old row=0 sprite must be destroyed and a
+    // new sprite at depth = (0+2)*16 = 32 must be created.
+    renderable.partialUpdate({
+      ...layout,
+      tiles: [floorTile, wallTile],
+    });
+
+    expect(initialWallSprite.destroyed).toBe(true);
+
+    const allWallImages = findWallImages(scene);
+    // Two total wall image calls: the original (now destroyed) + the new one.
+    expect(allWallImages).toHaveLength(2);
+    const newWallSprite = allWallImages[1]!;
+    expect(newWallSprite.depth).toBe(32);
+    expect(newWallSprite.destroyed).toBe(false);
+  });
+
   test("reuses the existing character render when the characters array is unchanged", () => {
     const scene = createScene();
     const characters = [

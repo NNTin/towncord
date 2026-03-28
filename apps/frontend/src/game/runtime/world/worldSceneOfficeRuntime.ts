@@ -94,7 +94,6 @@ export class WorldSceneOfficeRuntime {
         worldOffsetX: officeRegion.anchorX16 * WORLD_REGION_BASE_PX,
         worldOffsetY: officeRegion.anchorY16 * WORLD_REGION_BASE_PX,
         tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-        depthAnchorRow: officeRegion.anchorY16,
       },
     );
     this.createOfficeCellHighlight(officeRegion.layout.cellSize);
@@ -539,7 +538,6 @@ export class WorldSceneOfficeRuntime {
       worldOffsetX: region.anchorX16 * WORLD_REGION_BASE_PX,
       worldOffsetY: region.anchorY16 * WORLD_REGION_BASE_PX,
       tileDepth: RENDER_LAYERS.OFFICE_FLOOR,
-      depthAnchorRow: region.anchorY16,
     });
   }
 }

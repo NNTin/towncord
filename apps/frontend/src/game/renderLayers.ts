@@ -10,7 +10,7 @@
  *
  *   TERRAIN_STATIC   -1000   ← terrain chunk render-textures (static tiles)
  *   TERRAIN_ANIMATED  -999   ← terrain chunk render-textures (animated tiles, drawn on top of static within same chunk)
- *   OFFICE_FLOOR      -500   ← office tile graphics layer (floor/wall tiles)
+ *   OFFICE_FLOOR      -500   ← office tile graphics layer (floor tiles only; walls/furniture/characters use y-sorted depth)
  *   ENTITIES           y-sorted (entity.position.y, roughly 0..map-height in world pixels)
  *   OFFICE_CELL_HIGHLIGHT  8000   ← hover-highlight overlay for office editor
  *   TERRAIN_BRUSH_PREVIEW  9000   ← terrain-paint brush hover rectangle
@@ -31,8 +31,11 @@ export const RENDER_LAYERS = {
   TERRAIN_ANIMATED: -999,
 
   /**
-   * Depth for the office floor/wall tile graphics layer.
+   * Depth for the office floor tile graphics layer.
    * Sits above terrain and below world entities.
+   * Wall tiles, furniture, and characters are rendered as scene-level objects
+   * with y-sorted depth so they can occlude or be occluded by entities
+   * correctly.
    */
   OFFICE_FLOOR: -500,
 
