@@ -211,7 +211,7 @@ describe("WorldSceneOfficeEditorController", () => {
     });
   });
 
-  test("starts a furniture drag on second click of the selected item and commits move on endPainting", () => {
+  test("starts a furniture drag on second click of the selected item and hides same-cell move previews", () => {
     const { controller, region } = createControllerHarness();
 
     // First click: select the furniture
@@ -242,21 +242,19 @@ describe("WorldSceneOfficeEditorController", () => {
       controller.shouldContinuePainting({ isDown: true } as never),
     ).toBe(true);
 
-    // Build a drag preview at col:0, row:0 (pointer x=4,y=4 resolves to that cell in the 1x1 layout)
+    // Same-cell drags should not show a preview because moveFurniture would be a no-op.
     const preview = controller.getDragMovePreview({
       isDown: true,
       withinGame: true,
       x: 4,
       y: 4,
     } as never);
-    // Preview is non-null (drag is active and pointer is within the office region)
-    expect(preview).not.toBeNull();
-    expect(preview?.anchorCell).toMatchObject({ col: 0, row: 0 });
+    expect(preview).toBeNull();
 
-    // end painting commits the drag (same position = no layout change since moveFurniture short-circuits)
+    // end painting clears drag state without mutating the layout
     controller.endPainting();
     expect(controller.isFurnitureDragging()).toBe(false);
-    expect(controller.consumePendingLayoutChange()).toBe(false); // No actual move since same cell
+    expect(controller.consumePendingLayoutChange()).toBe(false);
     expect(region.layout.furniture[0]?.col).toBe(0);
     expect(region.layout.furniture[0]?.row).toBe(0);
   });

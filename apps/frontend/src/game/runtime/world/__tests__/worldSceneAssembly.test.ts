@@ -75,6 +75,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeDispose: vi.fn(),
   officeEndPainting: vi.fn(),
   officeHandleSetEditorTool: vi.fn(),
+  officeRotateSelectedFurniture: vi.fn(),
   officeTryHandleSecondaryPointerDown: vi.fn(() => false),
   officeShouldContinuePainting: vi.fn(() => false),
   officeSyncHighlight: vi.fn(),
@@ -280,6 +281,7 @@ vi.mock("../worldSceneOfficeRuntime", () => ({
     public continuePainting = assemblyMocks.officeContinuePainting;
     public syncHighlight = assemblyMocks.officeSyncHighlight;
     public endPainting = assemblyMocks.officeEndPainting;
+    public rotateSelectedFurniture = assemblyMocks.officeRotateSelectedFurniture;
     public update = assemblyMocks.officeUpdate;
     public handleSetEditorTool = assemblyMocks.officeHandleSetEditorTool;
     public dispose = assemblyMocks.officeDispose;
@@ -335,6 +337,15 @@ vi.mock("../worldSceneCommandBindings", () => ({
 import { createWorldSceneLifecycle } from "../../../../game/runtime/world/createWorldSceneLifecycle";
 
 function makeScene(): Record<string, unknown> {
+  const movementKeys = {
+    W: { isDown: false },
+    A: { isDown: false },
+    S: { isDown: false },
+    D: { isDown: false },
+  };
+  const shiftKey = { isDown: false };
+  const rKey = { isDown: false };
+
   return {
     registry: {
       get: vi.fn(() => ({ world: true })),
@@ -342,13 +353,10 @@ function makeScene(): Record<string, unknown> {
     input: {
       activePointer: { withinGame: true, x: 12, y: 34 },
       keyboard: {
-        addKeys: vi.fn(() => ({
-          W: { isDown: false },
-          A: { isDown: false },
-          S: { isDown: false },
-          D: { isDown: false },
-        })),
-        addKey: vi.fn(() => ({ isDown: false })),
+        addKeys: vi.fn(() => movementKeys),
+        addKey: vi.fn((keyCode: number) =>
+          keyCode === 16 ? shiftKey : rKey,
+        ),
       },
       on: vi.fn(),
       off: vi.fn(),
@@ -362,6 +370,11 @@ function makeScene(): Record<string, unknown> {
     },
     game: {
       events: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
+    },
+    __testKeys: {
+      movementKeys,
+      shiftKey,
+      rKey,
     },
   };
 }
@@ -484,5 +497,29 @@ describe("WorldScene assembly", () => {
     lifecycle.onResize();
 
     expect(assemblyMocks.cameraCenterCameraOnWorld).toHaveBeenCalledOnce();
+  });
+
+  test("rotates selected furniture on the R key rising edge", () => {
+    const lifecycle = createWorldSceneLifecycle();
+    const scene = makeScene() as ReturnType<typeof makeScene> & {
+      __testKeys: {
+        movementKeys: { W: { isDown: boolean }; A: { isDown: boolean }; S: { isDown: boolean }; D: { isDown: boolean } };
+        shiftKey: { isDown: boolean };
+        rKey: { isDown: boolean };
+      };
+    };
+
+    lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
+
+    scene.__testKeys.rKey.isDown = true;
+    lifecycle.update(16);
+    lifecycle.update(16);
+    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(1);
+
+    scene.__testKeys.rKey.isDown = false;
+    lifecycle.update(16);
+    scene.__testKeys.rKey.isDown = true;
+    lifecycle.update(16);
+    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(2);
   });
 });

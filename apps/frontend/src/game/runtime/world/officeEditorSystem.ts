@@ -400,6 +400,10 @@ export class OfficeEditorSystem {
       return null;
     }
 
+    if (furniture.col === targetCell.col && furniture.row === targetCell.row) {
+      return null;
+    }
+
     const blockedReason: "out-of-bounds" | null =
       targetCell.col < 0 ||
       targetCell.row < 0 ||

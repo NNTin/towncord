@@ -581,4 +581,39 @@ describe("OfficeEditorSystem floor editing", () => {
       affectedFurniture: [],
     });
   });
+
+  test("previewFurnitureMove returns null when dragging within the current cell", () => {
+    if (!laptop) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    expect(
+      system.previewFurnitureMove(layout, "desk-laptop", { col: 0, row: 0 }),
+    ).toBeNull();
+  });
 });

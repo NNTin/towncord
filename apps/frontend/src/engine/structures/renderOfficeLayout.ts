@@ -23,6 +23,12 @@ type OfficeRenderableTarget = {
   bounds: Phaser.Geom.Rectangle;
 };
 
+type FurnitureRenderableEntry = {
+  target: OfficeRenderableTarget;
+  container: Phaser.GameObjects.Container;
+  renderSignature: string;
+};
+
 export type OfficeSceneRenderIndex = {
   furniture: OfficeRenderableTarget[];
   characters: OfficeRenderableTarget[];
@@ -73,10 +79,7 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   private readonly tileLayer: Phaser.GameObjects.Container;
   private readonly worldOffsetX: number;
   private readonly worldOffsetY: number;
-  private readonly furnitureMap = new Map<
-    string,
-    { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }
-  >();
+  private readonly furnitureMap = new Map<string, FurnitureRenderableEntry>();
   private characterEntries: Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> = [];
   private characterSource: readonly OfficeSceneCharacter[];
   /**
@@ -202,10 +205,13 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     }
 
     for (const item of layout.furniture) {
-      if (this.furnitureMap.has(item.id)) {
+      const nextRenderSignature = buildFurnitureRenderSignature(item);
+      const existing = this.furnitureMap.get(item.id);
+      if (existing?.renderSignature === nextRenderSignature) {
         continue;
       }
 
+      existing?.container.destroy(true);
       const { target, container } = renderFurniture(
         this.scene,
         layout,
@@ -215,7 +221,11 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
       );
       // container is a direct scene-level object — do NOT add to this.container
       // so its depth participates in the scene's y-sort.
-      this.furnitureMap.set(item.id, { target, container });
+      this.furnitureMap.set(item.id, {
+        target,
+        container,
+        renderSignature: nextRenderSignature,
+      });
     }
   }
 
@@ -330,6 +340,30 @@ function renderFurniture(
   };
 
   return { target, container };
+}
+
+function buildFurnitureRenderSignature(item: OfficeSceneFurniture): string {
+  const renderAssetSignature = item.renderAsset
+    ? [
+        item.renderAsset.atlasKey,
+        item.renderAsset.atlasFrame.x,
+        item.renderAsset.atlasFrame.y,
+        item.renderAsset.atlasFrame.w,
+        item.renderAsset.atlasFrame.h,
+      ].join(",")
+    : "fallback";
+
+  return [
+    item.label,
+    item.placement,
+    item.col,
+    item.row,
+    item.width,
+    item.height,
+    item.color,
+    item.accentColor,
+    renderAssetSignature,
+  ].join("|");
 }
 
 function renderFurnitureSprite(
