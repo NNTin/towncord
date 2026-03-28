@@ -123,6 +123,26 @@ const subPanel: React.CSSProperties = {
   maxWidth: 320,
 };
 
+const actionPanel: React.CSSProperties = {
+  ...subPanel,
+  gap: 8,
+  maxWidth: 420,
+};
+
+const actionRow: React.CSSProperties = {
+  display: "flex",
+  gap: 4,
+  flexWrap: "wrap",
+  alignItems: "center",
+};
+
+const sectionLabel: React.CSSProperties = {
+  fontFamily: "monospace",
+  fontSize: 11,
+  color: "var(--pixel-text)",
+  opacity: 0.7,
+};
+
 const btnBase: React.CSSProperties = {
   padding: "5px 10px",
   fontSize: "14px",
@@ -137,13 +157,6 @@ const btnActive: React.CSSProperties = {
   ...btnBase,
   background: "var(--pixel-active-bg)",
   border: "2px solid var(--pixel-accent)",
-};
-
-const divider: React.CSSProperties = {
-  width: 1,
-  background: "var(--pixel-border)",
-  alignSelf: "stretch",
-  margin: "2px 2px",
 };
 
 // ─── Furniture sprite ─────────────────────────────────────────────────────────
@@ -968,7 +981,7 @@ function LayoutOverviewSubPanel({
       <div style={subPanel}>
         <PreviewCard
           breadcrumbs={["Layout"]}
-          description="Choose Floor, Wall, Erase, or Furniture to make a layout change."
+          description="Choose Floor, Terrain, Wall, Erase, or Furniture to make a layout change."
           title="Layout editing"
         />
       </div>
@@ -1152,6 +1165,12 @@ export function BottomToolbar({
     }
   }, [entityToolbarViewModel]);
 
+  useEffect(() => {
+    if (isLayoutMode) {
+      setIsEntitiesPanelOpen(false);
+    }
+  }, [isLayoutMode]);
+
   function resolveButtonStyle(
     key: string,
     options: { active?: boolean; disabled?: boolean } = {},
@@ -1187,13 +1206,41 @@ export function BottomToolbar({
     });
   }
 
-  function handleToggleLayoutMode(): void {
+  function closeLayoutPanel(): void {
+    if (!isLayoutMode) {
+      return;
+    }
+
+    onSelectTool?.(null);
+    onSelectTerrainTool?.(null);
+    onToggleLayoutMode();
+  }
+
+  function handleLayoutButtonClick(): void {
     setIsEntitiesPanelOpen(false);
     if (isLayoutMode) {
-      onSelectTerrainTool?.(null);
+      closeLayoutPanel();
+      return;
     }
 
     onToggleLayoutMode();
+  }
+
+  function handleEntityButtonClick(): void {
+    if (!entityToolbarViewModel) {
+      return;
+    }
+
+    if (isEntitiesPanelOpen) {
+      setIsEntitiesPanelOpen(false);
+      return;
+    }
+
+    if (isLayoutMode) {
+      closeLayoutPanel();
+    }
+
+    setIsEntitiesPanelOpen(true);
   }
 
   return (
@@ -1241,46 +1288,10 @@ export function BottomToolbar({
           onRotateFurnitureClockwise={onRotateFurnitureClockwise}
         />
       )}
-
-      {/* Button row */}
-      <div style={panelRow}>
-        <button
-          type="button"
-          onClick={handleToggleLayoutMode}
-          onMouseEnter={() => setHovered("layout")}
-          onMouseLeave={() => setHovered(null)}
-          style={resolveButtonStyle("layout", { active: isLayoutMode })}
-          title="Toggle layout editing mode"
-        >
-          Layout{isLayoutDirty ? "*" : ""}
-        </button>
-
-        <button
-          type="button"
-          disabled={!entityToolbarViewModel}
-          onClick={() => {
-            if (isLayoutMode) {
-              onSelectTool?.(null);
-              onSelectTerrainTool?.(null);
-              onToggleLayoutMode();
-            }
-
-            setIsEntitiesPanelOpen((open) => !open);
-          }}
-          onMouseEnter={() => setHovered("entities")}
-          onMouseLeave={() => setHovered(null)}
-          style={resolveButtonStyle("entities", {
-            active: isEntitiesPanelOpen,
-            disabled: !entityToolbarViewModel,
-          })}
-          title="Entity placeables"
-        >
-          Entity
-        </button>
-
-        {isLayoutMode && (
-          <>
-            <div style={divider} />
+      {isLayoutMode && (
+        <div style={actionPanel}>
+          <div style={sectionLabel}>Layout</div>
+          <div style={actionRow}>
             <button
               type="button"
               onClick={() => handleToolClick("floor")}
@@ -1331,9 +1342,8 @@ export function BottomToolbar({
             >
               Furniture
             </button>
-
-            <div style={divider} />
-
+          </div>
+          <div style={actionRow}>
             <button
               type="button"
               disabled={!canSaveLayout}
@@ -1385,8 +1395,37 @@ export function BottomToolbar({
                 {layoutStatusText}
               </div>
             ) : null}
-          </>
-        )}
+          </div>
+        </div>
+      )}
+
+      {/* Button row */}
+      <div style={panelRow}>
+        <button
+          type="button"
+          onClick={handleLayoutButtonClick}
+          onMouseEnter={() => setHovered("layout")}
+          onMouseLeave={() => setHovered(null)}
+          style={resolveButtonStyle("layout", { active: isLayoutMode })}
+          title="Toggle layout editing mode"
+        >
+          Layout{isLayoutDirty ? "*" : ""}
+        </button>
+
+        <button
+          type="button"
+          disabled={!entityToolbarViewModel}
+          onClick={handleEntityButtonClick}
+          onMouseEnter={() => setHovered("entities")}
+          onMouseLeave={() => setHovered(null)}
+          style={resolveButtonStyle("entities", {
+            active: isEntitiesPanelOpen,
+            disabled: !entityToolbarViewModel,
+          })}
+          title="Entity placeables"
+        >
+          Entity
+        </button>
       </div>
     </div>
   );

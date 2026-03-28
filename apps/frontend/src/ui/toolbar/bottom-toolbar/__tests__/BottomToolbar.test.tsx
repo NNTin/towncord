@@ -67,12 +67,20 @@ function renderToolbar(props = baseProps) {
   };
 }
 
-function getButton(container: HTMLElement, title: string): HTMLButtonElement {
+function findButton(
+  container: HTMLElement,
+  title: string,
+): HTMLButtonElement | null {
   const button = Array.from(container.querySelectorAll("button")).find(
     (element) => element.getAttribute("title") === title,
   );
 
-  if (!(button instanceof HTMLButtonElement)) {
+  return button instanceof HTMLButtonElement ? button : null;
+}
+
+function getButton(container: HTMLElement, title: string): HTMLButtonElement {
+  const button = findButton(container, title);
+  if (!button) {
     throw new Error(`Missing button with title: ${title}`);
   }
 
@@ -85,6 +93,50 @@ afterEach(() => {
 });
 
 describe("BottomToolbar", () => {
+  test("opens a dedicated Layout panel before exposing layout actions", () => {
+    const props = {
+      ...baseProps,
+      isLayoutMode: false,
+    };
+    const { container, root, rerender } = renderToolbar(props);
+
+    expect(findButton(container, "Floor tool")).toBeNull();
+    expect(findButton(container, "Terrain tool")).toBeNull();
+    expect(findButton(container, "Save combined layout data")).toBeNull();
+    expect(findButton(container, "Toggle JSON editor")).toBeNull();
+
+    act(() => {
+      getButton(container, "Toggle layout editing mode").click();
+    });
+
+    expect(props.onToggleLayoutMode).toHaveBeenCalledOnce();
+
+    rerender({
+      ...props,
+      isLayoutMode: true,
+    });
+
+    expect(container.textContent).toContain("Layout editing");
+    expect(getButton(container, "Floor tool")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Terrain tool")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Save combined layout data")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+    expect(getButton(container, "Toggle JSON editor")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+
+    act(() => {
+      getButton(container, "Floor tool").click();
+    });
+
+    expect(props.onSelectTool).toHaveBeenCalledWith("floor");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
   test("shows the Entities panel outside layout mode and wires drag start through the toolbar view model", () => {
     const onDragStart = vi.fn();
     const props = {
