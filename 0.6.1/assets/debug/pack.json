@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "generatedAt": "2026-03-28T18:24:47.561467+00:00",
+    "generator": "packages/public-assets/pipeline/export_public_assets.py",
+    "namespace": "debug",
+    "seed": "257263088",
+    "format": "phaser-asset-pack"
+  },
+  "debug": {
+    "files": [
+      {
+        "type": "atlas",
+        "key": "debug.tilesets",
+        "textureURL": "assets/debug/atlas.png",
+        "atlasURL": "assets/debug/atlas.json"
+      },
+      {
+        "type": "json",
+        "key": "debug.animations",
+        "url": "assets/debug/animations.json"
+      }
+    ]
+  }
+}
