@@ -509,9 +509,22 @@ export class WorldSceneOfficeRuntime {
           : `Replace ${firstFurniture.label}`;
       }
       case "blocked":
-        return preview.blockedReason === "out-of-bounds"
-          ? "Blocked: outside office bounds"
-          : "Blocked";
+        if (preview.blockedReason === "out-of-bounds") {
+          return "Blocked: outside office bounds";
+        }
+
+        if (preview.blockedReason === "occupied") {
+          const [firstFurniture, ...rest] = preview.affectedFurniture;
+          if (!firstFurniture) {
+            return "Blocked: occupied";
+          }
+
+          return rest.length > 0
+            ? `Blocked: occupied by ${firstFurniture.label} + ${rest.length} more`
+            : `Blocked: occupied by ${firstFurniture.label}`;
+        }
+
+        return "Blocked";
       case "place":
       default:
         return `Place ${preview.asset.label}`;

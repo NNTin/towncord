@@ -49,7 +49,7 @@ export type OfficeFurniturePlacementPreview = {
   footprintW: number;
   footprintH: number;
   affectedFurniture: OfficeSceneFurniture[];
-  blockedReason: "out-of-bounds" | null;
+  blockedReason: "out-of-bounds" | "occupied" | null;
 };
 
 /**
@@ -421,16 +421,17 @@ export class OfficeEditorSystem {
             furniture.height,
           ).filter((f) => f.id !== furnitureId)
         : [];
+    const moveBlockedReason =
+      blockedReason ?? (affectedFurniture.length > 0 ? "occupied" : null);
 
     return {
-      kind:
-        blockedReason !== null ? "blocked" : affectedFurniture.length > 0 ? "replace" : "place",
+      kind: moveBlockedReason !== null ? "blocked" : "place",
       anchorCell: targetCell,
       asset,
       footprintW: furniture.width,
       footprintH: furniture.height,
       affectedFurniture,
-      blockedReason,
+      blockedReason: moveBlockedReason,
     };
   }
 

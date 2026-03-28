@@ -4,7 +4,9 @@ import type { AnchoredGridRegion } from "../../../../engine/world-runtime/region
 import { FURNITURE_ALL_ITEMS } from "../../../content/structures/furniturePalette";
 import { WorldSceneOfficeEditorController } from "../worldSceneOfficeEditorController";
 
-function createControllerHarness() {
+function createControllerHarness(options: { cols?: number; rows?: number } = {}) {
+  const cols = options.cols ?? 1;
+  const rows = options.rows ?? 1;
   const highlight = {
     setPosition: vi.fn(),
     setVisible: vi.fn(),
@@ -16,15 +18,13 @@ function createControllerHarness() {
     x: 12,
     y: 12,
   };
-  const tiles: OfficeSceneTile[] = [
-    {
-      kind: "floor",
-      tileId: 0,
-    },
-  ];
+  const tiles: OfficeSceneTile[] = Array.from({ length: cols * rows }, () => ({
+    kind: "floor",
+    tileId: 0,
+  }));
   const layout: OfficeSceneLayout = {
-    cols: 1,
-    rows: 1,
+    cols,
+    rows,
     cellSize: 16,
     tiles,
     furniture: [],
@@ -257,6 +257,54 @@ describe("WorldSceneOfficeEditorController", () => {
     expect(controller.consumePendingLayoutChange()).toBe(false);
     expect(region.layout.furniture[0]?.col).toBe(0);
     expect(region.layout.furniture[0]?.row).toBe(0);
+  });
+
+  test("cancels a furniture drag when the pointer leaves the playable office area", () => {
+    const { controller, region } = createControllerHarness({ cols: 3, rows: 2 });
+
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+
+    expect(
+      controller.getDragMovePreview({
+        isDown: true,
+        withinGame: true,
+        x: 20,
+        y: 4,
+      } as never),
+    ).toMatchObject({
+      kind: "place",
+      anchorCell: { col: 1, row: 0 },
+    });
+
+    expect(
+      controller.getDragMovePreview({
+        isDown: true,
+        withinGame: false,
+        x: 20,
+        y: 4,
+      } as never),
+    ).toBeNull();
+
+    controller.endPainting();
+
+    expect(region.layout.furniture[0]?.col).toBe(0);
+    expect(region.layout.furniture[0]?.row).toBe(0);
+    expect(controller.consumePendingLayoutChange()).toBe(false);
   });
 
   test("right-click wall deletion only removes wall tiles", () => {

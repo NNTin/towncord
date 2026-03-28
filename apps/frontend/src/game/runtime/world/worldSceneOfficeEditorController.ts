@@ -245,27 +245,40 @@ export class WorldSceneOfficeEditorController {
   public getDragMovePreview(
     pointer: Phaser.Input.Pointer | null,
   ): OfficeFurniturePlacementPreview | null {
-    if (!this.isDraggingFurniture || !this.dragFurnitureId || !pointer) {
+    if (!this.isDraggingFurniture || !this.dragFurnitureId) {
+      return null;
+    }
+
+    if (!pointer) {
+      this.dragLastCell = null;
       return null;
     }
 
     if (!isPointerWithinGame(pointer)) {
+      this.dragLastCell = null;
       return null;
     }
 
     const region = this.host.getOfficeRegion();
     if (!region) {
+      this.dragLastCell = null;
       return null;
     }
 
     const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
     const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
     if (!cell) {
+      this.dragLastCell = null;
       return null;
     }
 
-    this.dragLastCell = cell;
-    return this.officeEditorSystem.previewFurnitureMove(region.layout, this.dragFurnitureId, cell);
+    const preview = this.officeEditorSystem.previewFurnitureMove(
+      region.layout,
+      this.dragFurnitureId,
+      cell,
+    );
+    this.dragLastCell = preview ? cell : null;
+    return preview;
   }
 
   public getFurniturePlacementPreview(

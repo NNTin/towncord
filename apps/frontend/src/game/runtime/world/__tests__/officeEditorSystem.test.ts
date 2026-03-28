@@ -582,6 +582,59 @@ describe("OfficeEditorSystem floor editing", () => {
     });
   });
 
+  test("previewFurnitureMove returns a blocked preview when the target overlaps furniture", () => {
+    if (!laptop || !rotatingChair) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 3,
+      rows: 1,
+      cellSize: 16,
+      tiles: Array.from({ length: 3 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+        {
+          id: "chair-1",
+          assetId: rotatingChair.id,
+          label: rotatingChair.label,
+          category: rotatingChair.category as never,
+          placement: rotatingChair.placement,
+          col: 1,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: rotatingChair.color ?? 0x000000,
+          accentColor: rotatingChair.accentColor ?? 0x000000,
+          renderAsset: { atlasKey: rotatingChair.atlasKey, atlasFrame: { ...rotatingChair.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    expect(
+      system.previewFurnitureMove(layout, "desk-laptop", { col: 1, row: 0 }),
+    ).toMatchObject({
+      kind: "blocked",
+      blockedReason: "occupied",
+      affectedFurniture: [expect.objectContaining({ id: "chair-1" })],
+    });
+  });
+
   test("previewFurnitureMove returns null when dragging within the current cell", () => {
     if (!laptop) {
       throw new Error("Missing test assets");
