@@ -13,6 +13,7 @@ const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
 const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 const DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY = "donarg.office.environment";
 const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
+const WALL_MOUNT_DEPTH_OFFSET = 0.5;
 
 type OfficeRenderableTargetKind = "furniture" | "character";
 
@@ -328,9 +329,7 @@ function renderFurniture(
     renderFurnitureFallback(scene, container, layout, item, width, height);
   }
 
-  // South-edge world-pixel Y: entities above this row render behind the
-  // furniture; entities below it render in front.
-  container.setDepth(worldOffsetY + (item.row + item.height) * layout.cellSize);
+  container.setDepth(resolveFurnitureDepth(layout, item, worldOffsetY));
 
   const target: OfficeRenderableTarget = {
     kind: "furniture",
@@ -340,6 +339,24 @@ function renderFurniture(
   };
 
   return { target, container };
+}
+
+function resolveFurnitureDepth(
+  layout: OfficeSceneLayout,
+  item: OfficeSceneFurniture,
+  worldOffsetY: number,
+): number {
+  const southEdgeDepth = worldOffsetY + (item.row + item.height) * layout.cellSize;
+  if (item.placement === "wall") {
+    // Wall sprites render at the wall cell's south edge. Wall-mounted furniture
+    // must sit slightly in front of that plane so partial wall rebuilds cannot
+    // cover unchanged mounted items that retain their existing containers.
+    return southEdgeDepth + WALL_MOUNT_DEPTH_OFFSET;
+  }
+
+  // South-edge world-pixel Y: entities above this row render behind the
+  // furniture; entities below it render in front.
+  return southEdgeDepth;
 }
 
 function buildFurnitureRenderSignature(item: OfficeSceneFurniture): string {
