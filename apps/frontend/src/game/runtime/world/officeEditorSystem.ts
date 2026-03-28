@@ -105,6 +105,17 @@ export class OfficeEditorSystem {
     return true;
   }
 
+  public canRotateFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
+    const current = layout.furniture.find((furniture) => furniture.id === furnitureId);
+    if (!current) {
+      return false;
+    }
+
+    const currentAsset = FURNITURE_ALL_ITEMS.find((item) => item.id === current.assetId);
+    const nextAsset = this.resolveRotatedFurnitureAsset(currentAsset);
+    return Boolean(nextAsset && currentAsset && nextAsset.id !== currentAsset.id);
+  }
+
   public rotateFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
     const index = layout.furniture.findIndex((furniture) => furniture.id === furnitureId);
     if (index < 0) {

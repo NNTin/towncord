@@ -30,6 +30,9 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   onSelectFurnitureId: vi.fn(),
   activeTerrainTool: null as { materialId: string; brushId: string } | null,
   onSelectTerrainTool: vi.fn(),
+  selectedOfficePlaceable: null,
+  onRotateSelectedOfficePlaceable: vi.fn(),
+  onDeleteSelectedOfficePlaceable: vi.fn(),
   onResetLayout: vi.fn(),
   onSaveLayout: vi.fn(),
   canResetLayout: true,
@@ -237,6 +240,76 @@ describe("BottomToolbar", () => {
     expect(container.textContent).toContain(
       "Layout > Furniture > Electronics > Monitor > Monitor - Front - Off",
     );
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("shows the selected placeable card and wires rotate/delete actions", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      selectedOfficePlaceable: {
+        kind: "furniture" as const,
+        id: "desk-laptop",
+        assetId: selectedItem.id,
+        label: selectedItem.label,
+        category: selectedItem.category as never,
+        placement: selectedItem.placement,
+        canRotate: true,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain(
+      "Layout > Selected > Electronics > Laptop > Laptop - Front - Off",
+    );
+    expect(container.textContent).toContain(selectedItem.label);
+
+    act(() => {
+      getButton(container, "Rotate selected placeable").click();
+      getButton(container, "Delete selected placeable").click();
+    });
+
+    expect(props.onRotateSelectedOfficePlaceable).toHaveBeenCalledOnce();
+    expect(props.onDeleteSelectedOfficePlaceable).toHaveBeenCalledOnce();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("disables rotation when the selected placeable cannot rotate", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      selectedOfficePlaceable: {
+        kind: "furniture" as const,
+        id: "desk-laptop",
+        assetId: selectedItem.id,
+        label: selectedItem.label,
+        category: selectedItem.category as never,
+        placement: selectedItem.placement,
+        canRotate: false,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(
+      getButton(
+        container,
+        "This selected placeable has no alternate orientation",
+      ).disabled,
+    ).toBe(true);
 
     act(() => {
       root.unmount();

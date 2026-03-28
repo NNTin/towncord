@@ -82,6 +82,9 @@ describe("useGameSession", () => {
         groups: [],
         onDragStart: vi.fn(),
       },
+      selectedOfficePlaceable: null,
+      onRotateSelectedOfficePlaceable: vi.fn(),
+      onDeleteSelectedOfficePlaceable: vi.fn(),
       activeTerrainTool: {
         materialId: "ground",
         brushId: "ground",

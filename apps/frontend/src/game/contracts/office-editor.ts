@@ -1,4 +1,8 @@
-import type { OfficeSceneLayout } from "./office-scene";
+import type {
+  OfficeSceneFurnitureCategory,
+  OfficeSceneFurniturePlacement,
+  OfficeSceneLayout,
+} from "./office-scene";
 import type { OfficeColorAdjust, OfficeTileColor } from "./content";
 
 export type OfficeEditorToolId = "floor" | "wall" | "erase" | "furniture";
@@ -43,4 +47,22 @@ export type OfficeFloorPickedPayload = {
 
 export type OfficeLayoutChangedPayload = {
   layout: OfficeSceneLayout;
+};
+
+export type OfficeSelectedPlaceablePayload = {
+  kind: "furniture";
+  id: string;
+  assetId: string;
+  label: string;
+  category: OfficeSceneFurnitureCategory;
+  placement: OfficeSceneFurniturePlacement;
+  canRotate: boolean;
+};
+
+export type OfficeSelectionChangedPayload = {
+  selection: OfficeSelectedPlaceablePayload | null;
+};
+
+export type OfficeSelectionActionPayload = {
+  action: "rotate" | "delete";
 };

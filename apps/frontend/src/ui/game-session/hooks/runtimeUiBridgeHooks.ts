@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import type { MutableRefObject } from "react";
-import type { OfficeFloorPickedPayload } from "../../../game/contracts/office-editor";
+import type {
+  OfficeFloorPickedPayload,
+  OfficeSelectionChangedPayload,
+} from "../../../game/contracts/office-editor";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import type { TerrainSeedDocument } from "../../../game";
 import type {
@@ -37,6 +40,9 @@ type RuntimeGatewayLifecycleOptions = {
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onZoomChanged: (payload: RuntimeZoomState) => void;
+  onOfficeSelectionChanged?: (
+    payload: OfficeSelectionChangedPayload,
+  ) => void;
   onOfficeLayoutChanged?: ((layout: OfficeSceneLayout) => void) | undefined;
   onTerrainSeedChanged?: ((seed: TerrainSeedDocument) => void) | undefined;
   onOfficeFloorPicked?:
@@ -56,6 +62,7 @@ export function useRuntimeGatewayLifecycle({
   onTerrainTileInspected,
   onRuntimeDiagnostics,
   onZoomChanged,
+  onOfficeSelectionChanged,
   onOfficeLayoutChanged,
   onTerrainSeedChanged,
   onOfficeFloorPicked,
@@ -69,6 +76,7 @@ export function useRuntimeGatewayLifecycle({
   const onTerrainTileInspectedRef = useLatestRef(onTerrainTileInspected);
   const onRuntimeDiagnosticsRef = useLatestRef(onRuntimeDiagnostics);
   const onZoomChangedRef = useLatestRef(onZoomChanged);
+  const onOfficeSelectionChangedRef = useLatestRef(onOfficeSelectionChanged);
   const onOfficeLayoutChangedRef = useLatestRef(onOfficeLayoutChanged);
   const onTerrainSeedChangedRef = useLatestRef(onTerrainSeedChanged);
   const onOfficeFloorPickedRef = useLatestRef(onOfficeFloorPicked);
@@ -93,6 +101,9 @@ export function useRuntimeGatewayLifecycle({
       },
       onZoomChanged(payload) {
         onZoomChangedRef.current(payload);
+      },
+      onOfficeSelectionChanged(payload) {
+        onOfficeSelectionChangedRef.current?.(payload);
       },
       onOfficeLayoutChanged(layout) {
         onOfficeLayoutChangedRef.current?.(layout);
@@ -206,10 +217,14 @@ export function useRuntimeSyncAdapter(): {
   activeTerrainTool: TerrainToolSelection;
   onBootstrap: (payload: RuntimeBootstrapPayload) => void;
   onClearInspectedTile: () => void;
+  onOfficeSelectionChanged: (
+    payload: OfficeSelectionChangedPayload,
+  ) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onSelectTerrainTool: (tool: TerrainToolSelection) => void;
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
   onZoomChanged: (payload: RuntimeZoomState) => void;
+  officeSelection: OfficeSelectionChangedPayload | null;
   runtimeSidebarProjection: ReturnType<typeof selectRuntimeSidebarProjection>;
   zoomState: RuntimeZoomState | null;
 } {
@@ -246,14 +261,23 @@ export function useRuntimeSyncAdapter(): {
     dispatch({ type: "inspectedTileCleared" });
   }, []);
 
+  const onOfficeSelectionChanged = useCallback(
+    (payload: OfficeSelectionChangedPayload) => {
+      dispatch({ type: "officeSelectionChanged", payload });
+    },
+    [],
+  );
+
   return {
     activeTerrainTool: state.activeTerrainTool,
     onBootstrap,
     onClearInspectedTile,
+    onOfficeSelectionChanged,
     onRuntimeDiagnostics,
     onSelectTerrainTool,
     onTerrainTileInspected,
     onZoomChanged,
+    officeSelection: state.officeSelection,
     runtimeSidebarProjection: selectRuntimeSidebarProjection(state),
     zoomState: state.zoomState,
   };

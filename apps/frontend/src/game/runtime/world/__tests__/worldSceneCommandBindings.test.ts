@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 import type {
+  OfficeSelectionActionPayload,
   OfficeSetEditorToolPayload,
 } from "../../../contracts/office-editor";
 import type {
@@ -43,6 +44,7 @@ describe("WorldSceneCommandBindings", () => {
     const handlePlaceTerrainDrop = vi.fn<(payload: PlaceTerrainDropPayload) => void>();
     const handleSelectTerrainTool = vi.fn<(payload: SelectedTerrainToolPayload) => void>();
     const handleSetOfficeEditorTool = vi.fn<(payload: OfficeSetEditorToolPayload) => void>();
+    const handleOfficeSelectionAction = vi.fn<(payload: OfficeSelectionActionPayload) => void>();
     const handleSetZoom = vi.fn<(payload: SetZoomPayload) => void>();
     const bindings = new WorldSceneCommandBindings(
       {
@@ -53,6 +55,7 @@ describe("WorldSceneCommandBindings", () => {
         handlePlaceTerrainDrop,
         handleSelectTerrainTool,
         handleSetOfficeEditorTool,
+        handleOfficeSelectionAction,
         handleSetZoom,
       },
     );
@@ -79,6 +82,9 @@ describe("WorldSceneCommandBindings", () => {
     runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL, {
       tool: "wall",
     });
+    runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION, {
+      action: "rotate",
+    });
     runtimeHost.events.emit(UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
       zoom: 4,
     });
@@ -102,6 +108,9 @@ describe("WorldSceneCommandBindings", () => {
     });
     expect(handleSetOfficeEditorTool).toHaveBeenCalledWith({
       tool: "wall",
+    });
+    expect(handleOfficeSelectionAction).toHaveBeenCalledWith({
+      action: "rotate",
     });
     expect(handleSetZoom).toHaveBeenCalledWith({
       zoom: 4,

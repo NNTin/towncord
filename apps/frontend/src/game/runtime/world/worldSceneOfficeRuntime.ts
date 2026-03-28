@@ -9,6 +9,8 @@ import {
 } from "../../../engine";
 import type {
   OfficeFloorMode,
+  OfficeSelectionActionPayload,
+  OfficeSelectedPlaceablePayload,
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
 import { WorldSceneOfficeEditorController } from "./worldSceneOfficeEditorController";
@@ -75,6 +77,7 @@ export class WorldSceneOfficeRuntime {
     this.createOfficeCellHighlight(officeRegion.layout.cellSize);
     this.createOfficeSelectionHighlight(officeRegion.layout.cellSize);
     this.syncSelectionHighlight();
+    this.emitSelectionChanged();
     return officeRegion;
   }
 
@@ -93,12 +96,14 @@ export class WorldSceneOfficeRuntime {
   public handleSetEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.controller.setOfficeEditorTool(payload);
     this.syncSelectionHighlight();
+    this.emitSelectionChanged();
   }
 
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
     const handled = this.controller.tryHandlePointerDown(pointer);
     if (handled) {
       this.syncSelectionHighlight();
+      this.emitSelectionChanged();
     }
     return handled;
   }
@@ -107,6 +112,7 @@ export class WorldSceneOfficeRuntime {
     const handled = this.controller.tryHandleSecondaryPointerDown(pointer);
     if (handled) {
       this.syncSelectionHighlight();
+      this.emitSelectionChanged();
     }
     return handled;
   }
@@ -134,6 +140,7 @@ export class WorldSceneOfficeRuntime {
         });
       }
       this.controller.consumePendingLayoutChange();
+      this.emitSelectionChanged();
     }
 
     return changed;
@@ -150,9 +157,23 @@ export class WorldSceneOfficeRuntime {
         });
       }
       this.controller.consumePendingLayoutChange();
+      this.emitSelectionChanged();
     }
 
     return changed;
+  }
+
+  public handleSelectionAction(payload: OfficeSelectionActionPayload): void {
+    switch (payload.action) {
+      case "rotate":
+        this.rotateSelectedFurniture();
+        return;
+      case "delete":
+        this.deleteSelectedFurniture();
+        return;
+      default:
+        return;
+    }
   }
 
   public syncHighlight(pointer: Phaser.Input.Pointer | null): void {
@@ -171,6 +192,7 @@ export class WorldSceneOfficeRuntime {
         layout: this.officeRegion.layout,
       });
     }
+    this.emitSelectionChanged();
   }
 
   public dispose(): void {
@@ -230,17 +252,16 @@ export class WorldSceneOfficeRuntime {
 
   private syncSelectionHighlight(): void {
     const highlight = this.officeSelectionHighlight;
-    const region = this.officeRegion;
     const officeRenderable = this.officeRenderable;
-    const selectedFurnitureId = this.controller.getSelectedFurnitureId();
+    const selectedFurniture = this.resolveSelectedFurniture();
 
-    if (!highlight || !region || !officeRenderable || !selectedFurnitureId) {
+    if (!highlight || !officeRenderable || !selectedFurniture) {
       highlight?.setVisible(false);
       return;
     }
 
     const target = officeRenderable.renderIndex.furniture.find(
-      (furniture) => furniture.id === selectedFurnitureId,
+      (furniture) => furniture.id === selectedFurniture.id,
     );
     if (!target) {
       highlight.setVisible(false);
@@ -250,6 +271,48 @@ export class WorldSceneOfficeRuntime {
     highlight.setPosition(target.bounds.x, target.bounds.y);
     highlight.setSize(target.bounds.width, target.bounds.height);
     highlight.setVisible(true);
+  }
+
+  private resolveSelectedFurniture() {
+    const region = this.officeRegion;
+    const selectedFurnitureId = this.controller.getSelectedFurnitureId();
+    if (!region || !selectedFurnitureId) {
+      return null;
+    }
+
+    const selectedFurniture =
+      region.layout.furniture.find(
+        (furniture) => furniture.id === selectedFurnitureId,
+      ) ?? null;
+    if (!selectedFurniture) {
+      this.controller.clearSelectedFurniture();
+      return null;
+    }
+
+    return selectedFurniture;
+  }
+
+  private emitSelectionChanged(): void {
+    this.projections.emitOfficeSelectionChanged({
+      selection: this.buildSelectedPlaceablePayload(),
+    });
+  }
+
+  private buildSelectedPlaceablePayload(): OfficeSelectedPlaceablePayload | null {
+    const selectedFurniture = this.resolveSelectedFurniture();
+    if (!selectedFurniture) {
+      return null;
+    }
+
+    return {
+      kind: "furniture",
+      id: selectedFurniture.id,
+      assetId: selectedFurniture.assetId,
+      label: selectedFurniture.label,
+      category: selectedFurniture.category,
+      placement: selectedFurniture.placement,
+      canRotate: this.controller.canRotateSelectedFurniture(),
+    };
   }
 
   private rerenderOffice(): void {

@@ -133,6 +133,8 @@ export class WorldSceneAssembly {
           this.terrainController.handleSelectTerrainTool(payload),
         handleSetOfficeEditorTool: (payload) =>
           this.officeRuntime.handleSetEditorTool(payload),
+        handleOfficeSelectionAction: (payload) =>
+          this.officeRuntime.handleSelectionAction(payload),
         handleSetZoom: (payload) =>
           this.cameraController.handleSetZoom(payload),
       },

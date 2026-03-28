@@ -129,6 +129,16 @@ export class WorldSceneOfficeEditorController {
     return changed;
   }
 
+  public canRotateSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    return this.officeEditorSystem.canRotateFurniture(region.layout, furnitureId);
+  }
+
   public deleteSelectedFurniture(): boolean {
     const furnitureId = this.selectedFurnitureId;
     const region = this.host.getOfficeRegion();

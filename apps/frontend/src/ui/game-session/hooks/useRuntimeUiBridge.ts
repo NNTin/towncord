@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MutableRefObject } from "react";
 import type { OfficeFloorPickedPayload } from "../../../game/contracts/office-editor";
+import type { OfficeSelectedPlaceablePayload } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import { buildOfficeEditorToolPayload } from "../../../game";
@@ -24,6 +25,9 @@ type RuntimeUiBridge = {
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
   entityToolbarViewModel: EntityToolbarViewModel | null;
+  selectedOfficePlaceable: OfficeSelectedPlaceablePayload | null;
+  onRotateSelectedOfficePlaceable: () => void;
+  onDeleteSelectedOfficePlaceable: () => void;
   zoomViewModel: ZoomControlsViewModel | null;
   terrainSeedSnapshot: TerrainSeedDocument | null;
   activeTerrainTool: TerrainToolSelection;
@@ -45,6 +49,7 @@ export function useRuntimeUiBridge(options: {
     onTerrainTileInspected: runtimeSync.onTerrainTileInspected,
     onRuntimeDiagnostics: runtimeSync.onRuntimeDiagnostics,
     onZoomChanged: runtimeSync.onZoomChanged,
+    onOfficeSelectionChanged: runtimeSync.onOfficeSelectionChanged,
     onOfficeLayoutChanged: options.onOfficeLayoutChanged,
     onTerrainSeedChanged(seed) {
       setTerrainSeedSnapshot(seed);
@@ -57,6 +62,8 @@ export function useRuntimeUiBridge(options: {
     sessionRef,
     zoomState: runtimeSync.zoomState,
   });
+  const selectedOfficePlaceable =
+    runtimeSync.officeSelection?.selection ?? null;
 
   const onSelectTerrainTool = useCallback(
     (tool: TerrainToolSelection) => {
@@ -68,6 +75,14 @@ export function useRuntimeUiBridge(options: {
     },
     [options.onClearOfficeTool, runtimeSync.onSelectTerrainTool],
   );
+
+  const onRotateSelectedOfficePlaceable = useCallback(() => {
+    sessionRef.current?.rotateSelectedOfficePlaceable();
+  }, [sessionRef]);
+
+  const onDeleteSelectedOfficePlaceable = useCallback(() => {
+    sessionRef.current?.deleteSelectedOfficePlaceable();
+  }, [sessionRef]);
 
   useEffect(() => {
     sessionRef.current?.selectTerrainTool(runtimeSync.activeTerrainTool);
@@ -129,6 +144,9 @@ export function useRuntimeUiBridge(options: {
     runtimeRootBindings,
     sidebarViewModel,
     entityToolbarViewModel,
+    selectedOfficePlaceable,
+    onRotateSelectedOfficePlaceable,
+    onDeleteSelectedOfficePlaceable,
     zoomViewModel,
     terrainSeedSnapshot,
     activeTerrainTool: runtimeSync.activeTerrainTool,

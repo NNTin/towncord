@@ -28,7 +28,11 @@ import {
 } from "../../../game/contracts/content";
 import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
-import type { EntityToolbarViewModel } from "../../game-session/contracts";
+import { FURNITURE_ALL_ITEMS } from "../../../game/content/structures/furniturePalette";
+import type {
+  EntityToolbarViewModel,
+  SelectedOfficePlaceableViewModel,
+} from "../../game-session/contracts";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -55,6 +59,9 @@ type ToolSelectionProps = {
   onSelectFurnitureId?: (id: string) => void;
   activeTerrainTool?: TerrainToolSelection;
   onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
+  selectedOfficePlaceable?: SelectedOfficePlaceableViewModel;
+  onRotateSelectedOfficePlaceable?: () => void;
+  onDeleteSelectedOfficePlaceable?: () => void;
 };
 
 type PersistenceProps = {
@@ -265,6 +272,32 @@ function resolveFurnitureBreadcrumbs(item: FurniturePaletteItem): string[] {
     breadcrumbs.push(titleCase(item.groupId));
   }
   breadcrumbs.push(item.label);
+  return breadcrumbs;
+}
+
+function resolveSelectedFurnitureItem(
+  selectedOfficePlaceable: SelectedOfficePlaceableViewModel | undefined,
+): FurniturePaletteItem | null {
+  if (!selectedOfficePlaceable || selectedOfficePlaceable.kind !== "furniture") {
+    return null;
+  }
+
+  return (
+    FURNITURE_PALETTE_ITEMS.find((item) => item.id === selectedOfficePlaceable.assetId) ??
+    FURNITURE_ALL_ITEMS.find((item) => item.id === selectedOfficePlaceable.assetId) ??
+    null
+  );
+}
+
+function resolveSelectedPlaceableBreadcrumbs(
+  selectedOfficePlaceable: NonNullable<SelectedOfficePlaceableViewModel>,
+  previewItem: FurniturePaletteItem | null,
+): string[] {
+  const breadcrumbs = ["Layout", "Selected", titleCase(selectedOfficePlaceable.category)];
+  if (previewItem?.groupId) {
+    breadcrumbs.push(titleCase(previewItem.groupId));
+  }
+  breadcrumbs.push(selectedOfficePlaceable.label);
   return breadcrumbs;
 }
 
@@ -784,6 +817,76 @@ function FurnitureSubPanel({
   );
 }
 
+function LayoutOverviewSubPanel({
+  selectedOfficePlaceable,
+  onRotateSelectedOfficePlaceable,
+  onDeleteSelectedOfficePlaceable,
+}: {
+  selectedOfficePlaceable: SelectedOfficePlaceableViewModel | undefined;
+  onRotateSelectedOfficePlaceable: (() => void) | undefined;
+  onDeleteSelectedOfficePlaceable: (() => void) | undefined;
+}): JSX.Element {
+  const previewItem = resolveSelectedFurnitureItem(selectedOfficePlaceable);
+  const canRotate = Boolean(selectedOfficePlaceable?.canRotate);
+
+  if (!selectedOfficePlaceable) {
+    return (
+      <div style={subPanel}>
+        <PreviewCard
+          breadcrumbs={["Layout"]}
+          description="Choose Floor, Wall, Erase, or Furniture to make a layout change."
+          title="Layout editing"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div style={subPanel}>
+      <PreviewCard
+        breadcrumbs={resolveSelectedPlaceableBreadcrumbs(
+          selectedOfficePlaceable,
+          previewItem,
+        )}
+        description={
+          canRotate
+            ? "This furniture is selected. Rotate or delete it to fix the placement in context."
+            : "This furniture is selected. Delete it or change the active asset if it needs a different orientation."
+        }
+        title={selectedOfficePlaceable.label}
+        visual={previewItem ? <FurnitureSprite item={previewItem} /> : null}
+      />
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          disabled={!canRotate}
+          onClick={() => onRotateSelectedOfficePlaceable?.()}
+          style={{
+            ...btnBase,
+            opacity: canRotate ? 1 : 0.5,
+            cursor: canRotate ? "pointer" : "default",
+          }}
+          title={
+            canRotate
+              ? "Rotate selected placeable"
+              : "This selected placeable has no alternate orientation"
+          }
+        >
+          Rotate
+        </button>
+        <button
+          type="button"
+          onClick={() => onDeleteSelectedOfficePlaceable?.()}
+          style={btnBase}
+          title="Delete selected placeable"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function EntitiesSubPanel({
   viewModel,
 }: {
@@ -890,6 +993,9 @@ export function BottomToolbar({
   onSelectFurnitureId,
   activeTerrainTool = null,
   onSelectTerrainTool,
+  selectedOfficePlaceable,
+  onRotateSelectedOfficePlaceable,
+  onDeleteSelectedOfficePlaceable,
   onResetLayout,
   onSaveLayout,
   canResetLayout = false,
@@ -957,6 +1063,13 @@ export function BottomToolbar({
       {/* Sub-panels (appear above button row) */}
       {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
         <EntitiesSubPanel viewModel={entityToolbarViewModel} />
+      ) : null}
+      {isLayoutMode && (selectedOfficePlaceable || (!activeTool && !activeTerrainTool)) ? (
+        <LayoutOverviewSubPanel
+          selectedOfficePlaceable={selectedOfficePlaceable}
+          onRotateSelectedOfficePlaceable={onRotateSelectedOfficePlaceable}
+          onDeleteSelectedOfficePlaceable={onDeleteSelectedOfficePlaceable}
+        />
       ) : null}
       {isLayoutMode && activeTool === "floor" && (
         <FloorSubPanel

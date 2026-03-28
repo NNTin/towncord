@@ -1,4 +1,5 @@
 import type {
+  OfficeSelectionActionPayload,
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
 import type {
@@ -30,6 +31,7 @@ type WorldSceneRuntimeCommandHandlers = {
   handlePlaceTerrainDrop: (payload: PlaceTerrainDropPayload) => void;
   handleSelectTerrainTool: (payload: SelectedTerrainToolPayload) => void;
   handleSetOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
+  handleOfficeSelectionAction: (payload: OfficeSelectionActionPayload) => void;
   handleSetZoom: (payload: SetZoomPayload) => void;
 };
 
@@ -68,6 +70,11 @@ export class WorldSceneCommandBindings {
         runtimeHost,
         UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
         this.handlers.handleSetOfficeEditorTool,
+      ),
+      bindUiToRuntimeCommand(
+        runtimeHost,
+        UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+        this.handlers.handleOfficeSelectionAction,
       ),
       bindUiToRuntimeCommand(
         runtimeHost,

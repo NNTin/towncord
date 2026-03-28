@@ -4,6 +4,7 @@ import {
   type OfficeTileColor,
 } from "../../contracts/content";
 import type {
+  OfficeSelectionActionPayload,
   OfficeFloorMode,
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
@@ -23,6 +24,7 @@ import {
 export type {
   OfficeEditorToolId,
   OfficeFloorMode,
+  OfficeSelectionActionPayload,
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
 
@@ -36,6 +38,7 @@ export const UI_TO_RUNTIME_COMMANDS = {
   SELECT_TERRAIN_TOOL: "selectTerrainTool",
   SET_ZOOM: "setZoom",
   OFFICE_SET_EDITOR_TOOL: "officeSetEditorTool",
+  OFFICE_SELECTION_ACTION: "officeSelectionAction",
 } as const;
 
 export const PLACE_ENTITY_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP;
@@ -43,6 +46,7 @@ export const PLACE_TERRAIN_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DRO
 export const SELECT_TERRAIN_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL;
 export const SET_ZOOM_EVENT = UI_TO_RUNTIME_COMMANDS.SET_ZOOM;
 export const OFFICE_SET_EDITOR_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
+export const OFFICE_SELECTION_ACTION_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION;
 
 export type SetZoomPayload = {
   zoom: number;
@@ -57,6 +61,7 @@ export type UiToRuntimeCommandPayloadByName = {
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: SelectedTerrainToolPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: SetZoomPayload;
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]: OfficeSetEditorToolPayload;
+  [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]: OfficeSelectionActionPayload;
 };
 
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
@@ -202,12 +207,28 @@ export function normalizeOfficeSetEditorToolPayload(
   }
 }
 
+export function normalizeOfficeSelectionActionPayload(
+  value: unknown,
+): OfficeSelectionActionPayload | undefined {
+  if (
+    !isRecord(value) ||
+    (value.action !== "rotate" && value.action !== "delete")
+  ) {
+    return undefined;
+  }
+
+  return {
+    action: value.action,
+  };
+}
+
 const uiToRuntimeCommandNormalizers = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: normalizeSelectedTerrainToolPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: normalizeSetZoomPayload,
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]: normalizeOfficeSetEditorToolPayload,
+  [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]: normalizeOfficeSelectionActionPayload,
 } satisfies {
   [K in UiToRuntimeCommandName]: PayloadNormalizer<UiToRuntimeCommandPayloadByName[K]>;
 };

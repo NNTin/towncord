@@ -22,6 +22,9 @@ function App(): JSX.Element {
     officeEditor,
     activeTerrainTool,
     entityToolbarViewModel,
+    selectedOfficePlaceable,
+    onRotateSelectedOfficePlaceable,
+    onDeleteSelectedOfficePlaceable,
     onSelectTerrainTool,
     runtimeRootRef,
     runtimeRootBindings,
@@ -75,6 +78,9 @@ function App(): JSX.Element {
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
         activeTerrainTool={activeTerrainTool}
         entityToolbarViewModel={entityToolbarViewModel}
+        selectedOfficePlaceable={selectedOfficePlaceable}
+        onRotateSelectedOfficePlaceable={onRotateSelectedOfficePlaceable}
+        onDeleteSelectedOfficePlaceable={onDeleteSelectedOfficePlaceable}
         onSelectTerrainTool={onSelectTerrainTool}
         onResetLayout={layoutSaveState.reset}
         onSaveLayout={() => void layoutSaveState.save()}

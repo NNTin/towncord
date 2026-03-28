@@ -3,6 +3,7 @@ import {
   bindUiToRuntimeCommand,
   emitPlaceDropCommand,
   normalizeOfficeSetEditorToolPayload,
+  normalizeOfficeSelectionActionPayload,
   normalizeUiToRuntimeCommandPayload,
   UI_TO_RUNTIME_COMMANDS,
 } from "../uiCommands";
@@ -83,6 +84,16 @@ describe("uiCommands transport", () => {
     ).toBeUndefined();
   });
 
+  test("normalizes office selection actions at the command boundary", () => {
+    expect(normalizeOfficeSelectionActionPayload({ action: "rotate" })).toEqual({
+      action: "rotate",
+    });
+    expect(normalizeOfficeSelectionActionPayload({ action: "delete" })).toEqual({
+      action: "delete",
+    });
+    expect(normalizeOfficeSelectionActionPayload({ action: "flip" })).toBeUndefined();
+  });
+
   test("bindUiToRuntimeCommand drops malformed entity payloads", () => {
     const { host } = createHost();
     const handler = vi.fn();
@@ -120,6 +131,28 @@ describe("uiCommands transport", () => {
       screenY: 40,
     });
     expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  test("bindUiToRuntimeCommand drops malformed office selection actions", () => {
+    const { host } = createHost();
+    const handler = vi.fn();
+    const unbind = bindUiToRuntimeCommand(
+      host,
+      UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+      handler,
+    );
+
+    host.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION, {
+      action: "rotate",
+    });
+    host.events.emit(UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION, {
+      action: "flip",
+    });
+
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler).toHaveBeenCalledWith({ action: "rotate" });
+
+    unbind();
   });
 
   test("emitPlaceDropCommand routes normalized payloads to the correct command", () => {

@@ -1,4 +1,7 @@
 import type {
+  OfficeSelectionChangedPayload,
+} from "../../contracts/office-editor";
+import type {
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
   RuntimeZoomState,
@@ -12,6 +15,7 @@ export type RuntimeBridgeState = {
   activeTerrainTool: TerrainToolSelection;
   runtimeDiagnostics: RuntimePerfPayload | null;
   zoomState: RuntimeZoomState | null;
+  officeSelection: OfficeSelectionChangedPayload | null;
 };
 
 export type RuntimeBridgeAction =
@@ -20,6 +24,7 @@ export type RuntimeBridgeAction =
   | { type: "runtimeDiagnosticsUpdated"; payload: RuntimePerfPayload }
   | { type: "zoomChanged"; payload: RuntimeZoomState }
   | { type: "terrainToolSelected"; tool: TerrainToolSelection }
+  | { type: "officeSelectionChanged"; payload: OfficeSelectionChangedPayload }
   | { type: "inspectedTileCleared" };
 
 export function createRuntimeBridgeState(): RuntimeBridgeState {
@@ -29,6 +34,7 @@ export function createRuntimeBridgeState(): RuntimeBridgeState {
     activeTerrainTool: null,
     runtimeDiagnostics: null,
     zoomState: null,
+    officeSelection: null,
   };
 }
 
@@ -62,6 +68,11 @@ export function reduceRuntimeBridgeState(
         ...state,
         activeTerrainTool: action.tool,
         inspectedTile: action.tool ? null : state.inspectedTile,
+      };
+    case "officeSelectionChanged":
+      return {
+        ...state,
+        officeSelection: action.payload,
       };
     case "inspectedTileCleared":
       return {

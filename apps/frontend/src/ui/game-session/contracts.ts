@@ -1,5 +1,6 @@
 import type { DragEvent } from "react";
 import type { AnimationCatalog } from "../../game/contracts/content";
+import type { OfficeSelectedPlaceablePayload } from "../../game/contracts/office-editor";
 import type {
   EntityPlaceableViewModel,
   PlaceableViewModel,
@@ -33,6 +34,9 @@ export type EntityToolbarViewModel = {
     placeable: EntityPlaceableViewModel,
   ) => void;
 };
+
+export type SelectedOfficePlaceableViewModel =
+  OfficeSelectedPlaceablePayload | null;
 
 export type PreviewPanelViewModel = {
   catalog: AnimationCatalog;
