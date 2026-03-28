@@ -28,19 +28,31 @@ function resolvePlaceableGroupLabel(kind: EntityKind): string {
   return KIND_LABEL_OVERRIDES[kind] ?? formatKindLabel(kind);
 }
 
+// Preferred preview animations in priority order. Enemies like the bat use
+// "sleep" as their resting state instead of "idle".
+const PREVIEW_TRACK_PRIORITY = ["idle", "sleep", "walk"];
+
 function resolveEntityPreviewFrameKey(
   definition: EntityDefinition,
   catalog: AnimationCatalog,
 ): string | null {
   const tracks = getTracksForPath(catalog, readEntityVisualRef(definition.visualRef));
-  const idleTrack = tracks.find((t) => t.id === "idle");
-  if (!idleTrack) return null;
-  const key =
-    idleTrack.keyByDirection.down ??
-    idleTrack.keyByDirection.side ??
-    idleTrack.undirectedKey;
-  if (!key) return null;
-  return `${key}#0`;
+  if (tracks.length === 0) return null;
+
+  const candidates = [
+    ...PREVIEW_TRACK_PRIORITY.map((id) => tracks.find((t) => t.id === id)),
+    tracks[0],
+  ];
+
+  for (const track of candidates) {
+    if (!track) continue;
+    const key =
+      track.keyByDirection.down ??
+      track.keyByDirection.side ??
+      track.undirectedKey;
+    if (key) return `${key}#0`;
+  }
+  return null;
 }
 
 export function listEntityPlaceables(
