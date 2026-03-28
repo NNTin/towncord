@@ -91,4 +91,18 @@ describe("UnifiedCollisionMap", () => {
     const rightEdge = (20 + 4) * WORLD_REGION_BASE_PX;
     expect(map.isWorldWalkable(rightEdge, 20 * WORLD_REGION_BASE_PX + 8)).toBe(false);
   });
+
+  test("void cell over walkable terrain is walkable (erased floor falls through)", () => {
+    const region = makeRegion(20, 20, 4, 4, ["void"]);
+    const map = new UnifiedCollisionMap(makeTerrainGrid(32, 32, "ground"), region);
+    const { worldX, worldY } = anchoredGridCellToWorldPixel(0, 0, region);
+    expect(map.isWorldWalkable(worldX + 8, worldY + 8)).toBe(true);
+  });
+
+  test("void cell over blocked terrain is blocked (erased floor falls through to water)", () => {
+    const region = makeRegion(20, 20, 4, 4, ["void"]);
+    const map = new UnifiedCollisionMap(makeTerrainGrid(32, 32, "water"), region);
+    const { worldX, worldY } = anchoredGridCellToWorldPixel(0, 0, region);
+    expect(map.isWorldWalkable(worldX + 8, worldY + 8)).toBe(false);
+  });
 });
