@@ -7,7 +7,6 @@ import type {
   OfficeSceneTile,
 } from "./contracts";
 
-const GRID_LINE_COLOR = 0x0f172a;
 const VOID_TILE_COLOR = 0x020617;
 const SHADOW_COLOR = 0x020617;
 const LABEL_TEXT_COLOR = "#f8fafc";
@@ -246,20 +245,6 @@ function buildTileObjects(
       }
     }
   }
-
-  const gridGraphics = scene.add.graphics();
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const tile = tiles[row * cols + col];
-      if (!tile || tile.kind === "void") continue;
-      const x = col * cellSize;
-      const y = row * cellSize;
-      const strokeAlpha = tile.kind === "wall" ? 0.45 : 0.22;
-      gridGraphics.lineStyle(1, GRID_LINE_COLOR, strokeAlpha);
-      gridGraphics.strokeRect(x, y, cellSize, cellSize);
-    }
-  }
-  container.add(gridGraphics);
 }
 
 function renderFurniture(
