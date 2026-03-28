@@ -18,8 +18,8 @@ describe("createOfficeSceneBootstrap", () => {
     expect(layout.furniture).toHaveLength(56);
     expect(layout.characters).toHaveLength(6);
 
-    expect(layout.tiles.filter((tile) => tile.kind === "wall")).toHaveLength(142);
-    expect(layout.tiles.filter((tile) => tile.kind === "floor")).toHaveLength(299);
+    expect(layout.tiles.filter((tile) => tile.kind === "wall")).toHaveLength(79);
+    expect(layout.tiles.filter((tile) => tile.kind === "floor")).toHaveLength(220);
 
     expect(
       layout.furniture.some(
@@ -29,7 +29,7 @@ describe("createOfficeSceneBootstrap", () => {
     ).toBe(true);
     expect(
       layout.furniture.some(
-        (item) => item.assetId === "ASSET_83" && item.label === "ASSET_83",
+        (item) => item.assetId === "ASSET_84" && item.label === "Colorful Wall Clock",
       ),
     ).toBe(true);
 
@@ -39,10 +39,10 @@ describe("createOfficeSceneBootstrap", () => {
 
     const floorTile = layout.tiles.find((tile) => tile.kind === "floor");
     expect(floorTile?.colorAdjust).toEqual({
-      h: 214,
-      s: 30,
-      b: -100,
-      c: -55,
+      h: 28,
+      s: 50,
+      b: -50,
+      c: -37,
     });
     expect(floorTile?.tint).toBe(resolveOfficeTileTint(floorTile?.colorAdjust ?? null, null));
   });
