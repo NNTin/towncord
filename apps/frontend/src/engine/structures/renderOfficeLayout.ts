@@ -14,11 +14,6 @@ const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 const DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY = "donarg.office.environment";
 const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
 
-const DEPTH_ROWS_PER_SLOT = 100;
-const DEPTH_LAYER_WALL_FURNITURE = 6;
-const DEPTH_LAYER_FLOOR_FURNITURE = 18;
-const DEPTH_LAYER_CHARACTER = 34;
-
 type OfficeRenderableTargetKind = "furniture" | "character";
 
 type OfficeRenderableTarget = {
@@ -44,7 +39,6 @@ type RenderOfficeLayoutOptions = {
   worldOffsetX?: number;
   worldOffsetY?: number;
   tileDepth?: number;
-  depthAnchorRow?: number;
 };
 
 export function renderOfficeLayout(
@@ -56,7 +50,6 @@ export function renderOfficeLayout(
     worldOffsetX = 0,
     worldOffsetY = 0,
     tileDepth = 0,
-    depthAnchorRow = 0,
   } = options;
 
   return new OfficeLayoutRenderableImpl(
@@ -65,19 +58,21 @@ export function renderOfficeLayout(
     worldOffsetX,
     worldOffsetY,
     tileDepth,
-    depthAnchorRow,
   );
 }
 
 class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   public renderIndex: OfficeSceneRenderIndex;
+  /**
+   * Floor-tile container only. Sits at tileDepth (RENDER_LAYERS.OFFICE_FLOOR,
+   * –500) so floor tiles are always behind entities and all y-sorted objects.
+   */
   public readonly container: Phaser.GameObjects.Container;
 
   private readonly scene: Phaser.Scene;
   private readonly tileLayer: Phaser.GameObjects.Container;
   private readonly worldOffsetX: number;
   private readonly worldOffsetY: number;
-  private readonly depthAnchorRow: number;
   private readonly furnitureMap = new Map<
     string,
     { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }
@@ -85,10 +80,11 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   private characterEntries: Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> = [];
   private characterSource: readonly OfficeSceneCharacter[];
   /**
-   * Wall sprites are kept outside any Phaser Container so their depth values
-   * participate in the scene-level y-sort together with moving entities.
-   * Each wall's depth equals the world-pixel Y of its south edge, which is the
-   * same coordinate space that EntitySystem uses for entity.position.y.
+   * Wall, furniture, and character containers are kept as direct scene-level
+   * objects (not inside `this.container`) so their depth values participate in
+   * the same y-sort space as moving entities.  Each object's depth equals the
+   * world-pixel Y of its south edge, matching the coordinate space that
+   * EntitySystem uses for entity.sprite.setDepth(entity.position.y).
    */
   private wallSprites: Phaser.GameObjects.Image[] = [];
 
@@ -98,14 +94,16 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     worldOffsetX: number,
     worldOffsetY: number,
     tileDepth: number,
-    depthAnchorRow: number,
   ) {
     this.scene = scene;
     this.worldOffsetX = worldOffsetX;
     this.worldOffsetY = worldOffsetY;
-    this.depthAnchorRow = depthAnchorRow;
 
+    // Floor-tile container only — its depth must be set here because the
+    // container is the scene-level object (depth on the tileLayer child inside
+    // it would be ignored by Phaser's Container renderer).
     this.container = scene.add.container(worldOffsetX, worldOffsetY);
+    this.container.setDepth(tileDepth);
     this.tileLayer = renderTiles(scene, layout, 0, 0, tileDepth);
     this.container.add(this.tileLayer);
 
@@ -139,6 +137,14 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
       sprite.destroy();
     }
     this.wallSprites = [];
+    for (const entry of this.furnitureMap.values()) {
+      entry.container.destroy(true);
+    }
+    this.furnitureMap.clear();
+    for (const entry of this.characterEntries) {
+      entry.container.destroy(true);
+    }
+    this.characterEntries = [];
   }
 
   private buildWallSprites(layout: OfficeSceneLayout): Phaser.GameObjects.Image[] {
@@ -190,7 +196,7 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
 
     for (const [id, entry] of this.furnitureMap) {
       if (!newFurnitureIds.has(id)) {
-        this.container.remove(entry.container, true);
+        entry.container.destroy(true);
         this.furnitureMap.delete(id);
       }
     }
@@ -204,13 +210,11 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
         this.scene,
         layout,
         item,
-        0,
-        0,
-        this.depthAnchorRow,
+        this.worldOffsetX,
+        this.worldOffsetY,
       );
-      this.container.add(container);
-      target.bounds.x += this.worldOffsetX;
-      target.bounds.y += this.worldOffsetY;
+      // container is a direct scene-level object — do NOT add to this.container
+      // so its depth participates in the scene's y-sort.
       this.furnitureMap.set(item.id, { target, container });
     }
   }
@@ -221,7 +225,7 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     }
 
     for (const entry of this.characterEntries) {
-      this.container.remove(entry.container, true);
+      entry.container.destroy(true);
     }
     this.characterEntries = this.buildCharacterEntries(newLayout);
     this.characterSource = newLayout.characters;
@@ -231,10 +235,14 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     layout: OfficeSceneLayout,
   ): Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> {
     return layout.characters.map((actor) => {
-      const { target, container } = renderCharacter(this.scene, layout, actor, 0, 0, this.depthAnchorRow);
-      this.container.add(container);
-      target.bounds.x += this.worldOffsetX;
-      target.bounds.y += this.worldOffsetY;
+      const { target, container } = renderCharacter(
+        this.scene,
+        layout,
+        actor,
+        this.worldOffsetX,
+        this.worldOffsetY,
+      );
+      // container is a direct scene-level object — do NOT add to this.container.
       return { target, container };
     });
   }
@@ -297,7 +305,6 @@ function renderFurniture(
   item: OfficeSceneFurniture,
   worldOffsetX: number,
   worldOffsetY: number,
-  depthAnchorRow: number,
 ): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const x = item.col * layout.cellSize;
   const y = item.row * layout.cellSize;
@@ -311,7 +318,9 @@ function renderFurniture(
     renderFurnitureFallback(scene, container, layout, item, width, height);
   }
 
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + item.row + item.height, item.placement === "wall" ? DEPTH_LAYER_WALL_FURNITURE : DEPTH_LAYER_FLOOR_FURNITURE));
+  // South-edge world-pixel Y: entities above this row render behind the
+  // furniture; entities below it render in front.
+  container.setDepth(worldOffsetY + (item.row + item.height) * layout.cellSize);
 
   const target: OfficeRenderableTarget = {
     kind: "furniture",
@@ -425,7 +434,6 @@ function renderCharacter(
   actor: OfficeSceneCharacter,
   worldOffsetX: number,
   worldOffsetY: number,
-  depthAnchorRow: number,
 ): { target: OfficeRenderableTarget; container: Phaser.GameObjects.Container } {
   const cellSize = layout.cellSize;
   const x = actor.col * cellSize;
@@ -465,7 +473,9 @@ function renderCharacter(
   badge.setOrigin(0.5);
 
   container.add([shadow, body, head, badge]);
-  container.setDepth(resolveRenderableDepth(depthAnchorRow + actor.row + 1, DEPTH_LAYER_CHARACTER));
+  // South-edge world-pixel Y so preview-scene characters y-sort consistently
+  // with walls and furniture.
+  container.setDepth(worldOffsetY + (actor.row + 1) * cellSize);
 
   const target: OfficeRenderableTarget = {
     kind: "character",
@@ -475,10 +485,6 @@ function renderCharacter(
   };
 
   return { target, container };
-}
-
-function resolveRenderableDepth(bottomRow: number, layer: number): number {
-  return bottomRow * DEPTH_ROWS_PER_SLOT + layer;
 }
 
 function computeWallBitmask(
