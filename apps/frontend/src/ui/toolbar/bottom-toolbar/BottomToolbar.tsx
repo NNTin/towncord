@@ -1198,11 +1198,8 @@ export function BottomToolbar({
 
   return (
     <div style={outerContainer}>
-      {/* Sub-panels (appear above button row) */}
-      {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
-        <EntitiesSubPanel viewModel={entityToolbarViewModel} />
-      ) : null}
-      {isLayoutMode && (selectedOfficePlaceable || (!activeTool && !activeTerrainTool)) ? (
+      {/* Tool-specific sub-panels (appear above the layout tools row) */}
+      {isLayoutMode && selectedOfficePlaceable ? (
         <LayoutOverviewSubPanel
           selectedOfficePlaceable={selectedOfficePlaceable}
           onRotateSelectedOfficePlaceable={onRotateSelectedOfficePlaceable}
@@ -1242,7 +1239,122 @@ export function BottomToolbar({
         />
       )}
 
-      {/* Button row */}
+      {/* Layout tools panel — expands above button row when Layout is active */}
+      {isLayoutMode && (
+        <div style={panelRow}>
+          <button
+            type="button"
+            onClick={() => handleToolClick("floor")}
+            onMouseEnter={() => setHovered("floor")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("floor", { active: activeTool === "floor" })}
+            title="Floor tool"
+          >
+            Floor
+          </button>
+          <button
+            type="button"
+            onClick={handleTerrainButtonClick}
+            onMouseEnter={() => setHovered("terrain")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("terrain", { active: Boolean(activeTerrainTool) })}
+            title="Terrain tool"
+          >
+            Terrain
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToolClick("wall")}
+            onMouseEnter={() => setHovered("wall")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("wall", { active: activeTool === "wall" })}
+            title="Wall tool"
+          >
+            Wall
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToolClick("erase")}
+            onMouseEnter={() => setHovered("erase")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("erase", { active: activeTool === "erase" })}
+            title="Erase tool"
+          >
+            Erase
+          </button>
+          <button
+            type="button"
+            onClick={() => handleToolClick("furniture")}
+            onMouseEnter={() => setHovered("furniture")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("furniture", { active: activeTool === "furniture" })}
+            title="Furniture tool"
+          >
+            Furniture
+          </button>
+
+          <div style={divider} />
+
+          <button
+            type="button"
+            disabled={!canSaveLayout}
+            onClick={onSaveLayout}
+            onMouseEnter={() => setHovered("save")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("save", { disabled: !canSaveLayout })}
+            title="Save combined layout data"
+          >
+            {isSavingLayout ? "Saving..." : "Save"}
+          </button>
+          <button
+            type="button"
+            disabled={!canResetLayout}
+            onClick={onResetLayout}
+            onMouseEnter={() => setHovered("reset")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("reset", { disabled: !canResetLayout })}
+            title={
+              isTerrainDirty
+                ? "Reset office layout changes; terrain edits can only be committed via Save"
+                : "Reset unsaved office layout changes"
+            }
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={onToggleJsonEditor}
+            onMouseEnter={() => setHovered("json")}
+            onMouseLeave={() => setHovered(null)}
+            style={resolveButtonStyle("json", { active: isJsonEditorOpen })}
+            title="Toggle JSON editor"
+          >
+            JSON
+          </button>
+
+          {layoutStatusText ? (
+            <div
+              style={{
+                color: "var(--pixel-text)",
+                fontFamily: "monospace",
+                fontSize: 12,
+                opacity: 0.8,
+                paddingLeft: 2,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {layoutStatusText}
+            </div>
+          ) : null}
+        </div>
+      )}
+
+      {/* Entity panel — expands above button row when Entity is active */}
+      {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
+        <EntitiesSubPanel viewModel={entityToolbarViewModel} />
+      ) : null}
+
+      {/* Button row — Layout and Entity are always visible as static top-level items */}
       <div style={panelRow}>
         <button
           type="button"
@@ -1277,116 +1389,6 @@ export function BottomToolbar({
         >
           Entity
         </button>
-
-        {isLayoutMode && (
-          <>
-            <div style={divider} />
-            <button
-              type="button"
-              onClick={() => handleToolClick("floor")}
-              onMouseEnter={() => setHovered("floor")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("floor", { active: activeTool === "floor" })}
-              title="Floor tool"
-            >
-              Floor
-            </button>
-            <button
-              type="button"
-              onClick={handleTerrainButtonClick}
-              onMouseEnter={() => setHovered("terrain")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("terrain", { active: Boolean(activeTerrainTool) })}
-              title="Terrain tool"
-            >
-              Terrain
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToolClick("wall")}
-              onMouseEnter={() => setHovered("wall")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("wall", { active: activeTool === "wall" })}
-              title="Wall tool"
-            >
-              Wall
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToolClick("erase")}
-              onMouseEnter={() => setHovered("erase")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("erase", { active: activeTool === "erase" })}
-              title="Erase tool"
-            >
-              Erase
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToolClick("furniture")}
-              onMouseEnter={() => setHovered("furniture")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("furniture", { active: activeTool === "furniture" })}
-              title="Furniture tool"
-            >
-              Furniture
-            </button>
-
-            <div style={divider} />
-
-            <button
-              type="button"
-              disabled={!canSaveLayout}
-              onClick={onSaveLayout}
-              onMouseEnter={() => setHovered("save")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("save", { disabled: !canSaveLayout })}
-              title="Save combined layout data"
-            >
-              {isSavingLayout ? "Saving..." : "Save"}
-            </button>
-            <button
-              type="button"
-              disabled={!canResetLayout}
-              onClick={onResetLayout}
-              onMouseEnter={() => setHovered("reset")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("reset", { disabled: !canResetLayout })}
-              title={
-                isTerrainDirty
-                  ? "Reset office layout changes; terrain edits can only be committed via Save"
-                  : "Reset unsaved office layout changes"
-              }
-            >
-              Reset
-            </button>
-            <button
-              type="button"
-              onClick={onToggleJsonEditor}
-              onMouseEnter={() => setHovered("json")}
-              onMouseLeave={() => setHovered(null)}
-              style={resolveButtonStyle("json", { active: isJsonEditorOpen })}
-              title="Toggle JSON editor"
-            >
-              JSON
-            </button>
-
-            {layoutStatusText ? (
-              <div
-                style={{
-                  color: "var(--pixel-text)",
-                  fontFamily: "monospace",
-                  fontSize: 12,
-                  opacity: 0.8,
-                  paddingLeft: 2,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {layoutStatusText}
-              </div>
-            ) : null}
-          </>
-        )}
       </div>
     </div>
   );
