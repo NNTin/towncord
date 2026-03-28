@@ -50,6 +50,17 @@ describe("office tool state reducer", () => {
     expect(next.activeTileColor).toBeNull();
   });
 
+  test("stores wall color edits as cloned state", () => {
+    const wallColor = { h: 214, s: 25, b: -54, c: 17 };
+    const next = reduceOfficeToolState(createOfficeToolStateData(), {
+      type: "selectWallColor",
+      color: wallColor,
+    });
+
+    expect(next.activeWallColor).toEqual(wallColor);
+    expect(next.activeWallColor).not.toBe(wallColor);
+  });
+
   test("selecting a different furniture asset resets the pending rotation", () => {
     const next = reduceOfficeToolState(
       {

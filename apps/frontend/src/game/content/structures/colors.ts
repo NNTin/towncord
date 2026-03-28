@@ -15,6 +15,13 @@ export const DEFAULT_FLOOR_COLOR_ADJUST: OfficeColorAdjust = {
   c: 0,
 };
 
+export const DEFAULT_WALL_COLOR_ADJUST: OfficeColorAdjust = {
+  h: 214,
+  s: 25,
+  b: -54,
+  c: 17,
+};
+
 export const OFFICE_TILE_COLOR_TINTS: Record<OfficeTileColor, number> = {
   neutral: 0x475569,
   blue: 0x2563eb,
@@ -105,6 +112,18 @@ export function resolveOfficeFloorAppearance(
   const tint = tileColor
     ? OFFICE_TILE_COLOR_TINTS[tileColor] ?? neutralTint
     : fallbackTint ?? neutralTint;
+
+  return { colorAdjust, tint };
+}
+
+export function resolveOfficeWallAppearance(
+  wallColor: OfficeColorAdjust | null | undefined,
+  fallbackTint = 0x334155,
+): { colorAdjust: OfficeColorAdjust; tint: number } {
+  const colorAdjust = cloneOfficeColorAdjust(
+    wallColor ?? DEFAULT_WALL_COLOR_ADJUST,
+  );
+  const tint = resolveOfficeTileTint(colorAdjust, fallbackTint) ?? fallbackTint;
 
   return { colorAdjust, tint };
 }

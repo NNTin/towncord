@@ -182,9 +182,19 @@ export function normalizeOfficeSetEditorToolPayload(
   switch (value.tool) {
     case null:
       return { tool: null };
-    case "wall":
     case "erase":
       return { tool: value.tool };
+    case "wall": {
+      const wallColor = normalizeNullableOfficeColorAdjust(value.wallColor);
+      if (wallColor === undefined) {
+        return undefined;
+      }
+
+      return {
+        tool: "wall",
+        wallColor,
+      };
+    }
     case "furniture": {
       const furnitureId = normalizeNullableString(value.furnitureId);
       const rotationQuarterTurns = normalizeFurnitureRotationQuarterTurns(

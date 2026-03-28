@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
 import {
+  DEFAULT_WALL_COLOR_ADJUST,
   resolveOfficeFloorAppearance,
+  resolveOfficeWallAppearance,
   resolveOfficeTileColorAdjustPreset,
 } from "../colors";
 
@@ -27,5 +29,23 @@ describe("resolveOfficeFloorAppearance", () => {
     expect(result.colorAdjust).toEqual(floorColor);
     expect(result.colorAdjust).not.toBe(floorColor);
     expect(result.tint).toBeTypeOf("number");
+  });
+});
+
+describe("resolveOfficeWallAppearance", () => {
+  test("uses the default wall tint when no wall color is provided", () => {
+    const result = resolveOfficeWallAppearance(null);
+
+    expect(result.colorAdjust).toEqual(DEFAULT_WALL_COLOR_ADJUST);
+    expect(result.tint).toBe(0x334155);
+  });
+
+  test("clones raw wall color adjust input before resolving tint", () => {
+    const wallColor = { h: 214, s: 25, b: -54, c: 17 };
+    const result = resolveOfficeWallAppearance(wallColor);
+
+    expect(result.colorAdjust).toEqual(wallColor);
+    expect(result.colorAdjust).not.toBe(wallColor);
+    expect(result.tint).toBe(0x334155);
   });
 });

@@ -5,6 +5,7 @@ import type {
   OfficeFloorPickedPayload,
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
+import type { OfficeColorAdjust } from "../../contracts/content";
 import {
   anchoredGridCellToWorldPixel,
   worldToAnchoredGridCell,
@@ -44,13 +45,17 @@ function cloneOfficeEditorToolPayload(
         floorColor: payload.floorColor,
         floorPattern: payload.floorPattern,
       };
+    case "wall":
+      return {
+        tool: "wall",
+        wallColor: payload.wallColor ? { ...payload.wallColor } : null,
+      };
     case "furniture":
       return {
         tool: "furniture",
         furnitureId: payload.furnitureId,
         rotationQuarterTurns: payload.rotationQuarterTurns,
       };
-    case "wall":
     case "erase":
       return { tool: payload.tool };
     default:
@@ -74,6 +79,12 @@ function getOfficeFloorPattern(
   payload: OfficeSetEditorToolPayload,
 ): string | null {
   return payload.tool === "floor" ? payload.floorPattern : null;
+}
+
+function getOfficeWallColor(
+  payload: OfficeSetEditorToolPayload,
+): OfficeColorAdjust | null {
+  return payload.tool === "wall" ? payload.wallColor : null;
 }
 
 function getOfficeFurnitureId(
@@ -407,6 +418,7 @@ export class WorldSceneOfficeEditorController {
         this.officeEditorToolPayload.tool === "floor"
           ? this.officeEditorToolPayload.floorColor
           : null,
+      wallColor: getOfficeWallColor(this.officeEditorToolPayload),
       floorPattern: getOfficeFloorPattern(this.officeEditorToolPayload),
       furnitureId: getOfficeFurnitureId(this.officeEditorToolPayload),
       rotationQuarterTurns: getOfficeFurnitureRotationQuarterTurns(

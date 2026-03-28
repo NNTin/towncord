@@ -1,7 +1,10 @@
 import { describe, expect, test } from "vitest";
 import { OfficeEditorSystem } from "../officeEditorSystem";
 import type { OfficeSceneLayout } from "../../office/bootstrap";
-import { resolveOfficeTileTint } from "../../../content/structures/colors";
+import {
+  resolveOfficeTileTint,
+  resolveOfficeWallAppearance,
+} from "../../../content/structures/colors";
 import {
   FURNITURE_ALL_ITEMS,
   resolveFurnitureRotationVariant,
@@ -56,6 +59,7 @@ describe("OfficeEditorSystem floor editing", () => {
         cell: { col: 0, row: 0 },
         tileColor: null,
         floorColor,
+        wallColor: null,
         floorPattern: "environment.floors.pattern-03",
         furnitureId: null,
         rotationQuarterTurns: 0,
@@ -102,6 +106,7 @@ describe("OfficeEditorSystem floor editing", () => {
         cell: { col: 0, row: 0 },
         tileColor: null,
         floorColor: { h: 35, s: 30, b: 15, c: 0 },
+        wallColor: null,
         floorPattern: "environment.floors.pattern-01",
         furnitureId: null,
         rotationQuarterTurns: 0,
@@ -109,7 +114,7 @@ describe("OfficeEditorSystem floor editing", () => {
     ).toBe(false);
   });
 
-  test("clears floor-only metadata when converting a floor tile to a wall", () => {
+  test("stores the active wall color and clears floor-only metadata when painting walls", () => {
     const system = new OfficeEditorSystem();
     const layout: OfficeSceneLayout = {
       cols: 1,
@@ -134,6 +139,7 @@ describe("OfficeEditorSystem floor editing", () => {
         cell: { col: 0, row: 0 },
         tileColor: null,
         floorColor: null,
+        wallColor: { h: 214, s: 25, b: -54, c: 17 },
         floorPattern: null,
         furnitureId: null,
         rotationQuarterTurns: 0,
@@ -142,11 +148,47 @@ describe("OfficeEditorSystem floor editing", () => {
 
     expect(layout.tiles[0]).toMatchObject({
       kind: "wall",
-      tileId: 0,
+      tileId: 8,
+      colorAdjust: { h: 214, s: 25, b: -54, c: 17 },
     });
-    expect(layout.tiles[0]).not.toHaveProperty("tint");
-    expect(layout.tiles[0]).not.toHaveProperty("colorAdjust");
+    expect(layout.tiles[0]?.tint).toBe(
+      resolveOfficeWallAppearance({ h: 214, s: 25, b: -54, c: 17 }).tint,
+    );
     expect(layout.tiles[0]).not.toHaveProperty("pattern");
+  });
+
+  test("treats identical wall paints as no-ops", () => {
+    const system = new OfficeEditorSystem();
+    const wallColor = { h: 214, s: 25, b: -54, c: 17 };
+    const wallAppearance = resolveOfficeWallAppearance(wallColor);
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        {
+          kind: "wall",
+          tileId: 8,
+          tint: wallAppearance.tint,
+          colorAdjust: wallAppearance.colorAdjust,
+        },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "wall",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        wallColor,
+        floorPattern: null,
+        furnitureId: null,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBe(false);
   });
 
   test("erase normalizes stale floor metadata from void tiles", () => {
@@ -174,6 +216,7 @@ describe("OfficeEditorSystem floor editing", () => {
         cell: { col: 0, row: 0 },
         tileColor: null,
         floorColor: null,
+        wallColor: null,
         floorPattern: null,
         furnitureId: null,
         rotationQuarterTurns: 0,
@@ -263,6 +306,7 @@ describe("OfficeEditorSystem floor editing", () => {
         cell: { col: 0, row: 0 },
         tileColor: null,
         floorColor: null,
+        wallColor: null,
         floorPattern: null,
         furnitureId: asset.id,
         rotationQuarterTurns: 1,

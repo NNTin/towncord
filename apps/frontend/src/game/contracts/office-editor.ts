@@ -18,6 +18,7 @@ export type OfficeSetEditorToolNonePayload = {
 
 export type OfficeSetEditorToolWallPayload = {
   tool: "wall";
+  wallColor: OfficeColorAdjust | null;
 };
 
 export type OfficeSetEditorToolErasePayload = {
