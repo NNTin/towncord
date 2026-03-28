@@ -35,6 +35,7 @@ function renderHarness() {
         activeFloorColor: { h: 0, s: 0, b: 0, c: 0 },
         activeFloorPattern: null,
         activeFurnitureId: null,
+        activeFurnitureRotationQuarterTurns: 0,
       },
       onClearOfficeTool: clearOfficeTool,
     });
@@ -47,6 +48,8 @@ function renderHarness() {
     current: {
       selectTerrainTool: vi.fn(),
       setOfficeEditorTool: vi.fn(),
+      rotateSelectedOfficePlaceable: vi.fn(),
+      deleteSelectedOfficePlaceable: vi.fn(),
     },
   };
 
@@ -93,7 +96,19 @@ function renderHarness() {
       inspectedTile: null,
       runtimeDiagnostics: null,
     },
+    officeSelection: {
+      selection: {
+        kind: "furniture" as const,
+        id: "desk-laptop",
+        assetId: "ASSET_107",
+        label: "Laptop - Front - Off",
+        category: "electronics" as const,
+        placement: "surface" as const,
+        canRotate: true,
+      },
+    },
     zoomState: null,
+    onOfficeSelectionChanged: vi.fn(),
   });
 
   vi.mocked(useRuntimeGatewayLifecycle).mockReturnValue({
@@ -105,6 +120,7 @@ function renderHarness() {
     runtimeRootBindings: {
       onDragOver: vi.fn(),
       onDrop: vi.fn(),
+      onContextMenu: vi.fn(),
     },
     zoomViewModel: null,
   } as never);
@@ -142,6 +158,12 @@ describe("useRuntimeUiBridge", () => {
   test("clears the office tool when terrain is selected through either bridge entry point", async () => {
     const harness = renderHarness();
     const bridge = harness.getValue();
+
+    expect(useRuntimeGatewayLifecycle).toHaveBeenCalledWith(
+      expect.objectContaining({
+        onOfficeSelectionChanged: expect.any(Function),
+      }),
+    );
 
     await act(async () => {
       bridge.onSelectTerrainTool({
@@ -203,6 +225,31 @@ describe("useRuntimeUiBridge", () => {
       ],
       onDragStart: expect.any(Function),
     });
+
+    await harness.unmount();
+  });
+
+  test("exposes the selected office placeable and runtime actions", async () => {
+    const harness = renderHarness();
+    const bridge = harness.getValue();
+
+    expect(bridge.selectedOfficePlaceable).toEqual({
+      kind: "furniture",
+      id: "desk-laptop",
+      assetId: "ASSET_107",
+      label: "Laptop - Front - Off",
+      category: "electronics",
+      placement: "surface",
+      canRotate: true,
+    });
+
+    await act(async () => {
+      bridge.onRotateSelectedOfficePlaceable();
+      bridge.onDeleteSelectedOfficePlaceable();
+    });
+
+    expect(harness.sessionRef.current.rotateSelectedOfficePlaceable).toHaveBeenCalledOnce();
+    expect(harness.sessionRef.current.deleteSelectedOfficePlaceable).toHaveBeenCalledOnce();
 
     await harness.unmount();
   });

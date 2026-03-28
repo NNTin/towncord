@@ -1,6 +1,7 @@
 import type { OfficeSceneLayout } from "../contracts/office-scene";
 import type {
   OfficeFloorPickedPayload,
+  OfficeSelectionChangedPayload,
   OfficeSetEditorToolPayload,
 } from "../contracts/office-editor";
 import type {
@@ -49,6 +50,9 @@ export type RuntimeCameraProjectionPort = {
 export type RuntimeOfficeProjectionPort = {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
+  onOfficeSelectionChanged?: (
+    payload: OfficeSelectionChangedPayload,
+  ) => void;
 };
 
 export type GameSessionNotifications = RuntimeLifecycleProjectionPort &
@@ -72,6 +76,8 @@ export type RuntimeCameraCommandPort = {
 
 export type RuntimeOfficeCommandPort = {
   setOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
+  rotateSelectedOfficePlaceable: () => void;
+  deleteSelectedOfficePlaceable: () => void;
 };
 
 export type GameSession = RuntimePlacementCommandPort &

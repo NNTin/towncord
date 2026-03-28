@@ -6,6 +6,8 @@ import {
 import type {
   OfficeFloorPickedPayload,
   OfficeLayoutChangedPayload,
+  OfficeSelectedPlaceablePayload,
+  OfficeSelectionChangedPayload,
 } from "../../contracts/office-editor";
 import type {
   PlayerPlacedPayload,
@@ -30,6 +32,8 @@ import type { RuntimeEventHost } from "./host";
 export type {
   OfficeFloorPickedPayload,
   OfficeLayoutChangedPayload,
+  OfficeSelectedPlaceablePayload,
+  OfficeSelectionChangedPayload,
 } from "../../contracts/office-editor";
 
 export type {
@@ -51,6 +55,7 @@ export const RUNTIME_TO_UI_EVENTS = {
   ZOOM_CHANGED: "zoomChanged",
   OFFICE_FLOOR_PICKED: "officeFloorPicked",
   OFFICE_LAYOUT_CHANGED: "officeLayoutChanged",
+  OFFICE_SELECTION_CHANGED: "officeSelectionChanged",
   TERRAIN_SEED_CHANGED: "terrainSeedChanged",
 } as const;
 
@@ -66,6 +71,8 @@ export const OFFICE_FLOOR_PICKED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED;
 export const OFFICE_LAYOUT_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED;
+export const OFFICE_SELECTION_CHANGED_EVENT =
+  RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED;
 export const TERRAIN_SEED_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED;
 
@@ -81,6 +88,7 @@ export type RuntimeToUiEventPayloadByName = {
   [RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED]: ZoomChangedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED]: OfficeFloorPickedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]: OfficeLayoutChangedPayload;
+  [RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED]: OfficeSelectionChangedPayload;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]: TerrainSeedChangedPayload;
 };
 
@@ -109,6 +117,7 @@ const OFFICE_SCENE_FURNITURE_PLACEMENT_SET = new Set([
   "surface",
   "wall",
 ]);
+const OFFICE_SELECTED_PLACEABLE_KIND_SET = new Set(["furniture"]);
 const PLAYER_STATE_SET = new Set(["idle", "walk", "run"]);
 const ROTATE_90_SET = new Set([0, 1, 2, 3]);
 
@@ -477,6 +486,46 @@ export function normalizeOfficeLayoutChangedPayload(
   };
 }
 
+function isOfficeSelectedPlaceablePayload(
+  value: unknown,
+): value is OfficeSelectedPlaceablePayload {
+  return (
+    isRecord(value) &&
+    typeof value.kind === "string" &&
+    OFFICE_SELECTED_PLACEABLE_KIND_SET.has(value.kind) &&
+    typeof value.id === "string" &&
+    typeof value.assetId === "string" &&
+    typeof value.label === "string" &&
+    typeof value.category === "string" &&
+    OFFICE_SCENE_FURNITURE_CATEGORY_SET.has(value.category) &&
+    typeof value.placement === "string" &&
+    OFFICE_SCENE_FURNITURE_PLACEMENT_SET.has(value.placement) &&
+    typeof value.canRotate === "boolean"
+  );
+}
+
+export function normalizeOfficeSelectionChangedPayload(
+  value: unknown,
+): OfficeSelectionChangedPayload | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  if (value.selection == null) {
+    return { selection: null };
+  }
+
+  if (!isOfficeSelectedPlaceablePayload(value.selection)) {
+    return undefined;
+  }
+
+  return {
+    selection: {
+      ...value.selection,
+    },
+  };
+}
+
 export function normalizeTerrainSeedChangedPayload(
   value: unknown,
 ): TerrainSeedChangedPayload | undefined {
@@ -519,6 +568,8 @@ const runtimeToUiEventNormalizers = {
   [RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED]: normalizeOfficeFloorPickedPayload,
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]:
     normalizeOfficeLayoutChangedPayload,
+  [RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED]:
+    normalizeOfficeSelectionChangedPayload,
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]:
     normalizeTerrainSeedChangedPayload,
 } satisfies {

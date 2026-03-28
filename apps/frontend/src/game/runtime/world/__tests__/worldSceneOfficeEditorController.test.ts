@@ -1,6 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import type { OfficeSceneLayout, OfficeSceneTile } from "../../office/bootstrap";
 import type { AnchoredGridRegion } from "../../../../engine/world-runtime/regions/anchoredGridRegion";
+import { FURNITURE_ALL_ITEMS } from "../../../content/structures/furniturePalette";
 import { WorldSceneOfficeEditorController } from "../worldSceneOfficeEditorController";
 
 function createControllerHarness() {
@@ -29,6 +30,34 @@ function createControllerHarness() {
     furniture: [],
     characters: [],
   };
+  const laptop = FURNITURE_ALL_ITEMS.find(
+    (item) =>
+      item.groupId === "LAPTOP" &&
+      item.orientation === "front" &&
+      item.state === "off",
+  );
+  if (!laptop) {
+    throw new Error("Missing laptop test asset");
+  }
+  layout.furniture = [
+    {
+      id: "desk-laptop",
+      assetId: laptop.id,
+      label: laptop.label,
+      category: laptop.category as never,
+      placement: laptop.placement,
+      col: 0,
+      row: 0,
+      width: laptop.footprintW,
+      height: laptop.footprintH,
+      color: laptop.color,
+      accentColor: laptop.accentColor,
+      renderAsset: {
+        atlasKey: laptop.atlasKey,
+        atlasFrame: { ...laptop.atlasFrame },
+      },
+    },
+  ];
   const region: AnchoredGridRegion<OfficeSceneLayout> = {
     anchorX16: 0,
     anchorY16: 0,
@@ -37,6 +66,16 @@ function createControllerHarness() {
   const controller = new WorldSceneOfficeEditorController({
     getOfficeRegion: () => region,
     getOfficeCellHighlight: () => highlight as never,
+    getOfficeFurnitureTargets: () => [
+      {
+        id: "desk-laptop",
+        bounds: {
+          contains(x: number, y: number) {
+            return x >= 0 && y >= 0 && x < 16 && y < 16;
+          },
+        } as never,
+      },
+    ],
     getActivePointer: () => pointer as never,
     getWorldPoint: (screenX, screenY) => ({ x: screenX, y: screenY }),
     emitOfficeFloorPicked,
@@ -104,5 +143,78 @@ describe("WorldSceneOfficeEditorController", () => {
     });
     expect(controller.getOfficeFloorMode()).toBe("paint");
     expect(controller.consumePendingLayoutChange()).toBe(false);
+  });
+
+  test("selects furniture on idle layout clicks and can rotate or delete the selected placeable", () => {
+    const { controller, region } = createControllerHarness();
+
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+    expect(controller.getSelectedFurnitureId()).toBe("desk-laptop");
+
+    expect(controller.rotateSelectedFurniture()).toBe(true);
+    expect(region.layout.furniture[0]?.assetId).not.toBe("ASSET_107");
+
+    expect(controller.deleteSelectedFurniture()).toBe(true);
+    expect(region.layout.furniture).toHaveLength(0);
+    expect(controller.getSelectedFurnitureId()).toBeNull();
+  });
+
+  test("projects the hovered furniture placement preview from the active tool", () => {
+    const { controller } = createControllerHarness();
+    const chair = FURNITURE_ALL_ITEMS.find(
+      (item) =>
+        item.groupId === "ROTATING_CHAIR" && item.orientation === "front",
+    );
+    if (!chair) {
+      throw new Error("Missing rotating chair test asset");
+    }
+
+    controller.setOfficeEditorTool({
+      tool: "furniture",
+      furnitureId: chair.id,
+      rotationQuarterTurns: 0,
+    });
+
+    expect(
+      controller.getFurniturePlacementPreview({
+        isDown: false,
+        withinGame: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toMatchObject({
+      kind: "replace",
+      anchorCell: { col: 0, row: 0 },
+      affectedFurniture: [expect.objectContaining({ id: "desk-laptop" })],
+      blockedReason: null,
+    });
+  });
+
+  test("right-click wall deletion only removes wall tiles", () => {
+    const { controller, region } = createControllerHarness();
+    region.layout.tiles[0] = {
+      kind: "wall",
+      tileId: 8,
+    };
+
+    controller.setOfficeEditorTool({ tool: "wall" });
+
+    expect(
+      controller.tryHandleSecondaryPointerDown({
+        button: 2,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+    expect(region.layout.tiles[0]?.kind).toBe("void");
+    expect(controller.consumePendingLayoutChange()).toBe(true);
   });
 });

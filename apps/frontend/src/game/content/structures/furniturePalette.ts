@@ -11,11 +11,15 @@ const atlasData = donargOfficeAtlasData;
 const furnitureCatalogData = donargFurnitureCatalogData;
 
 export type FurniturePalettePlacement = "floor" | "wall" | "surface";
+export type FurnitureRotationQuarterTurns = 0 | 1 | 2 | 3;
 
 export type FurniturePaletteItem = {
   id: string;
   label: string;
   category: string;
+  groupId?: string;
+  orientation?: string;
+  state?: string;
   atlasKey: string;
   atlasFrame: { x: number; y: number; w: number; h: number };
   footprintW: number;
@@ -31,6 +35,7 @@ export const ATLAS_H = atlasData.meta.size.h;
 
 const DONARG_TILE_WORLD_SIZE = 16;
 const ORIENTATION_ORDER = ["front", "right", "back", "left"] as const;
+const FURNITURE_ROTATION_QUARTER_TURNS = [0, 1, 2, 3] as const;
 
 function filePathToAtlasKey(filePath: string): string {
   const withoutExt = filePath.replace(/\.png$/, "");
@@ -126,6 +131,9 @@ function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
       footprintW,
       footprintH,
       placement: resolvePlacement(asset),
+      ...(asset.groupId ? { groupId: asset.groupId } : {}),
+      ...(asset.orientation ? { orientation: asset.orientation } : {}),
+      ...(asset.state ? { state: asset.state } : {}),
       ...resolveColors(asset),
     });
   }
@@ -168,6 +176,84 @@ function buildVisibleItems(): FurniturePaletteItem[] {
   }
 
   return buildItemsFromAssets(assets.filter((asset) => !hidden.has(asset.id)));
+}
+
+function resolveFurnitureItemById(id: string | null | undefined): FurniturePaletteItem | null {
+  if (!id) {
+    return null;
+  }
+
+  return FURNITURE_ALL_ITEMS.find((item) => item.id === id) ?? null;
+}
+
+function resolveNextRotatedFurnitureVariant(
+  currentItem: FurniturePaletteItem | null,
+): FurniturePaletteItem | null {
+  if (!currentItem?.groupId || !currentItem.orientation) {
+    return currentItem;
+  }
+
+  const candidates = FURNITURE_ALL_ITEMS.filter(
+    (item) => item.groupId === currentItem.groupId,
+  );
+  if (candidates.length < 2) {
+    return currentItem;
+  }
+
+  const currentState = currentItem.state ?? null;
+  const currentIndex = ORIENTATION_ORDER.indexOf(
+    currentItem.orientation as (typeof ORIENTATION_ORDER)[number],
+  );
+  if (currentIndex < 0) {
+    return currentItem;
+  }
+
+  for (let offset = 1; offset <= ORIENTATION_ORDER.length; offset += 1) {
+    const nextOrientation =
+      ORIENTATION_ORDER[(currentIndex + offset) % ORIENTATION_ORDER.length];
+    const nextItem =
+      candidates.find(
+        (item) =>
+          item.orientation === nextOrientation &&
+          (item.state ?? null) === currentState,
+      ) ?? candidates.find((item) => item.orientation === nextOrientation);
+
+    if (nextItem) {
+      return nextItem;
+    }
+  }
+
+  return currentItem;
+}
+
+export function canRotateFurniturePaletteItem(id: string | null | undefined): boolean {
+  const currentItem = resolveFurnitureItemById(id);
+  if (!currentItem) {
+    return false;
+  }
+
+  const nextItem = resolveNextRotatedFurnitureVariant(currentItem);
+  return Boolean(nextItem && nextItem.id !== currentItem.id);
+}
+
+export function resolveFurnitureRotationVariant(
+  id: string | null | undefined,
+  quarterTurns: FurnitureRotationQuarterTurns = 0,
+): FurniturePaletteItem | null {
+  let currentItem = resolveFurnitureItemById(id);
+  if (!currentItem) {
+    return null;
+  }
+
+  if (!FURNITURE_ROTATION_QUARTER_TURNS.includes(quarterTurns)) {
+    return currentItem;
+  }
+
+  for (let step = 0; step < quarterTurns; step += 1) {
+    currentItem = resolveNextRotatedFurnitureVariant(currentItem);
+  }
+
+  return currentItem;
 }
 
 /** All furniture items with atlas frames, including non-primary orientations. Used for rendering placed furniture. */

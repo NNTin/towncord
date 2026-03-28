@@ -22,6 +22,12 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
   let terrainSeedSnapshot:
     | Parameters<NonNullable<GameSessionNotifications["onTerrainSeedChanged"]>>[0]
     | null = null;
+  let officeSelectionSnapshot:
+    | Parameters<
+        NonNullable<GameSessionNotifications["onOfficeSelectionChanged"]>
+      >[0]
+    | null = null;
+  let hasOfficeSelectionSnapshot = false;
   let destroyed = false;
 
   const forEachSubscriber = (
@@ -92,6 +98,17 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         subscriber.onOfficeFloorPicked?.(payload),
       ),
   );
+  const unbindOfficeSelectionChanged = bindRuntimeToUiEvent(
+    runtime,
+    RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED,
+    (payload) => {
+      officeSelectionSnapshot = payload;
+      hasOfficeSelectionSnapshot = true;
+      forEachSubscriber((subscriber) =>
+        subscriber.onOfficeSelectionChanged?.(payload),
+      );
+    },
+  );
 
   const destroy = (): void => {
     if (destroyed) {
@@ -107,6 +124,7 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     unbindOfficeLayoutChanged();
     unbindTerrainSeedChanged();
     unbindOfficeFloorPicked();
+    unbindOfficeSelectionChanged();
     runtime.destroy(true);
   };
 
@@ -122,6 +140,11 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       }
       if (terrainSeedSnapshot) {
         notifications.onTerrainSeedChanged?.(terrainSeedSnapshot);
+      }
+      if (hasOfficeSelectionSnapshot) {
+        notifications.onOfficeSelectionChanged?.(
+          officeSelectionSnapshot ?? { selection: null },
+        );
       }
 
       return () => {
@@ -165,6 +188,28 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         runtime,
         UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
         payload,
+      );
+    },
+    rotateSelectedOfficePlaceable() {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(
+        runtime,
+        UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+        { action: "rotate" },
+      );
+    },
+    deleteSelectedOfficePlaceable() {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(
+        runtime,
+        UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+        { action: "delete" },
       );
     },
     destroy,

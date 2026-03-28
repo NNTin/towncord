@@ -22,6 +22,9 @@ function App(): JSX.Element {
     officeEditor,
     activeTerrainTool,
     entityToolbarViewModel,
+    selectedOfficePlaceable,
+    onRotateSelectedOfficePlaceable,
+    onDeleteSelectedOfficePlaceable,
     onSelectTerrainTool,
     runtimeRootRef,
     runtimeRootBindings,
@@ -72,9 +75,16 @@ function App(): JSX.Element {
         activeFloorPattern={officeToolState.activeFloorPattern}
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
         activeFurnitureId={officeToolState.activeFurnitureId}
+        activeFurnitureRotationQuarterTurns={
+          officeToolState.activeFurnitureRotationQuarterTurns
+        }
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
+        onRotateFurnitureClockwise={officeToolState.onRotateFurnitureClockwise}
         activeTerrainTool={activeTerrainTool}
         entityToolbarViewModel={entityToolbarViewModel}
+        selectedOfficePlaceable={selectedOfficePlaceable}
+        onRotateSelectedOfficePlaceable={onRotateSelectedOfficePlaceable}
+        onDeleteSelectedOfficePlaceable={onDeleteSelectedOfficePlaceable}
         onSelectTerrainTool={onSelectTerrainTool}
         onResetLayout={layoutSaveState.reset}
         onSaveLayout={() => void layoutSaveState.save()}

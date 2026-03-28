@@ -11,13 +11,22 @@ import {
   type AnchoredGridRegion,
 } from "../../../engine/world-runtime/regions";
 import type { OfficeSceneLayout } from "../../contracts/office-scene";
-import { OfficeEditorSystem } from "./officeEditorSystem";
+import {
+  OfficeEditorSystem,
+  type OfficeFurniturePlacementPreview,
+} from "./officeEditorSystem";
 
 type OfficeRegion = AnchoredGridRegion<OfficeSceneLayout>;
+
+type OfficeFurnitureTarget = {
+  id: string;
+  bounds: Phaser.Geom.Rectangle;
+};
 
 type WorldSceneOfficeEditorControllerHost = {
   getOfficeRegion: () => OfficeRegion | null;
   getOfficeCellHighlight: () => Phaser.GameObjects.Rectangle | null;
+  getOfficeFurnitureTargets: () => readonly OfficeFurnitureTarget[];
   getActivePointer: () => Phaser.Input.Pointer | null;
   getWorldPoint: (screenX: number, screenY: number) => { x: number; y: number };
   emitOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
@@ -39,6 +48,7 @@ function cloneOfficeEditorToolPayload(
       return {
         tool: "furniture",
         furnitureId: payload.furnitureId,
+        rotationQuarterTurns: payload.rotationQuarterTurns,
       };
     case "wall":
     case "erase":
@@ -72,11 +82,29 @@ function getOfficeFurnitureId(
   return payload.tool === "furniture" ? payload.furnitureId : null;
 }
 
+function getOfficeFurnitureRotationQuarterTurns(
+  payload: OfficeSetEditorToolPayload,
+): 0 | 1 | 2 | 3 {
+  return payload.tool === "furniture" ? payload.rotationQuarterTurns : 0;
+}
+
+function isPointerWithinGame(pointer: Phaser.Input.Pointer | null): boolean {
+  if (!pointer) {
+    return false;
+  }
+
+  return (
+    !("withinGame" in pointer) ||
+    Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame)
+  );
+}
+
 export class WorldSceneOfficeEditorController {
   private readonly officeEditorSystem = new OfficeEditorSystem();
   private officeEditorToolPayload: OfficeSetEditorToolPayload = { tool: null };
   private isOfficePainting = false;
   private officeDirty = false;
+  private selectedFurnitureId: string | null = null;
 
   constructor(private readonly host: WorldSceneOfficeEditorControllerHost) {}
 
@@ -84,6 +112,7 @@ export class WorldSceneOfficeEditorController {
     this.officeEditorToolPayload = { tool: null };
     this.isOfficePainting = false;
     this.officeDirty = false;
+    this.selectedFurnitureId = null;
   }
 
   public getOfficeFloorMode(): OfficeFloorMode {
@@ -92,7 +121,58 @@ export class WorldSceneOfficeEditorController {
 
   public setOfficeEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.officeEditorToolPayload = cloneOfficeEditorToolPayload(payload);
+    if (payload.tool !== null) {
+      this.selectedFurnitureId = null;
+    }
+    this.isOfficePainting = false;
     this.syncOfficeCellHighlight(this.host.getActivePointer());
+  }
+
+  public getSelectedFurnitureId(): string | null {
+    return this.selectedFurnitureId;
+  }
+
+  public clearSelectedFurniture(): void {
+    this.selectedFurnitureId = null;
+  }
+
+  public rotateSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.rotateFurniture(region.layout, furnitureId);
+    if (changed) {
+      this.officeDirty = true;
+    }
+    return changed;
+  }
+
+  public canRotateSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    return this.officeEditorSystem.canRotateFurniture(region.layout, furnitureId);
+  }
+
+  public deleteSelectedFurniture(): boolean {
+    const furnitureId = this.selectedFurnitureId;
+    const region = this.host.getOfficeRegion();
+    if (!furnitureId || !region) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.removeFurniture(region.layout, furnitureId);
+    if (changed) {
+      this.officeDirty = true;
+      this.selectedFurnitureId = null;
+    }
+    return changed;
   }
 
   public consumePendingLayoutChange(): boolean {
@@ -104,13 +184,20 @@ export class WorldSceneOfficeEditorController {
   public syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
     const highlight = this.host.getOfficeCellHighlight();
     const region = this.host.getOfficeRegion();
+    const tool = getOfficeEditorTool(this.officeEditorToolPayload);
     if (
       !highlight ||
       !pointer ||
-      !getOfficeEditorTool(this.officeEditorToolPayload) ||
+      !isPointerWithinGame(pointer) ||
+      !tool ||
       !region
     ) {
       highlight?.setVisible(false);
+      return;
+    }
+
+    if (tool === "furniture") {
+      highlight.setVisible(false);
       return;
     }
 
@@ -130,9 +217,36 @@ export class WorldSceneOfficeEditorController {
     highlight.setVisible(true);
   }
 
+  public getFurniturePlacementPreview(
+    pointer: Phaser.Input.Pointer | null,
+  ): OfficeFurniturePlacementPreview | null {
+    const region = this.host.getOfficeRegion();
+    if (
+      !pointer ||
+      !isPointerWithinGame(pointer) ||
+      !region ||
+      getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture"
+    ) {
+      return null;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
+    if (!cell) {
+      return null;
+    }
+
+    return this.officeEditorSystem.previewFurniturePlacement(
+      region.layout,
+      cell,
+      getOfficeFurnitureId(this.officeEditorToolPayload),
+      getOfficeFurnitureRotationQuarterTurns(this.officeEditorToolPayload),
+    );
+  }
+
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
     if (!getOfficeEditorTool(this.officeEditorToolPayload)) {
-      return false;
+      return this.trySelectFurniture(pointer);
     }
 
     const region = this.host.getOfficeRegion();
@@ -151,6 +265,34 @@ export class WorldSceneOfficeEditorController {
     }
 
     return false;
+  }
+
+  public tryHandleSecondaryPointerDown(pointer: Phaser.Input.Pointer): boolean {
+    if (pointer.button !== 2) {
+      return false;
+    }
+
+    if (getOfficeEditorTool(this.officeEditorToolPayload) !== "wall") {
+      return false;
+    }
+
+    const region = this.host.getOfficeRegion();
+    if (!region) {
+      return false;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
+    if (!cell) {
+      return false;
+    }
+
+    const changed = this.officeEditorSystem.removeWall(region.layout, cell);
+    if (changed) {
+      this.officeDirty = true;
+    }
+
+    return changed;
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
@@ -177,6 +319,28 @@ export class WorldSceneOfficeEditorController {
 
   private emitPickedOfficeFloor(payload: OfficeFloorPickedPayload): void {
     this.host.emitOfficeFloorPicked(payload);
+  }
+
+  private trySelectFurniture(pointer: Phaser.Input.Pointer): boolean {
+    const region = this.host.getOfficeRegion();
+    if (!region) {
+      return false;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    if (!worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region)) {
+      return false;
+    }
+
+    const targets = [...this.host.getOfficeFurnitureTargets()].reverse();
+    const hit = targets.find((target) => target.bounds.contains(worldPoint.x, worldPoint.y));
+    if (!hit) {
+      this.selectedFurnitureId = null;
+      return true;
+    }
+
+    this.selectedFurnitureId = hit.id;
+    return true;
   }
 
   private pickOfficeFloor(
@@ -245,6 +409,9 @@ export class WorldSceneOfficeEditorController {
           : null,
       floorPattern: getOfficeFloorPattern(this.officeEditorToolPayload),
       furnitureId: getOfficeFurnitureId(this.officeEditorToolPayload),
+      rotationQuarterTurns: getOfficeFurnitureRotationQuarterTurns(
+        this.officeEditorToolPayload,
+      ),
     });
 
     if (changed) {

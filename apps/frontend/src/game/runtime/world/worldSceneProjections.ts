@@ -1,6 +1,7 @@
 import type {
   OfficeFloorPickedPayload,
   OfficeLayoutChangedPayload,
+  OfficeSelectionChangedPayload,
 } from "../../contracts/office-editor";
 import type {
   PlayerPlacedPayload,
@@ -59,6 +60,10 @@ export class WorldSceneProjectionEmitter {
 
   public emitOfficeLayoutChanged(payload: OfficeLayoutChangedPayload): void {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, payload);
+  }
+
+  public emitOfficeSelectionChanged(payload: OfficeSelectionChangedPayload): void {
+    this.emitProjection(RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, payload);
   }
 
   public emitTerrainSeedChanged(payload: TerrainSeedChangedPayload): void {

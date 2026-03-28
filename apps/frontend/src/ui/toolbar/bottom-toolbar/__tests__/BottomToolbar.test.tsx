@@ -4,6 +4,7 @@ import { act } from "react";
 import type { ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
 import { BottomToolbar } from "../BottomToolbar";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
@@ -26,9 +27,14 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFloorPattern: "environment.floors.pattern-01",
   onSelectFloorPattern: vi.fn(),
   activeFurnitureId: null,
+  activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
+  onRotateFurnitureClockwise: vi.fn(),
   activeTerrainTool: null as { materialId: string; brushId: string } | null,
   onSelectTerrainTool: vi.fn(),
+  selectedOfficePlaceable: null,
+  onRotateSelectedOfficePlaceable: vi.fn(),
+  onDeleteSelectedOfficePlaceable: vi.fn(),
   onResetLayout: vi.fn(),
   onSaveLayout: vi.fn(),
   canResetLayout: true,
@@ -44,13 +50,18 @@ function renderToolbar(props = baseProps) {
   document.body.appendChild(container);
   const root = createRoot(container);
 
-  act(() => {
-    root.render(<BottomToolbar {...props} />);
-  });
+  const rerender = (nextProps = props) => {
+    act(() => {
+      root.render(<BottomToolbar {...nextProps} />);
+    });
+  };
+
+  rerender(props);
 
   return {
     container,
     root,
+    rerender,
   };
 }
 
@@ -117,7 +128,7 @@ describe("BottomToolbar", () => {
       getButton(container, "Entity placeables").click();
     });
 
-    expect(container.textContent).toContain("Entities");
+    expect(container.textContent).toContain("Entity");
     expect(container.textContent).toContain("Player");
     expect(container.textContent).toContain("Mobs");
     expect(container.textContent).toContain("Player Spawn");
@@ -151,6 +162,186 @@ describe("BottomToolbar", () => {
       groupKey: "entity:player",
       groupLabel: "Player",
     });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("clicking Entity closes Layout and shows an entity preview card", () => {
+    const props = {
+      ...baseProps,
+      activeTool: "wall" as const,
+      entityToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:player",
+            label: "Player",
+            placeables: [
+              {
+                id: "entity:player",
+                type: "entity" as const,
+                entityId: "player",
+                label: "Player Spawn",
+                groupKey: "entity:player",
+                groupLabel: "Player",
+              },
+            ],
+          },
+        ],
+        onDragStart: vi.fn(),
+      },
+    };
+    const { container, root, rerender } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Entity placeables").click();
+    });
+
+    expect(props.onToggleLayoutMode).toHaveBeenCalledOnce();
+    expect(props.onSelectTool).toHaveBeenCalledWith(null);
+    rerender({
+      ...props,
+      isLayoutMode: false,
+      activeTool: null,
+    });
+    expect(container.textContent).toContain("Entity > Player > Player Spawn");
+    expect(() => getButton(container, "Floor tool")).toThrow();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("layout previews show the concrete furniture asset and update on hover", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    const hoveredItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_78");
+    if (!selectedItem || !hoveredItem) {
+      throw new Error("Missing furniture palette fixtures");
+    }
+
+    const props = {
+      ...baseProps,
+      activeTool: "furniture" as const,
+      activeFurnitureId: selectedItem.id,
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain(
+      "Layout > Furniture > Electronics > Laptop > Laptop - Front - Off",
+    );
+    expect(container.textContent).toContain(selectedItem.label);
+
+    act(() => {
+      getButton(container, hoveredItem.label).dispatchEvent(
+        new MouseEvent("mouseover", { bubbles: true }),
+      );
+    });
+
+    expect(container.textContent).toContain(hoveredItem.label);
+    expect(container.textContent).toContain(
+      "Layout > Furniture > Electronics > Monitor > Monitor - Front - Off",
+    );
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("shows furniture details plus pending rotation controls while scene preview owns placement", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      activeTool: "furniture" as const,
+      activeFurnitureId: selectedItem.id,
+      activeFurnitureRotationQuarterTurns: 1 as const,
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain("Rotation: 90°");
+    expect(container.textContent).toContain(
+      "ghost preview follows your pointer inside the office scene",
+    );
+
+    act(() => {
+      getButton(container, "Rotate the pending furniture preview").click();
+    });
+
+    expect(props.onRotateFurnitureClockwise).toHaveBeenCalledOnce();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("shows the selected placeable card and wires rotate/delete actions", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      selectedOfficePlaceable: {
+        kind: "furniture" as const,
+        id: "desk-laptop",
+        assetId: selectedItem.id,
+        label: selectedItem.label,
+        category: selectedItem.category as never,
+        placement: selectedItem.placement,
+        canRotate: true,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain(
+      "Layout > Selected > Electronics > Laptop > Laptop - Front - Off",
+    );
+    expect(container.textContent).toContain(selectedItem.label);
+
+    act(() => {
+      getButton(container, "Rotate selected placeable").click();
+      getButton(container, "Delete selected placeable").click();
+    });
+
+    expect(props.onRotateSelectedOfficePlaceable).toHaveBeenCalledOnce();
+    expect(props.onDeleteSelectedOfficePlaceable).toHaveBeenCalledOnce();
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("disables rotation when the selected placeable cannot rotate", () => {
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    if (!selectedItem) {
+      throw new Error("Missing furniture palette fixture");
+    }
+
+    const props = {
+      ...baseProps,
+      selectedOfficePlaceable: {
+        kind: "furniture" as const,
+        id: "desk-laptop",
+        assetId: selectedItem.id,
+        label: selectedItem.label,
+        category: selectedItem.category as never,
+        placement: selectedItem.placement,
+        canRotate: false,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(
+      getButton(
+        container,
+        "This selected placeable has no alternate orientation",
+      ).disabled,
+    ).toBe(true);
 
     act(() => {
       root.unmount();

@@ -40,6 +40,8 @@ describe("game session factories", () => {
       selectTerrainTool: vi.fn(),
       setZoom: vi.fn(),
       setOfficeEditorTool: vi.fn(),
+      rotateSelectedOfficePlaceable: vi.fn(),
+      deleteSelectedOfficePlaceable: vi.fn(),
       destroy: vi.fn(),
     } satisfies GameSession;
 

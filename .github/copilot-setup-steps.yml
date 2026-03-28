@@ -1,0 +1,3 @@
+steps:
+  - name: Initialize submodules and install dependencies
+    run: npm run bootstrap

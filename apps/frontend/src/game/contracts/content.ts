@@ -2,10 +2,16 @@ export {
   ATLAS_H,
   ATLAS_IMAGE_URL,
   ATLAS_W,
+  canRotateFurniturePaletteItem,
+  FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
+  resolveFurnitureRotationVariant,
 } from "../content/structures/furniturePalette";
-export type { FurniturePaletteItem } from "../content/structures/furniturePalette";
+export type {
+  FurniturePaletteItem,
+  FurnitureRotationQuarterTurns,
+} from "../content/structures/furniturePalette";
 export {
   DEFAULT_FLOOR_COLOR_ADJUST,
   cloneOfficeColorAdjust,

@@ -4,6 +4,7 @@ import {
   emitRuntimeToUiEvent,
   RUNTIME_TO_UI_EVENTS,
   type OfficeLayoutChangedPayload,
+  type OfficeSelectionChangedPayload,
   type RuntimeBootstrapPayload,
   type TerrainSeedChangedPayload,
 } from "../runtimeEvents";
@@ -145,6 +146,20 @@ function createTerrainSeedPayload(): TerrainSeedChangedPayload {
   };
 }
 
+function createSelectionPayload(): OfficeSelectionChangedPayload {
+  return {
+    selection: {
+      kind: "furniture",
+      id: "desk-laptop",
+      assetId: "ASSET_107",
+      label: "Laptop - Front - Off",
+      category: "electronics" as const,
+      placement: "surface" as const,
+      canRotate: true,
+    },
+  };
+}
+
 describe("runtimeEvents transport", () => {
   test("bindRuntimeToUiEvent normalizes zoom payloads before delivery", () => {
     const { host } = createHost();
@@ -212,5 +227,22 @@ describe("runtimeEvents transport", () => {
 
     payload.seed.rows[0] = "~~";
     expect(received?.seed.rows[0]).toBe(".~");
+  });
+
+  test("emits office selection snapshots as cloned payloads", () => {
+    const { host } = createHost();
+    const handler = vi.fn();
+    const payload = createSelectionPayload();
+
+    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, handler);
+    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, payload);
+
+    const received = handler.mock.calls[0]?.[0];
+    expect(received).toEqual(payload);
+    expect(received).not.toBe(payload);
+    expect(received?.selection).not.toBe(payload.selection);
+
+    payload.selection!.label = "Changed label";
+    expect(received?.selection?.label).toBe("Laptop - Front - Off");
   });
 });

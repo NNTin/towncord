@@ -11,6 +11,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFloorColor: { h: 214, s: 30, b: -100, c: -55 },
         activeFloorPattern: "environment.floors.pattern-03",
         activeFurnitureId: null,
+        activeFurnitureRotationQuarterTurns: 0,
       }),
     ).toEqual({
       tool: "floor",
@@ -30,10 +31,12 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFloorColor: { h: 35, s: 30, b: 15, c: 0 },
         activeFloorPattern: null,
         activeFurnitureId: "desk-01",
+        activeFurnitureRotationQuarterTurns: 2,
       }),
     ).toEqual({
       tool: "furniture",
       furnitureId: "desk-01",
+      rotationQuarterTurns: 2,
     });
   });
 });

@@ -3,7 +3,11 @@ import type {
   OfficeFloorMode,
   OfficeFloorPickedPayload,
 } from "../../../game/contracts/office-editor";
-import type { OfficeColorAdjust, OfficeTileColor } from "../../../game/contracts/content";
+import type {
+  FurnitureRotationQuarterTurns,
+  OfficeColorAdjust,
+  OfficeTileColor,
+} from "../../../game/contracts/content";
 import { useOfficeLayoutEditor } from "../../editors/office-layout/draft-state/useOfficeLayoutEditor";
 import { useLayoutSaveState } from "./useLayoutSaveState";
 import { useRuntimeUiBridge } from "./useRuntimeUiBridge";
@@ -15,6 +19,7 @@ type OfficeToolStateBridge = {
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
   activeFurnitureId: string | null;
+  activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectTool: (tool: OfficeEditorToolId | null) => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
 };
@@ -33,6 +38,8 @@ export function useGameSession({ officeToolState }: UseGameSessionOptions) {
       activeFloorColor: officeToolState.activeFloorColor,
       activeFloorPattern: officeToolState.activeFloorPattern,
       activeFurnitureId: officeToolState.activeFurnitureId,
+      activeFurnitureRotationQuarterTurns:
+        officeToolState.activeFurnitureRotationQuarterTurns,
     },
     onOfficeLayoutChanged: officeEditor.syncFromRuntime,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,

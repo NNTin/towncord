@@ -57,6 +57,20 @@ function createBootstrapPayload(): RuntimeBootstrap {
   };
 }
 
+function createSelectionPayload() {
+  return {
+    selection: {
+      kind: "furniture" as const,
+      id: "desk-laptop",
+      assetId: "ASSET_107",
+      label: "Laptop - Front - Off",
+      category: "electronics" as const,
+      placement: "surface" as const,
+      canRotate: true,
+    },
+  };
+}
+
 describe("createMountedGameSession", () => {
   test("owns runtime lifecycle and tears the runtime down idempotently", () => {
     const runtimeHost = createRuntimeHost();
@@ -116,6 +130,42 @@ describe("createMountedGameSession", () => {
     expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
     expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledTimes(2);
     expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
+  });
+
+  test("replays office selection to late subscribers and routes rotate/delete actions", () => {
+    const runtimeHost = createRuntimeHost();
+    const session = createMountedGameSession(runtimeHost as never);
+    const selection = createSelectionPayload();
+    const firstSubscriber = {
+      onOfficeSelectionChanged: vi.fn(),
+    };
+
+    session.subscribe(firstSubscriber);
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, selection);
+
+    const lateSubscriber = {
+      onOfficeSelectionChanged: vi.fn(),
+    };
+    session.subscribe(lateSubscriber);
+
+    expect(firstSubscriber.onOfficeSelectionChanged).toHaveBeenCalledTimes(1);
+    expect(firstSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(selection);
+    expect(lateSubscriber.onOfficeSelectionChanged).toHaveBeenCalledTimes(1);
+    expect(lateSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(selection);
+
+    session.rotateSelectedOfficePlaceable();
+    session.deleteSelectedOfficePlaceable();
+
+    expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
+      2,
+      UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+      { action: "rotate" },
+    );
+    expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
+      3,
+      UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION,
+      { action: "delete" },
+    );
   });
 
   test("supports unsubscribe and dispatches runtime commands through transport", () => {

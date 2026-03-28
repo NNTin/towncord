@@ -9,6 +9,7 @@ import {
   cloneOfficeColorAdjust,
   findOfficeTileColorPreset,
   resolveOfficeTileColorAdjustPreset,
+  type FurnitureRotationQuarterTurns,
   type OfficeColorAdjust,
   type OfficeTileColor,
 } from "../../../game/contracts/content";
@@ -21,6 +22,7 @@ export type OfficeToolStateData = {
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
   activeFurnitureId: string | null;
+  activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export type OfficeToolStateAction =
@@ -31,6 +33,7 @@ export type OfficeToolStateAction =
   | { type: "selectFloorColor"; color: OfficeColorAdjust }
   | { type: "selectFloorPattern"; id: string }
   | { type: "selectFurnitureId"; id: string }
+  | { type: "rotateFurnitureClockwise" }
   | { type: "officeFloorPicked"; payload: OfficeFloorPickedPayload };
 
 const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
@@ -44,6 +47,7 @@ export function createOfficeToolStateData(): OfficeToolStateData {
     activeFloorColor: cloneOfficeColorAdjust(DEFAULT_FLOOR_COLOR_ADJUST),
     activeFloorPattern: DEFAULT_FLOOR_PATTERN,
     activeFurnitureId: null,
+    activeFurnitureRotationQuarterTurns: 0,
   };
 }
 
@@ -136,6 +140,18 @@ export function reduceOfficeToolState(
       return {
         ...state,
         activeFurnitureId: action.id,
+        activeFurnitureRotationQuarterTurns:
+          state.activeFurnitureId === action.id
+            ? state.activeFurnitureRotationQuarterTurns
+            : 0,
+      };
+
+    case "rotateFurnitureClockwise":
+      return {
+        ...state,
+        activeFurnitureRotationQuarterTurns:
+          ((state.activeFurnitureRotationQuarterTurns + 1) %
+            4) as FurnitureRotationQuarterTurns,
       };
 
     case "officeFloorPicked":
