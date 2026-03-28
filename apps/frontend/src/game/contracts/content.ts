@@ -2,6 +2,7 @@ export {
   ATLAS_H,
   ATLAS_IMAGE_URL,
   ATLAS_W,
+  FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
 } from "../content/structures/furniturePalette";

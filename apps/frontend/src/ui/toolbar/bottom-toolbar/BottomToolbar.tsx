@@ -13,6 +13,7 @@ import {
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
+  FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
@@ -28,7 +29,6 @@ import {
 } from "../../../game/contracts/content";
 import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
-import { FURNITURE_ALL_ITEMS } from "../../../game/content/structures/furniturePalette";
 import type {
   EntityToolbarViewModel,
   SelectedOfficePlaceableViewModel,
