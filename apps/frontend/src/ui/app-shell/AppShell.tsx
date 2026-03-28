@@ -74,6 +74,8 @@ function App(): JSX.Element {
         onSelectFloorColor={officeToolState.onSelectFloorColor}
         activeFloorPattern={officeToolState.activeFloorPattern}
         onSelectFloorPattern={officeToolState.onSelectFloorPattern}
+        activeWallColor={officeToolState.activeWallColor}
+        onSelectWallColor={officeToolState.onSelectWallColor}
         activeFurnitureId={officeToolState.activeFurnitureId}
         activeFurnitureRotationQuarterTurns={
           officeToolState.activeFurnitureRotationQuarterTurns

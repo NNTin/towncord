@@ -4,6 +4,7 @@ import {
   ATLAS_IMAGE_URL,
   ATLAS_W,
   DEFAULT_FLOOR_COLOR_ADJUST,
+  DEFAULT_WALL_COLOR_ADJUST,
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ENVIRONMENT_ATLAS_FRAMES,
   ENVIRONMENT_ATLAS_H,
@@ -21,6 +22,7 @@ import {
   cloneOfficeColorAdjust,
   resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
+  resolveOfficeWallAppearance,
   TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   tintToHexCss,
   type FurniturePaletteItem,
@@ -58,6 +60,8 @@ type ToolSelectionProps = {
   onSelectFloorColor?: (color: OfficeColorAdjust) => void;
   activeFloorPattern?: string | null;
   onSelectFloorPattern?: (id: string) => void;
+  activeWallColor?: OfficeColorAdjust | null;
+  onSelectWallColor?: (color: OfficeColorAdjust) => void;
   activeFurnitureId?: string | null;
   activeFurnitureRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectFurnitureId?: (id: string) => void;
@@ -455,6 +459,31 @@ function ColorSlider({
   );
 }
 
+function ColorAdjustControls({
+  colorAdjust,
+  onChange,
+}: {
+  colorAdjust: OfficeColorAdjust;
+  onChange: (key: "h" | "s" | "b" | "c", value: number) => void;
+}): JSX.Element {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        padding: "4px 6px",
+        background: "var(--pixel-btn-bg)",
+      }}
+    >
+      <ColorSlider label="H" value={colorAdjust.h} min={0} max={360} onChange={(value) => onChange("h", value)} />
+      <ColorSlider label="S" value={colorAdjust.s} min={0} max={100} onChange={(value) => onChange("s", value)} />
+      <ColorSlider label="B" value={colorAdjust.b} min={-100} max={100} onChange={(value) => onChange("b", value)} />
+      <ColorSlider label="C" value={colorAdjust.c} min={-100} max={100} onChange={(value) => onChange("c", value)} />
+    </div>
+  );
+}
+
 function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): JSX.Element {
   const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.floors.pattern-01#0"];
   const { tint } = resolveOfficeFloorAppearance(colorAdjust, null);
@@ -469,6 +498,24 @@ function FloorTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): 
       />
     );
   }
+  return <TintedAtlasSprite frame={defaultFrame.frame} tint={tint} />;
+}
+
+function WallTilePreview({ colorAdjust }: { colorAdjust: OfficeColorAdjust }): JSX.Element {
+  const defaultFrame = ENVIRONMENT_ATLAS_FRAMES["environment.walls.mask-00#0"];
+  const { tint } = resolveOfficeWallAppearance(colorAdjust);
+  if (!defaultFrame) {
+    return (
+      <div
+        style={{
+          width: 32,
+          height: 32,
+          background: tintToHexCss(tint) ?? "var(--pixel-btn-bg)",
+        }}
+      />
+    );
+  }
+
   return <TintedAtlasSprite frame={defaultFrame.frame} tint={tint} />;
 }
 
@@ -651,19 +698,28 @@ function FloorSubPanel({
         </button>
       </div>
       {showColor && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, padding: "4px 6px", background: "var(--pixel-btn-bg)" }}>
-          <ColorSlider label="H" value={previewColor.h} min={0} max={360} onChange={(value) => handleColorChange("h", value)} />
-          <ColorSlider label="S" value={previewColor.s} min={0} max={100} onChange={(value) => handleColorChange("s", value)} />
-          <ColorSlider label="B" value={previewColor.b} min={-100} max={100} onChange={(value) => handleColorChange("b", value)} />
-          <ColorSlider label="C" value={previewColor.c} min={-100} max={100} onChange={(value) => handleColorChange("c", value)} />
-        </div>
+        <ColorAdjustControls colorAdjust={previewColor} onChange={handleColorChange} />
       )}
     </div>
   );
 }
 
-function WallSubPanel(): JSX.Element {
-  const previewFrame = ENVIRONMENT_ATLAS_FRAMES["environment.walls.mask-00#0"];
+function WallSubPanel({
+  activeWallColor,
+  onSelectWallColor,
+}: {
+  activeWallColor: OfficeColorAdjust | null | undefined;
+  onSelectWallColor: ((color: OfficeColorAdjust) => void) | undefined;
+}): JSX.Element {
+  const previewColor = activeWallColor ?? DEFAULT_WALL_COLOR_ADJUST;
+  const [showColor, setShowColor] = useState(false);
+
+  function handleColorChange(key: "h" | "s" | "b" | "c", value: number): void {
+    const next = cloneOfficeColorAdjust(previewColor);
+    next[key] = value;
+    onSelectWallColor?.(next);
+  }
+
   return (
     <div style={subPanel}>
       <div style={{ fontFamily: "monospace", fontSize: 11, color: "var(--pixel-text)", opacity: 0.7 }}>
@@ -671,10 +727,23 @@ function WallSubPanel(): JSX.Element {
       </div>
       <PreviewCard
         breadcrumbs={["Layout", "Wall"]}
-        description="Paint or erase wall tiles in the grid."
+        description="Paint wall tiles with the selected tint. Right-click removes wall tiles."
         title="Wall placement"
-        visual={previewFrame ? <EnvironmentAtlasSprite frame={previewFrame.frame} /> : null}
+        visual={<WallTilePreview colorAdjust={previewColor} />}
       />
+      <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+        <button
+          type="button"
+          onClick={() => setShowColor((value) => !value)}
+          style={showColor ? btnActive : btnBase}
+          title="Adjust wall color"
+        >
+          Color
+        </button>
+      </div>
+      {showColor && (
+        <ColorAdjustControls colorAdjust={previewColor} onChange={handleColorChange} />
+      )}
     </div>
   );
 }
@@ -1067,6 +1136,8 @@ export function BottomToolbar({
   onSelectFloorColor,
   activeFloorPattern,
   onSelectFloorPattern,
+  activeWallColor,
+  onSelectWallColor,
   activeFurnitureId,
   activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
@@ -1203,7 +1274,12 @@ export function BottomToolbar({
           onSelectTerrainTool={onSelectTerrainTool}
         />
       )}
-      {isLayoutMode && activeTool === "wall" && <WallSubPanel />}
+      {isLayoutMode && activeTool === "wall" && (
+        <WallSubPanel
+          activeWallColor={activeWallColor}
+          onSelectWallColor={onSelectWallColor}
+        />
+      )}
       {isLayoutMode && activeTool === "furniture" && (
         <FurnitureSubPanel
           activeFurnitureId={activeFurnitureId}

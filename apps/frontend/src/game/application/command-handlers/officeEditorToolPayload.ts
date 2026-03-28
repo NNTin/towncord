@@ -15,6 +15,7 @@ export type OfficeEditorBridgeState = {
   activeTileColor: OfficeTileColor | null;
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
+  activeWallColor: OfficeColorAdjust;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
@@ -31,13 +32,17 @@ export function buildOfficeEditorToolPayload(
         floorColor: state.activeFloorColor,
         floorPattern: state.activeFloorPattern,
       };
+    case "wall":
+      return {
+        tool: "wall",
+        wallColor: state.activeWallColor,
+      };
     case "furniture":
       return {
         tool: "furniture",
         furnitureId: state.activeFurnitureId,
         rotationQuarterTurns: state.activeFurnitureRotationQuarterTurns,
       };
-    case "wall":
     case "erase":
       return { tool: state.activeTool };
     default:

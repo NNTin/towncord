@@ -27,6 +27,8 @@ export type OfficeToolState = OfficeToolStateData & {
   onSelectFloorColor: (color: OfficeColorAdjust) => void;
   activeFloorPattern: string | null;
   onSelectFloorPattern: (id: string) => void;
+  activeWallColor: OfficeColorAdjust;
+  onSelectWallColor: (color: OfficeColorAdjust) => void;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectFurnitureId: (id: string) => void;
@@ -61,6 +63,9 @@ export function useOfficeToolState(): OfficeToolState {
     },
     onSelectFloorPattern(id) {
       dispatch({ type: "selectFloorPattern", id });
+    },
+    onSelectWallColor(color) {
+      dispatch({ type: "selectWallColor", color });
     },
     onSelectFurnitureId(id) {
       dispatch({ type: "selectFurnitureId", id });

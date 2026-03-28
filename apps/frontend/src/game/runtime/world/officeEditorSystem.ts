@@ -2,6 +2,7 @@ import type { AnchoredGridCellCoord as OfficeCellCoord } from "../../../engine/w
 import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
+  resolveOfficeWallAppearance,
   type OfficeColorAdjust,
 } from "../../content/structures/colors";
 import {
@@ -31,6 +32,8 @@ type OfficeEditorCommand = {
   tileColor: OfficeTileColor | null;
   /** Raw floor color-adjust data (only used by the "floor" tool when provided). */
   floorColor: OfficeColorAdjust | null;
+  /** Raw wall color-adjust data (only used by the "wall" tool when provided). */
+  wallColor: OfficeColorAdjust | null;
   /** Active floor pattern ID (only used by the "floor" tool), e.g. "environment.floors.pattern-02". */
   floorPattern: string | null;
   /** Active furniture asset ID (only used by the "furniture" tool). */
@@ -84,7 +87,7 @@ export class OfficeEditorSystem {
         );
 
       case "wall":
-        return this.applyWall(layout, idx);
+        return this.applyWall(layout, idx, command.wallColor);
 
       case "erase":
         return this.applyErase(layout, idx, cell);
@@ -252,17 +255,30 @@ export class OfficeEditorSystem {
     return true;
   }
 
-  private applyWall(layout: OfficeSceneLayout, idx: number): boolean {
+  private applyWall(
+    layout: OfficeSceneLayout,
+    idx: number,
+    wallColor: OfficeColorAdjust | null,
+  ): boolean {
     const tile = layout.tiles[idx];
-    if (!tile) return false;
-    const hasFloorMetadata =
-      typeof tile.tint === "number" ||
-      tile.colorAdjust != null ||
-      typeof tile.pattern === "string";
-    if (tile.kind === "wall" && !hasFloorMetadata) return false;
+    if (!tile) {
+      return false;
+    }
+
+    const { colorAdjust, tint } = resolveOfficeWallAppearance(wallColor);
+    if (
+      tile.kind === "wall" &&
+      tile.tileId === 8 &&
+      tile.tint === tint &&
+      officeColorAdjustEquals(tile.colorAdjust ?? null, colorAdjust)
+    ) {
+      return false;
+    }
+
     tile.kind = "wall";
-    delete tile.tint;
-    delete tile.colorAdjust;
+    tile.tileId = 8;
+    tile.tint = tint;
+    tile.colorAdjust = colorAdjust;
     delete tile.pattern;
     return true;
   }

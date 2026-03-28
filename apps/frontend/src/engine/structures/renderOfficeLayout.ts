@@ -236,6 +236,9 @@ function buildTileObjects(
         const maskId = String(bitmask).padStart(2, "0");
         const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, `environment.walls.mask-${maskId}#0`);
         img.setDisplaySize(cellSize, cellSize);
+        if (typeof tile.tint === "number") {
+          img.setTint(tile.tint);
+        }
         container.add(img);
       }
     }

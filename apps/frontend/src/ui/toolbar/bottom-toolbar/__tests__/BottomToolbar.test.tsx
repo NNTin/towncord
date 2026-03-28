@@ -26,6 +26,8 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   onSelectFloorColor: vi.fn(),
   activeFloorPattern: "environment.floors.pattern-01",
   onSelectFloorPattern: vi.fn(),
+  activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
+  onSelectWallColor: vi.fn(),
   activeFurnitureId: null,
   activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
@@ -438,6 +440,46 @@ describe("BottomToolbar", () => {
 
     expect(props.onSelectTerrainTool).toHaveBeenCalledWith(null);
     expect(props.onSelectTool).toHaveBeenCalledWith("wall");
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("wall sub-panel exposes the same HSBC color controls as floor", () => {
+    const props = {
+      ...baseProps,
+      activeTool: "wall" as const,
+    };
+    const { container, root } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Adjust wall color").click();
+    });
+
+    const hueSlider = container.querySelector('input[type="range"]');
+    if (!(hueSlider instanceof HTMLInputElement)) {
+      throw new Error("Missing wall hue slider");
+    }
+    const setSliderValue = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )?.set;
+    if (!setSliderValue) {
+      throw new Error("Missing HTMLInputElement.value setter");
+    }
+
+    act(() => {
+      setSliderValue.call(hueSlider, "180");
+      hueSlider.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    expect(props.onSelectWallColor).toHaveBeenCalledWith({
+      h: 180,
+      s: 25,
+      b: -54,
+      c: 17,
+    });
 
     act(() => {
       root.unmount();
