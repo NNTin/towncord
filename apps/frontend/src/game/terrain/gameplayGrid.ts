@@ -125,9 +125,15 @@ export class TerrainGameplayGrid {
     this.revision += 1;
   }
 
-  public findPath(start: TerrainCellCoord, goal: TerrainCellCoord): TerrainPath | null {
-    if (!this.isCellWalkable(start.cellX, start.cellY)) return null;
-    if (!this.isCellWalkable(goal.cellX, goal.cellY)) return null;
+  public findPath(
+    start: TerrainCellCoord,
+    goal: TerrainCellCoord,
+    isWalkable?: (cellX: number, cellY: number) => boolean,
+  ): TerrainPath | null {
+    const cellIsWalkable = isWalkable ?? ((cellX, cellY) => this.isCellWalkable(cellX, cellY));
+
+    if (!cellIsWalkable(start.cellX, start.cellY)) return null;
+    if (!cellIsWalkable(goal.cellX, goal.cellY)) return null;
 
     const startKey = this.toCellKey(start.cellX, start.cellY);
     const goalKey = this.toCellKey(goal.cellX, goal.cellY);
@@ -152,7 +158,7 @@ export class TerrainGameplayGrid {
         const nextX = current.cellX + offset.x;
         const nextY = current.cellY + offset.y;
         const nextKey = this.toCellKey(nextX, nextY);
-        if (visited.has(nextKey) || !this.isCellWalkable(nextX, nextY)) continue;
+        if (visited.has(nextKey) || !cellIsWalkable(nextX, nextY)) continue;
 
         visited.add(nextKey);
         parentByKey.set(nextKey, currentKey);
