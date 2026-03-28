@@ -59,7 +59,7 @@ export function buildDebugModeSearch(
   return nextSearch.length > 0 ? `?${nextSearch}` : "";
 }
 
-function isEditableTarget(target: EventTarget | null): boolean {
+export function isEditableTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) {
     return false;
   }

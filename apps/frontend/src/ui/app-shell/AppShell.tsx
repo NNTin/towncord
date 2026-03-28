@@ -6,6 +6,7 @@ import { useOfficeToolState } from "../state/tool-drafts/useOfficeToolState";
 import { BottomToolbar } from "../toolbar/bottom-toolbar/BottomToolbar";
 import { ZoomControls } from "../toolbar/zoom-controls/ZoomControls";
 import { useDebugUiEnabled } from "./debugMode";
+import { useFurnitureRotateHotkey } from "./useFurnitureRotateHotkey";
 
 const LazySidebarAccordion = lazy(async () => {
   const module = await import("../sidebar/shell/SidebarAccordion");
@@ -32,6 +33,14 @@ function App(): JSX.Element {
     zoomViewModel,
   } = useGameSession({
     officeToolState,
+  });
+
+  useFurnitureRotateHotkey({
+    activeTool: officeToolState.activeTool,
+    activeFurnitureId: officeToolState.activeFurnitureId,
+    onRotateFurnitureClockwise: officeToolState.onRotateFurnitureClockwise,
+    selectedOfficePlaceable,
+    onRotateSelectedOfficePlaceable,
   });
 
   return (
