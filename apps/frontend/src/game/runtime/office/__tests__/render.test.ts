@@ -134,7 +134,9 @@ function createScene() {
   const add = {
     container: vi.fn(() => new FakeContainer()),
     graphics: vi.fn(() => new FakeGraphics()),
-    image: vi.fn(() => new FakeDisplayObject()),
+    image: vi.fn(
+      (_x: number, _y: number, _key: string, _frame?: string) => new FakeDisplayObject(),
+    ),
     ellipse: vi.fn(() => new FakeDisplayObject()),
     circle: vi.fn(() => new FakeDisplayObject()),
     rectangle: vi.fn(() => new FakeDisplayObject()),
@@ -162,10 +164,17 @@ function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneL
 
 /** Returns only the image call results whose frame arg starts with "environment.walls.". */
 function findWallImages(scene: ReturnType<typeof createScene>): FakeDisplayObject[] {
-  return scene.add.image.mock.calls
-    .map((args, i) => ({ frame: args[3], result: scene.add.image.mock.results[i] }))
-    .filter(({ frame }) => typeof frame === "string" && frame.startsWith("environment.walls."))
-    .map(({ result }) => result.value as FakeDisplayObject);
+  const results: FakeDisplayObject[] = [];
+  for (let i = 0; i < scene.add.image.mock.calls.length; i++) {
+    const args = scene.add.image.mock.calls[i];
+    const result = scene.add.image.mock.results[i];
+    if (!args || !result) continue;
+    const frame = args[3];
+    if (typeof frame === "string" && frame.startsWith("environment.walls.")) {
+      results.push(result.value as FakeDisplayObject);
+    }
+  }
+  return results;
 }
 
 describe("renderOfficeLayout", () => {
