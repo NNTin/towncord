@@ -731,7 +731,7 @@ export function BottomToolbar({
   return (
     <div style={outerContainer}>
       {/* Sub-panels (appear above button row) */}
-      {isEntitiesPanelOpen && entityToolbarViewModel ? (
+      {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
         <EntitiesSubPanel viewModel={entityToolbarViewModel} />
       ) : null}
       {isLayoutMode && activeTool === "floor" && (
