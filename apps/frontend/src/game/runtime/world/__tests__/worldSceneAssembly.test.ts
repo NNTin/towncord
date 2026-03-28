@@ -125,6 +125,7 @@ vi.mock("phaser", () => {
         Keyboard: {
           KeyCodes: {
             SHIFT: 16,
+            R: 82,
           },
         },
       },

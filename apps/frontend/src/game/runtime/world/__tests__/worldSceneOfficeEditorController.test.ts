@@ -211,6 +211,56 @@ describe("WorldSceneOfficeEditorController", () => {
     });
   });
 
+  test("starts a furniture drag on second click of the selected item and commits move on endPainting", () => {
+    const { controller, region } = createControllerHarness();
+
+    // First click: select the furniture
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+    expect(controller.getSelectedFurnitureId()).toBe("desk-laptop");
+    expect(controller.isFurnitureDragging()).toBe(false);
+
+    // Second click on the same furniture: start drag
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toBe(true);
+    expect(controller.isFurnitureDragging()).toBe(true);
+
+    // shouldContinuePainting returns true while dragging with pointer down
+    expect(
+      controller.shouldContinuePainting({ isDown: true } as never),
+    ).toBe(true);
+
+    // Build a drag preview at col:0, row:0 (pointer x=4,y=4 resolves to that cell in the 1x1 layout)
+    const preview = controller.getDragMovePreview({
+      isDown: true,
+      withinGame: true,
+      x: 4,
+      y: 4,
+    } as never);
+    // Preview is non-null (drag is active and pointer is within the office region)
+    expect(preview).not.toBeNull();
+    expect(preview?.anchorCell).toMatchObject({ col: 0, row: 0 });
+
+    // end painting commits the drag (same position = no layout change since moveFurniture short-circuits)
+    controller.endPainting();
+    expect(controller.isFurnitureDragging()).toBe(false);
+    expect(controller.consumePendingLayoutChange()).toBe(false); // No actual move since same cell
+    expect(region.layout.furniture[0]?.col).toBe(0);
+    expect(region.layout.furniture[0]?.row).toBe(0);
+  });
+
   test("right-click wall deletion only removes wall tiles", () => {
     const { controller, region } = createControllerHarness();
     region.layout.tiles[0] = {

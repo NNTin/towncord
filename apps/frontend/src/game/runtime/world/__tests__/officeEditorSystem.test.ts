@@ -425,4 +425,160 @@ describe("OfficeEditorSystem floor editing", () => {
     expect(layout.furniture).toHaveLength(0);
     expect(layout.tiles[0]?.kind).toBe("wall");
   });
+
+  test("moves furniture to a free target cell and returns true", () => {
+    if (!laptop) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 3,
+      rows: 3,
+      cellSize: 16,
+      tiles: Array.from({ length: 9 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 2 })).toBe(true);
+    expect(layout.furniture[0]).toMatchObject({ id: "desk-laptop", col: 2, row: 2 });
+  });
+
+  test("moveFurniture returns false when target overlaps another furniture item", () => {
+    if (!laptop || !rotatingChair) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 3,
+      rows: 3,
+      cellSize: 16,
+      tiles: Array.from({ length: 9 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+        {
+          id: "chair-1",
+          assetId: rotatingChair.id,
+          label: rotatingChair.label,
+          category: rotatingChair.category as never,
+          placement: rotatingChair.placement,
+          col: 2,
+          row: 2,
+          width: 1,
+          height: 1,
+          color: rotatingChair.color ?? 0x000000,
+          accentColor: rotatingChair.accentColor ?? 0x000000,
+          renderAsset: { atlasKey: rotatingChair.atlasKey, atlasFrame: { ...rotatingChair.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    // Trying to move laptop to where chair already sits
+    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 2 })).toBe(false);
+    expect(layout.furniture[0]).toMatchObject({ id: "desk-laptop", col: 0, row: 0 });
+  });
+
+  test("moveFurniture returns false when target is out of bounds", () => {
+    if (!laptop) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 0 })).toBe(false);
+    expect(system.moveFurniture(layout, "desk-laptop", { col: -1, row: 0 })).toBe(false);
+  });
+
+  test("previewFurnitureMove returns a place preview for a valid free target cell", () => {
+    if (!laptop) {
+      throw new Error("Missing test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 4,
+      rows: 4,
+      cellSize: 16,
+      tiles: Array.from({ length: 16 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+        },
+      ],
+      characters: [],
+    };
+
+    const preview = system.previewFurnitureMove(layout, "desk-laptop", { col: 2, row: 2 });
+    expect(preview).toMatchObject({
+      kind: "place",
+      anchorCell: { col: 2, row: 2 },
+      blockedReason: null,
+      affectedFurniture: [],
+    });
+  });
 });

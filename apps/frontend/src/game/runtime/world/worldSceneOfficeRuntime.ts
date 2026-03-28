@@ -151,6 +151,7 @@ export class WorldSceneOfficeRuntime {
 
   public endPainting(): void {
     this.controller.endPainting();
+    this.hidePlacementPreview();
   }
 
   public rotateSelectedFurniture(): boolean {
@@ -352,7 +353,9 @@ export class WorldSceneOfficeRuntime {
   }
 
   private syncPlacementPreview(pointer: Phaser.Input.Pointer | null): void {
-    const preview = this.controller.getFurniturePlacementPreview(pointer);
+    const preview = this.controller.isFurnitureDragging()
+      ? this.controller.getDragMovePreview(pointer)
+      : this.controller.getFurniturePlacementPreview(pointer);
     const region = this.officeRegion;
     if (!preview || !region) {
       this.hidePlacementPreview();

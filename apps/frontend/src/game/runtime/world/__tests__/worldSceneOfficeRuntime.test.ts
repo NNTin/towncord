@@ -320,6 +320,50 @@ describe("WorldSceneOfficeRuntime", () => {
     expect(previewLabel.setText).toHaveBeenCalledWith("Replace Laptop - Front - Off");
   });
 
+  test("shows drag move preview ghost when dragging selected furniture and hides it on endPainting", () => {
+    const { previewGhost, runtime, scene } = createHarness();
+    const bootstrap = createBootstrap();
+
+    scene.input.activePointer = {
+      withinGame: true,
+      x: 36,
+      y: 52,
+    };
+
+    runtime.bootstrap(bootstrap);
+    runtime.handleSetEditorTool({ tool: null });
+
+    // First click: select furniture
+    runtime.tryHandlePointerDown({
+      button: 0,
+      isDown: true,
+      x: 36,
+      y: 52,
+    } as never);
+    expect(runtime.getSelectedFurnitureId()).toBe("desk-laptop");
+
+    // Second click on same furniture: start drag
+    runtime.tryHandlePointerDown({
+      button: 0,
+      isDown: true,
+      x: 36,
+      y: 52,
+    } as never);
+
+    // Sync highlight (simulates pointer move) — drag preview ghost should appear
+    runtime.syncHighlight({
+      withinGame: true,
+      isDown: true,
+      x: 36,
+      y: 52,
+    } as never);
+    expect(previewGhost.setVisible).toHaveBeenCalledWith(true);
+
+    // End painting hides the drag preview immediately
+    runtime.endPainting();
+    expect(previewGhost.setVisible).toHaveBeenCalledWith(false);
+  });
+
   test("rerenders and emits layout projections after office edits", () => {
     const { emit, runtime } = createHarness();
     const bootstrap = createBootstrap();
