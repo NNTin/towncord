@@ -7,7 +7,6 @@ import type {
   OfficeSceneTile,
 } from "./contracts";
 
-const VOID_TILE_COLOR = 0x020617;
 const SHADOW_COLOR = 0x020617;
 const LABEL_TEXT_COLOR = "#f8fafc";
 const CHARACTER_LABEL_TEXT_COLOR = "#0f172a";
@@ -217,8 +216,6 @@ function buildTileObjects(
       const y = row * cellSize;
 
       if (!tile || tile.kind === "void") {
-        baseGraphics.fillStyle(VOID_TILE_COLOR, 0.55);
-        baseGraphics.fillRect(x, y, cellSize, cellSize);
         continue;
       }
 
