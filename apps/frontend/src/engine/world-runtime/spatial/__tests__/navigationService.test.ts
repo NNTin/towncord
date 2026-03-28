@@ -124,10 +124,10 @@ describe("createTerrainNavigationService", () => {
   });
 
   test("plans a path that avoids cells blocked by the collision override", () => {
-    // Layout (5x5 ground):
+    // Layout (32x32 ground):
     //   start at (0,0), target at (2,0)
     //   cell (1,0) is blocked by override — path must go around via (0,1),(1,1),(2,1)
-    const grid = makeTerrainGrid(5, 5, "ground");
+    const grid = makeTerrainGrid(32, 32, "ground");
     const blockedCell = grid.cellToWorldCenter(1, 0)!;
     const service = createTerrainNavigationService(grid, {
       isWorldWalkable(worldX, worldY) {
