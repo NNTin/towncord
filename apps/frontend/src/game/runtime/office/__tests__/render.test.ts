@@ -343,4 +343,66 @@ describe("renderOfficeLayout", () => {
     });
     expect(scene.add.container.mock.calls[3]).toEqual([48, 48]);
   });
+
+  test("keeps wall-mounted furniture in front of rebuilt wall sprites during partial updates", () => {
+    const scene = createScene();
+    const wallFurniture = createFurnitureItem({
+      id: "wall-art",
+      assetId: "wall-art-front",
+      label: "Wall Art",
+      placement: "wall",
+      col: 0,
+      row: 0,
+    });
+    const floorFurniture = createFurnitureItem({
+      id: "desk-2",
+      assetId: "desk-front",
+      label: "Desk Front",
+      placement: "floor",
+      col: 1,
+      row: 0,
+    });
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        { kind: "wall", tileId: 8 },
+        { kind: "floor", tileId: 0 },
+      ],
+      furniture: [wallFurniture, floorFurniture],
+      characters: [],
+    };
+
+    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetY: 32,
+    });
+    const initialWallSprite = findWallImages(scene)[0]!;
+    const wallFurnitureContainer = scene.add.container.mock.results[2]?.value as FakeContainer;
+
+    renderable.partialUpdate({
+      ...layout,
+      furniture: [
+        wallFurniture,
+        createFurnitureItem({
+          id: "desk-2",
+          assetId: "desk-right",
+          label: "Desk Right",
+          placement: "floor",
+          col: 1,
+          row: 0,
+          renderAsset: {
+            atlasKey: "desk-right",
+            atlasFrame: { x: 16, y: 0, w: 16, h: 16 },
+          },
+        }),
+      ],
+    });
+
+    const rebuiltWallSprite = findWallImages(scene)[1]!;
+
+    expect(initialWallSprite.destroyed).toBe(true);
+    expect(wallFurnitureContainer.destroyed).toBe(false);
+    expect(wallFurnitureContainer.depth).toBeGreaterThan(rebuiltWallSprite.depth);
+  });
 });
