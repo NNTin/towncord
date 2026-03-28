@@ -84,6 +84,13 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   >();
   private characterEntries: Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> = [];
   private characterSource: readonly OfficeSceneCharacter[];
+  /**
+   * Wall sprites are kept outside any Phaser Container so their depth values
+   * participate in the scene-level y-sort together with moving entities.
+   * Each wall's depth equals the world-pixel Y of its south edge, which is the
+   * same coordinate space that EntitySystem uses for entity.position.y.
+   */
+  private wallSprites: Phaser.GameObjects.Image[] = [];
 
   constructor(
     scene: Phaser.Scene,
@@ -102,6 +109,8 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     this.tileLayer = renderTiles(scene, layout, 0, 0, tileDepth);
     this.container.add(this.tileLayer);
 
+    this.wallSprites = this.buildWallSprites(layout);
+
     this.characterSource = layout.characters;
     this.syncFurniture(layout);
     this.characterEntries = this.buildCharacterEntries(layout);
@@ -112,6 +121,11 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     this.tileLayer.removeAll(true);
     buildTileObjects(this.scene, this.tileLayer, newLayout);
 
+    for (const sprite of this.wallSprites) {
+      sprite.destroy();
+    }
+    this.wallSprites = this.buildWallSprites(newLayout);
+
     this.syncFurniture(newLayout);
     this.syncCharacters(newLayout);
 
@@ -121,6 +135,47 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
 
   public destroy(): void {
     this.container.destroy(true);
+    for (const sprite of this.wallSprites) {
+      sprite.destroy();
+    }
+    this.wallSprites = [];
+  }
+
+  private buildWallSprites(layout: OfficeSceneLayout): Phaser.GameObjects.Image[] {
+    const { cols, rows, cellSize, tiles } = layout;
+    const half = cellSize / 2;
+    const sprites: Phaser.GameObjects.Image[] = [];
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const tile = tiles[row * cols + col];
+        if (!tile || tile.kind !== "wall") continue;
+
+        const bitmask = computeWallBitmask(tiles, cols, rows, col, row);
+        const maskId = String(bitmask).padStart(2, "0");
+        const worldX = this.worldOffsetX + col * cellSize + half;
+        const worldY = this.worldOffsetY + row * cellSize;
+
+        const img = this.scene.add.image(
+          worldX,
+          worldY,
+          DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY,
+          `environment.walls.mask-${maskId}#0`,
+        );
+        img.setDisplaySize(cellSize, cellSize * 2);
+        if (typeof tile.tint === "number") {
+          img.setTint(tile.tint);
+        }
+        // Depth equals the south-edge world-pixel Y of this wall cell so the
+        // sprite participates in the same y-sort space as entity sprites.
+        // An entity whose position.y is less than this depth will render behind
+        // the wall; one with a higher position.y will render in front.
+        img.setDepth(this.worldOffsetY + (row + 1) * cellSize);
+        sprites.push(img);
+      }
+    }
+
+    return sprites;
   }
 
   private buildRenderIndex(): OfficeSceneRenderIndex {
@@ -228,17 +283,9 @@ function buildTileObjects(
         }
         container.add(img);
       } else if (tile.kind === "wall") {
-        const bitmask = computeWallBitmask(tiles, cols, rows, col, row);
-        const maskId = String(bitmask).padStart(2, "0");
-        // Wall sprites are 16×32 (twice as tall as a floor tile). Render at
-        // cellSize × cellSize*2, anchored so the sprite bottom aligns with the
-        // bottom edge of the grid cell (center-Y = top of the cell, i.e. y).
-        const img = scene.add.image(x + half, y, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, `environment.walls.mask-${maskId}#0`);
-        img.setDisplaySize(cellSize, cellSize * 2);
-        if (typeof tile.tint === "number") {
-          img.setTint(tile.tint);
-        }
-        container.add(img);
+        // Wall sprites are rendered as scene-level objects in
+        // OfficeLayoutRenderableImpl.buildWallSprites() so their depth
+        // participates in the entity y-sort. Skip them here.
       }
     }
   }

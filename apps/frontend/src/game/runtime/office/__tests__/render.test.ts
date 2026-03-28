@@ -25,8 +25,10 @@ vi.mock("phaser", () => {
 class FakeDisplayObject {
   public visible = true;
   public destroyed = false;
+  public depth = 0;
 
-  setDepth(_depth: number): this {
+  setDepth(depth: number): this {
+    this.depth = depth;
     return this;
   }
 
@@ -159,6 +161,72 @@ function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneL
 }
 
 describe("renderOfficeLayout", () => {
+  test("wall sprites are added as scene-level objects with y-sorted depth", () => {
+    // Wall at col=0, row=1 in a 2×2 grid with cellSize=16 and worldOffsetY=32.
+    // Expected depth = worldOffsetY + (row + 1) * cellSize = 32 + 2 * 16 = 64.
+    const scene = createScene();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: [
+        { kind: "floor", tileId: 0 },
+        { kind: "void", tileId: 0 },
+        { kind: "wall", tileId: 8 },
+        { kind: "floor", tileId: 0 },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetY: 32,
+    });
+
+    // Collect the depth values set on all scene-level images created.
+    const imageDepths = scene.add.image.mock.results.map(
+      (r) => (r.value as FakeDisplayObject).depth,
+    );
+    // The wall at row=1 must have depth 64 so it occludes entities above it.
+    expect(imageDepths).toContain(64);
+  });
+
+  test("wall sprite depths update when partialUpdate changes the tile layout", () => {
+    const scene = createScene();
+    const wallTile = { kind: "wall" as const, tileId: 8 };
+    const floorTile = { kind: "floor" as const, tileId: 0 };
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 2,
+      cellSize: 16,
+      tiles: [wallTile, floorTile],
+      furniture: [],
+      characters: [],
+    };
+
+    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
+      worldOffsetY: 0,
+    });
+
+    // Initial: wall at row=0 → depth = 0 + (0+1)*16 = 16.
+    const beforeImageDepths = scene.add.image.mock.results.map(
+      (r) => (r.value as FakeDisplayObject).depth,
+    );
+    expect(beforeImageDepths).toContain(16);
+
+    // Move the wall to row=1; the old row=0 sprite should be destroyed and a
+    // new one at depth=(0+2)*16=32 should be created.
+    renderable.partialUpdate({
+      ...layout,
+      tiles: [floorTile, wallTile],
+    });
+
+    const allImageDepths = scene.add.image.mock.results.map(
+      (r) => (r.value as FakeDisplayObject).depth,
+    );
+    expect(allImageDepths).toContain(32);
+  });
+
   test("reuses the existing character render when the characters array is unchanged", () => {
     const scene = createScene();
     const characters = [
