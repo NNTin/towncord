@@ -168,6 +168,10 @@ export function createRuntimeInteractionAdapter({
     });
   };
 
+  const onContextMenu: RuntimeRootBindings["onContextMenu"] = (event) => {
+    event.preventDefault();
+  };
+
   const onZoomIn = (): void => {
     if (!zoomState) {
       return;
@@ -188,6 +192,7 @@ export function createRuntimeInteractionAdapter({
     runtimeRootBindings: {
       onDragOver,
       onDrop,
+      onContextMenu,
     },
     zoomViewModel: zoomState
       ? {

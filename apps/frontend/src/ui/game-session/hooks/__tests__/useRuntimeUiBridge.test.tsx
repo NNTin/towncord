@@ -35,6 +35,7 @@ function renderHarness() {
         activeFloorColor: { h: 0, s: 0, b: 0, c: 0 },
         activeFloorPattern: null,
         activeFurnitureId: null,
+        activeFurnitureRotationQuarterTurns: 0,
       },
       onClearOfficeTool: clearOfficeTool,
     });
@@ -119,6 +120,7 @@ function renderHarness() {
     runtimeRootBindings: {
       onDragOver: vi.fn(),
       onDrop: vi.fn(),
+      onContextMenu: vi.fn(),
     },
     zoomViewModel: null,
   } as never);

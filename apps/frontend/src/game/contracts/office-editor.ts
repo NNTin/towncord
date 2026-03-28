@@ -3,7 +3,11 @@ import type {
   OfficeSceneFurniturePlacement,
   OfficeSceneLayout,
 } from "./office-scene";
-import type { OfficeColorAdjust, OfficeTileColor } from "./content";
+import type {
+  FurnitureRotationQuarterTurns,
+  OfficeColorAdjust,
+  OfficeTileColor,
+} from "./content";
 
 export type OfficeEditorToolId = "floor" | "wall" | "erase" | "furniture";
 export type OfficeFloorMode = "paint" | "pick";
@@ -23,6 +27,7 @@ export type OfficeSetEditorToolErasePayload = {
 export type OfficeSetEditorToolFurniturePayload = {
   tool: "furniture";
   furnitureId: string | null;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export type OfficeSetEditorToolFloorPayload = {

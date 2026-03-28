@@ -11,7 +11,10 @@ import {
   type AnchoredGridRegion,
 } from "../../../engine/world-runtime/regions";
 import type { OfficeSceneLayout } from "../../contracts/office-scene";
-import { OfficeEditorSystem } from "./officeEditorSystem";
+import {
+  OfficeEditorSystem,
+  type OfficeFurniturePlacementPreview,
+} from "./officeEditorSystem";
 
 type OfficeRegion = AnchoredGridRegion<OfficeSceneLayout>;
 
@@ -45,6 +48,7 @@ function cloneOfficeEditorToolPayload(
       return {
         tool: "furniture",
         furnitureId: payload.furnitureId,
+        rotationQuarterTurns: payload.rotationQuarterTurns,
       };
     case "wall":
     case "erase":
@@ -76,6 +80,23 @@ function getOfficeFurnitureId(
   payload: OfficeSetEditorToolPayload,
 ): string | null {
   return payload.tool === "furniture" ? payload.furnitureId : null;
+}
+
+function getOfficeFurnitureRotationQuarterTurns(
+  payload: OfficeSetEditorToolPayload,
+): 0 | 1 | 2 | 3 {
+  return payload.tool === "furniture" ? payload.rotationQuarterTurns : 0;
+}
+
+function isPointerWithinGame(pointer: Phaser.Input.Pointer | null): boolean {
+  if (!pointer) {
+    return false;
+  }
+
+  return (
+    !("withinGame" in pointer) ||
+    Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame)
+  );
 }
 
 export class WorldSceneOfficeEditorController {
@@ -163,13 +184,20 @@ export class WorldSceneOfficeEditorController {
   public syncOfficeCellHighlight(pointer: Phaser.Input.Pointer | null): void {
     const highlight = this.host.getOfficeCellHighlight();
     const region = this.host.getOfficeRegion();
+    const tool = getOfficeEditorTool(this.officeEditorToolPayload);
     if (
       !highlight ||
       !pointer ||
-      !getOfficeEditorTool(this.officeEditorToolPayload) ||
+      !isPointerWithinGame(pointer) ||
+      !tool ||
       !region
     ) {
       highlight?.setVisible(false);
+      return;
+    }
+
+    if (tool === "furniture") {
+      highlight.setVisible(false);
       return;
     }
 
@@ -187,6 +215,33 @@ export class WorldSceneOfficeEditorController {
     );
     highlight.setPosition(worldX, worldY);
     highlight.setVisible(true);
+  }
+
+  public getFurniturePlacementPreview(
+    pointer: Phaser.Input.Pointer | null,
+  ): OfficeFurniturePlacementPreview | null {
+    const region = this.host.getOfficeRegion();
+    if (
+      !pointer ||
+      !isPointerWithinGame(pointer) ||
+      !region ||
+      getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture"
+    ) {
+      return null;
+    }
+
+    const worldPoint = this.host.getWorldPoint(pointer.x, pointer.y);
+    const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
+    if (!cell) {
+      return null;
+    }
+
+    return this.officeEditorSystem.previewFurniturePlacement(
+      region.layout,
+      cell,
+      getOfficeFurnitureId(this.officeEditorToolPayload),
+      getOfficeFurnitureRotationQuarterTurns(this.officeEditorToolPayload),
+    );
   }
 
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
@@ -354,6 +409,9 @@ export class WorldSceneOfficeEditorController {
           : null,
       floorPattern: getOfficeFloorPattern(this.officeEditorToolPayload),
       furnitureId: getOfficeFurnitureId(this.officeEditorToolPayload),
+      rotationQuarterTurns: getOfficeFurnitureRotationQuarterTurns(
+        this.officeEditorToolPayload,
+      ),
     });
 
     if (changed) {

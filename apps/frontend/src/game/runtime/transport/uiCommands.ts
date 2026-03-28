@@ -1,5 +1,6 @@
 import {
   OFFICE_TILE_COLORS,
+  type FurnitureRotationQuarterTurns,
   type OfficeColorAdjust,
   type OfficeTileColor,
 } from "../../contracts/content";
@@ -67,6 +68,12 @@ export type UiToRuntimeCommandPayloadByName = {
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 
 const OFFICE_TILE_COLOR_SET = new Set<string>(OFFICE_TILE_COLORS);
+const FURNITURE_ROTATION_QUARTER_TURNS = new Set<FurnitureRotationQuarterTurns>([
+  0,
+  1,
+  2,
+  3,
+]);
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -128,6 +135,14 @@ function normalizeNullableOfficeTileColor(
     : undefined;
 }
 
+function normalizeFurnitureRotationQuarterTurns(
+  value: unknown,
+): FurnitureRotationQuarterTurns | undefined {
+  return Number.isInteger(value) && FURNITURE_ROTATION_QUARTER_TURNS.has(value as FurnitureRotationQuarterTurns)
+    ? (value as FurnitureRotationQuarterTurns)
+    : undefined;
+}
+
 export function normalizeSelectedTerrainToolPayload(
   value: unknown,
 ): SelectedTerrainToolPayload | undefined {
@@ -172,13 +187,17 @@ export function normalizeOfficeSetEditorToolPayload(
       return { tool: value.tool };
     case "furniture": {
       const furnitureId = normalizeNullableString(value.furnitureId);
-      if (furnitureId === undefined) {
+      const rotationQuarterTurns = normalizeFurnitureRotationQuarterTurns(
+        value.rotationQuarterTurns,
+      );
+      if (furnitureId === undefined || rotationQuarterTurns === undefined) {
         return undefined;
       }
 
       return {
         tool: "furniture",
         furnitureId,
+        rotationQuarterTurns,
       };
     }
     case "floor": {

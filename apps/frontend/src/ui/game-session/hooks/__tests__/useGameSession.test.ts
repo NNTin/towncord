@@ -28,6 +28,7 @@ describe("useGameSession", () => {
       activeFloorColor: { h: 214, s: 30, b: -100, c: -55 },
       activeFloorPattern: "environment.floors.pattern-03",
       activeFurnitureId: "desk-01",
+      activeFurnitureRotationQuarterTurns: 1 as const,
       onSelectTool: vi.fn(),
       onOfficeFloorPicked: vi.fn(),
     };
@@ -52,6 +53,7 @@ describe("useGameSession", () => {
       runtimeRootBindings: {
         onDragOver: vi.fn(),
         onDrop: vi.fn(),
+        onContextMenu: vi.fn(),
       },
       sidebarViewModel: {
         placeablesPanel: {
@@ -129,6 +131,8 @@ describe("useGameSession", () => {
         activeFloorColor: officeToolState.activeFloorColor,
         activeFloorPattern: officeToolState.activeFloorPattern,
         activeFurnitureId: officeToolState.activeFurnitureId,
+        activeFurnitureRotationQuarterTurns:
+          officeToolState.activeFurnitureRotationQuarterTurns,
       },
       onOfficeLayoutChanged: officeEditor.syncFromRuntime,
       onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,

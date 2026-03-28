@@ -49,4 +49,34 @@ describe("office tool state reducer", () => {
     expect(next.activeFloorColor).not.toBe(createOfficeToolStateData().activeFloorColor);
     expect(next.activeTileColor).toBeNull();
   });
+
+  test("selecting a different furniture asset resets the pending rotation", () => {
+    const next = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        activeFurnitureId: "ASSET_107",
+        activeFurnitureRotationQuarterTurns: 3,
+      },
+      { type: "selectFurnitureId", id: "ASSET_78" },
+    );
+
+    expect(next.activeFurnitureId).toBe("ASSET_78");
+    expect(next.activeFurnitureRotationQuarterTurns).toBe(0);
+  });
+
+  test("rotates the pending furniture preview clockwise in quarter turns", () => {
+    const once = reduceOfficeToolState(createOfficeToolStateData(), {
+      type: "rotateFurnitureClockwise",
+    });
+    const wrapped = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        activeFurnitureRotationQuarterTurns: 3,
+      },
+      { type: "rotateFurnitureClockwise" },
+    );
+
+    expect(once.activeFurnitureRotationQuarterTurns).toBe(1);
+    expect(wrapped.activeFurnitureRotationQuarterTurns).toBe(0);
+  });
 });

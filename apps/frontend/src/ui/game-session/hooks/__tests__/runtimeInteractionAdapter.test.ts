@@ -102,4 +102,19 @@ describe("createRuntimeInteractionAdapter", () => {
     expect(sessionRef.current.setZoom).toHaveBeenNthCalledWith(1, 1.1);
     expect(sessionRef.current.setZoom).toHaveBeenNthCalledWith(2, 0.9);
   });
+
+  test("suppresses the browser context menu inside the runtime host", () => {
+    const adapter = createRuntimeInteractionAdapter({
+      runtimeRootRef: { current: null },
+      sessionRef: { current: null } as never,
+      zoomState: null,
+    });
+    const event = {
+      preventDefault: vi.fn(),
+    } as unknown as React.MouseEvent<HTMLDivElement>;
+
+    adapter.runtimeRootBindings.onContextMenu(event);
+
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+  });
 });

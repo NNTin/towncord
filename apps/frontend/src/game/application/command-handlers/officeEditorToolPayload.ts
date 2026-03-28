@@ -4,6 +4,7 @@ import type {
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
 import type {
+  FurnitureRotationQuarterTurns,
   OfficeColorAdjust,
   OfficeTileColor,
 } from "../../contracts/content";
@@ -15,6 +16,7 @@ export type OfficeEditorBridgeState = {
   activeFloorColor: OfficeColorAdjust;
   activeFloorPattern: string | null;
   activeFurnitureId: string | null;
+  activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export function buildOfficeEditorToolPayload(
@@ -33,6 +35,7 @@ export function buildOfficeEditorToolPayload(
       return {
         tool: "furniture",
         furnitureId: state.activeFurnitureId,
+        rotationQuarterTurns: state.activeFurnitureRotationQuarterTurns,
       };
     case "wall":
     case "erase":

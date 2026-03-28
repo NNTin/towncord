@@ -1,4 +1,4 @@
-import type { DragEvent } from "react";
+import type { DragEvent, MouseEvent } from "react";
 import type { AnimationCatalog } from "../../game/contracts/content";
 import type { OfficeSelectedPlaceablePayload } from "../../game/contracts/office-editor";
 import type {
@@ -12,6 +12,7 @@ import type {
 export type RuntimeRootBindings = {
   onDragOver: (event: DragEvent<HTMLDivElement>) => void;
   onDrop: (event: DragEvent<HTMLDivElement>) => void;
+  onContextMenu: (event: MouseEvent<HTMLDivElement>) => void;
 };
 
 export type PlaceablesPanelViewModel = {

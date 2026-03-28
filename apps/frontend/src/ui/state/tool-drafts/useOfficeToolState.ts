@@ -5,6 +5,7 @@ import type {
   OfficeEditorToolId,
 } from "../../../game/contracts/office-editor";
 import type {
+  FurnitureRotationQuarterTurns,
   OfficeColorAdjust,
   OfficeTileColor,
 } from "../../../game/contracts/content";
@@ -27,7 +28,9 @@ export type OfficeToolState = OfficeToolStateData & {
   activeFloorPattern: string | null;
   onSelectFloorPattern: (id: string) => void;
   activeFurnitureId: string | null;
+  activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectFurnitureId: (id: string) => void;
+  onRotateFurnitureClockwise: () => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
 };
 
@@ -61,6 +64,9 @@ export function useOfficeToolState(): OfficeToolState {
     },
     onSelectFurnitureId(id) {
       dispatch({ type: "selectFurnitureId", id });
+    },
+    onRotateFurnitureClockwise() {
+      dispatch({ type: "rotateFurnitureClockwise" });
     },
     onOfficeFloorPicked(payload) {
       dispatch({ type: "officeFloorPicked", payload });

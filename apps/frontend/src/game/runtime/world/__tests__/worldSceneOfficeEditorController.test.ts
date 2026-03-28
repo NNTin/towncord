@@ -166,6 +166,37 @@ describe("WorldSceneOfficeEditorController", () => {
     expect(controller.getSelectedFurnitureId()).toBeNull();
   });
 
+  test("projects the hovered furniture placement preview from the active tool", () => {
+    const { controller } = createControllerHarness();
+    const chair = FURNITURE_ALL_ITEMS.find(
+      (item) =>
+        item.groupId === "ROTATING_CHAIR" && item.orientation === "front",
+    );
+    if (!chair) {
+      throw new Error("Missing rotating chair test asset");
+    }
+
+    controller.setOfficeEditorTool({
+      tool: "furniture",
+      furnitureId: chair.id,
+      rotationQuarterTurns: 0,
+    });
+
+    expect(
+      controller.getFurniturePlacementPreview({
+        isDown: false,
+        withinGame: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toMatchObject({
+      kind: "replace",
+      anchorCell: { col: 0, row: 0 },
+      affectedFurniture: [expect.objectContaining({ id: "desk-laptop" })],
+      blockedReason: null,
+    });
+  });
+
   test("right-click wall deletion only removes wall tiles", () => {
     const { controller, region } = createControllerHarness();
     region.layout.tiles[0] = {

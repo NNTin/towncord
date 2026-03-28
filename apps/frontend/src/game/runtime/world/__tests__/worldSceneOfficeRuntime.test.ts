@@ -1,6 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
 import type { OfficeSceneBootstrap } from "../../../contracts/office-scene";
-import { FURNITURE_ALL_ITEMS } from "../../../content/structures/furniturePalette";
+import {
+  FURNITURE_ALL_ITEMS,
+  resolveFurnitureRotationVariant,
+} from "../../../content/structures/furniturePalette";
 import { RUNTIME_TO_UI_EVENTS } from "../../transport/runtimeEvents";
 import { WorldSceneOfficeRuntime } from "../worldSceneOfficeRuntime";
 import { WorldSceneProjectionEmitter } from "../worldSceneProjections";
@@ -14,6 +17,19 @@ const laptop = (() => {
   );
   if (!item) {
     throw new Error("Missing laptop test asset");
+  }
+
+  return item;
+})();
+
+const rotatingChair = (() => {
+  const item = FURNITURE_ALL_ITEMS.find(
+    (candidate) =>
+      candidate.groupId === "ROTATING_CHAIR" &&
+      candidate.orientation === "front",
+  );
+  if (!item) {
+    throw new Error("Missing rotating chair test asset");
   }
 
   return item;
@@ -46,6 +62,10 @@ const officeRenderMocks = vi.hoisted(() => ({
 vi.mock("../../../../engine", () => ({
   renderOfficeLayout: officeRenderMocks.renderOfficeLayout,
   WORLD_REGION_BASE_PX: 16,
+  anchoredGridCellToWorldPixel: (col: number, row: number, region: { anchorX16: number; anchorY16: number; layout: { cellSize: number } }) => ({
+    worldX: region.anchorX16 * 16 + col * region.layout.cellSize,
+    worldY: region.anchorY16 * 16 + row * region.layout.cellSize,
+  }),
 }));
 
 function createBootstrap(): OfficeSceneBootstrap {
@@ -91,6 +111,7 @@ function createBootstrap(): OfficeSceneBootstrap {
 function createHarness() {
   const emit = vi.fn();
   const cellHighlight = {
+    destroy: vi.fn(),
     setDepth: vi.fn(),
     setOrigin: vi.fn(),
     setPosition: vi.fn(),
@@ -99,6 +120,7 @@ function createHarness() {
     setSize: vi.fn(),
   };
   const selectionHighlight = {
+    destroy: vi.fn(),
     setDepth: vi.fn(),
     setOrigin: vi.fn(),
     setPosition: vi.fn(),
@@ -106,11 +128,41 @@ function createHarness() {
     setVisible: vi.fn(),
     setSize: vi.fn(),
   };
+  const previewCell = {
+    destroy: vi.fn(),
+    setDepth: vi.fn(),
+    setFillStyle: vi.fn(),
+    setOrigin: vi.fn(),
+    setPosition: vi.fn(),
+    setSize: vi.fn(),
+    setStrokeStyle: vi.fn(),
+    setVisible: vi.fn(),
+  };
+  const previewGhost = {
+    destroy: vi.fn(),
+    setAlpha: vi.fn(),
+    setDepth: vi.fn(),
+    setDisplaySize: vi.fn(),
+    setOrigin: vi.fn(),
+    setPosition: vi.fn(),
+    setTexture: vi.fn(),
+    setVisible: vi.fn(),
+  };
+  const previewLabel = {
+    destroy: vi.fn(),
+    setDepth: vi.fn(),
+    setPosition: vi.fn(),
+    setText: vi.fn(),
+    setVisible: vi.fn(),
+  };
   const scene = {
     add: {
       rectangle: vi.fn()
         .mockImplementationOnce(() => cellHighlight)
-        .mockImplementationOnce(() => selectionHighlight),
+        .mockImplementationOnce(() => selectionHighlight)
+        .mockImplementation(() => previewCell),
+      image: vi.fn(() => previewGhost),
+      text: vi.fn(() => previewLabel),
     },
     cameras: {
       main: {
@@ -148,6 +200,9 @@ function createHarness() {
   return {
     emit,
     cellHighlight,
+    previewCell,
+    previewGhost,
+    previewLabel,
     selectionHighlight,
     runtime,
     scene,
@@ -230,6 +285,37 @@ describe("WorldSceneOfficeRuntime", () => {
     ).toBe(true);
     runtime.update();
     expect(bootstrap.layout.tiles[0]?.kind).toBe("void");
+  });
+
+  test("renders the hovered furniture preview inside the office scene", () => {
+    const { previewCell, previewGhost, previewLabel, runtime, scene } = createHarness();
+    const bootstrap = createBootstrap();
+    const rotatedChair = resolveFurnitureRotationVariant(rotatingChair.id, 1);
+    if (!rotatedChair) {
+      throw new Error("Missing rotated chair test asset");
+    }
+
+    scene.input.activePointer = {
+      withinGame: true,
+      x: 36,
+      y: 52,
+    };
+
+    runtime.bootstrap(bootstrap);
+    runtime.handleSetEditorTool({
+      tool: "furniture",
+      furnitureId: rotatingChair.id,
+      rotationQuarterTurns: 1,
+    });
+
+    expect(previewGhost.setTexture).toHaveBeenCalledWith(
+      "donarg.office.furniture",
+      rotatedChair.atlasKey,
+    );
+    expect(previewGhost.setPosition).toHaveBeenCalledWith(32, 48);
+    expect(previewGhost.setDisplaySize).toHaveBeenCalledWith(16, 16);
+    expect(previewCell.setPosition).toHaveBeenCalledWith(32, 48);
+    expect(previewLabel.setText).toHaveBeenCalledWith("Replace Laptop - Front - Off");
   });
 
   test("rerenders and emits layout projections after office edits", () => {

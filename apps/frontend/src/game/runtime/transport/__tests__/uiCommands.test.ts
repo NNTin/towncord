@@ -75,11 +75,29 @@ describe("uiCommands transport", () => {
     expect(payload && payload.tool === "floor" ? payload.floorColor : null).not.toBe(floorColor);
     expect(
       normalizeOfficeSetEditorToolPayload({
+        tool: "furniture",
+        furnitureId: "ASSET_107",
+        rotationQuarterTurns: 3,
+      }),
+    ).toEqual({
+      tool: "furniture",
+      furnitureId: "ASSET_107",
+      rotationQuarterTurns: 3,
+    });
+    expect(
+      normalizeOfficeSetEditorToolPayload({
         tool: "floor",
         floorMode: "pick",
         tileColor: "teal",
         floorColor,
         floorPattern: "environment.floors.pattern-03",
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "furniture",
+        furnitureId: "ASSET_107",
+        rotationQuarterTurns: 5,
       }),
     ).toBeUndefined();
   });

@@ -3,6 +3,7 @@ import type { OfficeSceneBootstrap } from "../../contracts/office-scene";
 import { RENDER_LAYERS } from "../../renderLayers";
 import {
   WORLD_REGION_BASE_PX,
+  anchoredGridCellToWorldPixel,
   type AnchoredGridRegion,
   renderOfficeLayout,
   type OfficeLayoutRenderable,
@@ -15,6 +16,7 @@ import type {
 } from "../../contracts/office-editor";
 import { WorldSceneOfficeEditorController } from "./worldSceneOfficeEditorController";
 import type { WorldSceneProjectionEmitter } from "./worldSceneProjections";
+import type { OfficeFurniturePlacementPreview } from "./officeEditorSystem";
 
 const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
 const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
@@ -24,8 +26,26 @@ const OFFICE_SELECTION_HIGHLIGHT_FILL = 0xf59e0b;
 const OFFICE_SELECTION_HIGHLIGHT_ALPHA = 0.08;
 const OFFICE_SELECTION_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_SELECTION_HIGHLIGHT_STROKE = 0xfbbf24;
+const OFFICE_PREVIEW_TEXTURE_KEY = "donarg.office.furniture";
+const OFFICE_PREVIEW_GHOST_ALPHA = 0.58;
+const OFFICE_PREVIEW_FOOTPRINT_ALPHA = 0.18;
+const OFFICE_PREVIEW_FOOTPRINT_STROKE_WIDTH = 2;
+const OFFICE_PREVIEW_PLACE_FILL = 0x38bdf8;
+const OFFICE_PREVIEW_PLACE_STROKE = 0xe0f2fe;
+const OFFICE_PREVIEW_REPLACE_FILL = 0xf59e0b;
+const OFFICE_PREVIEW_REPLACE_STROKE = 0xfcd34d;
+const OFFICE_PREVIEW_BLOCKED_FILL = 0xef4444;
+const OFFICE_PREVIEW_BLOCKED_STROKE = 0xfecaca;
+const OFFICE_PREVIEW_FOOTPRINT_DEPTH = RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT + 2;
+const OFFICE_PREVIEW_GHOST_DEPTH = RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT + 3;
+const OFFICE_PREVIEW_LABEL_DEPTH = RENDER_LAYERS.OFFICE_CELL_HIGHLIGHT + 4;
 
 type OfficeRegion = AnchoredGridRegion<OfficeSceneBootstrap["layout"]>;
+
+type OfficePreviewVisualColors = {
+  fill: number;
+  stroke: number;
+};
 
 type WorldSceneOfficeRuntimeHost = {
   scene: Phaser.Scene;
@@ -39,6 +59,9 @@ export class WorldSceneOfficeRuntime {
   private officeRegion: OfficeRegion | null = null;
   private officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
   private officeSelectionHighlight: Phaser.GameObjects.Rectangle | null = null;
+  private officePlacementPreviewGhost: Phaser.GameObjects.Image | null = null;
+  private officePlacementPreviewCells: Phaser.GameObjects.Rectangle[] = [];
+  private officePlacementPreviewLabel: Phaser.GameObjects.Text | null = null;
 
   constructor(
     private readonly host: WorldSceneOfficeRuntimeHost,
@@ -77,6 +100,7 @@ export class WorldSceneOfficeRuntime {
     this.createOfficeCellHighlight(officeRegion.layout.cellSize);
     this.createOfficeSelectionHighlight(officeRegion.layout.cellSize);
     this.syncSelectionHighlight();
+    this.syncHighlight(this.host.getActivePointer());
     this.emitSelectionChanged();
     return officeRegion;
   }
@@ -96,6 +120,7 @@ export class WorldSceneOfficeRuntime {
   public handleSetEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.controller.setOfficeEditorTool(payload);
     this.syncSelectionHighlight();
+    this.syncHighlight(this.host.getActivePointer());
     this.emitSelectionChanged();
   }
 
@@ -134,6 +159,7 @@ export class WorldSceneOfficeRuntime {
     if (changed) {
       this.rerenderOffice();
       this.syncSelectionHighlight();
+      this.syncHighlight(this.host.getActivePointer());
       if (this.officeRegion) {
         this.projections.emitOfficeLayoutChanged({
           layout: this.officeRegion.layout,
@@ -151,6 +177,7 @@ export class WorldSceneOfficeRuntime {
     if (changed) {
       this.rerenderOffice();
       this.syncSelectionHighlight();
+      this.syncHighlight(this.host.getActivePointer());
       if (this.officeRegion) {
         this.projections.emitOfficeLayoutChanged({
           layout: this.officeRegion.layout,
@@ -178,6 +205,7 @@ export class WorldSceneOfficeRuntime {
 
   public syncHighlight(pointer: Phaser.Input.Pointer | null): void {
     this.controller.syncOfficeCellHighlight(pointer);
+    this.syncPlacementPreview(pointer);
   }
 
   public update(): void {
@@ -187,6 +215,7 @@ export class WorldSceneOfficeRuntime {
 
     this.rerenderOffice();
     this.syncSelectionHighlight();
+    this.syncHighlight(this.host.getActivePointer());
     if (this.officeRegion) {
       this.projections.emitOfficeLayoutChanged({
         layout: this.officeRegion.layout,
@@ -203,6 +232,14 @@ export class WorldSceneOfficeRuntime {
     this.officeCellHighlight = null;
     this.officeSelectionHighlight?.destroy();
     this.officeSelectionHighlight = null;
+    this.officePlacementPreviewGhost?.destroy();
+    this.officePlacementPreviewGhost = null;
+    this.officePlacementPreviewLabel?.destroy();
+    this.officePlacementPreviewLabel = null;
+    for (const cell of this.officePlacementPreviewCells) {
+      cell.destroy();
+    }
+    this.officePlacementPreviewCells = [];
     this.officeRegion = null;
   }
 
@@ -313,6 +350,178 @@ export class WorldSceneOfficeRuntime {
       placement: selectedFurniture.placement,
       canRotate: this.controller.canRotateSelectedFurniture(),
     };
+  }
+
+  private syncPlacementPreview(pointer: Phaser.Input.Pointer | null): void {
+    const preview = this.controller.getFurniturePlacementPreview(pointer);
+    const region = this.officeRegion;
+    if (!preview || !region) {
+      this.hidePlacementPreview();
+      return;
+    }
+
+    const { worldX, worldY } = anchoredGridCellToWorldPixel(
+      preview.anchorCell.col,
+      preview.anchorCell.row,
+      region,
+    );
+    const widthPx = preview.footprintW * region.layout.cellSize;
+    const heightPx = preview.footprintH * region.layout.cellSize;
+    const colors = this.resolvePlacementPreviewColors(preview);
+
+    const ghost = this.ensurePlacementPreviewGhost();
+    ghost.setTexture(OFFICE_PREVIEW_TEXTURE_KEY, preview.asset.atlasKey);
+    ghost.setOrigin(0, 0);
+    ghost.setDepth(OFFICE_PREVIEW_GHOST_DEPTH);
+    ghost.setAlpha(OFFICE_PREVIEW_GHOST_ALPHA);
+    ghost.setDisplaySize(widthPx, heightPx);
+    ghost.setPosition(worldX, worldY);
+    ghost.setVisible(true);
+
+    this.syncPlacementPreviewCells(preview, region, colors);
+
+    const label = this.ensurePlacementPreviewLabel();
+    label.setDepth(OFFICE_PREVIEW_LABEL_DEPTH);
+    label.setText(this.formatPlacementPreviewLabel(preview));
+    label.setPosition(worldX, Math.max(0, worldY - 18));
+    label.setVisible(true);
+  }
+
+  private syncPlacementPreviewCells(
+    preview: OfficeFurniturePlacementPreview,
+    region: OfficeRegion,
+    colors: OfficePreviewVisualColors,
+  ): void {
+    const cellSize = region.layout.cellSize;
+    let visibleCellCount = 0;
+
+    for (let rowOffset = 0; rowOffset < preview.footprintH; rowOffset += 1) {
+      for (let colOffset = 0; colOffset < preview.footprintW; colOffset += 1) {
+        const col = preview.anchorCell.col + colOffset;
+        const row = preview.anchorCell.row + rowOffset;
+        if (col < 0 || row < 0 || col >= region.layout.cols || row >= region.layout.rows) {
+          continue;
+        }
+
+        const cell = this.getPlacementPreviewCell(visibleCellCount);
+        const { worldX, worldY } = anchoredGridCellToWorldPixel(col, row, region);
+        cell.setPosition(worldX, worldY);
+        cell.setSize(cellSize, cellSize);
+        cell.setFillStyle(colors.fill, OFFICE_PREVIEW_FOOTPRINT_ALPHA);
+        cell.setStrokeStyle(
+          OFFICE_PREVIEW_FOOTPRINT_STROKE_WIDTH,
+          colors.stroke,
+          0.95,
+        );
+        cell.setVisible(true);
+        visibleCellCount += 1;
+      }
+    }
+
+    for (
+      let index = visibleCellCount;
+      index < this.officePlacementPreviewCells.length;
+      index += 1
+    ) {
+      this.officePlacementPreviewCells[index]?.setVisible(false);
+    }
+  }
+
+  private ensurePlacementPreviewGhost(): Phaser.GameObjects.Image {
+    if (this.officePlacementPreviewGhost) {
+      return this.officePlacementPreviewGhost;
+    }
+
+    const ghost = this.host.scene.add.image(0, 0, OFFICE_PREVIEW_TEXTURE_KEY);
+    ghost.setVisible(false);
+    this.officePlacementPreviewGhost = ghost;
+    return ghost;
+  }
+
+  private ensurePlacementPreviewLabel(): Phaser.GameObjects.Text {
+    if (this.officePlacementPreviewLabel) {
+      return this.officePlacementPreviewLabel;
+    }
+
+    const label = this.host.scene.add.text(0, 0, "", {
+      fontFamily: "monospace",
+      fontSize: "11px",
+      color: "#f8fafc",
+      backgroundColor: "#020617",
+      padding: { x: 4, y: 2 },
+    });
+    label.setVisible(false);
+    this.officePlacementPreviewLabel = label;
+    return label;
+  }
+
+  private getPlacementPreviewCell(index: number): Phaser.GameObjects.Rectangle {
+    const existing = this.officePlacementPreviewCells[index];
+    if (existing) {
+      return existing;
+    }
+
+    const cell = this.host.scene.add.rectangle(0, 0, 0, 0, OFFICE_PREVIEW_PLACE_FILL, 0);
+    cell.setOrigin(0, 0);
+    cell.setDepth(OFFICE_PREVIEW_FOOTPRINT_DEPTH);
+    cell.setVisible(false);
+    this.officePlacementPreviewCells.push(cell);
+    return cell;
+  }
+
+  private resolvePlacementPreviewColors(
+    preview: OfficeFurniturePlacementPreview,
+  ): OfficePreviewVisualColors {
+    switch (preview.kind) {
+      case "replace":
+        return {
+          fill: OFFICE_PREVIEW_REPLACE_FILL,
+          stroke: OFFICE_PREVIEW_REPLACE_STROKE,
+        };
+      case "blocked":
+        return {
+          fill: OFFICE_PREVIEW_BLOCKED_FILL,
+          stroke: OFFICE_PREVIEW_BLOCKED_STROKE,
+        };
+      case "place":
+      default:
+        return {
+          fill: OFFICE_PREVIEW_PLACE_FILL,
+          stroke: OFFICE_PREVIEW_PLACE_STROKE,
+        };
+    }
+  }
+
+  private formatPlacementPreviewLabel(
+    preview: OfficeFurniturePlacementPreview,
+  ): string {
+    switch (preview.kind) {
+      case "replace": {
+        const [firstFurniture, ...rest] = preview.affectedFurniture;
+        if (!firstFurniture) {
+          return "Replace";
+        }
+
+        return rest.length > 0
+          ? `Replace ${firstFurniture.label} + ${rest.length} more`
+          : `Replace ${firstFurniture.label}`;
+      }
+      case "blocked":
+        return preview.blockedReason === "out-of-bounds"
+          ? "Blocked: outside office bounds"
+          : "Blocked";
+      case "place":
+      default:
+        return `Place ${preview.asset.label}`;
+    }
+  }
+
+  private hidePlacementPreview(): void {
+    this.officePlacementPreviewGhost?.setVisible(false);
+    this.officePlacementPreviewLabel?.setVisible(false);
+    for (const cell of this.officePlacementPreviewCells) {
+      cell.setVisible(false);
+    }
   }
 
   private rerenderOffice(): void {

@@ -100,6 +100,7 @@ export function useRuntimeUiBridge(options: {
     options.officeToolState.activeFloorColor,
     options.officeToolState.activeFloorPattern,
     options.officeToolState.activeFurnitureId,
+    options.officeToolState.activeFurnitureRotationQuarterTurns,
   ]);
 
   const sidebarViewModel = useMemo<SidebarViewModel | null>(() => {

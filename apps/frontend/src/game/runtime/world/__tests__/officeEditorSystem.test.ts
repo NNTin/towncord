@@ -2,7 +2,34 @@ import { describe, expect, test } from "vitest";
 import { OfficeEditorSystem } from "../officeEditorSystem";
 import type { OfficeSceneLayout } from "../../office/bootstrap";
 import { resolveOfficeTileTint } from "../../../content/structures/colors";
-import { FURNITURE_ALL_ITEMS } from "../../../content/structures/furniturePalette";
+import {
+  FURNITURE_ALL_ITEMS,
+  resolveFurnitureRotationVariant,
+} from "../../../content/structures/furniturePalette";
+
+const laptop = FURNITURE_ALL_ITEMS.find(
+  (item) =>
+    item.groupId === "LAPTOP" &&
+    item.orientation === "front" &&
+    item.state === "off",
+);
+const rotatingChair = FURNITURE_ALL_ITEMS.find(
+  (item) => item.groupId === "ROTATING_CHAIR" && item.orientation === "front",
+);
+
+function findRotatableLargeAsset() {
+  return FURNITURE_ALL_ITEMS.find(
+    (item) => {
+      const rotated = resolveFurnitureRotationVariant(item.id, 1);
+      return (
+        item.groupId &&
+        item.orientation === "front" &&
+        item.footprintW > 1 &&
+        Boolean(rotated && rotated.id !== item.id && rotated.footprintH > 1)
+      );
+    },
+  );
+}
 
 describe("OfficeEditorSystem floor editing", () => {
   test("stores the active floor pattern and raw color adjust when painting", () => {
@@ -31,6 +58,7 @@ describe("OfficeEditorSystem floor editing", () => {
         floorColor,
         floorPattern: "environment.floors.pattern-03",
         furnitureId: null,
+        rotationQuarterTurns: 0,
       }),
     ).toBe(true);
 
@@ -76,6 +104,7 @@ describe("OfficeEditorSystem floor editing", () => {
         floorColor: { h: 35, s: 30, b: 15, c: 0 },
         floorPattern: "environment.floors.pattern-01",
         furnitureId: null,
+        rotationQuarterTurns: 0,
       }),
     ).toBe(false);
   });
@@ -107,6 +136,7 @@ describe("OfficeEditorSystem floor editing", () => {
         floorColor: null,
         floorPattern: null,
         furnitureId: null,
+        rotationQuarterTurns: 0,
       }),
     ).toBe(true);
 
@@ -146,6 +176,7 @@ describe("OfficeEditorSystem floor editing", () => {
         floorColor: null,
         floorPattern: null,
         furnitureId: null,
+        rotationQuarterTurns: 0,
       }),
     ).toBe(true);
 
@@ -160,12 +191,6 @@ describe("OfficeEditorSystem floor editing", () => {
 
   test("rotates furniture when a matching orientation variant exists", () => {
     const system = new OfficeEditorSystem();
-    const laptop = FURNITURE_ALL_ITEMS.find(
-      (item) =>
-        item.groupId === "LAPTOP" &&
-        item.orientation === "front" &&
-        item.state === "off",
-    );
     if (!laptop) {
       throw new Error("Missing laptop test asset");
     }
@@ -204,6 +229,122 @@ describe("OfficeEditorSystem floor editing", () => {
 
     expect(system.rotateFurniture(layout, "desk-laptop")).toBe(true);
     expect(layout.furniture[0]?.assetId).not.toBe(laptop.id);
+  });
+
+  test("places the rotated furniture variant selected in the active tool state", () => {
+    const system = new OfficeEditorSystem();
+    const asset = findRotatableLargeAsset();
+    if (!asset) {
+      throw new Error("Missing rotatable large test asset");
+    }
+
+    const rotatedAsset = resolveFurnitureRotationVariant(asset.id, 1);
+    if (!rotatedAsset) {
+      throw new Error("Missing rotated large test asset");
+    }
+
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: [
+        { kind: "void", tileId: 0 },
+        { kind: "void", tileId: 0 },
+        { kind: "void", tileId: 0 },
+        { kind: "void", tileId: 0 },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "furniture",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        floorPattern: null,
+        furnitureId: asset.id,
+        rotationQuarterTurns: 1,
+      }),
+    ).toBe(true);
+
+    expect(layout.furniture[0]).toMatchObject({
+      assetId: rotatedAsset.id,
+      width: rotatedAsset.footprintW,
+      height: rotatedAsset.footprintH,
+      label: rotatedAsset.label,
+    });
+  });
+
+  test("previews replace and blocked furniture placements before mutating the layout", () => {
+    const system = new OfficeEditorSystem();
+    const asset = findRotatableLargeAsset();
+    if (!asset || !laptop || !rotatingChair) {
+      throw new Error("Missing furniture preview test asset");
+    }
+
+    const replaceLayout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [{ kind: "void", tileId: 0 }],
+      furniture: [
+        {
+          id: "desk-laptop",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: laptop.footprintW,
+          height: laptop.footprintH,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
+        },
+      ],
+      characters: [],
+    };
+
+    expect(
+      system.previewFurniturePlacement(
+        replaceLayout,
+        { col: 0, row: 0 },
+        rotatingChair.id,
+        0,
+      ),
+    ).toMatchObject({
+      kind: "replace",
+      affectedFurniture: [expect.objectContaining({ id: "desk-laptop" })],
+      blockedReason: null,
+    });
+
+    expect(
+      system.previewFurniturePlacement(
+        {
+          cols: 2,
+          rows: 1,
+          cellSize: 16,
+          tiles: [
+            { kind: "void", tileId: 0 },
+            { kind: "void", tileId: 0 },
+          ],
+          furniture: [],
+          characters: [],
+        },
+        { col: 0, row: 0 },
+        asset.id,
+        1,
+      ),
+    ).toMatchObject({
+      kind: "blocked",
+      blockedReason: "out-of-bounds",
+    });
   });
 
   test("removes a selected furniture item by id without touching tiles", () => {
