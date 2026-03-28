@@ -2,6 +2,10 @@ export type OfficeLayoutDocument = {
   version: number;
   cols: number;
   rows: number;
+  anchor?: {
+    x: number;
+    y: number;
+  };
   tiles: unknown[];
   tileColors?: unknown[];
   furniture?: unknown[];

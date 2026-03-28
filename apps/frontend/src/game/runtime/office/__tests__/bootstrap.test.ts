@@ -9,8 +9,9 @@ import { resolveOfficeTileTint } from "../../../content/structures/colors";
 describe("createOfficeSceneBootstrap", () => {
   test("maps the checked-in Donarg office layout into scene data", () => {
     const bootstrap = createOfficeSceneBootstrap();
-    const { layout } = bootstrap;
+    const { anchor, layout } = bootstrap;
 
+    expect(anchor).toEqual({ x: 1, y: 1 });
     expect(layout.cols).toBe(21);
     expect(layout.rows).toBe(21);
     expect(layout.tiles).toHaveLength(21 * 21);
@@ -50,6 +51,43 @@ describe("createOfficeSceneBootstrap", () => {
     const bootstrap = createOfficeSceneBootstrap();
 
     expect(getOfficeSceneBootstrap(bootstrap)).toEqual(bootstrap);
+  });
+
+  test("defaults the anchor when the registry payload omits it", () => {
+    const bootstrap = createOfficeSceneBootstrap();
+    const parsed = getOfficeSceneBootstrap({
+      layout: bootstrap.layout,
+    });
+
+    expect(parsed).toEqual({
+      anchor: { x: 1, y: 1 },
+      layout: bootstrap.layout,
+    });
+  });
+
+  test("clones an explicit anchor from the registry payload", () => {
+    const anchor = { x: 5, y: 9 };
+    const bootstrap = {
+      anchor,
+      layout: {
+        cols: 1,
+        rows: 1,
+        cellSize: 16,
+        tiles: [
+          {
+            kind: "floor" as const,
+            tileId: 0,
+          },
+        ],
+        furniture: [],
+        characters: [],
+      },
+    };
+
+    const parsed = getOfficeSceneBootstrap(bootstrap);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.anchor).toEqual(anchor);
+    expect(parsed?.anchor).not.toBe(anchor);
   });
 
   test("accepts expanded tile records with raw floor color metadata", () => {
@@ -102,6 +140,10 @@ describe("createOfficeSceneBootstrap", () => {
         version: 2,
         cols: 2,
         rows: 1,
+        anchor: {
+          x: 3,
+          y: 4,
+        },
         tiles: [0, 8],
         furniture: [],
       },
@@ -118,6 +160,7 @@ describe("createOfficeSceneBootstrap", () => {
       expect.objectContaining({ kind: "floor", tileId: 0 }),
       expect.objectContaining({ kind: "wall", tileId: 8 }),
     ]);
+    expect(bootstrap.anchor).toEqual({ x: 3, y: 4 });
     expect(bootstrap.layout.furniture).toEqual([]);
     expect(bootstrap.layout.characters).toEqual([]);
   });

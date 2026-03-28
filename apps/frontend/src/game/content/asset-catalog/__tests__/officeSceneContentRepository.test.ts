@@ -9,6 +9,10 @@ describe("office scene content repository", () => {
         version: 2,
         cols: 1,
         rows: 1,
+        anchor: {
+          x: 4,
+          y: 7,
+        },
         tiles: [0],
         furniture: [],
       },
@@ -24,6 +28,8 @@ describe("office scene content repository", () => {
     expect(first).not.toBe(second);
     expect(first.layout).not.toBe(second.layout);
     expect(first.furnitureCatalog).not.toBe(second.furnitureCatalog);
+    expect(first.layout.anchor).toEqual({ x: 4, y: 7 });
+    expect(first.layout.anchor).not.toBe(second.layout.anchor);
 
     first.layout.cols = 99;
 

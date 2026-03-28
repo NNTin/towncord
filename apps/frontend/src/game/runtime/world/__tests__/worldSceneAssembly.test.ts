@@ -22,8 +22,10 @@ const assemblyMocks = vi.hoisted(() => ({
   inputRouterOnPointerMove: vi.fn(),
   inputRouterOnPointerUp: vi.fn(),
   officeBootstrap: vi.fn(() => ({
-    anchorX16: 0,
-    anchorY16: 0,
+    anchor: {
+      x: 0,
+      y: 0,
+    },
     layout: {
       cols: 1,
       rows: 1,
@@ -42,6 +44,10 @@ const assemblyMocks = vi.hoisted(() => ({
     characters: [],
   },
   createOfficeSceneBootstrap: vi.fn(() => ({
+    anchor: {
+      x: 2,
+      y: 3,
+    },
     layout: {
       cols: 3,
       rows: 3,
@@ -52,6 +58,10 @@ const assemblyMocks = vi.hoisted(() => ({
     },
   })),
   getOfficeSceneBootstrap: vi.fn(() => ({
+    anchor: {
+      x: 2,
+      y: 3,
+    },
     layout: {
       cols: 2,
       rows: 2,
@@ -356,6 +366,10 @@ describe("WorldScene assembly", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     assemblyMocks.getOfficeSceneBootstrap.mockReturnValue({
+      anchor: {
+        x: 2,
+        y: 3,
+      },
       layout: assemblyMocks.officeSceneBootstrapLayout,
     });
   });
@@ -368,7 +382,13 @@ describe("WorldScene assembly", () => {
 
     expect(assemblyMocks.getOfficeSceneBootstrap).toHaveBeenCalledWith({ world: true });
     expect(assemblyMocks.officeBootstrap).toHaveBeenCalledWith(
-      assemblyMocks.officeSceneBootstrapLayout,
+      expect.objectContaining({
+        anchor: {
+          x: 2,
+          y: 3,
+        },
+        layout: assemblyMocks.officeSceneBootstrapLayout,
+      }),
     );
     expect(assemblyMocks.createOfficeSceneBootstrap).not.toHaveBeenCalled();
     expect(assemblyMocks.createTerrainNavigationService).toHaveBeenCalledOnce();
@@ -392,7 +412,13 @@ describe("WorldScene assembly", () => {
 
     lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
     expect(assemblyMocks.officeBootstrap).toHaveBeenCalledWith(
-      assemblyMocks.officeSceneBootstrapLayout,
+      expect.objectContaining({
+        anchor: {
+          x: 2,
+          y: 3,
+        },
+        layout: assemblyMocks.officeSceneBootstrapLayout,
+      }),
     );
     lifecycle.dispose();
 

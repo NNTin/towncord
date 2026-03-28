@@ -1,5 +1,5 @@
 import type Phaser from "phaser";
-import type { OfficeSceneLayout } from "../../contracts/office-scene";
+import type { OfficeSceneBootstrap } from "../../contracts/office-scene";
 import { RENDER_LAYERS } from "../../renderLayers";
 import {
   WORLD_REGION_BASE_PX,
@@ -18,10 +18,8 @@ const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
 const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
 const OFFICE_CELL_HIGHLIGHT_STROKE_WIDTH = 2;
 const OFFICE_CELL_HIGHLIGHT_STROKE = 0xe0f2fe;
-const DEFAULT_OFFICE_ANCHOR_X16 = 1;
-const DEFAULT_OFFICE_ANCHOR_Y16 = 1;
 
-type OfficeRegion = AnchoredGridRegion<OfficeSceneLayout>;
+type OfficeRegion = AnchoredGridRegion<OfficeSceneBootstrap["layout"]>;
 
 type WorldSceneOfficeRuntimeHost = {
   scene: Phaser.Scene;
@@ -49,10 +47,11 @@ export class WorldSceneOfficeRuntime {
     });
   }
 
-  public bootstrap(layout: OfficeSceneLayout): OfficeRegion {
+  public bootstrap(bootstrap: OfficeSceneBootstrap): OfficeRegion {
+    const { anchor, layout } = bootstrap;
     const officeRegion: OfficeRegion = {
-      anchorX16: DEFAULT_OFFICE_ANCHOR_X16,
-      anchorY16: DEFAULT_OFFICE_ANCHOR_Y16,
+      anchorX16: anchor.x,
+      anchorY16: anchor.y,
       layout,
     };
     this.officeRegion = officeRegion;

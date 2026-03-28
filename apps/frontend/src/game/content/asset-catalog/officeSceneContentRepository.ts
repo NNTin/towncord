@@ -18,10 +18,16 @@ export type DonargLayoutPlacement = {
   row: number;
 };
 
+export type DonargLayoutAnchorSource = {
+  x: number;
+  y: number;
+};
+
 export type DonargOfficeLayoutSource = {
   version: number;
   cols: number;
   rows: number;
+  anchor?: DonargLayoutAnchorSource;
   tiles: Array<number | OfficeSceneTile>;
   tileColors?: Array<DonargLayoutColor | null>;
   furniture: DonargLayoutPlacement[];

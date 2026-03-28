@@ -208,7 +208,7 @@ export class WorldSceneAssembly {
         },
       },
     );
-    const officeRegion = this.officeRuntime.bootstrap(officeBootstrap.layout);
+    const officeRegion = this.officeRuntime.bootstrap(officeBootstrap);
     const collisionGrid = new UnifiedCollisionMap(
       this.terrainRuntime.getGameplayGrid(),
       {

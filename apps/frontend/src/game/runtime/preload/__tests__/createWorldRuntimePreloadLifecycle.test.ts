@@ -80,7 +80,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       callOrder.push("composeRuntimeBootstrap");
       return { world: {}, ui: { catalog: {}, placeables: [] } };
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
@@ -100,7 +103,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       world: {},
       ui: { catalog: {}, placeables: [] },
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
@@ -118,7 +124,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       world: worldBootstrap,
       ui: { catalog: {}, placeables: [] },
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
@@ -129,6 +138,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
 
   test("create() publishes office bootstrap to scene registry", () => {
     const officeBootstrap = {
+      anchor: {
+        x: 1,
+        y: 1,
+      },
       layout: { cols: 10, rows: 8, cellSize: 16, tiles: [], furniture: [], characters: [] },
     };
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -159,7 +172,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       world: {},
       ui: uiPayload,
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
@@ -181,7 +197,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       world: {},
       ui: { catalog: {}, placeables: [] },
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
     (emitRuntimeToUiEvent as ReturnType<typeof vi.fn>).mockImplementation(() => {
       callOrder.push("emitRuntimeReady");
     });
@@ -217,7 +236,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       world: {},
       ui: { catalog: {}, placeables: [] },
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({ layout: {} });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();

@@ -107,8 +107,8 @@ export function useOfficeLayoutEditor(
   }, [savedText]);
 
   const syncFromRuntime = useCallback((layout: OfficeSceneLayout): void => {
-    setJsonText(formatOfficeLayout(syncFromRuntimeLayout(layout)));
-  }, []);
+    setJsonText(formatOfficeLayout(syncFromRuntimeLayout(layout, parsed.document)));
+  }, [parsed.document]);
 
   const save = useCallback(async () => {
     if (!isAvailable || !parsed.document) return;

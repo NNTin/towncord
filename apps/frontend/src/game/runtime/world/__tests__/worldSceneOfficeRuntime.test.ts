@@ -1,4 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
+import type { OfficeSceneBootstrap } from "../../../contracts/office-scene";
 import { RUNTIME_TO_UI_EVENTS } from "../../transport/runtimeEvents";
 import { WorldSceneOfficeRuntime } from "../worldSceneOfficeRuntime";
 import { WorldSceneProjectionEmitter } from "../worldSceneProjections";
@@ -15,19 +16,25 @@ vi.mock("../../../../engine", () => ({
   WORLD_REGION_BASE_PX: 16,
 }));
 
-function createLayout() {
+function createBootstrap(): OfficeSceneBootstrap {
   return {
-    cols: 1,
-    rows: 1,
-    cellSize: 16,
-    tiles: [
-      {
-        kind: "void" as const,
-        tileId: 0,
-      },
-    ],
-    furniture: [],
-    characters: [],
+    anchor: {
+      x: 2,
+      y: 3,
+    },
+    layout: {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        {
+          kind: "void" as const,
+          tileId: 0,
+        },
+      ],
+      furniture: [],
+      characters: [],
+    },
   };
 }
 
@@ -88,20 +95,29 @@ function createHarness() {
 describe("WorldSceneOfficeRuntime", () => {
   test("bootstraps the office renderable and highlight overlay", () => {
     const { highlight, runtime, scene } = createHarness();
-    const layout = createLayout();
+    const bootstrap = createBootstrap();
 
-    runtime.bootstrap(layout);
+    runtime.bootstrap(bootstrap);
 
     expect(officeRenderMocks.renderOfficeLayout).toHaveBeenCalledOnce();
+    expect(officeRenderMocks.renderOfficeLayout).toHaveBeenCalledWith(
+      scene,
+      bootstrap.layout,
+      expect.objectContaining({
+        worldOffsetX: 32,
+        worldOffsetY: 48,
+        depthAnchorRow: 3,
+      }),
+    );
     expect(scene.add.rectangle).toHaveBeenCalledOnce();
     expect(highlight.setOrigin).toHaveBeenCalledWith(0, 0);
   });
 
   test("rerenders and emits layout projections after office edits", () => {
     const { emit, runtime } = createHarness();
-    const layout = createLayout();
+    const bootstrap = createBootstrap();
 
-    runtime.bootstrap(layout);
+    runtime.bootstrap(bootstrap);
     runtime.handleSetEditorTool({
       tool: "wall",
     });
@@ -110,8 +126,8 @@ describe("WorldSceneOfficeRuntime", () => {
       runtime.tryHandlePointerDown({
         button: 0,
         isDown: true,
-        x: 20,
-        y: 20,
+        x: 40,
+        y: 50,
       } as never),
     ).toBe(true);
 

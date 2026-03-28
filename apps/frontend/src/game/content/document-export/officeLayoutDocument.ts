@@ -9,9 +9,11 @@ export function formatOfficeLayout(document: OfficeLayoutDocument): string {
 
 export function syncFromRuntimeLayout(
   layout: OfficeSceneLayout,
+  document?: OfficeLayoutDocument | null,
 ): OfficeLayoutDocument {
   return {
     version: 2,
+    ...(document?.anchor ? { anchor: { ...document.anchor } } : {}),
     cols: layout.cols,
     rows: layout.rows,
     cellSize: layout.cellSize,
