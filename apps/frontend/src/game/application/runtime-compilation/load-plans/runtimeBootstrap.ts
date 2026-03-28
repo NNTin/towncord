@@ -31,7 +31,7 @@ export function composeRuntimeBootstrap(
   const catalog = buildAnimationCatalog(animationKeys);
   const entityRegistry = buildEntityRegistryFromCatalog(catalog);
   const placeables = [
-    ...listEntityPlaceables(entityRegistry),
+    ...listEntityPlaceables(entityRegistry, catalog),
     ...listTerrainPlaceables(),
   ];
 

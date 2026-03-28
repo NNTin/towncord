@@ -155,6 +155,7 @@ describe("BottomToolbar", () => {
                 label: "Player Spawn",
                 groupKey: "entity:player",
                 groupLabel: "Player",
+                previewFrameKey: null,
               },
             ],
           },
@@ -169,6 +170,7 @@ describe("BottomToolbar", () => {
                 label: "Greeter",
                 groupKey: "entity:npc",
                 groupLabel: "Mobs",
+                previewFrameKey: null,
               },
             ],
           },
@@ -215,6 +217,7 @@ describe("BottomToolbar", () => {
       label: "Player Spawn",
       groupKey: "entity:player",
       groupLabel: "Player",
+      previewFrameKey: null,
     });
 
     act(() => {
@@ -239,6 +242,7 @@ describe("BottomToolbar", () => {
                 label: "Player Spawn",
                 groupKey: "entity:player",
                 groupLabel: "Player",
+                previewFrameKey: null,
               },
             ],
           },
