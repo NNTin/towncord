@@ -83,6 +83,7 @@ function renderHarness() {
           label: "Player Spawn",
           groupKey: "entity:player",
           groupLabel: "Player",
+          previewFrameKey: null,
         },
         {
           id: "terrain.water.tile",
@@ -220,6 +221,7 @@ describe("useRuntimeUiBridge", () => {
               label: "Player Spawn",
               groupKey: "entity:player",
               groupLabel: "Player",
+              previewFrameKey: null,
             },
           ],
         },

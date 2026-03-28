@@ -56,6 +56,12 @@ export type {
   TilesetFamily,
 } from "../content/asset-catalog/animationCatalog";
 export {
+  BLOOMSEED_ATLAS_H,
+  BLOOMSEED_ATLAS_IMAGE_URL,
+  BLOOMSEED_ATLAS_W,
+  getBloomseedAtlasFrame,
+} from "../content/asset-catalog/bloomseedAtlas";
+export {
   DEBUG_TERRAIN_ATLAS_H,
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,

@@ -115,6 +115,7 @@ function createBootstrapPayload(): RuntimeBootstrapPayload {
         label: "Player",
         groupKey: "entity:player",
         groupLabel: "Player",
+        previewFrameKey: null,
       },
       {
         id: "terrain:grass",

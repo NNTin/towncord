@@ -61,6 +61,8 @@ export type EntityPlaceableViewModel = {
   label: string;
   groupKey: string;
   groupLabel: string;
+  /** First frame key of the idle-down animation in the bloomseed atlas, or null if unavailable. */
+  previewFrameKey: string | null;
 };
 
 export type TerrainPlaceableViewModel = {

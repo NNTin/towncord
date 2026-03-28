@@ -13,6 +13,7 @@ describe("createToolbarEntityPaletteBridge", () => {
           label: "Player Spawn",
           groupKey: "entity:player",
           groupLabel: "Player",
+          previewFrameKey: null,
         },
         {
           id: "entity:npc.greeter",
@@ -21,6 +22,7 @@ describe("createToolbarEntityPaletteBridge", () => {
           label: "Greeter",
           groupKey: "entity:npc",
           groupLabel: "Mobs",
+          previewFrameKey: null,
         },
         {
           id: "terrain.ground.tile",
@@ -47,6 +49,7 @@ describe("createToolbarEntityPaletteBridge", () => {
               label: "Player Spawn",
               groupKey: "entity:player",
               groupLabel: "Player",
+              previewFrameKey: null,
             },
           ],
         },
@@ -61,6 +64,7 @@ describe("createToolbarEntityPaletteBridge", () => {
               label: "Greeter",
               groupKey: "entity:npc",
               groupLabel: "Mobs",
+              previewFrameKey: null,
             },
           ],
         },
