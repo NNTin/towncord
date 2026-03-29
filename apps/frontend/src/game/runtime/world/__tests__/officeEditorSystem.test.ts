@@ -633,7 +633,7 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 6,
       rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({ kind: "floor" as const, tileId: 0 })),
       furniture: [
         createFurnitureItem({
           id: "moving-decor",
@@ -784,7 +784,7 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 6,
       rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({ kind: "floor" as const, tileId: 0 })),
       furniture: [
         createFurnitureItem({
           id: "moving-decor",

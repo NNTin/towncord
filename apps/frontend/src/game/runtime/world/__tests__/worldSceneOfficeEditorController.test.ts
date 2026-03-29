@@ -63,7 +63,7 @@ function createControllerHarness(options: { cols?: number; rows?: number } = {})
     anchorY16: 0,
     layout,
   };
-const controller = new WorldSceneOfficeEditorController({
+  const controller = new WorldSceneOfficeEditorController({
     getOfficeRegion: () => region,
     getOfficeCellHighlight: () => highlight as never,
     getOfficeFurnitureTargets: () => [

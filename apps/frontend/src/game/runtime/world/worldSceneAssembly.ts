@@ -12,6 +12,7 @@ import {
   doesFurnitureBlockMovement,
   type WorldNavigationService,
 } from "../../../engine";
+import { OFFICE_LAYOUT_CHANGED_EVENT } from "../../runtime/transport/runtimeEvents";
 import { createTerrainRuntimeContext } from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import { EntitySystem } from "./entitySystem";
@@ -53,9 +54,11 @@ export class WorldSceneAssembly {
   public readonly inputRouter: WorldRuntimeInputRouter;
 
   private terrainRuntime: TerrainRuntime | null = null;
+  private readonly officeLayoutChangedEvents: Phaser.Events.EventEmitter;
   private terrainRuntimeContext:
     | ReturnType<typeof createTerrainRuntimeContext>
     | null = null;
+  private officeRegion: OfficeSceneBootstrap["layout"] | null = null;
   private entitySystem: EntitySystem | null = null;
   private entityRegistry: EntityRegistry | null = null;
   private navigation: WorldNavigationService | null = null;
@@ -65,8 +68,10 @@ export class WorldSceneAssembly {
   private rKeyWasDown = false;
   private hasEmittedTerrainSeedSnapshot = false;
   private hasPendingTerrainSnapshotChange = false;
+  private officeFurnitureBlockingCells = new Set<number>();
 
   constructor(scene: Phaser.Scene) {
+    this.officeLayoutChangedEvents = scene.game.events;
     this.projections = new WorldSceneProjectionEmitter({
       getRuntimeHost: () => scene.game,
     });
@@ -97,6 +102,10 @@ export class WorldSceneAssembly {
     );
 
     this.terrainRuntimeContext = createTerrainRuntimeContext(scene);
+    scene.game.events.on(
+      OFFICE_LAYOUT_CHANGED_EVENT,
+      this.handleOfficeLayoutChanged,
+    );
 
     this.selectionController = new WorldSceneSelectionController(
       {
@@ -219,6 +228,8 @@ export class WorldSceneAssembly {
       },
     );
     const officeRegion = this.officeRuntime.bootstrap(officeBootstrap);
+    this.officeRegion = officeRegion.layout;
+    this.rebuildOfficeFurnitureBlockingCells(officeRegion.layout);
     const collisionGrid = new UnifiedCollisionMap(
       this.terrainRuntime.getGameplayGrid(),
       {
@@ -227,14 +238,7 @@ export class WorldSceneAssembly {
           officeRegion.layout.tiles[row * officeRegion.layout.cols + col]
             ?.kind ?? null,
         isFurnitureBlockingCell: (col, row) =>
-          officeRegion.layout.furniture.some(
-            (furniture) =>
-              doesFurnitureBlockMovement(furniture) &&
-              col >= furniture.col &&
-              col < furniture.col + furniture.width &&
-              row >= furniture.row &&
-              row < furniture.row + furniture.height,
-          ),
+          this.isFurnitureBlockingCell(col, row),
       },
     );
     this.navigation = createTerrainNavigationService(
@@ -299,6 +303,10 @@ export class WorldSceneAssembly {
    * Tears down all runtime systems. Call from the scene's shutdown handler.
    */
   public dispose(): void {
+    this.officeLayoutChangedEvents.off(
+      OFFICE_LAYOUT_CHANGED_EVENT,
+      this.handleOfficeLayoutChanged,
+    );
     this.entitySystem?.dispose();
     this.entitySystem = null;
     this.terrainRuntime?.destroy();
@@ -317,6 +325,49 @@ export class WorldSceneAssembly {
     this.terrainRuntimeContext = null;
     this.hasEmittedTerrainSeedSnapshot = false;
     this.hasPendingTerrainSnapshotChange = false;
+    this.officeFurnitureBlockingCells.clear();
+  }
+
+  private handleOfficeLayoutChanged = ({
+    layout,
+  }: {
+    layout: OfficeSceneBootstrap["layout"];
+  }): void => {
+    this.officeRegion = layout;
+    this.rebuildOfficeFurnitureBlockingCells(layout);
+  };
+
+  private rebuildOfficeFurnitureBlockingCells(
+    layout: OfficeSceneBootstrap["layout"],
+  ): void {
+    const blockingCells = new Set<number>();
+
+    for (const furniture of layout.furniture) {
+      if (!doesFurnitureBlockMovement(furniture)) {
+        continue;
+      }
+
+      for (let row = furniture.row; row < furniture.row + furniture.height; row++) {
+        for (
+          let col = furniture.col;
+          col < furniture.col + furniture.width;
+          col++
+        ) {
+          blockingCells.add(row * layout.cols + col);
+        }
+      }
+    }
+
+    this.officeFurnitureBlockingCells = blockingCells;
+  }
+
+  private isFurnitureBlockingCell(col: number, row: number): boolean {
+    const layout = this.officeRegion;
+    if (!layout) {
+      return false;
+    }
+
+    return this.officeFurnitureBlockingCells.has(row * layout.cols + col);
   }
 
   private emitTerrainSeedSnapshot(): void {
