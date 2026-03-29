@@ -1,7 +1,9 @@
 import {
-  shouldTreatFurnitureOverlapAsExclusive,
   type AnchoredGridCellCoord as OfficeCellCoord,
-} from "../../../engine";
+} from "../../../engine/world-runtime/regions";
+import {
+  shouldTreatFurnitureOverlapAsExclusive,
+} from "../../../engine/world-runtime/spatial";
 import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
