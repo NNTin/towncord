@@ -25,6 +25,9 @@ export {
 export { UnifiedCollisionMap } from "./world-runtime/spatial";
 export {
   createTerrainNavigationService,
+  doesFurnitureBlockMovement,
+  shouldTreatFurnitureOverlapAsExclusive,
+  type FurniturePlacementLike,
   type AutonomyNavigationService,
   type WorldNavigationService,
 } from "./world-runtime/spatial";

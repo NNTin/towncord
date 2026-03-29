@@ -1,4 +1,7 @@
-import type { AnchoredGridCellCoord as OfficeCellCoord } from "../../../engine/world-runtime/regions";
+import {
+  shouldTreatFurnitureOverlapAsExclusive,
+  type AnchoredGridCellCoord as OfficeCellCoord,
+} from "../../../engine";
 import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
@@ -19,7 +22,6 @@ import type {
 } from "../../officeLayoutContract";
 import type { OfficeTileColor } from "../../world/structures/model";
 import type { OfficeEditorToolId } from "../../contracts/office-editor";
-import { shouldTreatFurnitureOverlapAsExclusive } from "../../../engine/world-runtime/spatial/officeFurnitureRules";
 
 // Monotonic counter for unique furniture placement IDs. Module-level so it
 // survives re-instantiation of OfficeEditorSystem across re-renders.

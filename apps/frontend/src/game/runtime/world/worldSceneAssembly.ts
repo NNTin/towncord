@@ -9,13 +9,13 @@ import {
   WorldRuntimeDiagnosticsController,
   WorldRuntimeInputRouter,
   createTerrainNavigationService,
+  doesFurnitureBlockMovement,
   type WorldNavigationService,
 } from "../../../engine";
 import { createTerrainRuntimeContext } from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import { EntitySystem } from "./entitySystem";
 import type { MovementInput } from "./movementSystem";
-import { doesFurnitureBlockMovement } from "../../../engine/world-runtime/spatial/officeFurnitureRules";
 import { WorldSceneCommandBindings } from "./worldSceneCommandBindings";
 import { WorldSceneOfficeRuntime } from "./worldSceneOfficeRuntime";
 import { WorldScenePlacementController } from "./worldScenePlacementController";
