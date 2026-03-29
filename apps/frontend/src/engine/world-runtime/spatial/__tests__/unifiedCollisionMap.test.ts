@@ -29,6 +29,7 @@ function makeRegion(
   cols: number,
   rows: number,
   tileKinds: Array<"floor" | "wall" | "void"> = [],
+  furniture: OfficeSceneLayout["furniture"] = [],
 ): AnchoredRegionCellLookup<OfficeSceneLayout> {
   const defaultKinds = Array.from({ length: cols * rows }, (_, index) => tileKinds[index] ?? "floor");
   const tiles: OfficeSceneTile[] = defaultKinds.map((kind) => ({ kind, tileId: 0 }));
@@ -37,7 +38,7 @@ function makeRegion(
     rows,
     cellSize: 16,
     tiles,
-    furniture: [],
+    furniture,
     characters: [],
   };
   const region: AnchoredGridRegion<OfficeSceneLayout> = {
@@ -104,5 +105,66 @@ describe("UnifiedCollisionMap", () => {
     const map = new UnifiedCollisionMap(makeTerrainGrid(32, 32, "water"), region);
     const { worldX, worldY } = anchoredGridCellToWorldPixel(0, 0, region);
     expect(map.isWorldWalkable(worldX + 8, worldY + 8)).toBe(false);
+  });
+
+  test("floor furniture blocks walking unless it is a chair", () => {
+    const region = makeRegion(
+      20,
+      20,
+      4,
+      4,
+      ["floor"],
+      [
+        {
+          id: "chair",
+          assetId: "chair",
+          label: "Chair",
+          category: "chairs",
+          placement: "floor",
+          col: 0,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: 0x111111,
+          accentColor: 0x222222,
+        },
+        {
+          id: "desk",
+          assetId: "desk",
+          label: "Desk",
+          category: "desks",
+          placement: "floor",
+          col: 1,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: 0x111111,
+          accentColor: 0x222222,
+        },
+        {
+          id: "mug",
+          assetId: "mug",
+          label: "Mug",
+          category: "misc",
+          placement: "surface",
+          col: 2,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: 0x111111,
+          accentColor: 0x222222,
+        },
+      ],
+    );
+    const map = new UnifiedCollisionMap(makeTerrainGrid(32, 32, "ground"), region);
+
+    const chairCell = anchoredGridCellToWorldPixel(0, 0, region);
+    expect(map.isWorldWalkable(chairCell.worldX + 8, chairCell.worldY + 8)).toBe(true);
+
+    const deskCell = anchoredGridCellToWorldPixel(1, 0, region);
+    expect(map.isWorldWalkable(deskCell.worldX + 8, deskCell.worldY + 8)).toBe(false);
+
+    const mugCell = anchoredGridCellToWorldPixel(2, 0, region);
+    expect(map.isWorldWalkable(mugCell.worldX + 8, mugCell.worldY + 8)).toBe(true);
   });
 });

@@ -19,6 +19,19 @@ const laptop = FURNITURE_ALL_ITEMS.find(
 const rotatingChair = FURNITURE_ALL_ITEMS.find(
   (item) => item.groupId === "ROTATING_CHAIR" && item.orientation === "front",
 );
+const floorDecor = FURNITURE_ALL_ITEMS.find(
+  (item) => item.category === "decor" && item.placement === "floor",
+);
+const floorDecorMat = FURNITURE_ALL_ITEMS.find(
+  (item) =>
+    item.category === "decor" &&
+    item.placement === "floor" &&
+    item.footprintW === 2 &&
+    item.footprintH === 1,
+);
+const floorDesk = FURNITURE_ALL_ITEMS.find(
+  (item) => item.category === "desks" && item.placement === "floor",
+);
 
 function findRotatableLargeAsset() {
   return FURNITURE_ALL_ITEMS.find(
@@ -32,6 +45,25 @@ function findRotatableLargeAsset() {
       );
     },
   );
+}
+
+function createFurnitureItem(
+  overrides: Partial<OfficeSceneLayout["furniture"][number]>,
+): OfficeSceneLayout["furniture"][number] {
+  return {
+    id: "furniture",
+    assetId: "asset",
+    label: "Furniture",
+    category: "decor" as never,
+    placement: "floor",
+    col: 0,
+    row: 0,
+    width: 1,
+    height: 1,
+    color: 0x111111,
+    accentColor: 0x222222,
+    ...overrides,
+  };
 }
 
 describe("OfficeEditorSystem floor editing", () => {
@@ -321,27 +353,40 @@ describe("OfficeEditorSystem floor editing", () => {
     });
   });
 
-  test("previews replace and blocked furniture placements before mutating the layout", () => {
+  test("previews replacement only for overlaps that will actually be removed", () => {
     const system = new OfficeEditorSystem();
     const asset = findRotatableLargeAsset();
-    if (!asset || !laptop || !rotatingChair) {
+    if (!asset || !laptop || !rotatingChair || !floorDecor) {
       throw new Error("Missing furniture preview test asset");
     }
 
     const replaceLayout: OfficeSceneLayout = {
-      cols: 1,
-      rows: 1,
+      cols: 3,
+      rows: 2,
       cellSize: 16,
-      tiles: [{ kind: "void", tileId: 0 }],
+      tiles: Array.from({ length: 6 }, () => ({ kind: "void" as const, tileId: 0 })),
       furniture: [
-        {
-          id: "desk-laptop",
+        createFurnitureItem({
+          id: "same-decor",
+          assetId: floorDecor.id,
+          label: floorDecor.label,
+          category: floorDecor.category as never,
+          placement: floorDecor.placement,
+          width: floorDecor.footprintW,
+          height: floorDecor.footprintH,
+          color: floorDecor.color,
+          accentColor: floorDecor.accentColor,
+          renderAsset: {
+            atlasKey: floorDecor.atlasKey,
+            atlasFrame: { ...floorDecor.atlasFrame },
+          },
+        }),
+        createFurnitureItem({
+          id: "electronics",
           assetId: laptop.id,
           label: laptop.label,
           category: laptop.category as never,
           placement: laptop.placement,
-          col: 0,
-          row: 0,
           width: laptop.footprintW,
           height: laptop.footprintH,
           color: laptop.color,
@@ -350,10 +395,23 @@ describe("OfficeEditorSystem floor editing", () => {
             atlasKey: laptop.atlasKey,
             atlasFrame: { ...laptop.atlasFrame },
           },
-        },
+        }),
       ],
       characters: [],
     };
+
+    expect(
+      system.previewFurniturePlacement(
+        replaceLayout,
+        { col: 0, row: 0 },
+        floorDecor.id,
+        0,
+      ),
+    ).toMatchObject({
+      kind: "replace",
+      affectedFurniture: [expect.objectContaining({ id: "same-decor" })],
+      blockedReason: null,
+    });
 
     expect(
       system.previewFurniturePlacement(
@@ -364,7 +422,10 @@ describe("OfficeEditorSystem floor editing", () => {
       ),
     ).toMatchObject({
       kind: "replace",
-      affectedFurniture: [expect.objectContaining({ id: "desk-laptop" })],
+      affectedFurniture: expect.arrayContaining([
+        expect.objectContaining({ id: "same-decor" }),
+        expect.objectContaining({ id: "electronics" }),
+      ]),
       blockedReason: null,
     });
 
@@ -389,6 +450,108 @@ describe("OfficeEditorSystem floor editing", () => {
       kind: "blocked",
       blockedReason: "out-of-bounds",
     });
+  });
+
+  test("placement mutates only the furniture that the active category is allowed to replace", () => {
+    if (!laptop || !floorDecor || !floorDesk) {
+      throw new Error("Missing furniture placement test assets");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 3,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 6 }, () => ({ kind: "void" as const, tileId: 0 })),
+      furniture: [
+        createFurnitureItem({
+          id: "same-decor",
+          assetId: floorDecor.id,
+          label: floorDecor.label,
+          category: floorDecor.category as never,
+          placement: floorDecor.placement,
+          col: 0,
+          row: 0,
+          width: floorDecor.footprintW,
+          height: floorDecor.footprintH,
+          color: floorDecor.color,
+          accentColor: floorDecor.accentColor,
+          renderAsset: {
+            atlasKey: floorDecor.atlasKey,
+            atlasFrame: { ...floorDecor.atlasFrame },
+          },
+        }),
+        createFurnitureItem({
+          id: "electronics",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 0,
+          row: 0,
+          width: laptop.footprintW,
+          height: laptop.footprintH,
+          color: laptop.color,
+          accentColor: laptop.accentColor,
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
+        }),
+        createFurnitureItem({
+          id: "desk",
+          assetId: floorDesk.id,
+          label: floorDesk.label,
+          category: floorDesk.category as never,
+          placement: floorDesk.placement,
+          col: 0,
+          row: 0,
+          width: floorDesk.footprintW,
+          height: floorDesk.footprintH,
+          color: floorDesk.color,
+          accentColor: floorDesk.accentColor,
+          renderAsset: {
+            atlasKey: floorDesk.atlasKey,
+            atlasFrame: { ...floorDesk.atlasFrame },
+          },
+        }),
+      ],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "furniture",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        wallColor: null,
+        floorPattern: null,
+        furnitureId: floorDecor.id,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBe(true);
+
+    expect(layout.furniture).toHaveLength(3);
+    expect(layout.furniture[0]?.id).toBe("electronics");
+    expect(layout.furniture[1]?.id).toBe("desk");
+    expect(layout.furniture[2]?.id).toMatch(/^placed-/);
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "furniture",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        wallColor: null,
+        floorPattern: null,
+        furnitureId: floorDesk.id,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBe(true);
+
+    expect(layout.furniture).toHaveLength(1);
+    expect(layout.furniture[0]?.category).toBe("desks");
   });
 
   test("removes a selected furniture item by id without touching tiles", () => {
@@ -460,53 +623,82 @@ describe("OfficeEditorSystem floor editing", () => {
     expect(layout.furniture[0]).toMatchObject({ id: "desk-laptop", col: 2, row: 2 });
   });
 
-  test("moveFurniture returns false when target overlaps another furniture item", () => {
-    if (!laptop || !rotatingChair) {
+  test("moveFurniture allows coexist with different categories and blocks same-category overlaps", () => {
+    if (!laptop) {
       throw new Error("Missing test assets");
     }
 
     const system = new OfficeEditorSystem();
     const layout: OfficeSceneLayout = {
-      cols: 3,
-      rows: 3,
+      cols: 6,
+      rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 9 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
       furniture: [
-        {
-          id: "desk-laptop",
-          assetId: laptop.id,
-          label: laptop.label,
-          category: laptop.category as never,
-          placement: laptop.placement,
+        createFurnitureItem({
+          id: "moving-decor",
+          assetId: "decor-a",
+          label: "Decor A",
+          category: "decor" as never,
+          placement: "floor",
           col: 0,
           row: 0,
           width: 1,
           height: 1,
+          color: 0x335533,
+          accentColor: 0x99cc99,
+        }),
+        createFurnitureItem({
+          id: "blocking-decor",
+          assetId: "decor-b",
+          label: "Decor B",
+          category: "decor" as never,
+          placement: "floor",
+          col: 1,
+          row: 0,
+          width: 1,
+          height: 1,
+          color: 0x335533,
+          accentColor: 0x99cc99,
+        }),
+        createFurnitureItem({
+          id: "electronics",
+          assetId: laptop.id,
+          label: laptop.label,
+          category: laptop.category as never,
+          placement: laptop.placement,
+          col: 2,
+          row: 0,
+          width: laptop.footprintW,
+          height: laptop.footprintH,
           color: laptop.color,
           accentColor: laptop.accentColor,
           renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
-        },
-        {
-          id: "chair-1",
-          assetId: rotatingChair.id,
-          label: rotatingChair.label,
-          category: rotatingChair.category as never,
-          placement: rotatingChair.placement,
-          col: 2,
-          row: 2,
+        }),
+        createFurnitureItem({
+          id: "moving-desk",
+          assetId: "desk-a",
+          label: "Desk",
+          category: "desks" as never,
+          placement: "floor",
+          col: 3,
+          row: 0,
           width: 1,
           height: 1,
-          color: rotatingChair.color ?? 0x000000,
-          accentColor: rotatingChair.accentColor ?? 0x000000,
-          renderAsset: { atlasKey: rotatingChair.atlasKey, atlasFrame: { ...rotatingChair.atlasFrame } },
-        },
+          color: 0x444444,
+          accentColor: 0x888888,
+        }),
       ],
       characters: [],
     };
 
-    // Trying to move laptop to where chair already sits
-    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 2 })).toBe(false);
-    expect(layout.furniture[0]).toMatchObject({ id: "desk-laptop", col: 0, row: 0 });
+    expect(system.moveFurniture(layout, "moving-decor", { col: 2, row: 0 })).toBe(true);
+    expect(layout.furniture[0]).toMatchObject({ id: "moving-decor", col: 2, row: 0 });
+
+    expect(system.moveFurniture(layout, "moving-decor", { col: 1, row: 0 })).toBe(false);
+    expect(layout.furniture[0]).toMatchObject({ id: "moving-decor", col: 2, row: 0 });
+
+    expect(system.moveFurniture(layout, "moving-desk", { col: 2, row: 0 })).toBe(false);
   });
 
   test("moveFurniture returns false when target is out of bounds", () => {
@@ -582,56 +774,84 @@ describe("OfficeEditorSystem floor editing", () => {
     });
   });
 
-  test("previewFurnitureMove returns a blocked preview when the target overlaps furniture", () => {
-    if (!laptop || !rotatingChair) {
+  test("previewFurnitureMove allows overlapping different categories but blocks same-category overlaps", () => {
+    if (!laptop || !floorDecorMat) {
       throw new Error("Missing test assets");
     }
 
     const system = new OfficeEditorSystem();
     const layout: OfficeSceneLayout = {
-      cols: 3,
+      cols: 6,
       rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 3 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
       furniture: [
-        {
-          id: "desk-laptop",
+        createFurnitureItem({
+          id: "moving-decor",
+          assetId: floorDecorMat.id,
+          label: floorDecorMat.label,
+          category: floorDecorMat.category as never,
+          placement: floorDecorMat.placement,
+          col: 0,
+          row: 0,
+          width: floorDecorMat.footprintW,
+          height: floorDecorMat.footprintH,
+          color: floorDecorMat.color,
+          accentColor: floorDecorMat.accentColor,
+          renderAsset: {
+            atlasKey: floorDecorMat.atlasKey,
+            atlasFrame: { ...floorDecorMat.atlasFrame },
+          },
+        }),
+        createFurnitureItem({
+          id: "same-decor",
+          assetId: floorDecorMat.id,
+          label: floorDecorMat.label,
+          category: floorDecorMat.category as never,
+          placement: floorDecorMat.placement,
+          col: 4,
+          row: 0,
+          width: floorDecorMat.footprintW,
+          height: floorDecorMat.footprintH,
+          color: floorDecorMat.color,
+          accentColor: floorDecorMat.accentColor,
+          renderAsset: {
+            atlasKey: floorDecorMat.atlasKey,
+            atlasFrame: { ...floorDecorMat.atlasFrame },
+          },
+        }),
+        createFurnitureItem({
+          id: "electronics",
           assetId: laptop.id,
           label: laptop.label,
           category: laptop.category as never,
           placement: laptop.placement,
-          col: 0,
+          col: 2,
           row: 0,
-          width: 1,
-          height: 1,
+          width: laptop.footprintW,
+          height: laptop.footprintH,
           color: laptop.color,
           accentColor: laptop.accentColor,
           renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
-        },
-        {
-          id: "chair-1",
-          assetId: rotatingChair.id,
-          label: rotatingChair.label,
-          category: rotatingChair.category as never,
-          placement: rotatingChair.placement,
-          col: 1,
-          row: 0,
-          width: 1,
-          height: 1,
-          color: rotatingChair.color ?? 0x000000,
-          accentColor: rotatingChair.accentColor ?? 0x000000,
-          renderAsset: { atlasKey: rotatingChair.atlasKey, atlasFrame: { ...rotatingChair.atlasFrame } },
-        },
+        }),
       ],
       characters: [],
     };
 
     expect(
-      system.previewFurnitureMove(layout, "desk-laptop", { col: 1, row: 0 }),
+      system.previewFurnitureMove(layout, "moving-decor", { col: 2, row: 0 }),
+    ).toMatchObject({
+      kind: "place",
+      blockedReason: null,
+      affectedFurniture: [],
+    });
+
+    expect(
+      system.previewFurnitureMove(layout, "moving-decor", { col: 4, row: 0 }),
     ).toMatchObject({
       kind: "blocked",
       blockedReason: "occupied",
-      affectedFurniture: [expect.objectContaining({ id: "chair-1" })],
+      affectedFurniture: [expect.objectContaining({ id: "same-decor" })],
     });
   });
 

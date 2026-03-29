@@ -63,7 +63,7 @@ function createControllerHarness(options: { cols?: number; rows?: number } = {})
     anchorY16: 0,
     layout,
   };
-  const controller = new WorldSceneOfficeEditorController({
+const controller = new WorldSceneOfficeEditorController({
     getOfficeRegion: () => region,
     getOfficeCellHighlight: () => highlight as never,
     getOfficeFurnitureTargets: () => [
@@ -181,7 +181,7 @@ describe("WorldSceneOfficeEditorController", () => {
   });
 
   test("projects the hovered furniture placement preview from the active tool", () => {
-    const { controller } = createControllerHarness();
+    const { controller } = createControllerHarness({ cols: 3, rows: 2 });
     const chair = FURNITURE_ALL_ITEMS.find(
       (item) =>
         item.groupId === "ROTATING_CHAIR" && item.orientation === "front",
@@ -207,6 +207,35 @@ describe("WorldSceneOfficeEditorController", () => {
       kind: "replace",
       anchorCell: { col: 0, row: 0 },
       affectedFurniture: [expect.objectContaining({ id: "desk-laptop" })],
+      blockedReason: null,
+    });
+  });
+
+  test("projects a place preview when a different furniture category overlaps", () => {
+    const { controller } = createControllerHarness({ cols: 3, rows: 2 });
+    const decor = FURNITURE_ALL_ITEMS.find(
+      (item) => item.category === "decor" && item.placement === "floor",
+    );
+    if (!decor) {
+      throw new Error("Missing floor decor test asset");
+    }
+
+    controller.setOfficeEditorTool({
+      tool: "furniture",
+      furnitureId: decor.id,
+      rotationQuarterTurns: 0,
+    });
+
+    expect(
+      controller.getFurniturePlacementPreview({
+        isDown: false,
+        withinGame: true,
+        x: 4,
+        y: 4,
+      } as never),
+    ).toMatchObject({
+      kind: "place",
+      affectedFurniture: [],
       blockedReason: null,
     });
   });
