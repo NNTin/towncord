@@ -581,6 +581,100 @@ describe("renderOfficeLayout", () => {
     expect(monitorContainer.depth).toBeGreaterThan(benchContainer.depth);
   });
 
+  test("keeps a character in front of a 1x2 chair seat", () => {
+    const scene = createScene();
+    const chair = createFurnitureItem({
+      id: "chair-1",
+      assetId: "chair-1",
+      label: "Large Cushioned Chair",
+      category: "chairs" as never,
+      placement: "floor",
+      col: 0,
+      row: 0,
+      width: 1,
+      height: 2,
+    });
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 2 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
+      furniture: [chair],
+      characters: [
+        {
+          id: "worker-1",
+          label: "Ari",
+          glyph: "@",
+          col: 0,
+          row: 0,
+          color: 0x2563eb,
+          accentColor: 0xbfdbfe,
+        },
+      ],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    const chairContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
+    const characterContainer = scene.add.container.mock.results[3]
+      ?.value as FakeContainer;
+
+    expect(chairContainer.depth).toBe(15.5);
+    expect(characterContainer.depth).toBe(16);
+    expect(characterContainer.depth).toBeGreaterThan(chairContainer.depth);
+  });
+
+  test("keeps a character in front of a 2x1 chair seat", () => {
+    const scene = createScene();
+    const chair = createFurnitureItem({
+      id: "chair-2",
+      assetId: "chair-2",
+      label: "Large Cushioned Chair",
+      category: "chairs" as never,
+      placement: "floor",
+      col: 0,
+      row: 0,
+      width: 2,
+      height: 1,
+    });
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 1,
+      cellSize: 16,
+      tiles: Array.from({ length: 2 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
+      furniture: [chair],
+      characters: [
+        {
+          id: "worker-2",
+          label: "Bea",
+          glyph: "@",
+          col: 0,
+          row: 0,
+          color: 0xdb2777,
+          accentColor: 0xfbcfe8,
+        },
+      ],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    const chairContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
+    const characterContainer = scene.add.container.mock.results[3]
+      ?.value as FakeContainer;
+
+    expect(chairContainer.depth).toBe(15.5);
+    expect(characterContainer.depth).toBe(16);
+    expect(characterContainer.depth).toBeGreaterThan(chairContainer.depth);
+  });
+
   test("floor tiles are baked into a single RenderTexture sized to the full tile area", () => {
     // Individual Image objects placed edge-to-edge create sub-pixel gaps at
     // tile boundaries under non-integer CSS canvas scale. A single RenderTexture

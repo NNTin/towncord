@@ -14,6 +14,7 @@ const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 const DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY = "donarg.office.environment";
 const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
 const WALL_MOUNT_DEPTH_OFFSET = 0.5;
+const CHAIR_DEPTH_OFFSET = 0.5;
 const SURFACE_DEPTH_OFFSET = 0.5;
 
 type OfficeRenderableTargetKind = "furniture" | "character";
@@ -246,9 +247,7 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     this.characterSource = newLayout.characters;
   }
 
-  private buildCharacterEntries(
-    layout: OfficeSceneLayout,
-  ): Array<{
+  private buildCharacterEntries(layout: OfficeSceneLayout): Array<{
     target: OfficeRenderableTarget;
     container: Phaser.GameObjects.Container;
   }> {
@@ -373,6 +372,13 @@ function resolveFurnitureDepth(
     // must sit slightly in front of that plane so partial wall rebuilds cannot
     // cover unchanged mounted items that retain their existing containers.
     return southEdgeDepth + WALL_MOUNT_DEPTH_OFFSET;
+  }
+
+  if (item.category === "chairs") {
+    // Chair sprites can span multiple tiles, but the seat plane still lives on
+    // the anchor row. Keep chairs slightly behind that plane so entities on the
+    // seat render on top instead of disappearing behind the furniture sprite.
+    return worldOffsetY + (item.row + 1) * layout.cellSize - CHAIR_DEPTH_OFFSET;
   }
 
   if (item.placement === "surface") {
