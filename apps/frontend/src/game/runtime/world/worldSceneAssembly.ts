@@ -12,7 +12,6 @@ import {
   doesFurnitureBlockMovement,
   type WorldNavigationService,
 } from "../../../engine";
-import { OFFICE_LAYOUT_CHANGED_EVENT } from "../../runtime/transport/runtimeEvents";
 import { createTerrainRuntimeContext } from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import { EntitySystem } from "./entitySystem";
@@ -28,6 +27,8 @@ type WorldSceneMovementKeys = Record<
   "W" | "A" | "S" | "D",
   Phaser.Input.Keyboard.Key
 >;
+
+const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 
 export type WorldSceneBootOptions = {
   worldBootstrap: WorldBootstrap | null;
