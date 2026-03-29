@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import type { OfficeSceneBootstrap } from "../../../contracts/office-scene";
 
 const assemblyMocks = vi.hoisted(() => ({
   cameraBeginPan: vi.fn(),
@@ -114,6 +115,26 @@ const assemblyMocks = vi.hoisted(() => ({
   unifiedCollisionMapConstruct: vi.fn(),
 }));
 
+function createEventBus() {
+  const listeners = new Map<string, Set<(payload: unknown) => void>>();
+
+  return {
+    emit: vi.fn((event: string, payload: unknown) => {
+      for (const listener of listeners.get(event) ?? []) {
+        listener(payload);
+      }
+    }),
+    on: vi.fn((event: string, listener: (payload: unknown) => void) => {
+      const eventListeners = listeners.get(event) ?? new Set();
+      eventListeners.add(listener);
+      listeners.set(event, eventListeners);
+    }),
+    off: vi.fn((event: string, listener: (payload: unknown) => void) => {
+      listeners.get(event)?.delete(listener);
+    }),
+  };
+}
+
 vi.mock("phaser", () => {
   class Scene {
     constructor(_key?: string) {}
@@ -223,6 +244,10 @@ vi.mock("../../../../engine", () => ({
       assemblyMocks.unifiedCollisionMapConstruct(...args);
     }
   },
+  doesFurnitureBlockMovement: (furniture: {
+    placement: string;
+    category: string;
+  }) => furniture.placement === "floor" && furniture.category !== "chairs",
   WorldRuntimeCameraController: class {
     public initialize = assemblyMocks.cameraInitialize;
     public centerCameraOnWorld = assemblyMocks.cameraCenterCameraOnWorld;
@@ -337,6 +362,7 @@ vi.mock("../worldSceneCommandBindings", () => ({
 import { createWorldSceneLifecycle } from "../../../../game/runtime/world/createWorldSceneLifecycle";
 
 function makeScene(): Record<string, unknown> {
+  const gameEvents = createEventBus();
   const movementKeys = {
     W: { isDown: false },
     A: { isDown: false },
@@ -369,7 +395,7 @@ function makeScene(): Record<string, unknown> {
       },
     },
     game: {
-      events: { emit: vi.fn(), on: vi.fn(), off: vi.fn() },
+      events: gameEvents,
     },
     __testKeys: {
       movementKeys,
@@ -497,6 +523,74 @@ describe("WorldScene assembly", () => {
     lifecycle.onResize();
 
     expect(assemblyMocks.cameraCenterCameraOnWorld).toHaveBeenCalledOnce();
+  });
+
+  test("rebuilds the office furniture blocking lookup when the layout changes", () => {
+    const lifecycle = createWorldSceneLifecycle();
+    const scene = makeScene() as ReturnType<typeof makeScene> & {
+      game: {
+        events: {
+          emit: (event: string, payload: unknown) => void;
+        };
+      };
+    };
+    const layout: OfficeSceneBootstrap["layout"] = {
+      cols: 2,
+      rows: 1,
+      cellSize: 16,
+      tiles: [
+        { kind: "floor" as const, tileId: 0 },
+        { kind: "floor" as const, tileId: 0 },
+      ],
+      furniture: [] as Array<{
+        id: string;
+        assetId: string;
+        label: string;
+        category: "chairs" | "decor" | "desks" | "electronics" | "misc" | "storage" | "wall";
+        placement: "floor" | "surface" | "wall";
+        col: number;
+        row: number;
+        width: number;
+        height: number;
+        color: number;
+        accentColor: number;
+      }>,
+      characters: [],
+    };
+
+    assemblyMocks.officeBootstrap.mockReturnValueOnce({
+      anchor: {
+        x: 0,
+        y: 0,
+      },
+      layout,
+    } as never);
+
+    lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
+
+    const collisionLookup = assemblyMocks.unifiedCollisionMapConstruct.mock.calls[0]?.[1] as
+      | {
+          isFurnitureBlockingCell?: (col: number, row: number) => boolean;
+        }
+      | undefined;
+    expect(collisionLookup?.isFurnitureBlockingCell?.(0, 0)).toBe(false);
+
+    layout.furniture.push({
+      id: "desk",
+      assetId: "desk-1",
+      label: "Desk",
+      category: "desks",
+      placement: "floor",
+      col: 0,
+      row: 0,
+      width: 1,
+      height: 1,
+      color: 0x111111,
+      accentColor: 0x222222,
+    });
+    scene.game.events.emit("officeLayoutChanged", { layout });
+
+    expect(collisionLookup?.isFurnitureBlockingCell?.(0, 0)).toBe(true);
   });
 
   test("rotates selected furniture on the R key rising edge", () => {

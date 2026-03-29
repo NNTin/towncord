@@ -14,6 +14,7 @@ export interface AnchoredRegionCellLookup<
   TLayout extends AnchoredGridLayout = AnchoredGridLayout,
 > extends AnchoredGridRegion<TLayout> {
   getCellKind(col: number, row: number): RegionCellKind | null;
+  isFurnitureBlockingCell?(col: number, row: number): boolean;
 }
 
 export class UnifiedCollisionMap {
@@ -27,6 +28,10 @@ export class UnifiedCollisionMap {
     if (region) {
       const cell = worldToAnchoredGridCell(worldX, worldY, region);
       if (cell) {
+        if (region.isFurnitureBlockingCell?.(cell.col, cell.row)) {
+          return false;
+        }
+
         const kind = region.getCellKind(cell.col, cell.row);
         if (kind === "floor") return true;
         if (kind === "wall") return false;

@@ -1,4 +1,9 @@
-import type { AnchoredGridCellCoord as OfficeCellCoord } from "../../../engine/world-runtime/regions";
+import {
+  type AnchoredGridCellCoord as OfficeCellCoord,
+} from "../../../engine/world-runtime/regions";
+import {
+  shouldTreatFurnitureOverlapAsExclusive,
+} from "../../../engine/world-runtime/spatial";
 import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
@@ -150,7 +155,13 @@ export class OfficeEditorSystem {
         : null;
     const affectedFurniture =
       blockedReason === null
-        ? this.findOverlappingFurniture(layout, cell, asset.footprintW, asset.footprintH)
+        ? this.findExclusiveOverlappingFurniture(layout, {
+            category: asset.category,
+            col: cell.col,
+            row: cell.row,
+            width: asset.footprintW,
+            height: asset.footprintH,
+          })
         : [];
 
     return {
@@ -177,7 +188,42 @@ export class OfficeEditorSystem {
 
     const currentAsset = FURNITURE_ALL_ITEMS.find((item) => item.id === current.assetId);
     const nextAsset = this.resolveRotatedFurnitureAsset(currentAsset);
-    return Boolean(nextAsset && currentAsset && nextAsset.id !== currentAsset.id);
+    if (!nextAsset || !currentAsset || nextAsset.id === currentAsset.id) {
+      return false;
+    }
+
+    const rotatedFurniture: OfficeSceneFurniture = {
+      ...current,
+      assetId: nextAsset.id,
+      label: nextAsset.label,
+      category: nextAsset.category as OfficeSceneFurnitureCategory,
+      placement: nextAsset.placement,
+      width: nextAsset.footprintW,
+      height: nextAsset.footprintH,
+      color: nextAsset.color,
+      accentColor: nextAsset.accentColor,
+      ...(nextAsset.groupId ? { groupId: nextAsset.groupId } : {}),
+      ...(nextAsset.orientation ? { orientation: nextAsset.orientation } : {}),
+      ...(nextAsset.state ? { state: nextAsset.state } : {}),
+      renderAsset: {
+        atlasKey: nextAsset.atlasKey,
+        atlasFrame: { ...nextAsset.atlasFrame },
+      },
+    };
+
+    const blockedFurniture = this.findBlockingOverlappingFurniture(
+      layout,
+      {
+        category: rotatedFurniture.category,
+        col: rotatedFurniture.col,
+        row: rotatedFurniture.row,
+        width: rotatedFurniture.width,
+        height: rotatedFurniture.height,
+      },
+      furnitureId,
+    );
+
+    return blockedFurniture.length === 0;
   }
 
   public canRotatePlacementFurniture(furnitureId: string | null): boolean {
@@ -219,6 +265,22 @@ export class OfficeEditorSystem {
         atlasFrame: { ...nextAsset.atlasFrame },
       },
     };
+
+    const blockedFurniture = this.findBlockingOverlappingFurniture(
+      layout,
+      {
+        category: rotatedFurniture.category,
+        col: rotatedFurniture.col,
+        row: rotatedFurniture.row,
+        width: rotatedFurniture.width,
+        height: rotatedFurniture.height,
+      },
+      furnitureId,
+    );
+    if (blockedFurniture.length > 0) {
+      return false;
+    }
+
     layout.furniture[index] = rotatedFurniture;
     return true;
   }
@@ -335,13 +397,13 @@ export class OfficeEditorSystem {
       return false;
     }
 
-    // Remove existing furniture that overlaps the new placement footprint.
-    const overlappingFurniture = this.findOverlappingFurniture(
-      layout,
-      cell,
-      paletteItem.footprintW,
-      paletteItem.footprintH,
-    );
+    const overlappingFurniture = this.findExclusiveOverlappingFurniture(layout, {
+      category: paletteItem.category,
+      col: cell.col,
+      row: cell.row,
+      width: paletteItem.footprintW,
+      height: paletteItem.footprintH,
+    });
     if (overlappingFurniture.length > 0) {
       const removeIds = new Set(overlappingFurniture.map((furniture) => furniture.id));
       layout.furniture = layout.furniture.filter(
@@ -414,12 +476,17 @@ export class OfficeEditorSystem {
 
     const affectedFurniture =
       blockedReason === null
-        ? this.findOverlappingFurniture(
+        ? this.findBlockingOverlappingFurniture(
             layout,
-            targetCell,
-            furniture.width,
-            furniture.height,
-          ).filter((f) => f.id !== furnitureId)
+            {
+              category: furniture.category,
+              col: targetCell.col,
+              row: targetCell.row,
+              width: furniture.width,
+              height: furniture.height,
+            },
+            furnitureId,
+          )
         : [];
     const moveBlockedReason =
       blockedReason ?? (affectedFurniture.length > 0 ? "occupied" : null);
@@ -463,12 +530,17 @@ export class OfficeEditorSystem {
       return false;
     }
 
-    const overlapping = this.findOverlappingFurniture(
+    const overlapping = this.findBlockingOverlappingFurniture(
       layout,
-      targetCell,
-      furniture.width,
-      furniture.height,
-    ).filter((f) => f.id !== furnitureId);
+      {
+        category: furniture.category,
+        col: targetCell.col,
+        row: targetCell.row,
+        width: furniture.width,
+        height: furniture.height,
+      },
+      furnitureId,
+    );
 
     if (overlapping.length > 0) {
       return false;
@@ -481,22 +553,39 @@ export class OfficeEditorSystem {
 
   private findOverlappingFurniture(
     layout: OfficeSceneLayout,
-    cell: OfficeCellCoord,
-    width: number,
-    height: number,
+    bounds: { col: number; row: number; width: number; height: number },
   ): OfficeSceneFurniture[] {
-    const newRight = cell.col + width;
-    const newBottom = cell.row + height;
+    const newRight = bounds.col + bounds.width;
+    const newBottom = bounds.row + bounds.height;
 
     return layout.furniture.filter(
       (furniture) =>
         !(
           furniture.col >= newRight ||
-          furniture.col + furniture.width <= cell.col ||
+          furniture.col + furniture.width <= bounds.col ||
           furniture.row >= newBottom ||
-          furniture.row + furniture.height <= cell.row
+          furniture.row + furniture.height <= bounds.row
         ),
     );
+  }
+
+  private findExclusiveOverlappingFurniture(
+    layout: OfficeSceneLayout,
+    bounds: { category: string; col: number; row: number; width: number; height: number },
+  ): OfficeSceneFurniture[] {
+    return this.findOverlappingFurniture(layout, bounds).filter((furniture) =>
+      shouldTreatFurnitureOverlapAsExclusive(bounds.category, furniture.category),
+    );
+  }
+
+  private findBlockingOverlappingFurniture(
+    layout: OfficeSceneLayout,
+    bounds: { category: string; col: number; row: number; width: number; height: number },
+    ignoreFurnitureId?: string,
+  ): OfficeSceneFurniture[] {
+    return this.findOverlappingFurniture(layout, bounds)
+      .filter((furniture) => furniture.id !== ignoreFurnitureId)
+      .filter((furniture) => shouldTreatFurnitureOverlapAsExclusive(bounds.category, furniture.category));
   }
 
   private resolveRotatedFurnitureAsset(
