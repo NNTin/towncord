@@ -280,9 +280,6 @@ function buildTileObjects(
   const { cols, rows, cellSize, tiles } = layout;
   const half = cellSize / 2;
 
-  const baseGraphics = scene.add.graphics();
-  container.add(baseGraphics);
-
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const tile = tiles[row * cols + col];
@@ -296,7 +293,10 @@ function buildTileObjects(
       if (tile.kind === "floor") {
         const frameKey = tile.pattern ? `${tile.pattern}#0` : FLOOR_PATTERN_FRAME;
         const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, frameKey);
-        img.setDisplaySize(cellSize, cellSize);
+        // Extend by 1px in each axis so adjacent tiles overlap by 1px.
+        // Without this, WebGL floating-point rounding creates sub-pixel gaps
+        // at tile boundaries that reveal the terrain underneath as thin lines.
+        img.setDisplaySize(cellSize + 1, cellSize + 1);
         if (typeof tile.tint === "number") {
           img.setTint(tile.tint);
         }
