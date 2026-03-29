@@ -181,7 +181,8 @@ function createScene() {
         new FakeRenderTexture(width, height),
     ),
     image: vi.fn(
-      (_x: number, _y: number, _key: string, _frame?: string) => new FakeDisplayObject(),
+      (_x: number, _y: number, _key: string, _frame?: string) =>
+        new FakeDisplayObject(),
     ),
     ellipse: vi.fn(() => new FakeDisplayObject()),
     circle: vi.fn(() => new FakeDisplayObject()),
@@ -196,13 +197,20 @@ function createScene() {
   return { add, make };
 }
 
-function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneLayout {
+function createLayout(
+  characters: OfficeSceneLayout["characters"],
+): OfficeSceneLayout {
   return {
     cols: 2,
     rows: 2,
     cellSize: 16,
     tiles: [
-      { kind: "floor", tileId: 0, tint: 0x475569, pattern: "environment.floors.pattern-01" },
+      {
+        kind: "floor",
+        tileId: 0,
+        tint: 0x475569,
+        pattern: "environment.floors.pattern-01",
+      },
       { kind: "void", tileId: 0 },
       { kind: "void", tileId: 0 },
       { kind: "wall", tileId: 8 },
@@ -212,7 +220,9 @@ function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneL
   };
 }
 
-function createFurnitureItem(overrides: Partial<OfficeSceneLayout["furniture"][number]> = {}) {
+function createFurnitureItem(
+  overrides: Partial<OfficeSceneLayout["furniture"][number]> = {},
+) {
   return {
     id: "desk-1",
     assetId: "asset-front",
@@ -234,7 +244,9 @@ function createFurnitureItem(overrides: Partial<OfficeSceneLayout["furniture"][n
 }
 
 /** Returns only the image call results whose frame arg starts with "environment.walls.". */
-function findWallImages(scene: ReturnType<typeof createScene>): FakeDisplayObject[] {
+function findWallImages(
+  scene: ReturnType<typeof createScene>,
+): FakeDisplayObject[] {
   const results: FakeDisplayObject[] = [];
   for (let i = 0; i < scene.add.image.mock.calls.length; i++) {
     const args = scene.add.image.mock.calls[i];
@@ -290,9 +302,13 @@ describe("renderOfficeLayout", () => {
       characters: [],
     };
 
-    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
-      worldOffsetY: 0,
-    });
+    const renderable = renderOfficeLayout(
+      scene as unknown as Phaser.Scene,
+      layout,
+      {
+        worldOffsetY: 0,
+      },
+    );
 
     // Initial: one wall sprite at row=0 → depth = 0 + (0+1)*16 = 16.
     const initialWallImages = findWallImages(scene);
@@ -332,7 +348,10 @@ describe("renderOfficeLayout", () => {
     ];
     const layout = createLayout(characters);
 
-    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+    const renderable = renderOfficeLayout(
+      scene as unknown as Phaser.Scene,
+      layout,
+    );
     const initialContainerCalls = scene.add.container.mock.calls.length;
 
     renderable.partialUpdate({
@@ -360,11 +379,16 @@ describe("renderOfficeLayout", () => {
       characters: [],
     };
 
-    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
-      worldOffsetX: 32,
-      worldOffsetY: 48,
-    });
-    const initialFurnitureContainer = scene.add.container.mock.results[2]?.value as FakeContainer;
+    const renderable = renderOfficeLayout(
+      scene as unknown as Phaser.Scene,
+      layout,
+      {
+        worldOffsetX: 32,
+        worldOffsetY: 48,
+      },
+    );
+    const initialFurnitureContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
 
     renderable.partialUpdate({
       ...layout,
@@ -424,11 +448,16 @@ describe("renderOfficeLayout", () => {
       characters: [],
     };
 
-    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout, {
-      worldOffsetY: 32,
-    });
+    const renderable = renderOfficeLayout(
+      scene as unknown as Phaser.Scene,
+      layout,
+      {
+        worldOffsetY: 32,
+      },
+    );
     const initialWallSprite = findWallImages(scene)[0]!;
-    const wallFurnitureContainer = scene.add.container.mock.results[2]?.value as FakeContainer;
+    const wallFurnitureContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
 
     renderable.partialUpdate({
       ...layout,
@@ -453,7 +482,103 @@ describe("renderOfficeLayout", () => {
 
     expect(initialWallSprite.destroyed).toBe(true);
     expect(wallFurnitureContainer.destroyed).toBe(false);
-    expect(wallFurnitureContainer.depth).toBeGreaterThan(rebuiltWallSprite.depth);
+    expect(wallFurnitureContainer.depth).toBeGreaterThan(
+      rebuiltWallSprite.depth,
+    );
+  });
+
+  test("keeps surface furniture in front of a 2x2 table support", () => {
+    const scene = createScene();
+    const table = createFurnitureItem({
+      id: "table-1",
+      assetId: "table-1",
+      label: "Large Coffee Table",
+      category: "desks" as never,
+      placement: "floor",
+      col: 0,
+      row: 0,
+      width: 2,
+      height: 2,
+    });
+    const monitor = createFurnitureItem({
+      id: "monitor-1",
+      assetId: "monitor-1",
+      label: "Monitor - Front - Off",
+      category: "electronics" as never,
+      placement: "surface",
+      col: 0,
+      row: 0,
+      width: 1,
+      height: 1,
+    });
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 4 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
+      furniture: [table, monitor],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    const tableContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
+    const monitorContainer = scene.add.container.mock.results[3]
+      ?.value as FakeContainer;
+
+    expect(tableContainer.depth).toBe(32);
+    expect(monitorContainer.depth).toBeGreaterThan(tableContainer.depth);
+  });
+
+  test("keeps surface furniture in front of a 1x2 bench support", () => {
+    const scene = createScene();
+    const bench = createFurnitureItem({
+      id: "bench-1",
+      assetId: "bench-1",
+      label: "Wooden Table - Vertical",
+      category: "desks" as never,
+      placement: "floor",
+      col: 0,
+      row: 0,
+      width: 1,
+      height: 2,
+    });
+    const monitor = createFurnitureItem({
+      id: "monitor-2",
+      assetId: "monitor-2",
+      label: "Monitor - Front - Off",
+      category: "electronics" as never,
+      placement: "surface",
+      col: 0,
+      row: 0,
+      width: 1,
+      height: 1,
+    });
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 2 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
+      furniture: [bench, monitor],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    const benchContainer = scene.add.container.mock.results[2]
+      ?.value as FakeContainer;
+    const monitorContainer = scene.add.container.mock.results[3]
+      ?.value as FakeContainer;
+
+    expect(benchContainer.depth).toBe(32);
+    expect(monitorContainer.depth).toBeGreaterThan(benchContainer.depth);
   });
 
   test("floor tiles are baked into a single RenderTexture sized to the full tile area", () => {
@@ -469,9 +594,9 @@ describe("renderOfficeLayout", () => {
       tiles: [
         { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
         { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-        { kind: "void",  tileId: 0 },
+        { kind: "void", tileId: 0 },
         { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-        { kind: "wall",  tileId: 8 },
+        { kind: "wall", tileId: 8 },
         { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
       ],
       furniture: [],
@@ -482,7 +607,8 @@ describe("renderOfficeLayout", () => {
 
     // Exactly one RenderTexture must be created for the full tile area.
     expect(scene.add.renderTexture).toHaveBeenCalledTimes(1);
-    const rt = scene.add.renderTexture.mock.results[0]!.value as FakeRenderTexture;
+    const rt = scene.add.renderTexture.mock.results[0]!
+      .value as FakeRenderTexture;
     expect(rt.width).toBe(layout.cols * cellSize);
     expect(rt.height).toBe(layout.rows * cellSize);
 
@@ -491,7 +617,9 @@ describe("renderOfficeLayout", () => {
 
     // Floor tiles must NOT be added as individual Image objects to the scene.
     const floorImageCalls = scene.add.image.mock.calls.filter(
-      (args) => typeof args[3] === "string" && args[3].startsWith("environment.floors."),
+      (args) =>
+        typeof args[3] === "string" &&
+        args[3].startsWith("environment.floors."),
     );
     expect(floorImageCalls).toHaveLength(0);
   });
@@ -499,7 +627,11 @@ describe("renderOfficeLayout", () => {
   test("floor tile RenderTexture is replaced on partialUpdate", () => {
     const scene = createScene();
     const cellSize = 16;
-    const floorTile = { kind: "floor" as const, tileId: 0, pattern: "environment.floors.pattern-01" };
+    const floorTile = {
+      kind: "floor" as const,
+      tileId: 0,
+      pattern: "environment.floors.pattern-01",
+    };
     const layout: OfficeSceneLayout = {
       cols: 1,
       rows: 1,
@@ -509,8 +641,12 @@ describe("renderOfficeLayout", () => {
       characters: [],
     };
 
-    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
-    const firstRT = scene.add.renderTexture.mock.results[0]!.value as FakeRenderTexture;
+    const renderable = renderOfficeLayout(
+      scene as unknown as Phaser.Scene,
+      layout,
+    );
+    const firstRT = scene.add.renderTexture.mock.results[0]!
+      .value as FakeRenderTexture;
 
     renderable.partialUpdate({ ...layout, tiles: [floorTile] });
 
