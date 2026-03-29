@@ -40,9 +40,11 @@ export class WorldRuntimeCameraController {
     }
 
     const camera = this.host.getCamera();
+    // Round to the nearest integer world pixel so game objects at integer
+    // world coordinates land on integer screen pixels after camera transform.
     camera.setScroll(
-      worldBounds.width / 2 - camera.width / 2 - SIDEBAR_WIDTH / (2 * camera.zoom),
-      worldBounds.height / 2 - camera.height / 2,
+      Math.round(worldBounds.width / 2 - camera.width / 2 - SIDEBAR_WIDTH / (2 * camera.zoom)),
+      Math.round(worldBounds.height / 2 - camera.height / 2),
     );
   }
 
@@ -59,7 +61,10 @@ export class WorldRuntimeCameraController {
     const camera = this.host.getCamera();
     const dx = (pointer.x - this.panStartX) / camera.zoom;
     const dy = (pointer.y - this.panStartY) / camera.zoom;
-    camera.setScroll(this.camStartX - dx, this.camStartY - dy);
+    // Round to integer world pixels — fractional scroll shifts every game
+    // object off the pixel grid, producing the same seam artifacts as
+    // non-integer zoom.
+    camera.setScroll(Math.round(this.camStartX - dx), Math.round(this.camStartY - dy));
   }
 
   public endPan(): void {
@@ -71,8 +76,12 @@ export class WorldRuntimeCameraController {
   }
 
   public handleWheel(dy: number): void {
-    const factor = dy > 0 ? 0.9 : 1.1;
-    this.applyZoom(this.host.getCamera().zoom * factor);
+    // Step by ±1 integer so every zoom level is a whole number.
+    // Multiplying by a float factor (0.9 / 1.1) produces non-integer zoom
+    // values which map world pixel boundaries to fractional screen pixels,
+    // causing sub-pixel seams between any two adjacent sprites.
+    const current = Math.round(this.host.getCamera().zoom);
+    this.applyZoom(dy > 0 ? current - 1 : current + 1);
   }
 
   public handleSetZoom(payload: { zoom: number }): void {
@@ -89,7 +98,9 @@ export class WorldRuntimeCameraController {
 
   private applyZoom(nextZoom: number): void {
     const camera = this.host.getCamera();
-    camera.setZoom(Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM));
+    // Math.round ensures the zoom is always an integer, keeping every world
+    // pixel boundary at an exact screen pixel under any zoom level.
+    camera.setZoom(Math.round(Phaser.Math.Clamp(nextZoom, MIN_ZOOM, MAX_ZOOM)));
     this.emitZoomChanged();
   }
 

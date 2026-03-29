@@ -278,36 +278,41 @@ function buildTileObjects(
   layout: OfficeSceneLayout,
 ): void {
   const { cols, rows, cellSize, tiles } = layout;
-  const half = cellSize / 2;
 
-  const baseGraphics = scene.add.graphics();
-  container.add(baseGraphics);
+  // Bake all floor tiles into one RenderTexture. A single quad has no
+  // inter-tile GPU boundaries, so sub-pixel gaps from floating-point
+  // rasterization or non-integer CSS canvas scale are impossible.
+  const rt = scene.add.renderTexture(0, 0, cols * cellSize, rows * cellSize);
+  rt.setOrigin(0, 0);
+  container.add(rt);
+
+  const scratch = scene.make.image({
+    key: DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY,
+    add: false,
+  });
+
+  rt.beginDraw();
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const tile = tiles[row * cols + col];
-      const x = col * cellSize;
-      const y = row * cellSize;
+      if (!tile || tile.kind !== "floor") continue;
 
-      if (!tile || tile.kind === "void") {
-        continue;
+      const frameKey = tile.pattern ? `${tile.pattern}#0` : FLOOR_PATTERN_FRAME;
+      scratch.setTexture(DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, frameKey);
+      scratch.setDisplaySize(cellSize, cellSize);
+      if (typeof tile.tint === "number") {
+        scratch.setTint(tile.tint);
+      } else {
+        scratch.clearTint();
       }
-
-      if (tile.kind === "floor") {
-        const frameKey = tile.pattern ? `${tile.pattern}#0` : FLOOR_PATTERN_FRAME;
-        const img = scene.add.image(x + half, y + half, DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY, frameKey);
-        img.setDisplaySize(cellSize, cellSize);
-        if (typeof tile.tint === "number") {
-          img.setTint(tile.tint);
-        }
-        container.add(img);
-      } else if (tile.kind === "wall") {
-        // Wall sprites are rendered as scene-level objects in
-        // OfficeLayoutRenderableImpl.buildWallSprites() so their depth
-        // participates in the entity y-sort. Skip them here.
-      }
+      scratch.setPosition(col * cellSize + cellSize / 2, row * cellSize + cellSize / 2);
+      rt.batchDraw(scratch);
     }
   }
+
+  rt.endDraw();
+  scratch.destroy();
 }
 
 function renderFurniture(

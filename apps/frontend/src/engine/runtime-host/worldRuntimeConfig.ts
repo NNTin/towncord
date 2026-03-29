@@ -22,6 +22,7 @@ export function createWorldRuntimeConfig(
     render: {
       pixelArt: true,
       antialias: false,
+      antialiasGL: false,
       roundPixels: true,
     },
   };
