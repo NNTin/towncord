@@ -55,19 +55,49 @@ describe("WorldRuntimeCameraController", () => {
     expect(onZoomChanged).toHaveBeenCalledWith({ zoom: 2, minZoom: 1, maxZoom: 16 });
   });
 
-  test("handleWheel zooms out when dy > 0", () => {
+  test("handleWheel zooms out by one integer step when dy > 0", () => {
     camera.zoom = 4;
     controller.handleWheel(10);
-    expect(camera.setZoom).toHaveBeenCalledWith(4 * 0.9);
+    expect(camera.setZoom).toHaveBeenCalledWith(3);
     expect(onZoomChanged).toHaveBeenCalledWith(
-      expect.objectContaining({ zoom: 4 * 0.9 }),
+      expect.objectContaining({ zoom: 3 }),
     );
   });
 
-  test("handleWheel zooms in when dy < 0", () => {
+  test("handleWheel zooms in by one integer step when dy < 0", () => {
     camera.zoom = 4;
     controller.handleWheel(-10);
-    expect(camera.setZoom).toHaveBeenCalledWith(4 * 1.1);
+    expect(camera.setZoom).toHaveBeenCalledWith(5);
+  });
+
+  test("handleWheel always produces an integer zoom to keep sprites on the pixel grid", () => {
+    // Non-integer zoom maps world pixel edges to fractional screen pixels,
+    // creating sub-pixel gaps between adjacent sprites.
+    camera.zoom = 3;
+    controller.handleWheel(-1); // zoom in
+    expect(Number.isInteger(camera.zoom)).toBe(true);
+    controller.handleWheel(1);  // zoom out
+    expect(Number.isInteger(camera.zoom)).toBe(true);
+  });
+
+  test("handleSetZoom snaps fractional values to nearest integer", () => {
+    controller.handleSetZoom({ zoom: 3.7 });
+    expect(camera.zoom).toBe(4);
+    controller.handleSetZoom({ zoom: 2.3 });
+    expect(camera.zoom).toBe(2);
+  });
+
+  test("updatePan rounds scroll to integer world pixels to keep sprites on the pixel grid", () => {
+    // With zoom=3, a 1-pixel pointer move gives dx = 1/3 ≈ 0.333, which
+    // produces a fractional scroll that shifts every object off the pixel grid.
+    camera.zoom = 3;
+    camera.scrollX = 0;
+    camera.scrollY = 0;
+    controller.beginPan({ x: 0, y: 0 } as Phaser.Input.Pointer);
+    controller.updatePan({ x: 1, y: 1 } as Phaser.Input.Pointer);
+    const [sx, sy] = camera.setScroll.mock.calls.at(-1)!;
+    expect(Number.isInteger(sx)).toBe(true);
+    expect(Number.isInteger(sy)).toBe(true);
   });
 
   test("handleSetZoom clamps to min zoom", () => {
@@ -107,7 +137,7 @@ describe("WorldRuntimeCameraController", () => {
     expect(controller.isPanActive()).toBe(false);
   });
 
-  test("updatePan scrolls camera by delta divided by zoom", () => {
+  test("updatePan scrolls camera by delta divided by zoom, rounded to integer world pixels", () => {
     camera.zoom = 2;
     camera.scrollX = 0;
     camera.scrollY = 0;
@@ -115,9 +145,10 @@ describe("WorldRuntimeCameraController", () => {
     controller.beginPan(startPointer);
     const movePointer = { x: 110, y: 220 } as Phaser.Input.Pointer;
     controller.updatePan(movePointer);
+    // dx = 10/2 = 5, dy = 20/2 = 10 — already integers at zoom=2.
     expect(camera.setScroll).toHaveBeenCalledWith(
-      0 - 10 / 2,
-      0 - 20 / 2,
+      Math.round(0 - 10 / 2),
+      Math.round(0 - 20 / 2),
     );
   });
 
