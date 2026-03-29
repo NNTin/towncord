@@ -95,7 +95,8 @@ describe("WorldRuntimeCameraController", () => {
     camera.scrollY = 0;
     controller.beginPan({ x: 0, y: 0 } as Phaser.Input.Pointer);
     controller.updatePan({ x: 1, y: 1 } as Phaser.Input.Pointer);
-    const [sx, sy] = camera.setScroll.mock.calls.at(-1)!;
+    const calls = camera.setScroll.mock.calls;
+    const [sx, sy] = calls[calls.length - 1]!;
     expect(Number.isInteger(sx)).toBe(true);
     expect(Number.isInteger(sy)).toBe(true);
   });
