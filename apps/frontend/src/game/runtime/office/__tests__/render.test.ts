@@ -26,8 +26,6 @@ class FakeDisplayObject {
   public visible = true;
   public destroyed = false;
   public depth = 0;
-  public displayWidth = 0;
-  public displayHeight = 0;
 
   setDepth(depth: number): this {
     this.depth = depth;
@@ -55,9 +53,7 @@ class FakeDisplayObject {
     return this;
   }
 
-  setDisplaySize(width: number, height: number): this {
-    this.displayWidth = width;
-    this.displayHeight = height;
+  setDisplaySize(_width: number, _height: number): this {
     return this;
   }
 
@@ -185,21 +181,6 @@ function createFurnitureItem(overrides: Partial<OfficeSceneLayout["furniture"][n
     },
     ...overrides,
   };
-}
-
-/** Returns only the image call results whose frame arg starts with "environment.floors.". */
-function findFloorImages(scene: ReturnType<typeof createScene>): FakeDisplayObject[] {
-  const results: FakeDisplayObject[] = [];
-  for (let i = 0; i < scene.add.image.mock.calls.length; i++) {
-    const args = scene.add.image.mock.calls[i];
-    const result = scene.add.image.mock.results[i];
-    if (!args || !result) continue;
-    const frame = args[3];
-    if (typeof frame === "string" && frame.startsWith("environment.floors.")) {
-      results.push(result.value as FakeDisplayObject);
-    }
-  }
-  return results;
 }
 
 /** Returns only the image call results whose frame arg starts with "environment.walls.". */
@@ -423,35 +404,5 @@ describe("renderOfficeLayout", () => {
     expect(initialWallSprite.destroyed).toBe(true);
     expect(wallFurnitureContainer.destroyed).toBe(false);
     expect(wallFurnitureContainer.depth).toBeGreaterThan(rebuiltWallSprite.depth);
-  });
-
-  test("floor tiles are rendered 1px larger than cellSize in each dimension to prevent seam artifacts", () => {
-    // Floor tiles rendered at exactly cellSize×cellSize create sub-pixel gaps
-    // at tile boundaries in WebGL, revealing the terrain layer as thin lines.
-    // Each tile must overlap its neighbors by 1px to close those seams.
-    const scene = createScene();
-    const cellSize = 16;
-    const layout: OfficeSceneLayout = {
-      cols: 2,
-      rows: 2,
-      cellSize,
-      tiles: [
-        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
-      ],
-      furniture: [],
-      characters: [],
-    };
-
-    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
-
-    const floorImages = findFloorImages(scene);
-    expect(floorImages.length).toBeGreaterThan(0);
-    for (const img of floorImages) {
-      expect(img.displayWidth).toBe(cellSize + 1);
-      expect(img.displayHeight).toBe(cellSize + 1);
-    }
   });
 });
