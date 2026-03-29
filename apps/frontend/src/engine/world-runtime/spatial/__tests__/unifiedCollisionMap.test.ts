@@ -5,6 +5,7 @@ import type { OfficeSceneLayout, OfficeSceneTile } from "../../../../game/office
 import { TERRAIN_CHUNK_SIZE, type TerrainGridSpec } from "../../../../game/terrain/contracts";
 import { TerrainGameplayGrid } from "../../../../game/terrain/gameplayGrid";
 import { TerrainMapStore } from "../../../../game/terrain/store";
+import { doesFurnitureBlockMovement } from "../officeFurnitureRules";
 
 function makeTerrainGrid(
   width = TERRAIN_CHUNK_SIZE,
@@ -51,6 +52,16 @@ function makeRegion(
     ...region,
     getCellKind(col, row) {
       return layout.tiles[row * layout.cols + col]?.kind ?? null;
+    },
+    isFurnitureBlockingCell(col, row) {
+      return layout.furniture.some(
+        (item) =>
+          doesFurnitureBlockMovement(item) &&
+          col >= item.col &&
+          col < item.col + item.width &&
+          row >= item.row &&
+          row < item.row + item.height,
+      );
     },
   };
 }

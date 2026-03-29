@@ -15,6 +15,7 @@ import { createTerrainRuntimeContext } from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import { EntitySystem } from "./entitySystem";
 import type { MovementInput } from "./movementSystem";
+import { doesFurnitureBlockMovement } from "../../../engine/world-runtime/spatial/officeFurnitureRules";
 import { WorldSceneCommandBindings } from "./worldSceneCommandBindings";
 import { WorldSceneOfficeRuntime } from "./worldSceneOfficeRuntime";
 import { WorldScenePlacementController } from "./worldScenePlacementController";
@@ -225,6 +226,15 @@ export class WorldSceneAssembly {
         getCellKind: (col, row) =>
           officeRegion.layout.tiles[row * officeRegion.layout.cols + col]
             ?.kind ?? null,
+        isFurnitureBlockingCell: (col, row) =>
+          officeRegion.layout.furniture.some(
+            (furniture) =>
+              doesFurnitureBlockMovement(furniture) &&
+              col >= furniture.col &&
+              col < furniture.col + furniture.width &&
+              row >= furniture.row &&
+              row < furniture.row + furniture.height,
+          ),
       },
     );
     this.navigation = createTerrainNavigationService(
