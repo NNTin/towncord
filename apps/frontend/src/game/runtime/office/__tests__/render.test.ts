@@ -61,6 +61,10 @@ class FakeDisplayObject {
     return this;
   }
 
+  clearTint(): this {
+    return this;
+  }
+
   setPosition(_x: number, _y: number): this {
     return this;
   }
@@ -100,6 +104,39 @@ class FakeGraphics extends FakeDisplayObject {
   }
 }
 
+class FakeRenderTexture extends FakeDisplayObject {
+  public width = 0;
+  public height = 0;
+  public batchDrawCalls = 0;
+
+  constructor(width: number, height: number) {
+    super();
+    this.width = width;
+    this.height = height;
+  }
+
+  beginDraw(): this {
+    return this;
+  }
+
+  endDraw(): this {
+    return this;
+  }
+
+  batchDraw(_source: unknown): this {
+    this.batchDrawCalls += 1;
+    return this;
+  }
+
+  draw(_source: unknown): this {
+    return this;
+  }
+
+  clear(): this {
+    return this;
+  }
+}
+
 class FakeContainer extends FakeDisplayObject {
   public readonly children: unknown[] = [];
 
@@ -120,7 +157,12 @@ class FakeContainer extends FakeDisplayObject {
     return this;
   }
 
-  removeAll(_destroy?: boolean): this {
+  removeAll(destroy?: boolean): this {
+    if (destroy) {
+      for (const child of this.children) {
+        (child as FakeDisplayObject).destroy();
+      }
+    }
     this.children.length = 0;
     return this;
   }
@@ -134,6 +176,10 @@ function createScene() {
   const add = {
     container: vi.fn(() => new FakeContainer()),
     graphics: vi.fn(() => new FakeGraphics()),
+    renderTexture: vi.fn(
+      (_x: number, _y: number, width: number, height: number) =>
+        new FakeRenderTexture(width, height),
+    ),
     image: vi.fn(
       (_x: number, _y: number, _key: string, _frame?: string) => new FakeDisplayObject(),
     ),
@@ -143,7 +189,11 @@ function createScene() {
     text: vi.fn(() => new FakeDisplayObject()),
   };
 
-  return { add };
+  const make = {
+    image: vi.fn(() => new FakeDisplayObject()),
+  };
+
+  return { add, make };
 }
 
 function createLayout(characters: OfficeSceneLayout["characters"]): OfficeSceneLayout {
@@ -404,5 +454,68 @@ describe("renderOfficeLayout", () => {
     expect(initialWallSprite.destroyed).toBe(true);
     expect(wallFurnitureContainer.destroyed).toBe(false);
     expect(wallFurnitureContainer.depth).toBeGreaterThan(rebuiltWallSprite.depth);
+  });
+
+  test("floor tiles are baked into a single RenderTexture sized to the full tile area", () => {
+    // Individual Image objects placed edge-to-edge create sub-pixel gaps at
+    // tile boundaries under non-integer CSS canvas scale. A single RenderTexture
+    // has no inter-tile GPU boundaries, making seams impossible.
+    const scene = createScene();
+    const cellSize = 16;
+    const layout: OfficeSceneLayout = {
+      cols: 3,
+      rows: 2,
+      cellSize,
+      tiles: [
+        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
+        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
+        { kind: "void",  tileId: 0 },
+        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
+        { kind: "wall",  tileId: 8 },
+        { kind: "floor", tileId: 0, pattern: "environment.floors.pattern-01" },
+      ],
+      furniture: [],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    // Exactly one RenderTexture must be created for the full tile area.
+    expect(scene.add.renderTexture).toHaveBeenCalledTimes(1);
+    const rt = scene.add.renderTexture.mock.results[0]!.value as FakeRenderTexture;
+    expect(rt.width).toBe(layout.cols * cellSize);
+    expect(rt.height).toBe(layout.rows * cellSize);
+
+    // Four floor tiles → four batchDraw calls; void and wall tiles are skipped.
+    expect(rt.batchDrawCalls).toBe(4);
+
+    // Floor tiles must NOT be added as individual Image objects to the scene.
+    const floorImageCalls = scene.add.image.mock.calls.filter(
+      (args) => typeof args[3] === "string" && args[3].startsWith("environment.floors."),
+    );
+    expect(floorImageCalls).toHaveLength(0);
+  });
+
+  test("floor tile RenderTexture is replaced on partialUpdate", () => {
+    const scene = createScene();
+    const cellSize = 16;
+    const floorTile = { kind: "floor" as const, tileId: 0, pattern: "environment.floors.pattern-01" };
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize,
+      tiles: [floorTile],
+      furniture: [],
+      characters: [],
+    };
+
+    const renderable = renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+    const firstRT = scene.add.renderTexture.mock.results[0]!.value as FakeRenderTexture;
+
+    renderable.partialUpdate({ ...layout, tiles: [floorTile] });
+
+    // partialUpdate must destroy the old RT and allocate a fresh one.
+    expect(firstRT.destroyed).toBe(true);
+    expect(scene.add.renderTexture).toHaveBeenCalledTimes(2);
   });
 });
