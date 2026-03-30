@@ -2,9 +2,12 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, test, vi } from "vitest";
 
-vi.mock("../../../editors/office-layout/draft-state/useOfficeLayoutEditor", () => ({
-  useOfficeLayoutEditor: vi.fn(),
-}));
+vi.mock(
+  "../../../editors/office-layout/draft-state/useOfficeLayoutEditor",
+  () => ({
+    useOfficeLayoutEditor: vi.fn(),
+  }),
+);
 
 vi.mock("../useRuntimeUiBridge", () => ({
   useRuntimeUiBridge: vi.fn(),
@@ -68,6 +71,7 @@ describe("useGameSession", () => {
             entityTypes: [],
             playerModels: [],
             mobFamilies: [],
+            npcFamilies: [],
             propFamilies: [],
             tilesetFamilies: [],
             officeCharacterPalettes: [],

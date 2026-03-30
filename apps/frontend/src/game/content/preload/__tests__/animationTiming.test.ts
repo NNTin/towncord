@@ -7,6 +7,7 @@ import {
 import {
   BLOOMSEED_ANIMATIONS_JSON_KEY,
   DONARG_OFFICE_ANIMATIONS_JSON_KEY,
+  FARMRPG_ANIMATIONS_JSON_KEY,
 } from "../preload";
 
 function createScene(manifestByKey: Record<string, unknown>) {
@@ -195,37 +196,55 @@ describe("registerBloomseedAnimations timing", () => {
       expect.objectContaining({
         key: "environment.carpet.variant-a",
         frames: [
-          { key: "donarg.office.environment", frame: "variant-a#0", duration: 200 },
+          {
+            key: "donarg.office.environment",
+            frame: "variant-a#0",
+            duration: 200,
+          },
         ],
       }),
     );
   });
 
-  test("registers Bloomseed and Donarg office character animations during preload", () => {
+  test("registers Bloomseed, FarmRPG, and Donarg office character animations during preload", () => {
     const { scene, create } = createScene({
       [BLOOMSEED_ANIMATIONS_JSON_KEY]: {
         namespace: "bloomseed",
         animations: {
-          "characters.bloomseed.player.female.walk-down": createAnimationDefinition(
-            "bloomseed.characters",
-            "aseprite/characters/player-female.aseprite",
+          "characters.bloomseed.player.female.walk-down":
+            createAnimationDefinition(
+              "bloomseed.characters",
+              "aseprite/characters/player-female.aseprite",
+              "characters",
+              ["walk-down#0", "walk-down#1"],
+              [80, 120],
+            ),
+        },
+      },
+      [FARMRPG_ANIMATIONS_JSON_KEY]: {
+        namespace: "farmrpg",
+        animations: {
+          "characters.farmrpg.player.walk-right": createAnimationDefinition(
+            "farmrpg.characters",
+            "aseprite/characters/player.aseprite",
             "characters",
-            ["walk-down#0", "walk-down#1"],
-            [80, 120],
+            ["walk-right#0", "walk-right#1"],
+            [90, 110],
           ),
         },
       },
       [DONARG_OFFICE_ANIMATIONS_JSON_KEY]: {
         namespace: "donarg.office",
         animations: {
-          "characters.palette-0.office-worker.walk-right": createAnimationDefinition(
-            "donarg.office.characters",
-            "aseprite/characters/office-worker.aseprite",
-            "characters",
-            ["walk-right#0", "walk-right#1"],
-            [100, 100],
-            { paletteVariant: "palette-0" },
-          ),
+          "characters.palette-0.office-worker.walk-right":
+            createAnimationDefinition(
+              "donarg.office.characters",
+              "aseprite/characters/office-worker.aseprite",
+              "characters",
+              ["walk-right#0", "walk-right#1"],
+              [100, 100],
+              { paletteVariant: "palette-0" },
+            ),
           "environment.floors.pattern-01": createAnimationDefinition(
             "donarg.office.environment",
             "aseprite/environment/floors.aseprite",
@@ -239,16 +258,15 @@ describe("registerBloomseedAnimations timing", () => {
 
     const registration = registerPreloadAnimations(scene as never);
 
-    expect(create).toHaveBeenCalledTimes(2);
+    expect(create).toHaveBeenCalledTimes(3);
     expect(registration).toEqual({
-      bloomseedAnimationKeys: [
-        "characters.bloomseed.player.female.walk-down",
-      ],
+      bloomseedAnimationKeys: ["characters.bloomseed.player.female.walk-down"],
       donargOfficeCharacterAnimationKeys: [
         "characters.palette-0.office-worker.walk-right",
       ],
       animationKeys: [
         "characters.bloomseed.player.female.walk-down",
+        "characters.farmrpg.player.walk-right",
         "characters.palette-0.office-worker.walk-right",
       ],
     });

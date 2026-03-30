@@ -1,19 +1,25 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-vi.mock("../../../application/runtime-compilation/load-plans/runtimeBootstrap", () => ({
-  WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
-  composeRuntimeBootstrap: vi.fn(),
-}));
+vi.mock(
+  "../../../application/runtime-compilation/load-plans/runtimeBootstrap",
+  () => ({
+    WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
+    composeRuntimeBootstrap: vi.fn(),
+  }),
+);
 
 vi.mock("../../transport/runtimeEvents", () => ({
   RUNTIME_TO_UI_EVENTS: { RUNTIME_READY: "runtimeReady" },
   emitRuntimeToUiEvent: vi.fn(),
 }));
 
-vi.mock("../../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap", () => ({
-  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY: "officeSceneBootstrap",
-  createOfficeSceneBootstrap: vi.fn(),
-}));
+vi.mock(
+  "../../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap",
+  () => ({
+    OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY: "officeSceneBootstrap",
+    createOfficeSceneBootstrap: vi.fn(),
+  }),
+);
 
 vi.mock("../../../content/preload/animation", () => ({
   registerPreloadAnimations: vi.fn(),
@@ -23,6 +29,7 @@ vi.mock("../../../content/preload/preload", () => ({
   preloadBloomseedPack: vi.fn(),
   preloadDebugPack: vi.fn(),
   preloadDonargOfficePack: vi.fn(),
+  preloadFarmrpgPack: vi.fn(),
 }));
 
 import { createWorldRuntimePreloadLifecycle } from "../createWorldRuntimePreloadLifecycle";
@@ -30,7 +37,10 @@ import {
   WORLD_BOOTSTRAP_REGISTRY_KEY,
   composeRuntimeBootstrap,
 } from "../../../application/runtime-compilation/load-plans/runtimeBootstrap";
-import { RUNTIME_TO_UI_EVENTS, emitRuntimeToUiEvent } from "../../transport/runtimeEvents";
+import {
+  RUNTIME_TO_UI_EVENTS,
+  emitRuntimeToUiEvent,
+} from "../../transport/runtimeEvents";
 import {
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
   createOfficeSceneBootstrap,
@@ -40,6 +50,7 @@ import {
   preloadBloomseedPack,
   preloadDebugPack,
   preloadDonargOfficePack,
+  preloadFarmrpgPack,
 } from "../../../content/preload/preload";
 
 function makeScene() {
@@ -59,7 +70,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     vi.resetAllMocks();
   });
 
-  test("preload() queues all three asset packs", () => {
+  test("preload() queues all four asset packs", () => {
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
 
@@ -68,18 +79,23 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     expect(preloadBloomseedPack).toHaveBeenCalledWith(scene);
     expect(preloadDebugPack).toHaveBeenCalledWith(scene);
     expect(preloadDonargOfficePack).toHaveBeenCalledWith(scene);
+    expect(preloadFarmrpgPack).toHaveBeenCalledWith(scene);
   });
 
   test("create() registers preload animations before composing bootstrap", () => {
     const callOrder: string[] = [];
-    (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockImplementation(() => {
-      callOrder.push("registerPreloadAnimations");
-      return { bloomseedAnimationKeys: ["key1", "key2"] };
-    });
-    (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockImplementation(() => {
-      callOrder.push("composeRuntimeBootstrap");
-      return { world: {}, ui: { catalog: {}, placeables: [] } };
-    });
+    (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockImplementation(
+      () => {
+        callOrder.push("registerPreloadAnimations");
+        return { animationKeys: ["key1", "key2"] };
+      },
+    );
+    (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockImplementation(
+      () => {
+        callOrder.push("composeRuntimeBootstrap");
+        return { world: {}, ui: { catalog: {}, placeables: [] } };
+      },
+    );
     (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       anchor: { x: 1, y: 1 },
       layout: {},
@@ -97,7 +113,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
   test("create() passes animation keys to composeRuntimeBootstrap", () => {
     const animationKeys = ["anim:player:idle:down", "anim:player:walk:down"];
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: animationKeys,
+      animationKeys,
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: {},
@@ -118,7 +134,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
   test("create() publishes world bootstrap to scene registry", () => {
     const worldBootstrap = { catalog: { entityTypes: [] }, entityRegistry: {} };
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: [],
+      animationKeys: [],
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: worldBootstrap,
@@ -133,7 +149,10 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     const scene = makeScene();
     adapter.create(scene as never);
 
-    expect(scene.registry.set).toHaveBeenCalledWith(WORLD_BOOTSTRAP_REGISTRY_KEY, worldBootstrap);
+    expect(scene.registry.set).toHaveBeenCalledWith(
+      WORLD_BOOTSTRAP_REGISTRY_KEY,
+      worldBootstrap,
+    );
   });
 
   test("create() publishes office bootstrap to scene registry", () => {
@@ -142,16 +161,25 @@ describe("createWorldRuntimePreloadLifecycle", () => {
         x: 1,
         y: 1,
       },
-      layout: { cols: 10, rows: 8, cellSize: 16, tiles: [], furniture: [], characters: [] },
+      layout: {
+        cols: 10,
+        rows: 8,
+        cellSize: 16,
+        tiles: [],
+        furniture: [],
+        characters: [],
+      },
     };
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: [],
+      animationKeys: [],
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: {},
       ui: { catalog: {}, placeables: [] },
     });
-    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue(officeBootstrap);
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue(
+      officeBootstrap,
+    );
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
@@ -166,7 +194,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
   test("create() emits RUNTIME_READY with the UI bootstrap payload", () => {
     const uiPayload = { catalog: { entityTypes: [] }, placeables: [] };
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: [],
+      animationKeys: [],
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: {},
@@ -191,7 +219,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
   test("create() starts the world runtime scene after registry publication and RUNTIME_READY", () => {
     const callOrder: string[] = [];
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: [],
+      animationKeys: [],
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: {},
@@ -201,18 +229,24 @@ describe("createWorldRuntimePreloadLifecycle", () => {
       anchor: { x: 1, y: 1 },
       layout: {},
     });
-    (emitRuntimeToUiEvent as ReturnType<typeof vi.fn>).mockImplementation(() => {
-      callOrder.push("emitRuntimeReady");
-    });
+    (emitRuntimeToUiEvent as ReturnType<typeof vi.fn>).mockImplementation(
+      () => {
+        callOrder.push("emitRuntimeReady");
+      },
+    );
 
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
-    (scene.registry.set as ReturnType<typeof vi.fn>).mockImplementation((key: string) => {
-      callOrder.push(`set:${key}`);
-    });
-    (scene.scene.start as ReturnType<typeof vi.fn>).mockImplementation((key: string) => {
-      callOrder.push(`start:${key}`);
-    });
+    (scene.registry.set as ReturnType<typeof vi.fn>).mockImplementation(
+      (key: string) => {
+        callOrder.push(`set:${key}`);
+      },
+    );
+    (scene.scene.start as ReturnType<typeof vi.fn>).mockImplementation(
+      (key: string) => {
+        callOrder.push(`start:${key}`);
+      },
+    );
 
     adapter.create(scene as never);
 
@@ -230,7 +264,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
 
   test("create() emits RUNTIME_READY exactly once", () => {
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
-      bloomseedAnimationKeys: [],
+      animationKeys: [],
     });
     (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
       world: {},

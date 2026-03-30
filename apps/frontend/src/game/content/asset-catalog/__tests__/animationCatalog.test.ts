@@ -13,6 +13,30 @@ import {
 } from "../animationCatalog";
 
 describe("animationCatalog", () => {
+  test("parses bloomseed and farmrpg player models alongside farmrpg npc families", () => {
+    const catalog = buildAnimationCatalog([
+      "characters.bloomseed.player.female.walk.walk-down",
+      "characters.farmrpg.player.default.idle.idle-down",
+      "characters.farmrpg.npc.child.walk.walk-down",
+      "characters.farmrpg.npc.child.walk.walk-right",
+    ]);
+
+    expect(catalog.entityTypes).toEqual(["npcs", "player"]);
+    expect(catalog.playerModels).toEqual(["farmrpg-default", "female"]);
+    expect(catalog.npcFamilies).toEqual(["child"]);
+    expect(
+      getTracksForPath(catalog, "player/female").map((track) => track.id),
+    ).toEqual(["walk"]);
+    expect(
+      getTracksForPath(catalog, "player/farmrpg-default").map(
+        (track) => track.id,
+      ),
+    ).toEqual(["idle"]);
+    expect(
+      getTracksForPath(catalog, "npcs/child").map((track) => track.id),
+    ).toEqual(["walk"]);
+  });
+
   test("parses props into prop families and groups", () => {
     const catalog = buildAnimationCatalog([
       "props.bloomseed.animated.chest.black-chest",
@@ -23,9 +47,9 @@ describe("animationCatalog", () => {
     expect(catalog.entityTypes).toContain("props");
     expect(catalog.propFamilies).toEqual(["animated", "static"]);
     expect(getPropGroups(catalog, "animated")).toEqual(["chest", "water"]);
-    expect(getTracksForPath(catalog, "props/static/tables").map((track) => track.id)).toEqual([
-      "variant-01",
-    ]);
+    expect(
+      getTracksForPath(catalog, "props/static/tables").map((track) => track.id),
+    ).toEqual(["variant-01"]);
   });
 
   test("parses tilesets as a separate entity type", () => {
@@ -38,16 +62,25 @@ describe("animationCatalog", () => {
 
     expect(catalog.entityTypes).toEqual(["tilesets"]);
     expect(catalog.tilesetFamilies).toEqual(["animated", "static"]);
-    expect(getTilesetGroups(catalog, "static")).toEqual(["environment", "structure"]);
+    expect(getTilesetGroups(catalog, "static")).toEqual([
+      "environment",
+      "structure",
+    ]);
     expect(getTilesetGroups(catalog, "animated")).toEqual(["environment"]);
     expect(
-      getTracksForPath(catalog, "tilesets/static/environment").map((track) => track.id),
+      getTracksForPath(catalog, "tilesets/static/environment").map(
+        (track) => track.id,
+      ),
     ).toEqual(["grass-tileset", "water-tileset"]);
     expect(
-      getTracksForPath(catalog, "tilesets/static/structure").map((track) => track.id),
+      getTracksForPath(catalog, "tilesets/static/structure").map(
+        (track) => track.id,
+      ),
     ).toEqual(["walls-and-floors"]);
     expect(
-      getTracksForPath(catalog, "tilesets/animated/environment").map((track) => track.id),
+      getTracksForPath(catalog, "tilesets/animated/environment").map(
+        (track) => track.id,
+      ),
     ).toEqual(["water-tileset-vfx"]);
   });
 
@@ -64,9 +97,14 @@ describe("animationCatalog", () => {
     ]);
 
     expect(catalog.entityTypes).toEqual([]);
-    expect(getOfficeCharacterPalettes(catalog)).toEqual(["palette-0", "palette-1"]);
+    expect(getOfficeCharacterPalettes(catalog)).toEqual([
+      "palette-0",
+      "palette-1",
+    ]);
     expect(catalog.officeCharacterIds).toEqual(["office-worker"]);
-    expect(getOfficeCharacterIds(catalog, "palette-0")).toEqual(["office-worker"]);
+    expect(getOfficeCharacterIds(catalog, "palette-0")).toEqual([
+      "office-worker",
+    ]);
     expect(getOfficeEnvironmentGroups(catalog)).toEqual(["floors", "walls"]);
     expect(getOfficeFurnitureGroups(catalog)).toEqual(["chairs", "desks"]);
     expect(listOfficeCharacterDescriptors(catalog)).toEqual([
@@ -82,7 +120,10 @@ describe("animationCatalog", () => {
       },
     ]);
     expect(
-      getTracksForPath(catalog, "office/characters/palette-0/office-worker").map((track) => track.id),
+      getTracksForPath(
+        catalog,
+        "office/characters/palette-0/office-worker",
+      ).map((track) => track.id),
     ).toEqual(["read", "walk"]);
   });
 
@@ -93,8 +134,10 @@ describe("animationCatalog", () => {
       "characters.palette-0.office-worker.walk-up",
     ]);
 
-    const track = getTracksForPath(catalog, "office/characters/palette-0/office-worker")
-      .find((item) => item.id === "walk");
+    const track = getTracksForPath(
+      catalog,
+      "office/characters/palette-0/office-worker",
+    ).find((item) => item.id === "walk");
 
     expect(track).toBeTruthy();
     expect(resolveTrackForDirection(track!, "right")).toEqual({

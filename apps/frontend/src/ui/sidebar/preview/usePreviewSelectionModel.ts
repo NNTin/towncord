@@ -16,6 +16,7 @@ type PreviewSelectionState = {
   playerFamily: string;
   mobFamily: string;
   mobId: string;
+  npcFamily: string;
   propFamily: string;
   propGroup: string;
   tilesetFamily: TilesetFamily;
@@ -27,33 +28,58 @@ type PreviewSelectionState = {
 
 type PreviewSelectionPathState = Pick<
   PreviewSelectionState,
-  "entityType" | "playerFamily" | "mobFamily" | "mobId" | "propFamily" | "propGroup" | "tilesetFamily" | "tilesetGroup"
+  | "entityType"
+  | "playerFamily"
+  | "mobFamily"
+  | "mobId"
+  | "npcFamily"
+  | "propFamily"
+  | "propGroup"
+  | "tilesetFamily"
+  | "tilesetGroup"
 >;
 
-function createInitialSelection(catalog: AnimationCatalog): PreviewSelectionState {
+function createInitialSelection(
+  catalog: AnimationCatalog,
+): PreviewSelectionState {
   const playerFamily = catalog.playerModels[0] ?? "female";
-  const playerTracks = getTracksForPath(catalog, `player/${playerFamily}`);
-  const defaultTrack = playerTracks.find((track) => track.id === "run") ?? playerTracks[0] ?? null;
-
   const mobFamily = catalog.mobFamilies[0] ?? "";
   const mobId = getMobIds(catalog, mobFamily)[0] ?? "";
+  const npcFamily = catalog.npcFamilies[0] ?? "";
   const propFamily = catalog.propFamilies[0] ?? "";
   const propGroup = getPropGroups(catalog, propFamily)[0] ?? "";
-  const tilesetFamily = catalog.tilesetFamilies.includes("static") ? "static" : catalog.tilesetFamilies[0]!;
+  const tilesetFamily = catalog.tilesetFamilies.includes("static")
+    ? "static"
+    : catalog.tilesetFamilies[0]!;
   const tilesetGroup = getTilesetGroups(catalog, tilesetFamily)[0] ?? "";
 
-  return {
-    entityType: "player",
+  const entityType = catalog.entityTypes.includes("player")
+    ? "player"
+    : (catalog.entityTypes[0] ?? "player");
+  const selection: PreviewSelectionState = {
+    entityType,
     playerFamily,
     mobFamily,
     mobId,
+    npcFamily,
     propFamily,
     propGroup,
     tilesetFamily,
     tilesetGroup,
+    trackId: "",
+    equipmentId: "",
+    tilesetFrameIndex: 0,
+  };
+  const defaultTracks = getTracksForPath(catalog, getSelectionPath(selection));
+  const defaultTrack =
+    defaultTracks.find((track) => track.id === "run") ??
+    defaultTracks[0] ??
+    null;
+
+  return {
+    ...selection,
     trackId: defaultTrack?.id ?? "",
     equipmentId: defaultTrack?.equipmentCompatible[0] ?? "",
-    tilesetFrameIndex: 0,
   };
 }
 
@@ -74,6 +100,8 @@ function getSelectionPath(selection: PreviewSelectionPathState): string {
       return `player/${selection.playerFamily}`;
     case "mobs":
       return `mobs/${selection.mobFamily}/${selection.mobId}`;
+    case "npcs":
+      return `npcs/${selection.npcFamily}`;
     case "props":
       return getPropPath(selection.propFamily, selection.propGroup);
     case "tilesets":
@@ -88,8 +116,13 @@ function isTrackEquipmentCompatible(
   return equipmentId !== "" && track.equipmentCompatible.includes(equipmentId);
 }
 
-function resolveEquipmentId(track: AnimationTrack, equipmentId: EquipmentId | ""): EquipmentId | "" {
-  return isTrackEquipmentCompatible(track, equipmentId) ? equipmentId : (track.equipmentCompatible[0] ?? "");
+function resolveEquipmentId(
+  track: AnimationTrack,
+  equipmentId: EquipmentId | "",
+): EquipmentId | "" {
+  return isTrackEquipmentCompatible(track, equipmentId)
+    ? equipmentId
+    : (track.equipmentCompatible[0] ?? "");
 }
 
 function resolveTrack(
@@ -98,7 +131,9 @@ function resolveTrack(
   preferredTrackId: string,
 ): AnimationTrack | null {
   const tracks = getTracksForPath(catalog, getSelectionPath(selection));
-  return tracks.find((track) => track.id === preferredTrackId) ?? tracks[0] ?? null;
+  return (
+    tracks.find((track) => track.id === preferredTrackId) ?? tracks[0] ?? null
+  );
 }
 
 function syncTrackSelection(
@@ -125,19 +160,26 @@ function applyTrackSelection(
     ...selection,
     trackId: track.id,
     equipmentId: resolveEquipmentId(track, selection.equipmentId),
-    tilesetFrameIndex: selection.entityType === "tilesets" ? 0 : selection.tilesetFrameIndex,
+    tilesetFrameIndex:
+      selection.entityType === "tilesets" ? 0 : selection.tilesetFrameIndex,
   };
 }
 
 export function usePreviewSelectionModel(catalog: AnimationCatalog) {
-  const [selection, setSelection] = useState<PreviewSelectionState>(() => createInitialSelection(catalog));
+  const [selection, setSelection] = useState<PreviewSelectionState>(() =>
+    createInitialSelection(catalog),
+  );
 
   const currentTracks = getTracksForPath(catalog, getSelectionPath(selection));
-  const currentTrack = currentTracks.find((track) => track.id === selection.trackId) ?? currentTracks[0] ?? null;
+  const currentTrack =
+    currentTracks.find((track) => track.id === selection.trackId) ??
+    currentTracks[0] ??
+    null;
   const mobIds = getMobIds(catalog, selection.mobFamily);
   const propGroups = getPropGroups(catalog, selection.propFamily);
   const tilesetGroups = getTilesetGroups(catalog, selection.tilesetFamily);
-  const isTilesetStatic = selection.entityType === "tilesets" && selection.tilesetFamily === "static";
+  const isTilesetStatic =
+    selection.entityType === "tilesets" && selection.tilesetFamily === "static";
   const compatibleEquipment = currentTrack?.equipmentCompatible ?? [];
 
   useEffect(() => {
@@ -153,6 +195,7 @@ export function usePreviewSelectionModel(catalog: AnimationCatalog) {
     playerFamily: selection.playerFamily,
     mobFamily: selection.mobFamily,
     mobId: selection.mobId,
+    npcFamily: selection.npcFamily,
     propFamily: selection.propFamily,
     propGroup: selection.propGroup,
     tilesetFamily: selection.tilesetFamily,
@@ -206,11 +249,25 @@ export function usePreviewSelectionModel(catalog: AnimationCatalog) {
         ),
       );
     },
+    selectNpcFamily(npcFamily: string): void {
+      setSelection((prev) =>
+        syncTrackSelection(
+          catalog,
+          { ...prev, npcFamily },
+          prev.trackId,
+          prev.equipmentId,
+        ),
+      );
+    },
     selectPropFamily(propFamily: string): void {
       setSelection((prev) =>
         syncTrackSelection(
           catalog,
-          { ...prev, propFamily, propGroup: getPropGroups(catalog, propFamily)[0] ?? "" },
+          {
+            ...prev,
+            propFamily,
+            propGroup: getPropGroups(catalog, propFamily)[0] ?? "",
+          },
           prev.trackId,
           prev.equipmentId,
         ),
@@ -255,12 +312,17 @@ export function usePreviewSelectionModel(catalog: AnimationCatalog) {
       setSelection((prev) => applyTrackSelection(prev, track));
     },
     setEquipmentId(equipmentId: EquipmentId | ""): void {
-      setSelection((prev) => (prev.equipmentId === equipmentId ? prev : { ...prev, equipmentId }));
+      setSelection((prev) =>
+        prev.equipmentId === equipmentId ? prev : { ...prev, equipmentId },
+      );
     },
     setTilesetFrameIndex(value: SetStateAction<number>): void {
       setSelection((prev) => {
-        const nextValue = typeof value === "function" ? value(prev.tilesetFrameIndex) : value;
-        return prev.tilesetFrameIndex === nextValue ? prev : { ...prev, tilesetFrameIndex: nextValue };
+        const nextValue =
+          typeof value === "function" ? value(prev.tilesetFrameIndex) : value;
+        return prev.tilesetFrameIndex === nextValue
+          ? prev
+          : { ...prev, tilesetFrameIndex: nextValue };
       });
     },
   };

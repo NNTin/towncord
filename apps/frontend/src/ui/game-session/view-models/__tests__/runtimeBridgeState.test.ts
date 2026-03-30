@@ -11,6 +11,7 @@ function createBootstrapPayload() {
       entityTypes: [],
       playerModels: [],
       mobFamilies: [],
+      npcFamilies: [],
       propFamilies: [],
       tilesetFamilies: [],
       officeCharacterPalettes: [],

@@ -9,6 +9,7 @@ function createCatalog(): AnimationCatalog {
     entityTypes: ["mobs", "player"],
     playerModels: ["scout"],
     mobFamilies: ["animals"],
+    npcFamilies: [],
     propFamilies: [],
     tilesetFamilies: ["animated", "static"],
     officeCharacterPalettes: [],
@@ -46,7 +47,9 @@ describe("entityRegistryBuilder", () => {
       capabilities: ["idle", "walk"],
       placeable: true,
     });
-    expect(readEntityVisualRef(chicken!.visualRef)).toBe("mobs/animals/chicken");
+    expect(readEntityVisualRef(chicken!.visualRef)).toBe(
+      "mobs/animals/chicken",
+    );
 
     const catalog = createCatalog();
     expect(listEntityPlaceables(registry, catalog)).toEqual([

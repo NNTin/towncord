@@ -20,6 +20,7 @@ import {
   preloadBloomseedPack,
   preloadDebugPack,
   preloadDonargOfficePack,
+  preloadFarmrpgPack,
 } from "../../content/preload/preload";
 
 /**
@@ -44,11 +45,12 @@ export function createWorldRuntimePreloadLifecycle(): PreloadSceneLifecycleAdapt
       preloadBloomseedPack(scene);
       preloadDebugPack(scene);
       preloadDonargOfficePack(scene);
+      preloadFarmrpgPack(scene);
     },
 
     create(scene: Phaser.Scene): void {
-      const { bloomseedAnimationKeys } = registerPreloadAnimations(scene);
-      const bootstrap = composeRuntimeBootstrap(bloomseedAnimationKeys);
+      const { animationKeys } = registerPreloadAnimations(scene);
+      const bootstrap = composeRuntimeBootstrap(animationKeys);
       scene.registry.set(WORLD_BOOTSTRAP_REGISTRY_KEY, bootstrap.world);
       scene.registry.set(
         OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,

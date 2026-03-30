@@ -9,6 +9,7 @@ import { listDonargOfficeCharacterAnimations } from "../asset-catalog/donargOffi
 import {
   BLOOMSEED_ANIMATIONS_JSON_KEY,
   DONARG_OFFICE_ANIMATIONS_JSON_KEY,
+  FARMRPG_ANIMATIONS_JSON_KEY,
 } from "./preload";
 
 type PublicAnimationOverride = {
@@ -27,7 +28,10 @@ type RegisterPublicAnimationsOptions = {
   sourceLabel?: string;
   defaultRepeat?: number;
   onMissingAtlas?: "skip" | "throw";
-  filter?: (animationId: string, definition: PublicAnimationDefinition) => boolean;
+  filter?: (
+    animationId: string,
+    definition: PublicAnimationDefinition,
+  ) => boolean;
   overrides?: Record<string, PublicAnimationOverride>;
 };
 
@@ -39,6 +43,7 @@ type RegisterNamedAnimationsOptions = Omit<
 };
 
 type RegisterBloomseedAnimationsOptions = RegisterNamedAnimationsOptions;
+type RegisterFarmrpgAnimationsOptions = RegisterNamedAnimationsOptions;
 type RegisterDonargOfficeAnimationsOptions = RegisterNamedAnimationsOptions;
 
 type RegisterAnimationsFromManifestOptions = Omit<
@@ -182,6 +187,20 @@ export function registerBloomseedAnimations(
   );
 }
 
+export function registerFarmrpgAnimations(
+  scene: Phaser.Scene,
+  options: RegisterFarmrpgAnimationsOptions = {},
+): string[] {
+  return registerPublicAnimations(
+    scene,
+    buildPublicAnimationOptions(
+      options,
+      FARMRPG_ANIMATIONS_JSON_KEY,
+      "FarmRPG",
+    ),
+  );
+}
+
 /**
  * Registers animations from `assets/donarg-office/animations.json` in Phaser.
  * Returns animation keys that were created during this call.
@@ -240,15 +259,16 @@ export function registerPreloadAnimations(
   scene: Phaser.Scene,
 ): PreloadAnimationRegistration {
   const bloomseedAnimationKeys = registerBloomseedAnimations(scene);
-  const donargOfficeCharacterAnimationKeys = registerDonargOfficeCharacterAnimations(
-    scene,
-  );
+  const farmrpgAnimationKeys = registerFarmrpgAnimations(scene);
+  const donargOfficeCharacterAnimationKeys =
+    registerDonargOfficeCharacterAnimations(scene);
 
   return {
     bloomseedAnimationKeys,
     donargOfficeCharacterAnimationKeys,
     animationKeys: [
       ...bloomseedAnimationKeys,
+      ...farmrpgAnimationKeys,
       ...donargOfficeCharacterAnimationKeys,
     ],
   };
@@ -259,7 +279,9 @@ function buildAnimationFrames(
 ): Phaser.Types.Animations.AnimationFrame[] {
   if (
     definition.durationsMs.length !== definition.frames.length ||
-    !definition.durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+    !definition.durationsMs.every(
+      (duration) => Number.isInteger(duration) && duration > 0,
+    )
   ) {
     const expectedDurations = definition.frames.length;
     const actualDurations = definition.durationsMs.length;
@@ -286,19 +308,21 @@ function buildAnimationFrames(
     throw new Error(parts.join(" "));
   }
 
-  return definition.frames.map((frame, index): Phaser.Types.Animations.AnimationFrame => {
-    const animationFrame: Phaser.Types.Animations.AnimationFrame = {
-      key: definition.atlasKey,
-      frame,
-    };
+  return definition.frames.map(
+    (frame, index): Phaser.Types.Animations.AnimationFrame => {
+      const animationFrame: Phaser.Types.Animations.AnimationFrame = {
+        key: definition.atlasKey,
+        frame,
+      };
 
-    const duration = definition.durationsMs[index];
-    if (duration !== undefined) {
-      animationFrame.duration = duration;
-    }
+      const duration = definition.durationsMs[index];
+      if (duration !== undefined) {
+        animationFrame.duration = duration;
+      }
 
-    return animationFrame;
-  });
+      return animationFrame;
+    },
+  );
 }
 
 function resolveAnimationFrameRate(
@@ -316,8 +340,11 @@ function readAnimationManifest(
   try {
     return parsePublicAnimationManifest(raw);
   } catch (error) {
-    const details = error instanceof Error && error.message ? ` ${error.message}` : "";
-    throw new Error(`Invalid animation manifest for cache key "${manifestKey}".${details}`);
+    const details =
+      error instanceof Error && error.message ? ` ${error.message}` : "";
+    throw new Error(
+      `Invalid animation manifest for cache key "${manifestKey}".${details}`,
+    );
   }
 }
 
@@ -326,7 +353,11 @@ export function readOptionalAnimationManifest(
   manifestKey: string,
 ): PublicAnimationManifest | null {
   const cache = (scene["cache"] as Phaser.Scene["cache"] | undefined)?.json;
-  if (!cache || typeof cache.exists !== "function" || typeof cache.get !== "function") {
+  if (
+    !cache ||
+    typeof cache.exists !== "function" ||
+    typeof cache.get !== "function"
+  ) {
     return null;
   }
 
@@ -350,9 +381,13 @@ export function collectPhaseDurationsByAnimationId(
     if (
       Array.isArray(definition.phaseDurationsMs) &&
       definition.phaseDurationsMs.length > 0 &&
-      definition.phaseDurationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+      definition.phaseDurationsMs.every(
+        (duration) => Number.isInteger(duration) && duration > 0,
+      )
     ) {
-      phaseDurationsByAnimationId[animationId] = [...definition.phaseDurationsMs];
+      phaseDurationsByAnimationId[animationId] = [
+        ...definition.phaseDurationsMs,
+      ];
     }
   }
 

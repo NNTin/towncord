@@ -35,6 +35,7 @@ function createBootstrapPayload(): RuntimeBootstrap {
       entityTypes: [],
       playerModels: [],
       mobFamilies: [],
+      npcFamilies: [],
       propFamilies: [],
       tilesetFamilies: [],
       officeCharacterPalettes: [],
@@ -112,7 +113,10 @@ describe("createMountedGameSession", () => {
 
     session.subscribe(firstSubscriber);
     runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
-    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, terrainSeed);
+    runtimeHost.events.emit(
+      RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
+      terrainSeed,
+    );
 
     const lateSubscriber = {
       onBootstrap: vi.fn(),
@@ -120,16 +124,23 @@ describe("createMountedGameSession", () => {
     };
     session.subscribe(lateSubscriber);
     runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.RUNTIME_READY, bootstrap);
-    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, terrainSeed);
+    runtimeHost.events.emit(
+      RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
+      terrainSeed,
+    );
 
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledTimes(1);
     expect(firstSubscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
     expect(lateSubscriber.onBootstrap).toHaveBeenCalledTimes(1);
     expect(lateSubscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
     expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledTimes(2);
-    expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
+    expect(firstSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(
+      terrainSeed.seed,
+    );
     expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledTimes(2);
-    expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(terrainSeed.seed);
+    expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(
+      terrainSeed.seed,
+    );
   });
 
   test("replays office selection to late subscribers and routes rotate/delete actions", () => {
@@ -141,7 +152,10 @@ describe("createMountedGameSession", () => {
     };
 
     session.subscribe(firstSubscriber);
-    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, selection);
+    runtimeHost.events.emit(
+      RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED,
+      selection,
+    );
 
     const lateSubscriber = {
       onOfficeSelectionChanged: vi.fn(),
@@ -149,9 +163,13 @@ describe("createMountedGameSession", () => {
     session.subscribe(lateSubscriber);
 
     expect(firstSubscriber.onOfficeSelectionChanged).toHaveBeenCalledTimes(1);
-    expect(firstSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(selection);
+    expect(firstSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(
+      selection,
+    );
     expect(lateSubscriber.onOfficeSelectionChanged).toHaveBeenCalledTimes(1);
-    expect(lateSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(selection);
+    expect(lateSubscriber.onOfficeSelectionChanged).toHaveBeenCalledWith(
+      selection,
+    );
 
     session.rotateSelectedOfficePlaceable();
     session.deleteSelectedOfficePlaceable();

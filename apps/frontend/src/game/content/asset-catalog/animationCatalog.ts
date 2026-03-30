@@ -1,6 +1,6 @@
 import { type EquipmentId, TOOL_EQUIPMENT_MAP } from "./equipmentGroups";
 
-export type EntityType = "player" | "mobs" | "props" | "tilesets";
+export type EntityType = "player" | "mobs" | "npcs" | "props" | "tilesets";
 export type TilesetFamily = "animated" | "static";
 export type SpriteDirection = "up" | "down" | "side" | "right";
 export type InputDirection = "up" | "down" | "left" | "right";
@@ -19,6 +19,7 @@ export type AnimationCatalog = {
   entityTypes: EntityType[];
   playerModels: string[];
   mobFamilies: string[];
+  npcFamilies: string[];
   propFamilies: string[];
   tilesetFamilies: TilesetFamily[];
   officeCharacterPalettes: string[];
@@ -90,18 +91,27 @@ function parsePlayerKeys(
   keys: string[],
   pathTracks: Map<string, Map<string, AnimationTrack>>,
 ): void {
-  const PREFIX = "characters.bloomseed.player.";
   for (const key of keys) {
-    if (!key.startsWith(PREFIX)) continue;
+    if (
+      !key.startsWith("characters.bloomseed.player.") &&
+      !key.startsWith("characters.farmrpg.player.")
+    ) {
+      continue;
+    }
+
     const parts = key.split(".");
-    // characters.bloomseed.player.<model>.<...groups>.<lastSegment>
+    // characters.<namespace>.player.<model>.<...groups>.<lastSegment>
     if (parts.length < 6) continue;
+    const namespace = parts[1]!;
     const model = parts[3]!;
     const baseType = parts.slice(4, parts.length - 1).join("-");
     const lastSegment = parts[parts.length - 1]!;
     if (!baseType) continue;
 
-    const path = `player/${model}`;
+    const displayModel =
+      namespace === "bloomseed" ? model : `${namespace}-${model}`;
+
+    const path = `player/${displayModel}`;
     if (!pathTracks.has(path)) pathTracks.set(path, new Map());
     const track = getOrCreate(pathTracks.get(path)!, baseType, {
       label: baseType,
@@ -150,6 +160,39 @@ function parseMobKeys(
       equipmentCompatible: [],
     });
 
+    if (dir) {
+      track.directional = true;
+      track.keyByDirection[dir] = key;
+    } else {
+      track.undirectedKey = key;
+    }
+  }
+}
+
+function parseNpcKeys(
+  keys: string[],
+  pathTracks: Map<string, Map<string, AnimationTrack>>,
+): void {
+  const PREFIX = "characters.farmrpg.npc.";
+  for (const key of keys) {
+    if (!key.startsWith(PREFIX)) continue;
+    const parts = key.split(".");
+    // characters.farmrpg.npc.<npcType>.<...action>.<lastSegment>
+    if (parts.length < 6) continue;
+    const npcType = parts[3]!;
+    const baseType = parts.slice(4, parts.length - 1).join("-");
+    const lastSegment = parts[parts.length - 1]!;
+    if (!baseType) continue;
+
+    const path = `npcs/${npcType}`;
+    if (!pathTracks.has(path)) pathTracks.set(path, new Map());
+    const track = getOrCreate(pathTracks.get(path)!, baseType, {
+      label: baseType,
+      entityType: "npcs",
+      equipmentCompatible: [],
+    });
+
+    const dir = getSpriteDirection(lastSegment);
     if (dir) {
       track.directional = true;
       track.keyByDirection[dir] = key;
@@ -324,6 +367,7 @@ export function buildAnimationCatalog(
   const pathTracks = new Map<string, Map<string, AnimationTrack>>();
   parsePlayerKeys(animationKeys, pathTracks);
   parseMobKeys(animationKeys, pathTracks);
+  parseNpcKeys(animationKeys, pathTracks);
   parsePropKeys(animationKeys, pathTracks);
   parseTilesetKeys(animationKeys, pathTracks);
   parseOfficeCharacterKeys(animationKeys, pathTracks);
@@ -340,6 +384,7 @@ export function buildAnimationCatalog(
 
   const playerModels = new Set<string>();
   const mobFamilies = new Set<string>();
+  const npcFamilies = new Set<string>();
   const propFamilies = new Set<string>();
   const entityTypes = new Set<EntityType>();
   const officeCharacterPalettes = new Set<string>();
@@ -357,6 +402,9 @@ export function buildAnimationCatalog(
     } else if (ns === "mobs") {
       entityTypes.add("mobs");
       if (sub) mobFamilies.add(sub);
+    } else if (ns === "npcs") {
+      entityTypes.add("npcs");
+      if (sub) npcFamilies.add(sub);
     } else if (ns === "props") {
       entityTypes.add("props");
       if (sub) propFamilies.add(sub);
@@ -380,6 +428,7 @@ export function buildAnimationCatalog(
     entityTypes: [...entityTypes].sort() as EntityType[],
     playerModels: [...playerModels].sort(),
     mobFamilies: [...mobFamilies].sort(),
+    npcFamilies: [...npcFamilies].sort(),
     propFamilies: [...propFamilies].sort(),
     tilesetFamilies: [...TILESET_FAMILIES],
     officeCharacterPalettes: [...officeCharacterPalettes].sort(),
@@ -396,7 +445,8 @@ export function resolveTrackForDirection(
 ): { key: string; flipX: boolean } | null {
   if (track.directional) {
     if (dir === "left" || dir === "right") {
-      const horizontalKey = track.keyByDirection.side ?? track.keyByDirection.right;
+      const horizontalKey =
+        track.keyByDirection.side ?? track.keyByDirection.right;
       if (horizontalKey) {
         return { key: horizontalKey, flipX: dir === "left" };
       }
@@ -429,9 +479,17 @@ function parseMobVisualPath(path: string): MobCatalogDescriptor | null {
   return { family, mobId, visualPath: path };
 }
 
-function parseOfficeCharacterVisualPath(path: string): OfficeCharacterDescriptor | null {
+function parseOfficeCharacterVisualPath(
+  path: string,
+): OfficeCharacterDescriptor | null {
   const [ns, group, palette, characterId, extra] = path.split("/");
-  if (ns !== "office" || group !== "characters" || !palette || !characterId || extra) {
+  if (
+    ns !== "office" ||
+    group !== "characters" ||
+    !palette ||
+    !characterId ||
+    extra
+  ) {
     return null;
   }
   return { palette, characterId, visualPath: path };
@@ -476,7 +534,9 @@ export function getTilesetGroups(
   return listCatalogPathSuffixes(catalog, `tilesets/${family}/`);
 }
 
-export function getOfficeCharacterPalettes(catalog: AnimationCatalog): string[] {
+export function getOfficeCharacterPalettes(
+  catalog: AnimationCatalog,
+): string[] {
   return [...catalog.officeCharacterPalettes];
 }
 
@@ -487,7 +547,9 @@ export function getOfficeCharacterIds(
   return listCatalogPathSuffixes(catalog, `office/characters/${palette}/`);
 }
 
-export function getOfficeEnvironmentGroups(catalog: AnimationCatalog): string[] {
+export function getOfficeEnvironmentGroups(
+  catalog: AnimationCatalog,
+): string[] {
   return [...catalog.officeEnvironmentGroups];
 }
 
