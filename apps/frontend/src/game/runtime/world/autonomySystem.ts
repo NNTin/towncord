@@ -15,7 +15,12 @@ const AMBIENT_ACTION_MIN_MS = 900;
 const AMBIENT_ACTION_MAX_MS = 1_600;
 const AMBIENT_ACTION_CHANCE = 0.35;
 const AMBIENT_ACTION_COOLDOWN_MS = 2_400;
-const AUTONOMY_DECISION_DELAY_MS = 350;
+/** Minimum wait between autonomous decisions (wander / ambient). */
+const AUTONOMY_DECISION_MIN_MS = 2_000;
+/** Maximum wait between autonomous decisions. */
+const AUTONOMY_DECISION_MAX_MS = 5_000;
+/** Short retry delay used when no action could be found (prevents busy-spin). */
+const AUTONOMY_RETRY_DELAY_MS = 500;
 
 type AutonomyUpdateContext = {
   autoplayEnabled: boolean;
@@ -23,13 +28,24 @@ type AutonomyUpdateContext = {
   rng?: () => number;
 };
 
-export function createAutonomyState(ambientActionIds: readonly string[]) {
+/**
+ * Creates initial autonomy state for an entity.
+ *
+ * Pass an `rng` function to stagger the first decision across multiple entities
+ * so they do not all start wandering at the same moment. In tests you can omit
+ * `rng` (or pass `() => 0`) to get a deterministic zero initial delay.
+ */
+export function createAutonomyState(
+  ambientActionIds: readonly string[],
+  rng?: () => number,
+) {
+  const initialDelay = rng ? Math.round(rng() * AUTONOMY_DECISION_MAX_MS) : 0;
   return {
     ambientActionIds,
     ambientCooldownMs: 0,
     currentAmbientAction: null,
     currentAmbientMs: 0,
-    nextDecisionMs: AUTONOMY_DECISION_DELAY_MS,
+    nextDecisionMs: initialDelay,
     path: [],
     pathIndex: 0,
     pathRevision: null,
@@ -40,7 +56,7 @@ export function createAutonomyState(ambientActionIds: readonly string[]) {
 export function resetEntityAutonomy(entity: WorldAutonomyActor): void {
   entity.autonomy.currentAmbientAction = null;
   entity.autonomy.currentAmbientMs = 0;
-  entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
+  entity.autonomy.nextDecisionMs = AUTONOMY_RETRY_DELAY_MS;
   entity.autonomy.path = [];
   entity.autonomy.pathIndex = 0;
   entity.autonomy.pathRevision = null;
@@ -75,7 +91,11 @@ export function updateEntityAutonomy(
       entity.autonomy.currentAmbientAction = null;
       entity.animationAction = entity.state;
       entity.autonomy.ambientCooldownMs = AMBIENT_ACTION_COOLDOWN_MS;
-      entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
+      entity.autonomy.nextDecisionMs = lerp(
+        AUTONOMY_DECISION_MIN_MS,
+        AUTONOMY_DECISION_MAX_MS,
+        rng(),
+      );
     }
 
     return ZERO_INPUT;
@@ -97,7 +117,11 @@ export function updateEntityAutonomy(
         entity.autonomy.pathIndex = 0;
         entity.autonomy.pathRevision = null;
         entity.autonomy.wanderTarget = null;
-        entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
+        entity.autonomy.nextDecisionMs = lerp(
+          AUTONOMY_DECISION_MIN_MS,
+          AUTONOMY_DECISION_MAX_MS,
+          rng(),
+        );
       }
       return ZERO_INPUT;
     }
@@ -148,7 +172,7 @@ export function updateEntityAutonomy(
   entity.animationAction = entity.state;
 
   if (!entity.autonomy.wanderTarget) {
-    entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
+    entity.autonomy.nextDecisionMs = AUTONOMY_RETRY_DELAY_MS;
     return ZERO_INPUT;
   }
 
@@ -158,7 +182,7 @@ export function updateEntityAutonomy(
   );
   if (!path || path.waypoints.length === 0) {
     entity.autonomy.wanderTarget = null;
-    entity.autonomy.nextDecisionMs = AUTONOMY_DECISION_DELAY_MS;
+    entity.autonomy.nextDecisionMs = AUTONOMY_RETRY_DELAY_MS;
     return ZERO_INPUT;
   }
 
