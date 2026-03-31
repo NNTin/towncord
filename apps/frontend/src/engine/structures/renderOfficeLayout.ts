@@ -14,6 +14,8 @@ const DONARG_OFFICE_FURNITURE_ATLAS_KEY = "donarg.office.furniture";
 const DONARG_OFFICE_ENVIRONMENT_ATLAS_KEY = "donarg.office.environment";
 const FLOOR_PATTERN_FRAME = "environment.floors.pattern-01#0";
 const WALL_MOUNT_DEPTH_OFFSET = 0.5;
+const CHAIR_DEPTH_OFFSET = 0.5;
+const SURFACE_DEPTH_OFFSET = 0.5;
 
 type OfficeRenderableTargetKind = "furniture" | "character";
 
@@ -53,11 +55,7 @@ export function renderOfficeLayout(
   layout: OfficeSceneLayout,
   options: RenderOfficeLayoutOptions = {},
 ): OfficeLayoutRenderable {
-  const {
-    worldOffsetX = 0,
-    worldOffsetY = 0,
-    tileDepth = 0,
-  } = options;
+  const { worldOffsetX = 0, worldOffsetY = 0, tileDepth = 0 } = options;
 
   return new OfficeLayoutRenderableImpl(
     scene,
@@ -81,7 +79,10 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   private readonly worldOffsetX: number;
   private readonly worldOffsetY: number;
   private readonly furnitureMap = new Map<string, FurnitureRenderableEntry>();
-  private characterEntries: Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> = [];
+  private characterEntries: Array<{
+    target: OfficeRenderableTarget;
+    container: Phaser.GameObjects.Container;
+  }> = [];
   private characterSource: readonly OfficeSceneCharacter[];
   /**
    * Wall, furniture, and character containers are kept as direct scene-level
@@ -151,7 +152,9 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     this.characterEntries = [];
   }
 
-  private buildWallSprites(layout: OfficeSceneLayout): Phaser.GameObjects.Image[] {
+  private buildWallSprites(
+    layout: OfficeSceneLayout,
+  ): Phaser.GameObjects.Image[] {
     const { cols, rows, cellSize, tiles } = layout;
     const half = cellSize / 2;
     const sprites: Phaser.GameObjects.Image[] = [];
@@ -196,7 +199,9 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
   }
 
   private syncFurniture(layout: OfficeSceneLayout): void {
-    const newFurnitureIds = new Set(layout.furniture.map((furniture) => furniture.id));
+    const newFurnitureIds = new Set(
+      layout.furniture.map((furniture) => furniture.id),
+    );
 
     for (const [id, entry] of this.furnitureMap) {
       if (!newFurnitureIds.has(id)) {
@@ -242,9 +247,10 @@ class OfficeLayoutRenderableImpl implements OfficeLayoutRenderable {
     this.characterSource = newLayout.characters;
   }
 
-  private buildCharacterEntries(
-    layout: OfficeSceneLayout,
-  ): Array<{ target: OfficeRenderableTarget; container: Phaser.GameObjects.Container }> {
+  private buildCharacterEntries(layout: OfficeSceneLayout): Array<{
+    target: OfficeRenderableTarget;
+    container: Phaser.GameObjects.Container;
+  }> {
     return layout.characters.map((actor) => {
       const { target, container } = renderCharacter(
         this.scene,
@@ -306,7 +312,10 @@ function buildTileObjects(
       } else {
         scratch.clearTint();
       }
-      scratch.setPosition(col * cellSize + cellSize / 2, row * cellSize + cellSize / 2);
+      scratch.setPosition(
+        col * cellSize + cellSize / 2,
+        row * cellSize + cellSize / 2,
+      );
       rt.batchDraw(scratch);
     }
   }
@@ -340,7 +349,12 @@ function renderFurniture(
     kind: "furniture",
     id: item.id,
     label: item.label,
-    bounds: new Phaser.Geom.Rectangle(x + worldOffsetX, y + worldOffsetY, width, height),
+    bounds: new Phaser.Geom.Rectangle(
+      x + worldOffsetX,
+      y + worldOffsetY,
+      width,
+      height,
+    ),
   };
 
   return { target, container };
@@ -351,7 +365,8 @@ function resolveFurnitureDepth(
   item: OfficeSceneFurniture,
   worldOffsetY: number,
 ): number {
-  const southEdgeDepth = worldOffsetY + (item.row + item.height) * layout.cellSize;
+  const southEdgeDepth =
+    worldOffsetY + (item.row + item.height) * layout.cellSize;
   if (item.placement === "wall") {
     // Wall sprites render at the wall cell's south edge. Wall-mounted furniture
     // must sit slightly in front of that plane so partial wall rebuilds cannot
@@ -359,9 +374,66 @@ function resolveFurnitureDepth(
     return southEdgeDepth + WALL_MOUNT_DEPTH_OFFSET;
   }
 
+  if (item.category === "chairs") {
+    // Chair sprites can span multiple tiles, but the seat plane still lives on
+    // the anchor row. Keep chairs slightly behind that plane so entities on the
+    // seat render on top instead of disappearing behind the furniture sprite.
+    return worldOffsetY + (item.row + 1) * layout.cellSize - CHAIR_DEPTH_OFFSET;
+  }
+
+  if (item.placement === "surface") {
+    const supportDepth = resolveSurfaceSupportDepth(layout, item, worldOffsetY);
+    if (supportDepth !== null) {
+      // Surface items only store their own footprint. On multi-tile tables that
+      // footprint can end above the support's south edge, which lets the table
+      // render over the item. Keep them slightly in front of the deepest floor
+      // support they overlap so they stay visibly on top of the surface.
+      return Math.max(southEdgeDepth, supportDepth + SURFACE_DEPTH_OFFSET);
+    }
+  }
+
   // South-edge world-pixel Y: entities above this row render behind the
   // furniture; entities below it render in front.
   return southEdgeDepth;
+}
+
+function resolveSurfaceSupportDepth(
+  layout: OfficeSceneLayout,
+  item: OfficeSceneFurniture,
+  worldOffsetY: number,
+): number | null {
+  let deepestSupportDepth: number | null = null;
+
+  for (const candidate of layout.furniture) {
+    if (candidate.id === item.id || candidate.placement !== "floor") {
+      continue;
+    }
+
+    if (!doFurnitureBoundsOverlap(item, candidate)) {
+      continue;
+    }
+
+    const candidateSouthEdgeDepth =
+      worldOffsetY + (candidate.row + candidate.height) * layout.cellSize;
+    deepestSupportDepth =
+      deepestSupportDepth === null
+        ? candidateSouthEdgeDepth
+        : Math.max(deepestSupportDepth, candidateSouthEdgeDepth);
+  }
+
+  return deepestSupportDepth;
+}
+
+function doFurnitureBoundsOverlap(
+  left: Pick<OfficeSceneFurniture, "col" | "row" | "width" | "height">,
+  right: Pick<OfficeSceneFurniture, "col" | "row" | "width" | "height">,
+): boolean {
+  return !(
+    left.col >= right.col + right.width ||
+    left.col + left.width <= right.col ||
+    left.row >= right.row + right.height ||
+    left.row + left.height <= right.row
+  );
 }
 
 function buildFurnitureRenderSignature(item: OfficeSceneFurniture): string {
@@ -396,7 +468,12 @@ function renderFurnitureSprite(
   height: number,
 ): void {
   const { atlasFrame, atlasKey } = renderAsset;
-  const sprite = scene.add.image(width / 2, height / 2, DONARG_OFFICE_FURNITURE_ATLAS_KEY, atlasKey);
+  const sprite = scene.add.image(
+    width / 2,
+    height / 2,
+    DONARG_OFFICE_FURNITURE_ATLAS_KEY,
+    atlasKey,
+  );
   sprite.setOrigin(0.5, 0.5);
   sprite.setScale(width / atlasFrame.w, height / atlasFrame.h);
   container.add(sprite);
@@ -537,7 +614,12 @@ function renderCharacter(
     kind: "character",
     id: actor.id,
     label: actor.label,
-    bounds: new Phaser.Geom.Rectangle(x + worldOffsetX, y + worldOffsetY, cellSize, cellSize),
+    bounds: new Phaser.Geom.Rectangle(
+      x + worldOffsetX,
+      y + worldOffsetY,
+      cellSize,
+      cellSize,
+    ),
   };
 
   return { target, container };
