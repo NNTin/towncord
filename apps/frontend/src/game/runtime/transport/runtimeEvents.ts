@@ -302,6 +302,7 @@ function isAnimationCatalog(value: unknown): value is AnimationCatalog {
     value.entityTypes,
     value.playerModels,
     value.mobFamilies,
+    value.npcFamilies,
     value.propFamilies,
     value.tilesetFamilies,
     value.officeCharacterPalettes,
