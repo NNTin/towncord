@@ -62,6 +62,12 @@ export {
   getBloomseedAtlasFrame,
 } from "../content/asset-catalog/bloomseedAtlas";
 export {
+  FARMRPG_ATLAS_H,
+  FARMRPG_ATLAS_IMAGE_URL,
+  FARMRPG_ATLAS_W,
+  getFarmrpgAtlasFrame,
+} from "../content/asset-catalog/farmrpgAtlas";
+export {
   DEBUG_TERRAIN_ATLAS_H,
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,
