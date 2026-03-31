@@ -33,7 +33,6 @@ const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 export type WorldSceneBootOptions = {
   worldBootstrap: WorldBootstrap | null;
   officeBootstrap: OfficeSceneBootstrap;
-  rawUiBootstrap: unknown;
 };
 
 /**
@@ -202,7 +201,7 @@ export class WorldSceneAssembly {
    * Initializes runtime systems. Call once from the scene's `create()`.
    */
   public boot(scene: Phaser.Scene, options: WorldSceneBootOptions): void {
-    const { worldBootstrap, officeBootstrap, rawUiBootstrap } = options;
+    const { worldBootstrap, officeBootstrap } = options;
     const terrainRuntimeContext = this.terrainRuntimeContext;
     if (!terrainRuntimeContext) {
       throw new Error("Terrain runtime context was not initialized.");
@@ -258,7 +257,6 @@ export class WorldSceneAssembly {
     this.selectionController.createSelectionBadge();
     this.terrainController.createBrushPreview();
     this.cameraController.initialize();
-    this.projections.emitRuntimeReady(rawUiBootstrap);
   }
 
   /**

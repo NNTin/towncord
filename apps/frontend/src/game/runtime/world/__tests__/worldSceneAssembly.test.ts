@@ -167,7 +167,6 @@ vi.mock("phaser", () => {
 vi.mock(
   "../../../application/runtime-compilation/load-plans/runtimeBootstrap",
   () => ({
-    UI_BOOTSTRAP_REGISTRY_KEY: "uiBootstrap",
     WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
     getWorldBootstrap: vi.fn(() => ({
       catalog: {},
@@ -462,9 +461,7 @@ describe("WorldScene assembly", () => {
     ).toHaveBeenCalledOnce();
     expect(assemblyMocks.commandBind).toHaveBeenCalledOnce();
     expect(assemblyMocks.cameraInitialize).toHaveBeenCalledOnce();
-    expect(assemblyMocks.projectionEmitRuntimeReady).toHaveBeenCalledWith({
-      world: true,
-    });
+    expect(assemblyMocks.projectionEmitRuntimeReady).not.toHaveBeenCalled();
 
     lifecycle.update(16);
 

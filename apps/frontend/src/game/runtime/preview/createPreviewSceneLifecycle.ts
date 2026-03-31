@@ -195,13 +195,21 @@ export function createPreviewSceneLifecycle(): PreviewSceneLifecycleAdapter {
   return {
     preload(scene: Phaser.Scene): void {
       preloadBloomseedPack(scene);
-      preloadFarmrpgPack(scene);
+      try {
+        preloadFarmrpgPack(scene);
+      } catch {
+        // FarmRPG pack is optional in preview; ignore if missing or invalid.
+      }
       preloadDebugPack(scene);
     },
 
     create(scene: Phaser.Scene): void {
       registerBloomseedAnimations(scene);
-      registerFarmrpgAnimations(scene);
+      try {
+        registerFarmrpgAnimations(scene);
+      } catch {
+        // FarmRPG animations are optional in preview; ignore if manifest is missing or invalid.
+      }
 
       const handlePlay = (payload: PreviewAnimationRequest): void => {
         onPlay(scene, payload);

@@ -1,7 +1,6 @@
 import type Phaser from "phaser";
 import type { WorldSceneLifecycleAdapter } from "../../../engine";
 import {
-  UI_BOOTSTRAP_REGISTRY_KEY,
   getWorldBootstrap,
   WORLD_BOOTSTRAP_REGISTRY_KEY,
 } from "../../application/runtime-compilation/load-plans/runtimeBootstrap";
@@ -33,14 +32,13 @@ export function createWorldSceneLifecycle(): WorldSceneLifecycleAdapter {
       const worldBootstrap = getWorldBootstrap(
         scene.registry.get(WORLD_BOOTSTRAP_REGISTRY_KEY),
       );
-      const rawUiBootstrap = scene.registry.get(UI_BOOTSTRAP_REGISTRY_KEY);
       const officeBootstrap =
         getOfficeSceneBootstrap(
           scene.registry.get(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY),
         ) ?? createOfficeSceneBootstrap();
 
       assembly = new WorldSceneAssembly(scene);
-      assembly.boot(scene, { worldBootstrap, officeBootstrap, rawUiBootstrap });
+      assembly.boot(scene, { worldBootstrap, officeBootstrap });
       assembly.protocolBindings.bind();
     },
 
