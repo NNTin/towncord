@@ -67,6 +67,7 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
     playerFamily,
     mobFamily,
     mobId,
+    npcFamily,
     propFamily,
     propGroup,
     tilesetFamily,
@@ -83,6 +84,7 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
     selectPlayerFamily,
     selectMobFamily,
     selectMobId,
+    selectNpcFamily,
     selectPropFamily,
     selectPropGroup,
     selectTilesetFamily,
@@ -93,7 +95,7 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
     setTilesetFrameIndex,
   } = usePreviewSelectionModel(preview.catalog);
   const expectedPreviewKey = currentTrack
-    ? resolveTrackForDirection(currentTrack, previewDirection)?.key ?? null
+    ? (resolveTrackForDirection(currentTrack, previewDirection)?.key ?? null)
     : null;
   const maxTilesetFrameIndex =
     isTilesetStatic &&
@@ -121,7 +123,14 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
         onToggle={previewPanel.toggle}
       />
       {previewPanel.isOpen && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 4 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+            paddingLeft: 4,
+          }}
+        >
           {preview.catalog.entityTypes.map((entityTypeId) => (
             <button
               key={entityTypeId}
@@ -132,29 +141,57 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
             </button>
           ))}
 
-          {entityType === "player" && preview.catalog.playerModels.length > 1 && (
-            <>
-              <SectionLabel>Family</SectionLabel>
-              {preview.catalog.playerModels.map((family) => (
-                <button key={family} onClick={() => selectPlayerFamily(family)} style={activeBtn(playerFamily === family)}>
-                  {family}
-                </button>
-              ))}
-            </>
-          )}
+          {entityType === "player" &&
+            preview.catalog.playerModels.length > 1 && (
+              <>
+                <SectionLabel>Family</SectionLabel>
+                {preview.catalog.playerModels.map((family) => (
+                  <button
+                    key={family}
+                    onClick={() => selectPlayerFamily(family)}
+                    style={activeBtn(playerFamily === family)}
+                  >
+                    {family}
+                  </button>
+                ))}
+              </>
+            )}
 
           {entityType === "mobs" && (
             <>
               <SectionLabel>Family</SectionLabel>
               {preview.catalog.mobFamilies.map((family) => (
-                <button key={family} onClick={() => selectMobFamily(family)} style={activeBtn(mobFamily === family)}>
+                <button
+                  key={family}
+                  onClick={() => selectMobFamily(family)}
+                  style={activeBtn(mobFamily === family)}
+                >
                   {family}
                 </button>
               ))}
               <SectionLabel>Mob</SectionLabel>
               {mobIds.map((id) => (
-                <button key={id} onClick={() => selectMobId(id)} style={activeBtn(mobId === id)}>
+                <button
+                  key={id}
+                  onClick={() => selectMobId(id)}
+                  style={activeBtn(mobId === id)}
+                >
                   {id}
+                </button>
+              ))}
+            </>
+          )}
+
+          {entityType === "npcs" && (
+            <>
+              <SectionLabel>Family</SectionLabel>
+              {preview.catalog.npcFamilies.map((family) => (
+                <button
+                  key={family}
+                  onClick={() => selectNpcFamily(family)}
+                  style={activeBtn(npcFamily === family)}
+                >
+                  {family}
                 </button>
               ))}
             </>
@@ -164,7 +201,11 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
             <>
               <SectionLabel>Family</SectionLabel>
               {preview.catalog.propFamilies.map((family) => (
-                <button key={family} onClick={() => selectPropFamily(family)} style={activeBtn(propFamily === family)}>
+                <button
+                  key={family}
+                  onClick={() => selectPropFamily(family)}
+                  style={activeBtn(propFamily === family)}
+                >
                   {family}
                 </button>
               ))}
@@ -172,7 +213,11 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
                 <>
                   <SectionLabel>Group</SectionLabel>
                   {propGroups.map((group) => (
-                    <button key={group} onClick={() => selectPropGroup(group)} style={activeBtn(propGroup === group)}>
+                    <button
+                      key={group}
+                      onClick={() => selectPropGroup(group)}
+                      style={activeBtn(propGroup === group)}
+                    >
                       {group}
                     </button>
                   ))}
@@ -185,7 +230,11 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
             <>
               <SectionLabel>Family</SectionLabel>
               {preview.catalog.tilesetFamilies.map((family) => (
-                <button key={family} onClick={() => selectTilesetFamily(family)} style={activeBtn(tilesetFamily === family)}>
+                <button
+                  key={family}
+                  onClick={() => selectTilesetFamily(family)}
+                  style={activeBtn(tilesetFamily === family)}
+                >
                   {family}
                 </button>
               ))}
@@ -193,7 +242,11 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
                 <>
                   <SectionLabel>Group</SectionLabel>
                   {tilesetGroups.map((group) => (
-                    <button key={group} onClick={() => selectTilesetGroup(group)} style={activeBtn(tilesetGroup === group)}>
+                    <button
+                      key={group}
+                      onClick={() => selectTilesetGroup(group)}
+                      style={activeBtn(tilesetGroup === group)}
+                    >
                       {group}
                     </button>
                   ))}
@@ -222,8 +275,14 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
               <SectionLabel>Tile</SectionLabel>
               <div style={{ alignItems: "center", display: "flex", gap: 4 }}>
                 <button
-                  onClick={() => setTilesetFrameIndex((value) => Math.max(0, value - 1))}
-                  style={{ ...activeBtn(false), minWidth: 30, padding: "4px 0" }}
+                  onClick={() =>
+                    setTilesetFrameIndex((value) => Math.max(0, value - 1))
+                  }
+                  style={{
+                    ...activeBtn(false),
+                    minWidth: 30,
+                    padding: "4px 0",
+                  }}
                 >
                   -
                 </button>
@@ -234,7 +293,9 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
                   value={resolvedTilesetFrameIndex}
                   onChange={(event) => {
                     const parsed = Number.parseInt(event.target.value, 10);
-                    setTilesetFrameIndex(Number.isFinite(parsed) ? Math.max(0, parsed) : 0);
+                    setTilesetFrameIndex(
+                      Number.isFinite(parsed) ? Math.max(0, parsed) : 0,
+                    );
                   }}
                   style={{
                     background: "var(--ui-surface-muted)",
@@ -250,17 +311,24 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
                 <button
                   onClick={() =>
                     setTilesetFrameIndex((value) =>
-                      maxTilesetFrameIndex === null ? value + 1 : Math.min(maxTilesetFrameIndex, value + 1),
+                      maxTilesetFrameIndex === null
+                        ? value + 1
+                        : Math.min(maxTilesetFrameIndex, value + 1),
                     )
                   }
-                  style={{ ...activeBtn(false), minWidth: 30, padding: "4px 0" }}
+                  style={{
+                    ...activeBtn(false),
+                    minWidth: 30,
+                    padding: "4px 0",
+                  }}
                 >
                   +
                 </button>
               </div>
               {maxTilesetFrameIndex !== null && (
                 <div style={{ color: "var(--ui-text-muted)", fontSize: 10 }}>
-                  Tile {resolvedTilesetFrameIndex + 1} / {maxTilesetFrameIndex + 1}
+                  Tile {resolvedTilesetFrameIndex + 1} /{" "}
+                  {maxTilesetFrameIndex + 1}
                 </div>
               )}
             </>
@@ -302,9 +370,13 @@ export function PreviewPanel({ preview, onInfo }: Props): JSX.Element {
           {preview.inspectedTile && (
             <>
               <div style={{ color: "var(--ui-text-muted)", fontSize: 10 }}>
-                Inspecting tile {preview.inspectedTile.cellX},{preview.inspectedTile.cellY}
+                Inspecting tile {preview.inspectedTile.cellX},
+                {preview.inspectedTile.cellY}
               </div>
-              <button onClick={preview.onClearInspectedTile} style={activeBtn(false)}>
+              <button
+                onClick={preview.onClearInspectedTile}
+                style={activeBtn(false)}
+              >
                 Back to animation
               </button>
             </>

@@ -4,6 +4,7 @@ import {
   createPreloadRuntimeScene,
   createWorldRuntimeScene,
 } from "../../../engine/world-runtime/scene/runtimeScenes";
+import type { RuntimeBootstrapPayload } from "../../contracts/runtime";
 import { createWorldRuntimePreloadLifecycle } from "../preload/createWorldRuntimePreloadLifecycle";
 import type { RuntimeHost } from "../transport/host";
 import { createWorldSceneLifecycle } from "../world/createWorldSceneLifecycle";
@@ -15,12 +16,20 @@ export type WorldRuntimeHostAssemblyFactory = (
 export function createWorldRuntimeHostAssembly(
   parent: HTMLElement,
 ): RuntimeHost {
-  const preloadAdapter = createWorldRuntimePreloadLifecycle();
+  let uiBootstrapSnapshot: RuntimeBootstrapPayload | null = null;
+  const preloadAdapter = createWorldRuntimePreloadLifecycle({
+    onUiBootstrap(bootstrap) {
+      uiBootstrapSnapshot = bootstrap;
+    },
+  });
   const lifecycleAdapter = createWorldSceneLifecycle();
 
-  return createWorldRuntimeHost(parent, [
+  const runtime = createWorldRuntimeHost(parent, [
     createBootRuntimeScene(),
     createPreloadRuntimeScene(preloadAdapter),
     createWorldRuntimeScene(lifecycleAdapter),
-  ]);
+  ]) as RuntimeHost;
+
+  runtime.getUiBootstrapSnapshot = () => uiBootstrapSnapshot;
+  return runtime;
 }

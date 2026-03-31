@@ -6,6 +6,7 @@ import type {
 import type {
   PlayerPlacedPayload,
   PlayerStateChangedPayload,
+  RuntimeBootstrapPayload,
   RuntimePerfPayload,
   TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
@@ -23,8 +24,16 @@ type RuntimeProjectionHost = {
     | {
         events: {
           emit: (event: string, payload: unknown) => void;
-          on: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
-          off: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
+          on: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
+          off: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
         };
       }
     | null
@@ -33,6 +42,14 @@ type RuntimeProjectionHost = {
 
 export class WorldSceneProjectionEmitter {
   constructor(private readonly host: RuntimeProjectionHost) {}
+
+  public emitRuntimeReady(rawPayload: unknown): void {
+    emitRuntimeToUiEvent(
+      this.host.getRuntimeHost(),
+      RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
+      rawPayload as RuntimeBootstrapPayload,
+    );
+  }
 
   public emitTerrainTileInspected(payload: TerrainTileInspectedPayload): void {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED, payload);
@@ -62,7 +79,9 @@ export class WorldSceneProjectionEmitter {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, payload);
   }
 
-  public emitOfficeSelectionChanged(payload: OfficeSelectionChangedPayload): void {
+  public emitOfficeSelectionChanged(
+    payload: OfficeSelectionChangedPayload,
+  ): void {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, payload);
   }
 

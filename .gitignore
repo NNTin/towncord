@@ -3,6 +3,7 @@
 apps/frontend/public/assets/bloomseed/
 apps/frontend/public/assets/debug/
 apps/frontend/public/assets/donarg-office/
+apps/frontend/public/assets/farmrpg/
 node_modules/
 TODO.md
 __pycache__/
@@ -20,3 +21,8 @@ specs/
 agent-orchestrator.yaml
 .claude/
 AGENTS.md
+
+.env
+docs/
+
+.github/agents/

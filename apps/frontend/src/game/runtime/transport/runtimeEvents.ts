@@ -97,6 +97,7 @@ type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 const ANIMATION_ENTITY_TYPE_SET = new Set([
   "player",
   "mobs",
+  "npcs",
   "props",
   "tilesets",
 ]);
@@ -301,6 +302,7 @@ function isAnimationCatalog(value: unknown): value is AnimationCatalog {
     value.entityTypes,
     value.playerModels,
     value.mobFamilies,
+    value.npcFamilies,
     value.propFamilies,
     value.tilesetFamilies,
     value.officeCharacterPalettes,

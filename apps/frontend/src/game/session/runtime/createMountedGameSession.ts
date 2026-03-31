@@ -1,7 +1,9 @@
+import { UI_BOOTSTRAP_REGISTRY_KEY } from "../../application/runtime-compilation/load-plans/runtimeBootstrap";
 import type { RuntimeHost } from "../../runtime/transport/host";
 import { toPlaceDropPayload } from "../../runtime/transport/placeDragPayload";
 import {
   bindRuntimeToUiEvent,
+  normalizeRuntimeBootstrapPayload,
   RUNTIME_TO_UI_EVENTS,
 } from "../../runtime/transport/runtimeEvents";
 import {
@@ -9,10 +11,7 @@ import {
   emitUiToRuntimeCommand,
   UI_TO_RUNTIME_COMMANDS,
 } from "../../runtime/transport/uiCommands";
-import type {
-  GameSession,
-  GameSessionNotifications,
-} from "../GameSession";
+import type { GameSession, GameSessionNotifications } from "../GameSession";
 
 export function createMountedGameSession(runtime: RuntimeHost): GameSession {
   const subscribers = new Set<GameSessionNotifications>();
@@ -20,7 +19,9 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     | Parameters<NonNullable<GameSessionNotifications["onBootstrap"]>>[0]
     | null = null;
   let terrainSeedSnapshot:
-    | Parameters<NonNullable<GameSessionNotifications["onTerrainSeedChanged"]>>[0]
+    | Parameters<
+        NonNullable<GameSessionNotifications["onTerrainSeedChanged"]>
+      >[0]
     | null = null;
   let officeSelectionSnapshot:
     | Parameters<
@@ -38,52 +39,88 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     }
   };
 
+  const publishBootstrapSnapshot = (
+    payload: Parameters<
+      NonNullable<GameSessionNotifications["onBootstrap"]>
+    >[0],
+  ): void => {
+    if (bootstrapSnapshot) {
+      return;
+    }
+
+    bootstrapSnapshot = payload;
+    forEachSubscriber((subscriber) => subscriber.onBootstrap?.(payload));
+  };
+
+  const hydrateBootstrapSnapshotFromRegistry = (): void => {
+    if (bootstrapSnapshot) {
+      return;
+    }
+
+    const cachedBootstrap = normalizeRuntimeBootstrapPayload(
+      runtime.getUiBootstrapSnapshot?.(),
+    );
+    if (cachedBootstrap) {
+      publishBootstrapSnapshot(cachedBootstrap);
+      return;
+    }
+
+    const registryBootstrap = normalizeRuntimeBootstrapPayload(
+      runtime.registry?.get(UI_BOOTSTRAP_REGISTRY_KEY),
+    );
+    if (registryBootstrap) {
+      publishBootstrapSnapshot(registryBootstrap);
+    }
+  };
+
   const unbindBootstrap = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
-    (payload) => {
-      if (bootstrapSnapshot) {
-        return;
-      }
-
-      bootstrapSnapshot = payload;
-      forEachSubscriber((subscriber) => subscriber.onBootstrap?.(payload));
-    },
+    (payload) => publishBootstrapSnapshot(payload),
   );
   const unbindTerrainTileInspected = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.TERRAIN_TILE_INSPECTED,
-    (payload) =>
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       forEachSubscriber((subscriber) =>
         subscriber.onTerrainTileInspected?.(payload),
-      ),
+      );
+    },
   );
   const unbindRuntimeDiagnostics = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.RUNTIME_PERF,
-    (payload) =>
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       forEachSubscriber((subscriber) =>
         subscriber.onRuntimeDiagnostics?.(payload),
-      ),
+      );
+    },
   );
   const unbindZoomChanged = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED,
-    (payload) =>
-      forEachSubscriber((subscriber) => subscriber.onZoomChanged?.(payload)),
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
+      forEachSubscriber((subscriber) => subscriber.onZoomChanged?.(payload));
+    },
   );
   const unbindOfficeLayoutChanged = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,
-    (payload) =>
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       forEachSubscriber((subscriber) =>
         subscriber.onOfficeLayoutChanged?.(payload.layout),
-      ),
+      );
+    },
   );
   const unbindTerrainSeedChanged = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
     (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       terrainSeedSnapshot = payload.seed;
       forEachSubscriber((subscriber) =>
         subscriber.onTerrainSeedChanged?.(payload.seed),
@@ -93,15 +130,18 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
   const unbindOfficeFloorPicked = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED,
-    (payload) =>
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       forEachSubscriber((subscriber) =>
         subscriber.onOfficeFloorPicked?.(payload),
-      ),
+      );
+    },
   );
   const unbindOfficeSelectionChanged = bindRuntimeToUiEvent(
     runtime,
     RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED,
     (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
       officeSelectionSnapshot = payload;
       hasOfficeSelectionSnapshot = true;
       forEachSubscriber((subscriber) =>
@@ -109,6 +149,8 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       );
     },
   );
+
+  hydrateBootstrapSnapshotFromRegistry();
 
   const destroy = (): void => {
     if (destroyed) {
@@ -135,6 +177,7 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       }
 
       subscribers.add(notifications);
+      hydrateBootstrapSnapshotFromRegistry();
       if (bootstrapSnapshot) {
         notifications.onBootstrap?.(bootstrapSnapshot);
       }
@@ -177,7 +220,9 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         return;
       }
 
-      emitUiToRuntimeCommand(runtime, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, { zoom });
+      emitUiToRuntimeCommand(runtime, UI_TO_RUNTIME_COMMANDS.SET_ZOOM, {
+        zoom,
+      });
     },
     setOfficeEditorTool(payload) {
       if (destroyed) {

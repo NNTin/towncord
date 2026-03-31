@@ -3,8 +3,12 @@ import type { PreviewSceneLifecycleAdapter } from "../../../engine";
 import {
   preloadBloomseedPack,
   preloadDebugPack,
+  preloadFarmrpgPack,
 } from "../../content/preload/preload";
-import { registerBloomseedAnimations } from "../../content/preload/animation";
+import {
+  registerBloomseedAnimations,
+  registerFarmrpgAnimations,
+} from "../../content/preload/animation";
 import {
   PREVIEW_INFO_EVENT,
   PREVIEW_PLAY_EVENT,
@@ -140,10 +144,7 @@ export function createPreviewSceneLifecycle(): PreviewSceneLifecycleAdapter {
     scene.game.events.emit(PREVIEW_INFO_EVENT, info);
   }
 
-  function onShowTile(
-    scene: Phaser.Scene,
-    payload: PreviewTileRequest,
-  ): void {
+  function onShowTile(scene: Phaser.Scene, payload: PreviewTileRequest): void {
     const {
       textureKey,
       frame,
@@ -194,11 +195,21 @@ export function createPreviewSceneLifecycle(): PreviewSceneLifecycleAdapter {
   return {
     preload(scene: Phaser.Scene): void {
       preloadBloomseedPack(scene);
+      try {
+        preloadFarmrpgPack(scene);
+      } catch {
+        // FarmRPG pack is optional in preview; ignore if missing or invalid.
+      }
       preloadDebugPack(scene);
     },
 
     create(scene: Phaser.Scene): void {
       registerBloomseedAnimations(scene);
+      try {
+        registerFarmrpgAnimations(scene);
+      } catch {
+        // FarmRPG animations are optional in preview; ignore if manifest is missing or invalid.
+      }
 
       const handlePlay = (payload: PreviewAnimationRequest): void => {
         onPlay(scene, payload);

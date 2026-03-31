@@ -3,10 +3,12 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 vi.mock("../../../content/preload/preload", () => ({
   preloadBloomseedPack: vi.fn(),
   preloadDebugPack: vi.fn(),
+  preloadFarmrpgPack: vi.fn(),
 }));
 
 vi.mock("../../../content/preload/animation", () => ({
   registerBloomseedAnimations: vi.fn(),
+  registerFarmrpgAnimations: vi.fn(),
 }));
 
 vi.mock("phaser", () => ({
@@ -129,7 +131,9 @@ describe("createPreviewSceneLifecycle", () => {
 
   test("create() registers bloomseed animations before emitting ready", () => {
     const callOrder: string[] = [];
-    (registerBloomseedAnimations as ReturnType<typeof vi.fn>).mockImplementation(() => {
+    (
+      registerBloomseedAnimations as ReturnType<typeof vi.fn>
+    ).mockImplementation(() => {
       callOrder.push("registerAnimations");
     });
 
@@ -155,9 +159,9 @@ describe("createPreviewSceneLifecycle", () => {
     adapter.create(scene as never);
 
     expect(scene.game.events.emit).toHaveBeenCalledWith(PREVIEW_READY_EVENT);
-    const readyCalls = (scene.game.events.emit as ReturnType<typeof vi.fn>).mock.calls.filter(
-      (args) => args[0] === PREVIEW_READY_EVENT,
-    );
+    const readyCalls = (
+      scene.game.events.emit as ReturnType<typeof vi.fn>
+    ).mock.calls.filter((args) => args[0] === PREVIEW_READY_EVENT);
     expect(readyCalls).toHaveLength(1);
   });
 
@@ -183,14 +187,25 @@ describe("createPreviewSceneLifecycle", () => {
 
     adapter.create(scene as never);
 
-    const onCalls = (scene.game.events.on as ReturnType<typeof vi.fn>).mock.calls;
-    const playHandler = onCalls.find((args) => args[0] === PREVIEW_PLAY_EVENT)?.[1];
-    const tileHandler = onCalls.find((args) => args[0] === PREVIEW_SHOW_TILE_EVENT)?.[1];
+    const onCalls = (scene.game.events.on as ReturnType<typeof vi.fn>).mock
+      .calls;
+    const playHandler = onCalls.find(
+      (args) => args[0] === PREVIEW_PLAY_EVENT,
+    )?.[1];
+    const tileHandler = onCalls.find(
+      (args) => args[0] === PREVIEW_SHOW_TILE_EVENT,
+    )?.[1];
 
     adapter.dispose();
 
-    expect(scene.game.events.off).toHaveBeenCalledWith(PREVIEW_PLAY_EVENT, playHandler);
-    expect(scene.game.events.off).toHaveBeenCalledWith(PREVIEW_SHOW_TILE_EVENT, tileHandler);
+    expect(scene.game.events.off).toHaveBeenCalledWith(
+      PREVIEW_PLAY_EVENT,
+      playHandler,
+    );
+    expect(scene.game.events.off).toHaveBeenCalledWith(
+      PREVIEW_SHOW_TILE_EVENT,
+      tileHandler,
+    );
   });
 
   test("dispose() can be called without create() without throwing", () => {
@@ -212,7 +227,9 @@ describe("createPreviewSceneLifecycle", () => {
 
     const frameObj = { width: 32, height: 48 };
     const textureObj = { get: vi.fn().mockReturnValue(frameObj) };
-    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(textureObj);
+    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(
+      textureObj,
+    );
     (scene.anims.exists as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     adapter.create(scene as never);
@@ -248,7 +265,9 @@ describe("createPreviewSceneLifecycle", () => {
     const resolvedFrame = { width: 16, height: 16 };
     const textureObj = { get: vi.fn().mockReturnValue(resolvedFrame) };
     (scene.textures.exists as ReturnType<typeof vi.fn>).mockReturnValue(true);
-    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(textureObj);
+    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(
+      textureObj,
+    );
 
     adapter.create(scene as never);
     vi.mocked(scene.game.events.emit).mockClear();
@@ -319,12 +338,16 @@ describe("createPreviewSceneLifecycle", () => {
     const animationFrames = [
       { textureKey: "bloomseed.characters", textureFrame: "player_idle_0" },
     ];
-    (scene.anims.get as ReturnType<typeof vi.fn>).mockReturnValue({ frames: animationFrames });
+    (scene.anims.get as ReturnType<typeof vi.fn>).mockReturnValue({
+      frames: animationFrames,
+    });
     (scene.anims.exists as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     const frameObj = { width: 32, height: 48 };
     const textureObj = { get: vi.fn().mockReturnValue(frameObj) };
-    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(textureObj);
+    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(
+      textureObj,
+    );
 
     adapter.create(scene as never);
 
@@ -350,12 +373,16 @@ describe("createPreviewSceneLifecycle", () => {
       { textureKey: "bloomseed.characters", textureFrame: "player_idle_0" },
       { textureKey: "bloomseed.characters", textureFrame: "player_idle_1" },
     ];
-    (scene.anims.get as ReturnType<typeof vi.fn>).mockReturnValue({ frames: animationFrames });
+    (scene.anims.get as ReturnType<typeof vi.fn>).mockReturnValue({
+      frames: animationFrames,
+    });
     (scene.anims.exists as ReturnType<typeof vi.fn>).mockReturnValue(true);
 
     const frameObj = { width: 32, height: 48 };
     const textureObj = { get: vi.fn().mockReturnValue(frameObj) };
-    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(textureObj);
+    (scene.textures.get as ReturnType<typeof vi.fn>).mockReturnValue(
+      textureObj,
+    );
 
     adapter.create(scene as never);
 

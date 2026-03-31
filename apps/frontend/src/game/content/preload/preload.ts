@@ -5,6 +5,11 @@ const BLOOMSEED_PACK_URL = "assets/bloomseed/pack.json";
 const BLOOMSEED_PACK_SECTION = "bloomseed";
 export const BLOOMSEED_ANIMATIONS_JSON_KEY = "bloomseed.animations";
 
+const FARMRPG_PACK_KEY = "farmrpg";
+const FARMRPG_PACK_URL = "assets/farmrpg/pack.json";
+const FARMRPG_PACK_SECTION = "farmrpg";
+export const FARMRPG_ANIMATIONS_JSON_KEY = "farmrpg.animations";
+
 const DEBUG_PACK_KEY = "debug";
 const DEBUG_PACK_URL = "assets/debug/pack.json";
 const DEBUG_PACK_SECTION = "debug";
@@ -59,6 +64,26 @@ export function preloadBloomseedPack(
     section,
     skipIfLoaded,
     manifestKey: BLOOMSEED_ANIMATIONS_JSON_KEY,
+  });
+}
+
+export function preloadFarmrpgPack(
+  scene: Phaser.Scene,
+  options: PackPreloadOptions = {},
+): boolean {
+  const {
+    packKey = FARMRPG_PACK_KEY,
+    packUrl = FARMRPG_PACK_URL,
+    section = FARMRPG_PACK_SECTION,
+    skipIfLoaded = true,
+  } = options;
+
+  return preloadPack(scene, {
+    packKey,
+    packUrl,
+    section,
+    skipIfLoaded,
+    manifestKey: FARMRPG_ANIMATIONS_JSON_KEY,
   });
 }
 

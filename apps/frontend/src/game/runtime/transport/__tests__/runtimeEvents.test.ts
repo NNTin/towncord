@@ -81,9 +81,10 @@ function createLayoutSnapshot(): OfficeLayoutChangedPayload["layout"] {
 function createBootstrapPayload(): RuntimeBootstrapPayload {
   return {
     catalog: {
-      entityTypes: ["player"],
+      entityTypes: ["player", "npcs"],
       playerModels: ["female"],
       mobFamilies: [],
+      npcFamilies: ["child"],
       propFamilies: [],
       tilesetFamilies: ["static"],
       officeCharacterPalettes: ["palette-0"],
@@ -99,7 +100,25 @@ function createBootstrapPayload(): RuntimeBootstrapPayload {
               label: "walk",
               entityType: "player" as const,
               directional: true,
-              keyByDirection: { down: "characters.bloomseed.player.female.walk-down" },
+              keyByDirection: {
+                down: "characters.bloomseed.player.female.walk-down",
+              },
+              undirectedKey: null,
+              equipmentCompatible: [],
+            },
+          ],
+        ],
+        [
+          "npcs/child",
+          [
+            {
+              id: "idle",
+              label: "idle",
+              entityType: "npcs" as const,
+              directional: true,
+              keyByDirection: {
+                down: "characters.farmrpg.npc.child.idle.down",
+              },
               undirectedKey: null,
               equipmentCompatible: [],
             },
@@ -186,8 +205,16 @@ describe("runtimeEvents transport", () => {
     const handler = vi.fn();
     const payload = { layout: createLayoutSnapshot() };
 
-    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, handler);
-    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED, payload);
+    bindRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,
+      handler,
+    );
+    emitRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,
+      payload,
+    );
 
     const received = handler.mock.calls[0]?.[0];
     expect(received).toEqual(payload);
@@ -210,7 +237,9 @@ describe("runtimeEvents transport", () => {
     expect(received).toEqual(payload);
     expect(received).not.toBe(payload);
     expect(received?.catalog).not.toBe(payload.catalog);
-    expect(received?.catalog.tracksByPath).not.toBe(payload.catalog.tracksByPath);
+    expect(received?.catalog.tracksByPath).not.toBe(
+      payload.catalog.tracksByPath,
+    );
     expect(received?.placeables).not.toBe(payload.placeables);
   });
 
@@ -219,8 +248,16 @@ describe("runtimeEvents transport", () => {
     const handler = vi.fn();
     const payload = createTerrainSeedPayload();
 
-    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, handler);
-    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, payload);
+    bindRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
+      handler,
+    );
+    emitRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED,
+      payload,
+    );
 
     const received = handler.mock.calls[0]?.[0];
     expect(received).toEqual(payload);
@@ -235,8 +272,16 @@ describe("runtimeEvents transport", () => {
     const handler = vi.fn();
     const payload = createSelectionPayload();
 
-    bindRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, handler);
-    emitRuntimeToUiEvent(host, RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED, payload);
+    bindRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED,
+      handler,
+    );
+    emitRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED,
+      payload,
+    );
 
     const received = handler.mock.calls[0]?.[0];
     expect(received).toEqual(payload);

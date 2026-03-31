@@ -17,8 +17,9 @@ import {
 } from "../runtimeUiBridgeHooks";
 import { useRuntimeUiBridge } from "../useRuntimeUiBridge";
 
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
-  true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 function renderHarness() {
   const container = document.createElement("div");
@@ -67,6 +68,7 @@ function renderHarness() {
         entityTypes: [],
         playerModels: [],
         mobFamilies: [],
+        npcFamilies: [],
         propFamilies: [],
         tilesetFamilies: [],
         officeCharacterPalettes: [],
@@ -251,8 +253,12 @@ describe("useRuntimeUiBridge", () => {
       bridge.onDeleteSelectedOfficePlaceable();
     });
 
-    expect(harness.sessionRef.current.rotateSelectedOfficePlaceable).toHaveBeenCalledOnce();
-    expect(harness.sessionRef.current.deleteSelectedOfficePlaceable).toHaveBeenCalledOnce();
+    expect(
+      harness.sessionRef.current.rotateSelectedOfficePlaceable,
+    ).toHaveBeenCalledOnce();
+    expect(
+      harness.sessionRef.current.deleteSelectedOfficePlaceable,
+    ).toHaveBeenCalledOnce();
 
     await harness.unmount();
   });

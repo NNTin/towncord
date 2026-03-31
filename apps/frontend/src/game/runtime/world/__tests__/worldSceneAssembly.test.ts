@@ -84,6 +84,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeUpdate: vi.fn(),
   placementHandlePlaceEntityDrop: vi.fn(),
   projectionEmit: vi.fn(),
+  projectionEmitRuntimeReady: vi.fn(),
   projectionEmitTerrainSeedChanged: vi.fn(),
   selectionCreateSelectionBadge: vi.fn(),
   selectionDispose: vi.fn(),
@@ -107,7 +108,10 @@ const assemblyMocks = vi.hoisted(() => ({
     isCellWalkable: vi.fn(() => true),
     cellToWorldCenter: vi.fn(() => ({ worldX: 0, worldY: 0 })),
     findPath: vi.fn(() => ({ cells: [], revision: 1 })),
-    clampWorldPoint: vi.fn((worldX: number, worldY: number) => ({ worldX, worldY })),
+    clampWorldPoint: vi.fn((worldX: number, worldY: number) => ({
+      worldX,
+      worldY,
+    })),
     isWorldWalkable: vi.fn(() => true),
   },
   terrainRuntimeDestroy: vi.fn(),
@@ -160,19 +164,33 @@ vi.mock("phaser", () => {
   };
 });
 
-vi.mock("../../../application/runtime-compilation/load-plans/runtimeBootstrap", () => ({
-  WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
-  getWorldBootstrap: vi.fn(() => ({
-    catalog: {},
-    entityRegistry: {},
-  })),
+vi.mock(
+  "../../../application/runtime-compilation/load-plans/runtimeBootstrap",
+  () => ({
+    WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
+    getWorldBootstrap: vi.fn(() => ({
+      catalog: {},
+      entityRegistry: {},
+    })),
+  }),
+);
+
+vi.mock("../../../runtime/transport/runtimeEvents", () => ({
+  RUNTIME_TO_UI_EVENTS: {
+    RUNTIME_READY: "runtimeReady",
+  },
+  emitRuntimeToUiEvent: vi.fn(),
+  normalizeRuntimeBootstrapPayload: vi.fn((value: unknown) => value),
 }));
 
-vi.mock("../../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap", () => ({
-  OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY: "officeSceneBootstrap",
-  createOfficeSceneBootstrap: assemblyMocks.createOfficeSceneBootstrap,
-  getOfficeSceneBootstrap: assemblyMocks.getOfficeSceneBootstrap,
-}));
+vi.mock(
+  "../../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap",
+  () => ({
+    OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY: "officeSceneBootstrap",
+    createOfficeSceneBootstrap: assemblyMocks.createOfficeSceneBootstrap,
+    getOfficeSceneBootstrap: assemblyMocks.getOfficeSceneBootstrap,
+  }),
+);
 
 vi.mock("../../../terrain/runtime", () => ({
   createTerrainRuntimeContext: vi.fn(() => ({
@@ -290,6 +308,7 @@ vi.mock("../entitySystem", () => ({
 
 vi.mock("../worldSceneProjections", () => ({
   WorldSceneProjectionEmitter: class {
+    public emitRuntimeReady = assemblyMocks.projectionEmitRuntimeReady;
     public emitPlayerStateChanged = assemblyMocks.projectionEmit;
     public emitTerrainSeedChanged =
       assemblyMocks.projectionEmitTerrainSeedChanged;
@@ -306,7 +325,8 @@ vi.mock("../worldSceneOfficeRuntime", () => ({
     public continuePainting = assemblyMocks.officeContinuePainting;
     public syncHighlight = assemblyMocks.officeSyncHighlight;
     public endPainting = assemblyMocks.officeEndPainting;
-    public rotateSelectedFurniture = assemblyMocks.officeRotateSelectedFurniture;
+    public rotateSelectedFurniture =
+      assemblyMocks.officeRotateSelectedFurniture;
     public update = assemblyMocks.officeUpdate;
     public handleSetEditorTool = assemblyMocks.officeHandleSetEditorTool;
     public dispose = assemblyMocks.officeDispose;
@@ -339,8 +359,7 @@ vi.mock("../worldSceneTerrainController", () => ({
     public beginPainting = assemblyMocks.terrainControllerBeginPainting;
     public shouldContinuePainting =
       assemblyMocks.terrainControllerShouldContinuePainting;
-    public continuePainting =
-      assemblyMocks.terrainControllerContinuePainting;
+    public continuePainting = assemblyMocks.terrainControllerContinuePainting;
     public endPainting = assemblyMocks.terrainControllerEndPainting;
     public handlePlaceTerrainDrop =
       assemblyMocks.terrainControllerHandlePlaceTerrainDrop;
@@ -380,9 +399,7 @@ function makeScene(): Record<string, unknown> {
       activePointer: { withinGame: true, x: 12, y: 34 },
       keyboard: {
         addKeys: vi.fn(() => movementKeys),
-        addKey: vi.fn((keyCode: number) =>
-          keyCode === 16 ? shiftKey : rKey,
-        ),
+        addKey: vi.fn((keyCode: number) => (keyCode === 16 ? shiftKey : rKey)),
       },
       on: vi.fn(),
       off: vi.fn(),
@@ -423,7 +440,9 @@ describe("WorldScene assembly", () => {
 
     lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
 
-    expect(assemblyMocks.getOfficeSceneBootstrap).toHaveBeenCalledWith({ world: true });
+    expect(assemblyMocks.getOfficeSceneBootstrap).toHaveBeenCalledWith({
+      world: true,
+    });
     expect(assemblyMocks.officeBootstrap).toHaveBeenCalledWith(
       expect.objectContaining({
         anchor: {
@@ -437,9 +456,12 @@ describe("WorldScene assembly", () => {
     expect(assemblyMocks.createTerrainNavigationService).toHaveBeenCalledOnce();
     expect(assemblyMocks.entitySystemConstruct).toHaveBeenCalledOnce();
     expect(assemblyMocks.selectionCreateSelectionBadge).toHaveBeenCalledOnce();
-    expect(assemblyMocks.terrainControllerCreateBrushPreview).toHaveBeenCalledOnce();
+    expect(
+      assemblyMocks.terrainControllerCreateBrushPreview,
+    ).toHaveBeenCalledOnce();
     expect(assemblyMocks.commandBind).toHaveBeenCalledOnce();
     expect(assemblyMocks.cameraInitialize).toHaveBeenCalledOnce();
+    expect(assemblyMocks.projectionEmitRuntimeReady).not.toHaveBeenCalled();
 
     lifecycle.update(16);
 
@@ -491,13 +513,19 @@ describe("WorldScene assembly", () => {
     const scene = makeScene();
     lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
 
-    const pointer = { x: 5, y: 10 } as unknown as Parameters<typeof lifecycle.onPointerDown>[0];
+    const pointer = { x: 5, y: 10 } as unknown as Parameters<
+      typeof lifecycle.onPointerDown
+    >[0];
     lifecycle.onPointerDown(pointer);
     lifecycle.onPointerMove(pointer);
     lifecycle.onPointerUp(pointer);
 
-    expect(assemblyMocks.inputRouterOnPointerDown).toHaveBeenCalledWith(pointer);
-    expect(assemblyMocks.inputRouterOnPointerMove).toHaveBeenCalledWith(pointer);
+    expect(assemblyMocks.inputRouterOnPointerDown).toHaveBeenCalledWith(
+      pointer,
+    );
+    expect(assemblyMocks.inputRouterOnPointerMove).toHaveBeenCalledWith(
+      pointer,
+    );
     expect(assemblyMocks.inputRouterOnPointerUp).toHaveBeenCalledWith(pointer);
   });
 
@@ -506,13 +534,15 @@ describe("WorldScene assembly", () => {
     const scene = makeScene();
     lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
 
-    const activePointer = { x: 1, y: 2 } as unknown as Parameters<typeof lifecycle.onWheel>[1];
+    const activePointer = { x: 1, y: 2 } as unknown as Parameters<
+      typeof lifecycle.onWheel
+    >[1];
     lifecycle.onWheel(50, activePointer);
 
     expect(assemblyMocks.cameraHandleWheel).toHaveBeenCalledWith(50);
-    expect(assemblyMocks.terrainControllerSyncPreviewFromPointer).toHaveBeenCalledWith(
-      activePointer,
-    );
+    expect(
+      assemblyMocks.terrainControllerSyncPreviewFromPointer,
+    ).toHaveBeenCalledWith(activePointer);
   });
 
   test("delegates resize to cameraController.centerCameraOnWorld", () => {
@@ -546,7 +576,14 @@ describe("WorldScene assembly", () => {
         id: string;
         assetId: string;
         label: string;
-        category: "chairs" | "decor" | "desks" | "electronics" | "misc" | "storage" | "wall";
+        category:
+          | "chairs"
+          | "decor"
+          | "desks"
+          | "electronics"
+          | "misc"
+          | "storage"
+          | "wall";
         placement: "floor" | "surface" | "wall";
         col: number;
         row: number;
@@ -568,7 +605,8 @@ describe("WorldScene assembly", () => {
 
     lifecycle.boot(scene as unknown as Parameters<typeof lifecycle.boot>[0]);
 
-    const collisionLookup = assemblyMocks.unifiedCollisionMapConstruct.mock.calls[0]?.[1] as
+    const collisionLookup = assemblyMocks.unifiedCollisionMapConstruct.mock
+      .calls[0]?.[1] as
       | {
           isFurnitureBlockingCell?: (col: number, row: number) => boolean;
         }
@@ -597,7 +635,12 @@ describe("WorldScene assembly", () => {
     const lifecycle = createWorldSceneLifecycle();
     const scene = makeScene() as ReturnType<typeof makeScene> & {
       __testKeys: {
-        movementKeys: { W: { isDown: boolean }; A: { isDown: boolean }; S: { isDown: boolean }; D: { isDown: boolean } };
+        movementKeys: {
+          W: { isDown: boolean };
+          A: { isDown: boolean };
+          S: { isDown: boolean };
+          D: { isDown: boolean };
+        };
         shiftKey: { isDown: boolean };
         rKey: { isDown: boolean };
       };
@@ -608,12 +651,16 @@ describe("WorldScene assembly", () => {
     scene.__testKeys.rKey.isDown = true;
     lifecycle.update(16);
     lifecycle.update(16);
-    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(1);
+    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(
+      1,
+    );
 
     scene.__testKeys.rKey.isDown = false;
     lifecycle.update(16);
     scene.__testKeys.rKey.isDown = true;
     lifecycle.update(16);
-    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(2);
+    expect(assemblyMocks.officeRotateSelectedFurniture).toHaveBeenCalledTimes(
+      2,
+    );
   });
 });
