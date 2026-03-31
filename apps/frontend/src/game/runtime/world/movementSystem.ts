@@ -2,8 +2,8 @@ import { resolveNextAction } from "../../application/actionResolver";
 import { supportsRun, supportsWalk } from "../../world/entities/capabilities";
 import type { WorldMovementActor } from "./types";
 
-const WALK_SPEED = 100;
-const RUN_SPEED = 220;
+const WALK_SPEED = 32;
+const RUN_SPEED = 64;
 /** Per-frame velocity retention at 60 fps when keys released (fast ease-out). */
 const STOP_DAMPING_60FPS = 0.75;
 
@@ -21,10 +21,13 @@ export function updateEntityMovement(
   const hasInputMovement = input.moveX !== 0 || input.moveY !== 0;
 
   if (supportsWalk(entity.behavior) && hasInputMovement) {
-    const len = Math.sqrt(input.moveX * input.moveX + input.moveY * input.moveY);
-    const speed = input.isRunModifier && supportsRun(entity.behavior)
-      ? RUN_SPEED
-      : WALK_SPEED;
+    const len = Math.sqrt(
+      input.moveX * input.moveX + input.moveY * input.moveY,
+    );
+    const speed =
+      input.isRunModifier && supportsRun(entity.behavior)
+        ? RUN_SPEED
+        : WALK_SPEED;
     entity.velocity.x = (input.moveX / len) * speed;
     entity.velocity.y = (input.moveY / len) * speed;
 
@@ -45,7 +48,9 @@ export function updateEntityMovement(
     }
   }
 
-  const speedAfterUpdate = Math.sqrt(entity.velocity.x ** 2 + entity.velocity.y ** 2);
+  const speedAfterUpdate = Math.sqrt(
+    entity.velocity.x ** 2 + entity.velocity.y ** 2,
+  );
   const isMovingByVelocity = speedAfterUpdate >= 1;
 
   entity.state = resolveNextAction(entity.behavior, {

@@ -39,19 +39,27 @@ function createWorldActor(params: CreateWorldActorParams): WorldActor {
     facing: "down",
     state: "idle",
     animationAction: "idle",
-    autonomy: createAutonomyState(ambientActionIds),
+    autonomy: createAutonomyState(ambientActionIds, Math.random),
   };
 }
 
-export function createWorldEntity(params: CreateWorldEntityParams): WorldEntity | null {
-  const { scene, catalog, runtime, nextId, worldX, worldY, spriteScale } = params;
+export function createWorldEntity(
+  params: CreateWorldEntityParams,
+): WorldEntity | null {
+  const { scene, catalog, runtime, nextId, worldX, worldY, spriteScale } =
+    params;
   const actor = createWorldActor({ catalog, runtime, nextId, worldX, worldY });
   const { definition } = actor;
 
   const spawn = resolveSpawnVisual(catalog, scene.anims, definition);
   if (!spawn) return null;
 
-  const sprite = scene.add.sprite(worldX, worldY, spawn.textureKey, spawn.textureFrame);
+  const sprite = scene.add.sprite(
+    worldX,
+    worldY,
+    spawn.textureKey,
+    spawn.textureFrame,
+  );
   sprite.setScale(spriteScale);
   sprite.setFlipX(spawn.flipX);
   // LLM Agent: do not delete below setOrigin. This is needed to have the correct collision
