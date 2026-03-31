@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { AnimationCatalog } from "../../content/asset-catalog/animationCatalog";
+import { buildAnimationCatalog } from "../../content/asset-catalog/animationCatalog";
 import { readEntityVisualRef } from "../../world/entities/model";
 import { buildEntityRegistryFromCatalog } from "../entityRegistryBuilder";
 import { listEntityPlaceables } from "../placeableService";
@@ -81,5 +82,37 @@ describe("entityRegistryBuilder", () => {
         previewFrameKey: null,
       },
     ]);
+  });
+
+  test("resolves previewFrameKey for bloomseed player using idle-down track", () => {
+    const catalog = buildAnimationCatalog([
+      "characters.bloomseed.player.female.idle.idle-down",
+      "characters.bloomseed.player.female.walk.walk-down",
+    ]);
+    const registry = buildEntityRegistryFromCatalog(catalog);
+    const placeables = listEntityPlaceables(registry, catalog);
+    const playerPlaceable = placeables.find((p) => p.entityId === "player.female");
+
+    expect(playerPlaceable).toBeDefined();
+    expect(playerPlaceable?.previewFrameKey).toBe(
+      "characters.bloomseed.player.female.idle.idle-down#0",
+    );
+  });
+
+  test("resolves previewFrameKey for farmrpg-default player using idle-down track", () => {
+    const catalog = buildAnimationCatalog([
+      "characters.farmrpg.player.default.idle.down",
+      "characters.farmrpg.player.default.walk.down",
+    ]);
+    const registry = buildEntityRegistryFromCatalog(catalog);
+    const placeables = listEntityPlaceables(registry, catalog);
+    const playerPlaceable = placeables.find(
+      (p) => p.entityId === "player.farmrpg-default",
+    );
+
+    expect(playerPlaceable).toBeDefined();
+    expect(playerPlaceable?.previewFrameKey).toBe(
+      "characters.farmrpg.player.default.idle.down#0",
+    );
   });
 });

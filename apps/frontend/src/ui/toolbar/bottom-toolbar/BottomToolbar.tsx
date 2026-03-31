@@ -16,6 +16,9 @@ import {
   DEBUG_TERRAIN_ATLAS_H,
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,
+  FARMRPG_ATLAS_H,
+  FARMRPG_ATLAS_IMAGE_URL,
+  FARMRPG_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
   canRotateFurniturePaletteItem,
   FURNITURE_ALL_ITEMS,
@@ -24,6 +27,7 @@ import {
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
   getBloomseedAtlasFrame,
+  getFarmrpgAtlasFrame,
   resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
   resolveOfficeWallAppearance,
@@ -215,17 +219,33 @@ function FurnitureSprite({ item }: { item: FurniturePaletteItem }): JSX.Element 
 const ENTITY_PREVIEW_SCALE = 0.5;
 
 function EntityPreviewSprite({ frameKey }: { frameKey: string }): JSX.Element | null {
-  const frame = getBloomseedAtlasFrame(frameKey);
-  if (!frame) return null;
-  return (
-    <AtlasSprite
-      atlasUrl={BLOOMSEED_ATLAS_IMAGE_URL}
-      atlasW={BLOOMSEED_ATLAS_W}
-      atlasH={BLOOMSEED_ATLAS_H}
-      frame={frame}
-      scale={ENTITY_PREVIEW_SCALE}
-    />
-  );
+  const bloomseedFrame = getBloomseedAtlasFrame(frameKey);
+  if (bloomseedFrame) {
+    return (
+      <AtlasSprite
+        atlasUrl={BLOOMSEED_ATLAS_IMAGE_URL}
+        atlasW={BLOOMSEED_ATLAS_W}
+        atlasH={BLOOMSEED_ATLAS_H}
+        frame={bloomseedFrame}
+        scale={ENTITY_PREVIEW_SCALE}
+      />
+    );
+  }
+
+  const farmrpgFrame = getFarmrpgAtlasFrame(frameKey);
+  if (farmrpgFrame) {
+    return (
+      <AtlasSprite
+        atlasUrl={FARMRPG_ATLAS_IMAGE_URL}
+        atlasW={FARMRPG_ATLAS_W}
+        atlasH={FARMRPG_ATLAS_H}
+        frame={farmrpgFrame}
+        scale={ENTITY_PREVIEW_SCALE}
+      />
+    );
+  }
+
+  return null;
 }
 
 function EnvironmentAtlasSprite({ frame }: { frame: AtlasFrame }): JSX.Element {

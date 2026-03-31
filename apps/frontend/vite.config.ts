@@ -29,6 +29,10 @@ const BLOOMSEED_ATLAS_FALLBACK_PATH = path.resolve(
   __dirname,
   "./src/assets/bloomseed-atlas-fallback.json",
 );
+const FARMRPG_ATLAS_FALLBACK_PATH = path.resolve(
+  __dirname,
+  "./src/assets/farmrpg-atlas-fallback.json",
+);
 
 const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   ["donarg-office/atlas.json", path.resolve(DONARG_OFFICE_ASSETS_ROOT, "atlas.json")],
@@ -38,6 +42,7 @@ const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
     path.resolve(DONARG_OFFICE_ASSETS_ROOT, "furniture/furniture-catalog.json"),
   ],
   ["bloomseed/atlas.json", BLOOMSEED_ATLAS_FALLBACK_PATH],
+  ["farmrpg/atlas.json", FARMRPG_ATLAS_FALLBACK_PATH],
 ]);
 
 function publicJsonImportPlugin(): Plugin {
