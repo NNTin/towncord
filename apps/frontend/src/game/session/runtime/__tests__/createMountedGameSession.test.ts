@@ -11,6 +11,7 @@ function createRuntimeHost(registryEntries: Record<string, unknown> = {}) {
 
   return {
     destroy: vi.fn(),
+    getUiBootstrapSnapshot: undefined as (() => unknown) | undefined,
     registry: {
       get: vi.fn((key: string) => registry.get(key)),
     },

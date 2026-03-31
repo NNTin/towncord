@@ -10,11 +10,6 @@ import {
   getOfficeSceneBootstrap,
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
 } from "../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap";
-import {
-  emitRuntimeToUiEvent,
-  normalizeRuntimeBootstrapPayload,
-  RUNTIME_TO_UI_EVENTS,
-} from "../transport/runtimeEvents";
 import { WorldSceneAssembly } from "./worldSceneAssembly";
 
 /**
@@ -38,24 +33,15 @@ export function createWorldSceneLifecycle(): WorldSceneLifecycleAdapter {
       const worldBootstrap = getWorldBootstrap(
         scene.registry.get(WORLD_BOOTSTRAP_REGISTRY_KEY),
       );
-      const uiBootstrap = normalizeRuntimeBootstrapPayload(
-        scene.registry.get(UI_BOOTSTRAP_REGISTRY_KEY),
-      );
+      const rawUiBootstrap = scene.registry.get(UI_BOOTSTRAP_REGISTRY_KEY);
       const officeBootstrap =
         getOfficeSceneBootstrap(
           scene.registry.get(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY),
         ) ?? createOfficeSceneBootstrap();
 
       assembly = new WorldSceneAssembly(scene);
-      assembly.boot(scene, { worldBootstrap, officeBootstrap });
+      assembly.boot(scene, { worldBootstrap, officeBootstrap, rawUiBootstrap });
       assembly.protocolBindings.bind();
-      if (uiBootstrap) {
-        emitRuntimeToUiEvent(
-          scene.game,
-          RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
-          uiBootstrap,
-        );
-      }
     },
 
     update(delta: number): void {

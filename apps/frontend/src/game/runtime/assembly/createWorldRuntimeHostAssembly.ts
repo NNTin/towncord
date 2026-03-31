@@ -28,7 +28,7 @@ export function createWorldRuntimeHostAssembly(
     createBootRuntimeScene(),
     createPreloadRuntimeScene(preloadAdapter),
     createWorldRuntimeScene(lifecycleAdapter),
-  ]);
+  ]) as RuntimeHost;
 
   runtime.getUiBootstrapSnapshot = () => uiBootstrapSnapshot;
   return runtime;

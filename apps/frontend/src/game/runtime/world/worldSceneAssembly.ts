@@ -33,6 +33,7 @@ const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
 export type WorldSceneBootOptions = {
   worldBootstrap: WorldBootstrap | null;
   officeBootstrap: OfficeSceneBootstrap;
+  rawUiBootstrap: unknown;
 };
 
 /**
@@ -56,9 +57,9 @@ export class WorldSceneAssembly {
 
   private terrainRuntime: TerrainRuntime | null = null;
   private readonly officeLayoutChangedEvents: Phaser.Events.EventEmitter;
-  private terrainRuntimeContext:
-    | ReturnType<typeof createTerrainRuntimeContext>
-    | null = null;
+  private terrainRuntimeContext: ReturnType<
+    typeof createTerrainRuntimeContext
+  > | null = null;
   private officeRegion: OfficeSceneBootstrap["layout"] | null = null;
   private entitySystem: EntitySystem | null = null;
   private entityRegistry: EntityRegistry | null = null;
@@ -201,7 +202,7 @@ export class WorldSceneAssembly {
    * Initializes runtime systems. Call once from the scene's `create()`.
    */
   public boot(scene: Phaser.Scene, options: WorldSceneBootOptions): void {
-    const { worldBootstrap, officeBootstrap } = options;
+    const { worldBootstrap, officeBootstrap, rawUiBootstrap } = options;
     const terrainRuntimeContext = this.terrainRuntimeContext;
     if (!terrainRuntimeContext) {
       throw new Error("Terrain runtime context was not initialized.");
@@ -215,19 +216,14 @@ export class WorldSceneAssembly {
     this.shiftKey = scene.input.keyboard!.addKey(
       Phaser.Input.Keyboard.KeyCodes.SHIFT,
     );
-    this.rKey = scene.input.keyboard!.addKey(
-      Phaser.Input.Keyboard.KeyCodes.R,
-    );
+    this.rKey = scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
-    this.terrainRuntime = new TerrainRuntime(
-      scene,
-      {
-        ...terrainRuntimeContext.runtimeOptions,
-        onTerrainChanged: () => {
-          this.hasPendingTerrainSnapshotChange = true;
-        },
+    this.terrainRuntime = new TerrainRuntime(scene, {
+      ...terrainRuntimeContext.runtimeOptions,
+      onTerrainChanged: () => {
+        this.hasPendingTerrainSnapshotChange = true;
       },
-    );
+    });
     const officeRegion = this.officeRuntime.bootstrap(officeBootstrap);
     this.officeRegion = officeRegion.layout;
     this.rebuildOfficeFurnitureBlockingCells(officeRegion.layout);
@@ -262,6 +258,7 @@ export class WorldSceneAssembly {
     this.selectionController.createSelectionBadge();
     this.terrainController.createBrushPreview();
     this.cameraController.initialize();
+    this.projections.emitRuntimeReady(rawUiBootstrap);
   }
 
   /**
@@ -348,7 +345,11 @@ export class WorldSceneAssembly {
         continue;
       }
 
-      for (let row = furniture.row; row < furniture.row + furniture.height; row++) {
+      for (
+        let row = furniture.row;
+        row < furniture.row + furniture.height;
+        row++
+      ) {
         for (
           let col = furniture.col;
           col < furniture.col + furniture.width;

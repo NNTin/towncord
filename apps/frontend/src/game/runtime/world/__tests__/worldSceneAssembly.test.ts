@@ -84,6 +84,7 @@ const assemblyMocks = vi.hoisted(() => ({
   officeUpdate: vi.fn(),
   placementHandlePlaceEntityDrop: vi.fn(),
   projectionEmit: vi.fn(),
+  projectionEmitRuntimeReady: vi.fn(),
   projectionEmitTerrainSeedChanged: vi.fn(),
   selectionCreateSelectionBadge: vi.fn(),
   selectionDispose: vi.fn(),
@@ -308,6 +309,7 @@ vi.mock("../entitySystem", () => ({
 
 vi.mock("../worldSceneProjections", () => ({
   WorldSceneProjectionEmitter: class {
+    public emitRuntimeReady = assemblyMocks.projectionEmitRuntimeReady;
     public emitPlayerStateChanged = assemblyMocks.projectionEmit;
     public emitTerrainSeedChanged =
       assemblyMocks.projectionEmitTerrainSeedChanged;
@@ -378,10 +380,6 @@ vi.mock("../worldSceneCommandBindings", () => ({
 }));
 
 import { createWorldSceneLifecycle } from "../../../../game/runtime/world/createWorldSceneLifecycle";
-import {
-  emitRuntimeToUiEvent,
-  RUNTIME_TO_UI_EVENTS,
-} from "../../../../game/runtime/transport/runtimeEvents";
 
 function makeScene(): Record<string, unknown> {
   const gameEvents = createEventBus();
@@ -464,11 +462,9 @@ describe("WorldScene assembly", () => {
     ).toHaveBeenCalledOnce();
     expect(assemblyMocks.commandBind).toHaveBeenCalledOnce();
     expect(assemblyMocks.cameraInitialize).toHaveBeenCalledOnce();
-    expect(emitRuntimeToUiEvent).toHaveBeenCalledWith(
-      (scene as { game: unknown }).game,
-      RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
-      { world: true },
-    );
+    expect(assemblyMocks.projectionEmitRuntimeReady).toHaveBeenCalledWith({
+      world: true,
+    });
 
     lifecycle.update(16);
 
