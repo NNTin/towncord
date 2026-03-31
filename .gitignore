@@ -24,3 +24,5 @@ AGENTS.md
 
 .env
 docs/
+
+.github/agents/

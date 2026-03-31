@@ -47,7 +47,7 @@ const TILESET_FAMILIES: TilesetFamily[] = ["animated", "static"];
 
 function getSpriteDirection(segment: string): SpriteDirection | null {
   for (const dir of SPRITE_DIRECTIONS) {
-    if (segment.endsWith(`-${dir}`)) return dir;
+    if (segment === dir || segment.endsWith(`-${dir}`)) return dir;
   }
   return null;
 }

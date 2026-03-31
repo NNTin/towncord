@@ -16,9 +16,9 @@ describe("animationCatalog", () => {
   test("parses bloomseed and farmrpg player models alongside farmrpg npc families", () => {
     const catalog = buildAnimationCatalog([
       "characters.bloomseed.player.female.walk.walk-down",
-      "characters.farmrpg.player.default.idle.idle-down",
-      "characters.farmrpg.npc.child.walk.walk-down",
-      "characters.farmrpg.npc.child.walk.walk-right",
+      "characters.farmrpg.player.default.idle.down",
+      "characters.farmrpg.npc.child.walk.down",
+      "characters.farmrpg.npc.child.walk.right",
     ]);
 
     expect(catalog.entityTypes).toEqual(["npcs", "player"]);
