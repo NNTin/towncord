@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 vi.mock(
   "../../../application/runtime-compilation/load-plans/runtimeBootstrap",
   () => ({
+    UI_BOOTSTRAP_REGISTRY_KEY: "uiBootstrap",
     WORLD_BOOTSTRAP_REGISTRY_KEY: "worldBootstrap",
     composeRuntimeBootstrap: vi.fn(),
   }),
@@ -34,6 +35,7 @@ vi.mock("../../../content/preload/preload", () => ({
 
 import { createWorldRuntimePreloadLifecycle } from "../createWorldRuntimePreloadLifecycle";
 import {
+  UI_BOOTSTRAP_REGISTRY_KEY,
   WORLD_BOOTSTRAP_REGISTRY_KEY,
   composeRuntimeBootstrap,
 } from "../../../application/runtime-compilation/load-plans/runtimeBootstrap";
@@ -155,6 +157,52 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     );
   });
 
+  test("create() publishes UI bootstrap to scene registry", () => {
+    const uiBootstrap = { catalog: { entityTypes: [] }, placeables: [] };
+    (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
+      animationKeys: [],
+    });
+    (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      world: {},
+      ui: uiBootstrap,
+    });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
+
+    const adapter = createWorldRuntimePreloadLifecycle();
+    const scene = makeScene();
+    adapter.create(scene as never);
+
+    expect(scene.registry.set).toHaveBeenCalledWith(
+      UI_BOOTSTRAP_REGISTRY_KEY,
+      uiBootstrap,
+    );
+  });
+
+  test("create() exposes UI bootstrap through the preload callback", () => {
+    const uiBootstrap = { catalog: { entityTypes: [] }, placeables: [] };
+    const onUiBootstrap = vi.fn();
+    (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
+      animationKeys: [],
+    });
+    (composeRuntimeBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      world: {},
+      ui: uiBootstrap,
+    });
+    (createOfficeSceneBootstrap as ReturnType<typeof vi.fn>).mockReturnValue({
+      anchor: { x: 1, y: 1 },
+      layout: {},
+    });
+
+    const adapter = createWorldRuntimePreloadLifecycle({ onUiBootstrap });
+    const scene = makeScene();
+    adapter.create(scene as never);
+
+    expect(onUiBootstrap).toHaveBeenCalledWith(uiBootstrap);
+  });
+
   test("create() publishes office bootstrap to scene registry", () => {
     const officeBootstrap = {
       anchor: {
@@ -191,7 +239,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     );
   });
 
-  test("create() emits RUNTIME_READY with the UI bootstrap payload", () => {
+  test("create() emits RUNTIME_READY with the UI bootstrap payload", async () => {
     const uiPayload = { catalog: { entityTypes: [] }, placeables: [] };
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
       animationKeys: [],
@@ -208,6 +256,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
     adapter.create(scene as never);
+    await Promise.resolve();
 
     expect(emitRuntimeToUiEvent).toHaveBeenCalledWith(
       scene.game,
@@ -216,7 +265,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     );
   });
 
-  test("create() starts the world runtime scene after registry publication and RUNTIME_READY", () => {
+  test("create() starts the world runtime scene after registry publication and schedules RUNTIME_READY", async () => {
     const callOrder: string[] = [];
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
       animationKeys: [],
@@ -249,20 +298,24 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     );
 
     adapter.create(scene as never);
+    await Promise.resolve();
 
     expect(scene.scene.start).toHaveBeenCalledWith("world");
     expect(callOrder.indexOf("set:worldBootstrap")).toBeLessThan(
       callOrder.indexOf("start:world"),
     );
+    expect(callOrder.indexOf("set:uiBootstrap")).toBeLessThan(
+      callOrder.indexOf("start:world"),
+    );
     expect(callOrder.indexOf("set:officeSceneBootstrap")).toBeLessThan(
       callOrder.indexOf("start:world"),
     );
-    expect(callOrder.indexOf("emitRuntimeReady")).toBeLessThan(
-      callOrder.indexOf("start:world"),
+    expect(callOrder.indexOf("start:world")).toBeLessThan(
+      callOrder.indexOf("emitRuntimeReady"),
     );
   });
 
-  test("create() emits RUNTIME_READY exactly once", () => {
+  test("create() emits RUNTIME_READY exactly once", async () => {
     (registerPreloadAnimations as ReturnType<typeof vi.fn>).mockReturnValue({
       animationKeys: [],
     });
@@ -278,6 +331,7 @@ describe("createWorldRuntimePreloadLifecycle", () => {
     const adapter = createWorldRuntimePreloadLifecycle();
     const scene = makeScene();
     adapter.create(scene as never);
+    await Promise.resolve();
 
     expect(emitRuntimeToUiEvent).toHaveBeenCalledTimes(1);
   });

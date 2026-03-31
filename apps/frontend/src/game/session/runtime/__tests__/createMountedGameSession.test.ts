@@ -1,14 +1,19 @@
 import { describe, expect, test, vi } from "vitest";
+import { UI_BOOTSTRAP_REGISTRY_KEY } from "../../../application/runtime-compilation/load-plans/runtimeBootstrap";
 import { RUNTIME_TO_UI_EVENTS } from "../../../runtime/transport/runtimeEvents";
 import { UI_TO_RUNTIME_COMMANDS } from "../../../runtime/transport/uiCommands";
 import type { RuntimeBootstrap } from "../../GameSession";
 import { createMountedGameSession } from "../createMountedGameSession";
 
-function createRuntimeHost() {
+function createRuntimeHost(registryEntries: Record<string, unknown> = {}) {
   const listeners = new Map<string, Set<(payload: unknown) => void>>();
+  const registry = new Map<string, unknown>(Object.entries(registryEntries));
 
   return {
     destroy: vi.fn(),
+    registry: {
+      get: vi.fn((key: string) => registry.get(key)),
+    },
     events: {
       emit: vi.fn((event: string, payload?: unknown) => {
         for (const listener of listeners.get(event) ?? []) {
@@ -141,6 +146,71 @@ describe("createMountedGameSession", () => {
     expect(lateSubscriber.onTerrainSeedChanged).toHaveBeenCalledWith(
       terrainSeed.seed,
     );
+  });
+
+  test("hydrates bootstrap from runtime registry when runtimeReady already fired before binding", () => {
+    const bootstrap = createBootstrapPayload();
+    const runtimeHost = createRuntimeHost({
+      [UI_BOOTSTRAP_REGISTRY_KEY]: bootstrap,
+    });
+    const session = createMountedGameSession(runtimeHost as never);
+    const subscriber = {
+      onBootstrap: vi.fn(),
+    };
+
+    session.subscribe(subscriber);
+
+    expect(runtimeHost.registry.get).toHaveBeenCalledWith(
+      UI_BOOTSTRAP_REGISTRY_KEY,
+    );
+    expect(subscriber.onBootstrap).toHaveBeenCalledTimes(1);
+    expect(subscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
+  });
+
+  test("hydrates bootstrap from the cached runtime snapshot when it is available", () => {
+    const bootstrap = createBootstrapPayload();
+    const runtimeHost = createRuntimeHost();
+    runtimeHost.getUiBootstrapSnapshot = vi.fn(() => bootstrap);
+    const session = createMountedGameSession(runtimeHost as never);
+    const subscriber = {
+      onBootstrap: vi.fn(),
+    };
+
+    session.subscribe(subscriber);
+
+    expect(runtimeHost.getUiBootstrapSnapshot).toHaveBeenCalledTimes(1);
+    expect(subscriber.onBootstrap).toHaveBeenCalledTimes(1);
+    expect(subscriber.onBootstrap).toHaveBeenCalledWith(bootstrap);
+  });
+
+  test("hydrates bootstrap from runtime registry before forwarding later runtime events", () => {
+    const bootstrap = createBootstrapPayload();
+    const runtimeHost = createRuntimeHost({
+      [UI_BOOTSTRAP_REGISTRY_KEY]: bootstrap,
+    });
+    const session = createMountedGameSession(runtimeHost as never);
+    const subscriber = {
+      onBootstrap: vi.fn(),
+      onZoomChanged: vi.fn(),
+    };
+
+    session.subscribe(subscriber);
+    runtimeHost.registry.get.mockClear();
+    subscriber.onBootstrap.mockClear();
+
+    runtimeHost.events.emit(RUNTIME_TO_UI_EVENTS.ZOOM_CHANGED, {
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 16,
+    });
+
+    expect(runtimeHost.registry.get).not.toHaveBeenCalled();
+    expect(subscriber.onBootstrap).not.toHaveBeenCalled();
+    expect(subscriber.onZoomChanged).toHaveBeenCalledWith({
+      zoom: 2,
+      minZoom: 1,
+      maxZoom: 16,
+    });
   });
 
   test("replays office selection to late subscribers and routes rotate/delete actions", () => {

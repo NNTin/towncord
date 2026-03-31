@@ -1,6 +1,7 @@
 import type Phaser from "phaser";
 import type { WorldSceneLifecycleAdapter } from "../../../engine";
 import {
+  UI_BOOTSTRAP_REGISTRY_KEY,
   getWorldBootstrap,
   WORLD_BOOTSTRAP_REGISTRY_KEY,
 } from "../../application/runtime-compilation/load-plans/runtimeBootstrap";
@@ -9,6 +10,11 @@ import {
   getOfficeSceneBootstrap,
   OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY,
 } from "../../application/runtime-compilation/structure-surfaces/officeSceneBootstrap";
+import {
+  emitRuntimeToUiEvent,
+  normalizeRuntimeBootstrapPayload,
+  RUNTIME_TO_UI_EVENTS,
+} from "../transport/runtimeEvents";
 import { WorldSceneAssembly } from "./worldSceneAssembly";
 
 /**
@@ -32,6 +38,9 @@ export function createWorldSceneLifecycle(): WorldSceneLifecycleAdapter {
       const worldBootstrap = getWorldBootstrap(
         scene.registry.get(WORLD_BOOTSTRAP_REGISTRY_KEY),
       );
+      const uiBootstrap = normalizeRuntimeBootstrapPayload(
+        scene.registry.get(UI_BOOTSTRAP_REGISTRY_KEY),
+      );
       const officeBootstrap =
         getOfficeSceneBootstrap(
           scene.registry.get(OFFICE_SCENE_BOOTSTRAP_REGISTRY_KEY),
@@ -40,6 +49,13 @@ export function createWorldSceneLifecycle(): WorldSceneLifecycleAdapter {
       assembly = new WorldSceneAssembly(scene);
       assembly.boot(scene, { worldBootstrap, officeBootstrap });
       assembly.protocolBindings.bind();
+      if (uiBootstrap) {
+        emitRuntimeToUiEvent(
+          scene.game,
+          RUNTIME_TO_UI_EVENTS.RUNTIME_READY,
+          uiBootstrap,
+        );
+      }
     },
 
     update(delta: number): void {

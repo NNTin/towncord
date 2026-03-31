@@ -97,6 +97,7 @@ type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 const ANIMATION_ENTITY_TYPE_SET = new Set([
   "player",
   "mobs",
+  "npcs",
   "props",
   "tilesets",
 ]);

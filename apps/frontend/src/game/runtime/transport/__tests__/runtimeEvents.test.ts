@@ -81,10 +81,10 @@ function createLayoutSnapshot(): OfficeLayoutChangedPayload["layout"] {
 function createBootstrapPayload(): RuntimeBootstrapPayload {
   return {
     catalog: {
-      entityTypes: ["player"],
+      entityTypes: ["player", "npcs"],
       playerModels: ["female"],
       mobFamilies: [],
-      npcFamilies: [],
+      npcFamilies: ["child"],
       propFamilies: [],
       tilesetFamilies: ["static"],
       officeCharacterPalettes: ["palette-0"],
@@ -102,6 +102,22 @@ function createBootstrapPayload(): RuntimeBootstrapPayload {
               directional: true,
               keyByDirection: {
                 down: "characters.bloomseed.player.female.walk-down",
+              },
+              undirectedKey: null,
+              equipmentCompatible: [],
+            },
+          ],
+        ],
+        [
+          "npcs/child",
+          [
+            {
+              id: "idle",
+              label: "idle",
+              entityType: "npcs" as const,
+              directional: true,
+              keyByDirection: {
+                down: "characters.farmrpg.npc.child.idle.down",
               },
               undirectedKey: null,
               equipmentCompatible: [],

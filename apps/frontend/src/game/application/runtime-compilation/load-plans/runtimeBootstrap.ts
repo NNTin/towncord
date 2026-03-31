@@ -18,6 +18,7 @@ type RuntimeBootstrapBundle = {
 };
 
 export const WORLD_BOOTSTRAP_REGISTRY_KEY = "worldBootstrap";
+export const UI_BOOTSTRAP_REGISTRY_KEY = "uiBootstrap";
 
 export function getWorldBootstrap(value: unknown): WorldBootstrap | null {
   if (!isRecord(value)) return null;
