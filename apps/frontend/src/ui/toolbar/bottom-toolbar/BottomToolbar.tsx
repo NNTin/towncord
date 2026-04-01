@@ -20,6 +20,7 @@ import {
   FARMRPG_ATLAS_IMAGE_URL,
   FARMRPG_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
+  PHASE1_TERRAIN_SOURCE_ID,
   canRotateFurniturePaletteItem,
   FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
@@ -46,7 +47,6 @@ import type {
   EntityToolbarViewModel,
   SelectedOfficePlaceableViewModel,
 } from "../../game-session/contracts";
-import { PHASE1_TERRAIN_SOURCE_ID } from "../../../game/content/asset-catalog/terrainContentRepository";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -939,7 +939,7 @@ function TerrainSubPanel({
 }): JSX.Element {
   const [tick, setTick] = useState(0);
   const resolveTilesetId = (
-    terrainSourceId: TerrainToolSelection["terrainSourceId"],
+    terrainSourceId: NonNullable<TerrainToolSelection>["terrainSourceId"],
   ): "debug" | "farmrpg" => {
     if (terrainSourceId === PHASE1_TERRAIN_SOURCE_ID) {
       return "debug";

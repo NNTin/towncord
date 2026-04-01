@@ -84,5 +84,6 @@ export type {
 export {
   DEFAULT_TERRAIN_SOURCE_ID,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  PHASE1_TERRAIN_SOURCE_ID,
 } from "../content/asset-catalog/terrainContentRepository";
 export type { TerrainContentSourceId } from "../content/asset-catalog/terrainContentRepository";
