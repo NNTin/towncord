@@ -2,10 +2,12 @@ import type { EntityId } from "../world/entities/model";
 import type { TerrainBrushId, TerrainMaterialId } from "../terrain/contracts";
 import type { AnimationCatalog } from "./content";
 import type { TerrainSeedDocument } from "../../data";
+import type { TerrainContentSourceId } from "../content/asset-catalog/terrainContentRepository";
 
 export type TerrainToolSelection = {
   materialId: TerrainMaterialId;
   brushId: TerrainBrushId;
+  terrainSourceId?: TerrainContentSourceId;
 } | null;
 
 export type PlayerMovementState = "idle" | "walk" | "run";
@@ -70,6 +72,7 @@ export type TerrainPlaceableViewModel = {
   type: "terrain";
   materialId: TerrainMaterialId;
   brushId: TerrainBrushId;
+  terrainSourceId?: TerrainContentSourceId;
   label: string;
   groupKey: string;
   groupLabel: string;

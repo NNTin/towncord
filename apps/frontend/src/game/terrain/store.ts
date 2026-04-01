@@ -15,7 +15,10 @@ const CASE_NEIGHBOR_OFFSETS = [
   { x: -1, y: -1 },
 ] as const;
 
-function compareChunkStates(a: TerrainChunkState, b: TerrainChunkState): number {
+function compareChunkStates(
+  a: TerrainChunkState,
+  b: TerrainChunkState,
+): number {
   if (a.chunkY !== b.chunkY) return a.chunkY - b.chunkY;
   return a.chunkX - b.chunkX;
 }
@@ -115,7 +118,9 @@ export class TerrainMapStore {
   }
 
   public isInBounds(cellX: number, cellY: number): boolean {
-    return cellX >= 0 && cellX < this.width && cellY >= 0 && cellY < this.height;
+    return (
+      cellX >= 0 && cellX < this.width && cellY >= 0 && cellY < this.height
+    );
   }
 
   public getCellMaterial(cellX: number, cellY: number): TerrainMaterialId {
@@ -135,7 +140,11 @@ export class TerrainMapStore {
     );
   }
 
-  public setCellMaterial(cellX: number, cellY: number, materialId: TerrainMaterialId): boolean {
+  public setCellMaterial(
+    cellX: number,
+    cellY: number,
+    materialId: TerrainMaterialId,
+  ): boolean {
     if (!this.isInBounds(cellX, cellY)) return false;
 
     if (!this.materials.has(materialId)) {
@@ -169,7 +178,16 @@ export class TerrainMapStore {
     return dirty;
   }
 
-  public getChunkCellBounds(chunkX: number, chunkY: number): {
+  public markAllChunksDirty(): void {
+    for (const chunk of this.chunks.values()) {
+      this.markChunkDirty(chunk.chunkX, chunk.chunkY);
+    }
+  }
+
+  public getChunkCellBounds(
+    chunkX: number,
+    chunkY: number,
+  ): {
     startX: number;
     startY: number;
     endX: number;
@@ -207,7 +225,9 @@ export class TerrainMapStore {
   private getNumericId(materialId: TerrainMaterialId): number {
     const id = this.materialToNumeric.get(materialId);
     if (id === undefined) {
-      throw new Error(`TerrainMapStore: material "${materialId}" has no numeric ID (not registered).`);
+      throw new Error(
+        `TerrainMapStore: material "${materialId}" has no numeric ID (not registered).`,
+      );
     }
     return id;
   }

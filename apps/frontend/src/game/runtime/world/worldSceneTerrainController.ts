@@ -7,6 +7,7 @@ import {
   type TerrainRenderTile,
   type TerrainRuntime,
 } from "../../../engine";
+import type { TerrainContentSourceId } from "../../content/asset-catalog/terrainContentRepository";
 import type {
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
@@ -27,6 +28,7 @@ type WorldSceneTerrainControllerHost = {
   scene: Pick<Phaser.Scene, "add" | "cameras" | "input">;
   getTerrainRuntime: () => TerrainRuntime | null;
   getEntities: () => readonly WorldEntity[];
+  setTerrainContentSource: (sourceId: TerrainContentSourceId) => void;
 };
 
 type Destroyable = {
@@ -37,7 +39,9 @@ function destroyGameObject(object: Destroyable | null | undefined): void {
   object?.destroy?.();
 }
 
-function destroyGameObjects(objects: readonly (Destroyable | null | undefined)[]): void {
+function destroyGameObjects(
+  objects: readonly (Destroyable | null | undefined)[],
+): void {
   for (const object of objects) {
     destroyGameObject(object);
   }
@@ -82,7 +86,9 @@ export class WorldSceneTerrainController {
   }
 
   public shouldContinuePainting(): boolean {
-    return Boolean(this.activeTerrainTool && this.terrainPaintSession.isActive());
+    return Boolean(
+      this.activeTerrainTool && this.terrainPaintSession.isActive(),
+    );
   }
 
   public continuePainting(pointer: Phaser.Input.Pointer): void {
@@ -107,6 +113,10 @@ export class WorldSceneTerrainController {
   }
 
   public handleSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
+    if (payload?.terrainSourceId) {
+      this.host.setTerrainContentSource(payload.terrainSourceId);
+    }
+
     this.activeTerrainTool = payload;
     this.terrainPaintSession.end();
     this.syncPreviewFromPointer(this.host.scene.input.activePointer);
@@ -121,7 +131,9 @@ export class WorldSceneTerrainController {
 
     const isWithinGame =
       !("withinGame" in pointer) ||
-      Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame);
+      Boolean(
+        (pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame,
+      );
 
     if (!isWithinGame) {
       this.setTerrainBrushPreviewVisible(false);
@@ -133,7 +145,11 @@ export class WorldSceneTerrainController {
   }
 
   public syncPreviewAtScreen(screenX: number, screenY: number): void {
-    if (!this.activeTerrainTool || !this.host.getTerrainRuntime() || !this.terrainBrushPreview) {
+    if (
+      !this.activeTerrainTool ||
+      !this.host.getTerrainRuntime() ||
+      !this.terrainBrushPreview
+    ) {
       this.setTerrainBrushPreviewVisible(false);
       this.hideTerrainBrushRenderPreview();
       return;
@@ -144,7 +160,10 @@ export class WorldSceneTerrainController {
       return;
     }
 
-    const worldPoint = this.host.scene.cameras.main.getWorldPoint(screenX, screenY);
+    const worldPoint = this.host.scene.cameras.main.getWorldPoint(
+      screenX,
+      screenY,
+    );
     const grid = terrainRuntime.getGameplayGrid();
     const cell = grid.worldToCell(worldPoint.x, worldPoint.y);
     if (!cell) {
@@ -155,7 +174,9 @@ export class WorldSceneTerrainController {
 
     const isBlocked = this.isTerrainCellOccupied(cell);
     this.terrainBrushPreview.setFillStyle(
-      isBlocked ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL : TERRAIN_BRUSH_PREVIEW_READY_FILL,
+      isBlocked
+        ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL
+        : TERRAIN_BRUSH_PREVIEW_READY_FILL,
       TERRAIN_BRUSH_PREVIEW_ALPHA,
     );
     this.terrainBrushPreview.setStrokeStyle(
@@ -196,9 +217,16 @@ export class WorldSceneTerrainController {
   }
 
   public syncRenderPreviewTiles(tiles: readonly TerrainRenderTile[]): void {
+    const terrainRuntime = this.host.getTerrainRuntime();
+    const textureKey = terrainRuntime?.getTextureKey();
+    if (!textureKey) {
+      this.hideTerrainBrushRenderPreview();
+      return;
+    }
+
     tiles.forEach((tile, index) => {
       const image = this.getTerrainBrushRenderPreviewImage(index);
-      image.setTexture(TERRAIN_TEXTURE_KEY, tile.frame);
+      image.setTexture(textureKey, tile.frame);
       image.setScale(TERRAIN_CELL_WORLD_SIZE / image.width);
       image.setRotation(tile.rotate90 * (Math.PI / 2));
       image.setFlip(tile.flipX, tile.flipY);
@@ -228,8 +256,13 @@ export class WorldSceneTerrainController {
       return;
     }
 
-    const worldPoint = this.host.scene.cameras.main.getWorldPoint(screenX, screenY);
-    const cell = terrainRuntime.getGameplayGrid().worldToCell(worldPoint.x, worldPoint.y);
+    const worldPoint = this.host.scene.cameras.main.getWorldPoint(
+      screenX,
+      screenY,
+    );
+    const cell = terrainRuntime
+      .getGameplayGrid()
+      .worldToCell(worldPoint.x, worldPoint.y);
     if (
       !cell ||
       this.isTerrainCellOccupied(cell) ||
@@ -270,13 +303,19 @@ export class WorldSceneTerrainController {
     }
   }
 
-  private getTerrainBrushRenderPreviewImage(index: number): Phaser.GameObjects.Image {
+  private getTerrainBrushRenderPreviewImage(
+    index: number,
+  ): Phaser.GameObjects.Image {
     const existing = this.terrainBrushRenderPreviewImages[index];
     if (existing) {
       return existing;
     }
 
-    const image = this.host.scene.add.image(0, 0, TERRAIN_TEXTURE_KEY);
+    const image = this.host.scene.add.image(
+      0,
+      0,
+      this.host.getTerrainRuntime()?.getTextureKey() ?? TERRAIN_TEXTURE_KEY,
+    );
     image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
     image.setDepth(RENDER_LAYERS.TERRAIN_BRUSH_PREVIEW - 1);
     image.setVisible(false);
@@ -312,8 +351,7 @@ export class WorldSceneTerrainController {
     return this.host.getEntities().some((entity) => {
       const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
       return (
-        entityCell?.cellX === cell.cellX &&
-        entityCell?.cellY === cell.cellY
+        entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY
       );
     });
   }

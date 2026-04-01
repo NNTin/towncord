@@ -74,9 +74,16 @@ export {
 } from "../content/asset-catalog/debugTerrainAtlas";
 export {
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+  FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   TERRAIN_TOOLBAR_PREVIEW_ITEMS,
 } from "../content/asset-catalog/terrainToolbarPreviewCatalog";
 export type {
   TerrainToolbarPreviewFrame,
   TerrainToolbarPreviewItem,
 } from "../content/asset-catalog/terrainToolbarPreviewCatalog";
+export {
+  DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  PHASE1_TERRAIN_SOURCE_ID,
+} from "../content/asset-catalog/terrainContentRepository";
+export type { TerrainContentSourceId } from "../content/asset-catalog/terrainContentRepository";

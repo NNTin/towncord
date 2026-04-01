@@ -4,11 +4,13 @@ import { act } from "react";
 import type { ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import type { TerrainToolSelection } from "../../../../game/contracts/runtime";
 import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
 import { BottomToolbar } from "../BottomToolbar";
 
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
-  true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 const baseProps: ComponentProps<typeof BottomToolbar> = {
   isLayoutMode: true,
@@ -32,7 +34,7 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
   onRotateFurnitureClockwise: vi.fn(),
-  activeTerrainTool: null as { materialId: string; brushId: string } | null,
+  activeTerrainTool: null as TerrainToolSelection,
   onSelectTerrainTool: vi.fn(),
   selectedOfficePlaceable: null,
   onRotateSelectedOfficePlaceable: vi.fn(),
@@ -117,8 +119,12 @@ describe("BottomToolbar", () => {
     });
 
     expect(container.textContent).toContain("Layout editing");
-    expect(getButton(container, "Floor tool")).toBeInstanceOf(HTMLButtonElement);
-    expect(getButton(container, "Terrain tool")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Floor tool")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+    expect(getButton(container, "Terrain tool")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
     expect(getButton(container, "Save combined layout data")).toBeInstanceOf(
       HTMLButtonElement,
     );
@@ -190,9 +196,9 @@ describe("BottomToolbar", () => {
     expect(container.textContent).toContain("Player Spawn");
     expect(container.textContent).toContain("Greeter");
 
-    const entry = Array.from(container.querySelectorAll("[draggable='true']")).find(
-      (element) => element.textContent?.includes("Player Spawn"),
-    );
+    const entry = Array.from(
+      container.querySelectorAll("[draggable='true']"),
+    ).find((element) => element.textContent?.includes("Player Spawn"));
     if (!entry) {
       throw new Error("Missing draggable entity entry");
     }
@@ -272,8 +278,12 @@ describe("BottomToolbar", () => {
   });
 
   test("layout previews show the concrete furniture asset and update on hover", () => {
-    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
-    const hoveredItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_78");
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find(
+      (item) => item.id === "ASSET_107",
+    );
+    const hoveredItem = FURNITURE_PALETTE_ITEMS.find(
+      (item) => item.id === "ASSET_78",
+    );
     if (!selectedItem || !hoveredItem) {
       throw new Error("Missing furniture palette fixtures");
     }
@@ -307,7 +317,9 @@ describe("BottomToolbar", () => {
   });
 
   test("shows furniture details plus pending rotation controls while scene preview owns placement", () => {
-    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find(
+      (item) => item.id === "ASSET_107",
+    );
     if (!selectedItem) {
       throw new Error("Missing furniture palette fixture");
     }
@@ -337,7 +349,9 @@ describe("BottomToolbar", () => {
   });
 
   test("shows the selected placeable card and wires rotate/delete actions", () => {
-    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find(
+      (item) => item.id === "ASSET_107",
+    );
     if (!selectedItem) {
       throw new Error("Missing furniture palette fixture");
     }
@@ -375,7 +389,9 @@ describe("BottomToolbar", () => {
   });
 
   test("disables rotation when the selected placeable cannot rotate", () => {
-    const selectedItem = FURNITURE_PALETTE_ITEMS.find((item) => item.id === "ASSET_107");
+    const selectedItem = FURNITURE_PALETTE_ITEMS.find(
+      (item) => item.id === "ASSET_107",
+    );
     if (!selectedItem) {
       throw new Error("Missing furniture palette fixture");
     }
@@ -420,6 +436,7 @@ describe("BottomToolbar", () => {
     expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
       materialId: "ground",
       brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
     });
     expect(props.onSelectTool).not.toHaveBeenCalled();
 
@@ -502,14 +519,56 @@ describe("BottomToolbar", () => {
     };
     const { container, root } = renderToolbar(props);
 
-    expect(getButton(container, "Terrain tool").textContent).toContain("Terrain");
-    expect(getButton(container, "Water Tile Brush")).toBeInstanceOf(HTMLButtonElement);
-    expect(getButton(container, "Ground Tile Brush")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Terrain tool").textContent).toContain(
+      "Terrain",
+    );
+    expect(getButton(container, "FarmRPG Water Tile Brush")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+    expect(getButton(container, "FarmRPG Ground Tile Brush")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
 
     act(() => {
       root.unmount();
     });
 
     vi.useRealTimers();
+  });
+
+  test("the FarmRPG terrain tab selects FarmRPG terrain content", () => {
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/phase1" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+    const farmrpgTab = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.textContent?.trim() === "FarmRPG",
+    );
+    if (!(farmrpgTab instanceof HTMLButtonElement)) {
+      throw new Error("Missing FarmRPG terrain tab button");
+    }
+
+    act(() => {
+      farmrpgTab.click();
+    });
+
+    act(() => {
+      getButton(container, "FarmRPG Water Tile Brush").click();
+    });
+
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
+      materialId: "water",
+      brushId: "water",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
+    });
+
+    act(() => {
+      root.unmount();
+    });
   });
 });

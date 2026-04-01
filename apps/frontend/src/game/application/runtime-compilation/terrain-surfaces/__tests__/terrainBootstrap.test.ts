@@ -31,7 +31,7 @@ describe("terrain bootstrap compilation", () => {
     });
     expect(bootstrap.gridSpec.cells).toHaveLength(32 * 32);
     expect(bootstrap.transition).toMatchObject({
-      id: "phase1-water-over-ground",
+      id: "farmrpg-grass-water-over-ground",
       insideMaterial: "water",
       outsideMaterial: "ground",
     });
@@ -40,7 +40,10 @@ describe("terrain bootstrap compilation", () => {
 
   test("validates the compiled terrain bootstrap against the render surface", () => {
     expect(() =>
-      validateTerrainBootstrap(createSceneStub() as never, loadTerrainBootstrap()),
+      validateTerrainBootstrap(
+        createSceneStub() as never,
+        loadTerrainBootstrap(),
+      ),
     ).not.toThrow();
   });
 
@@ -102,7 +105,7 @@ describe("terrain bootstrap compilation", () => {
         "transition must provide 16 rules, got 1.",
       );
       expect((error as Error).message).toContain(
-        'texture key "debug.tilesets" is not loaded.',
+        'texture key "farmrpg.tilesets" is not loaded.',
       );
     }
   });

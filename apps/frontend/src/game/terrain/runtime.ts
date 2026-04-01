@@ -2,7 +2,10 @@ import {
   collectPhaseDurationsByAnimationId,
   readOptionalAnimationManifest,
 } from "../content/preload/animation";
-import { DEBUG_ANIMATIONS_JSON_KEY } from "../content/preload/preload";
+import {
+  DEBUG_ANIMATIONS_JSON_KEY,
+  FARMRPG_ANIMATIONS_JSON_KEY,
+} from "../content/preload/preload";
 import {
   loadTerrainBootstrap,
   validateTerrainBootstrap,
@@ -15,7 +18,6 @@ import {
   DEFAULT_TERRAIN_MATERIAL_RULES,
   TerrainGameplayGrid,
 } from "./gameplayGrid";
-import { TERRAIN_TEXTURE_KEY } from "./contracts";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainQueries } from "./queries";
 import type { TerrainRenderSurface } from "./renderSurface";
@@ -27,30 +29,77 @@ import {
   type TerrainRuntimeOptions,
 } from "../../engine/terrain";
 import type { TerrainSeedDocument } from "../../data";
-import { terrainContentRepository } from "../content/asset-catalog/terrainContentRepository";
+import {
+  readTerrainContent,
+  type TerrainContent,
+  type TerrainContentSourceId,
+} from "../content/asset-catalog/terrainContentRepository";
+
+type TerrainRuntimeSharedState = {
+  store: TerrainMapStore;
+  gameplayGrid: TerrainGameplayGrid;
+};
 
 export type TerrainRuntimeContext = {
+  sourceId: TerrainContentSourceId;
   seedDocument: TerrainSeedDocument;
+  gameplayGrid: TerrainGameplayGrid;
   runtimeOptions: Omit<TerrainRuntimeOptions, "store"> & {
     store: TerrainMapStore;
   };
 };
 
+type CreateTerrainRuntimeContextOptions = {
+  terrainContent?: TerrainContent;
+  sharedState?: TerrainRuntimeSharedState;
+};
+
+const ANIMATION_MANIFEST_KEY_BY_TERRAIN_TEXTURE: Record<string, string> = {
+  "debug.tilesets": DEBUG_ANIMATIONS_JSON_KEY,
+  "farmrpg.tilesets": FARMRPG_ANIMATIONS_JSON_KEY,
+};
+
+function resolveTerrainAnimationManifestKey(textureKey: string): string {
+  return (
+    ANIMATION_MANIFEST_KEY_BY_TERRAIN_TEXTURE[textureKey] ??
+    DEBUG_ANIMATIONS_JSON_KEY
+  );
+}
+
 export function createTerrainRuntimeContext(
   scene: TerrainRenderSurface,
+  options: CreateTerrainRuntimeContextOptions = {},
 ): TerrainRuntimeContext {
-  const terrainContent = terrainContentRepository.read();
-  const bootstrap = loadTerrainBootstrap(terrainContent.seed, terrainContent.ruleset);
-  validateTerrainBootstrap(scene, bootstrap);
-  const debugAnimationManifest = readOptionalAnimationManifest(
+  const terrainContent = options.terrainContent ?? readTerrainContent();
+  const bootstrap = loadTerrainBootstrap(
+    terrainContent.seed,
+    terrainContent.ruleset,
+  );
+  validateTerrainBootstrap(scene, bootstrap, terrainContent.textureKey);
+  const animationManifest = readOptionalAnimationManifest(
     scene as unknown as Record<string, unknown>,
-    DEBUG_ANIMATIONS_JSON_KEY,
+    resolveTerrainAnimationManifestKey(terrainContent.textureKey),
   );
-  const phaseDurationsByAnimationId = collectPhaseDurationsByAnimationId(
-    debugAnimationManifest,
-  );
+  const phaseDurationsByAnimationId =
+    collectPhaseDurationsByAnimationId(animationManifest);
 
-  const store = new TerrainMapStore(bootstrap.gridSpec);
+  const store =
+    options.sharedState?.store ?? new TerrainMapStore(bootstrap.gridSpec);
+  const gameplayGrid =
+    options.sharedState?.gameplayGrid ??
+    new TerrainGameplayGrid(store, DEFAULT_TERRAIN_MATERIAL_RULES);
+
+  if (
+    store.width !== bootstrap.gridSpec.width ||
+    store.height !== bootstrap.gridSpec.height ||
+    store.chunkSize !== bootstrap.gridSpec.chunkSize ||
+    store.defaultMaterial !== bootstrap.gridSpec.defaultMaterial
+  ) {
+    throw new Error(
+      "Terrain runtime shared state does not match the selected terrain content.",
+    );
+  }
+
   const kernel = new MarchingSquaresKernel();
   const mapper = new TerrainCaseMapper(bootstrap.transition.rules);
   const tileResolver = new TerrainTileResolver(
@@ -59,16 +108,17 @@ export function createTerrainRuntimeContext(
     bootstrap.transition.insideMaterial,
   );
   const chunkBuilder = new TerrainChunkBuilder(store, tileResolver);
-  const gameplayGrid = new TerrainGameplayGrid(
-    store,
-    DEFAULT_TERRAIN_MATERIAL_RULES,
-  );
   const commands = new TerrainCommands(
     new TerrainEditRouter(),
     store,
     gameplayGrid,
   );
-  const queries = new TerrainQueries(store, gameplayGrid, tileResolver);
+  const queries = new TerrainQueries(
+    store,
+    gameplayGrid,
+    tileResolver,
+    terrainContent.textureKey,
+  );
   const visibleChunks = new TerrainVisibleChunkResolver(
     store.chunkSize,
     store.chunkCountX,
@@ -76,7 +126,9 @@ export function createTerrainRuntimeContext(
   );
 
   return {
+    sourceId: terrainContent.sourceId,
     seedDocument: terrainContent.seed,
+    gameplayGrid,
     runtimeOptions: {
       gridSpec: bootstrap.gridSpec,
       store,
@@ -84,7 +136,7 @@ export function createTerrainRuntimeContext(
       commands,
       queries,
       visibleChunks,
-      textureKey: TERRAIN_TEXTURE_KEY,
+      textureKey: terrainContent.textureKey,
       animationPhaseDurationsById: phaseDurationsByAnimationId,
     },
   };

@@ -5,6 +5,7 @@ describe("terrain content repository", () => {
   test("returns cloned snapshots for each read", () => {
     const repository = createStaticTerrainContentRepository({
       sourceId: "test-terrain",
+      textureKey: "test-terrain-texture",
       seed: {
         width: 2,
         height: 2,

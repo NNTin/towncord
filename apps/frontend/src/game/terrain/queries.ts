@@ -20,6 +20,7 @@ export class TerrainQueries {
     private readonly store: TerrainMapStore,
     private readonly gameplayGrid: TerrainGameplayGrid,
     private readonly tileResolver: TerrainTileResolver,
+    private readonly textureKey: string,
   ) {}
 
   public getGameplayGrid(): TerrainGameplayGrid {
@@ -34,7 +35,10 @@ export class TerrainQueries {
     const center = this.gameplayGrid.worldToCell(worldX, worldY);
     if (!center) return null;
 
-    const previewMaterialId = resolveTerrainEditMaterial(payload, this.store.defaultMaterial);
+    const previewMaterialId = resolveTerrainEditMaterial(
+      payload,
+      this.store.defaultMaterial,
+    );
     const materialAt = (cellX: number, cellY: number) =>
       cellX === center.cellX && cellY === center.cellY
         ? previewMaterialId
@@ -52,17 +56,22 @@ export class TerrainQueries {
     return tiles;
   }
 
-  public inspectAtWorld(worldX: number, worldY: number): TerrainTileInspectedPayload | null {
+  public inspectAtWorld(
+    worldX: number,
+    worldY: number,
+  ): TerrainTileInspectedPayload | null {
     const cell = this.gameplayGrid.worldToRenderCell(worldX, worldY);
     if (!cell) return null;
 
-    const materialAt = (cellX: number, cellY: number) => this.store.getCellMaterial(cellX, cellY);
+    const materialAt = (cellX: number, cellY: number) =>
+      this.store.getCellMaterial(cellX, cellY);
     const materialId = materialAt(cell.cellX, cell.cellY);
     return this.tileResolver.resolveInspectedTile(
       materialAt,
       cell.cellX,
       cell.cellY,
       materialId,
+      this.textureKey,
     );
   }
 }

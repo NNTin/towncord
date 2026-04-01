@@ -36,12 +36,18 @@ export type TerrainGameplayGridView = {
   getRevision(): number;
   worldToCell(worldX: number, worldY: number): TerrainCellCoord | null;
   isCellWalkable(cellX: number, cellY: number): boolean;
-  cellToWorldCenter(cellX: number, cellY: number): { worldX: number; worldY: number } | null;
+  cellToWorldCenter(
+    cellX: number,
+    cellY: number,
+  ): { worldX: number; worldY: number } | null;
   findPath(
     start: TerrainCellCoord,
     goal: TerrainCellCoord,
   ): { cells: TerrainCellCoord[]; revision: number } | null;
-  clampWorldPoint(worldX: number, worldY: number): { worldX: number; worldY: number };
+  clampWorldPoint(
+    worldX: number,
+    worldY: number,
+  ): { worldX: number; worldY: number };
   isWorldWalkable(worldX: number, worldY: number): boolean;
 };
 
@@ -55,7 +61,11 @@ type TerrainRuntimeChunkBuilder = {
 };
 
 type TerrainRuntimeCommands = {
-  queueDrop(payload: TerrainRuntimeDropPayload, worldX: number, worldY: number): void;
+  queueDrop(
+    payload: TerrainRuntimeDropPayload,
+    worldX: number,
+    worldY: number,
+  ): void;
   flushPendingDrops(onError: (error: unknown) => void): TerrainCellCoord[];
   clearPendingDrops(): void;
 };
@@ -67,7 +77,10 @@ type TerrainRuntimeQueries = {
     worldX: number,
     worldY: number,
   ): TerrainRenderTile[] | null;
-  inspectAtWorld(worldX: number, worldY: number): TerrainRuntimeTileInspection | null;
+  inspectAtWorld(
+    worldX: number,
+    worldY: number,
+  ): TerrainRuntimeTileInspection | null;
 };
 
 type TerrainRuntimeVisibleChunks = {
@@ -94,26 +107,36 @@ export type TerrainRuntimeOptions = {
 
 export class TerrainRuntime {
   private readonly renderer: TerrainRenderer;
+  private readonly textureKey: string;
 
   constructor(
     private readonly scene: TerrainRenderSurface,
     private readonly options: TerrainRuntimeOptions,
   ) {
+    this.textureKey = options.textureKey ?? TERRAIN_TEXTURE_KEY;
     this.renderer = new TerrainRenderer(
       scene,
       options.gridSpec,
-      options.textureKey ?? TERRAIN_TEXTURE_KEY,
+      this.textureKey,
       options.animationPhaseDurationsById ?? {},
       options.fallbackPhaseDurationMs ?? DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
     );
   }
 
-  public queueDrop(payload: TerrainRuntimeDropPayload, worldX: number, worldY: number): void {
+  public queueDrop(
+    payload: TerrainRuntimeDropPayload,
+    worldX: number,
+    worldY: number,
+  ): void {
     this.options.commands.queueDrop(payload, worldX, worldY);
   }
 
   public getGameplayGrid(): TerrainGameplayGridView {
     return this.options.queries.getGameplayGrid();
+  }
+
+  public getTextureKey(): string {
+    return this.textureKey;
   }
 
   public previewPaintAtWorld(
@@ -126,7 +149,9 @@ export class TerrainRuntime {
 
   public update(): void {
     this.renderer.setVisibleChunkIds(
-      this.options.visibleChunks.resolveVisibleChunkIds(this.scene.cameras.main.worldView),
+      this.options.visibleChunks.resolveVisibleChunkIds(
+        this.scene.cameras.main.worldView,
+      ),
     );
     const changedCells = this.options.commands.flushPendingDrops((error) =>
       this.handleEditError(error),

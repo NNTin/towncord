@@ -37,19 +37,25 @@ function createHost() {
 describe("uiCommands transport", () => {
   test("rejects malformed entity drop commands at the command boundary", () => {
     expect(
-      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
-        type: "terrain",
-        entityId: "player.seed",
-        screenX: 32,
-        screenY: 48,
-      }),
+      normalizeUiToRuntimeCommandPayload(
+        UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP,
+        {
+          type: "terrain",
+          entityId: "player.seed",
+          screenX: 32,
+          screenY: 48,
+        },
+      ),
     ).toBeUndefined();
     expect(
-      normalizeUiToRuntimeCommandPayload(UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, {
-        entityId: "player.seed",
-        screenX: 32,
-        screenY: 48,
-      }),
+      normalizeUiToRuntimeCommandPayload(
+        UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP,
+        {
+          entityId: "player.seed",
+          screenX: 32,
+          screenY: 48,
+        },
+      ),
     ).toBeUndefined();
   });
 
@@ -73,7 +79,9 @@ describe("uiCommands transport", () => {
     });
     expect(payload).not.toBeUndefined();
     expect(payload?.tool).toBe("floor");
-    expect(payload && payload.tool === "floor" ? payload.floorColor : null).not.toBe(floorColor);
+    expect(
+      payload && payload.tool === "floor" ? payload.floorColor : null,
+    ).not.toBe(floorColor);
     expect(
       normalizeOfficeSetEditorToolPayload({
         tool: "furniture",
@@ -99,9 +107,9 @@ describe("uiCommands transport", () => {
       wallColor,
     });
     expect(wallPayload?.tool).toBe("wall");
-    expect(wallPayload && wallPayload.tool === "wall" ? wallPayload.wallColor : null).not.toBe(
-      wallColor,
-    );
+    expect(
+      wallPayload && wallPayload.tool === "wall" ? wallPayload.wallColor : null,
+    ).not.toBe(wallColor);
     expect(
       normalizeOfficeSetEditorToolPayload({
         tool: "floor",
@@ -127,13 +135,36 @@ describe("uiCommands transport", () => {
   });
 
   test("normalizes office selection actions at the command boundary", () => {
-    expect(normalizeOfficeSelectionActionPayload({ action: "rotate" })).toEqual({
-      action: "rotate",
+    expect(normalizeOfficeSelectionActionPayload({ action: "rotate" })).toEqual(
+      {
+        action: "rotate",
+      },
+    );
+    expect(normalizeOfficeSelectionActionPayload({ action: "delete" })).toEqual(
+      {
+        action: "delete",
+      },
+    );
+    expect(
+      normalizeOfficeSelectionActionPayload({ action: "flip" }),
+    ).toBeUndefined();
+  });
+
+  test("preserves optional terrain source ids on terrain tool selections", () => {
+    expect(
+      normalizeUiToRuntimeCommandPayload(
+        UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
+        {
+          materialId: "water",
+          brushId: "water",
+          terrainSourceId: "public-assets:terrain/farmrpg-grass",
+        },
+      ),
+    ).toEqual({
+      materialId: "water",
+      brushId: "water",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
     });
-    expect(normalizeOfficeSelectionActionPayload({ action: "delete" })).toEqual({
-      action: "delete",
-    });
-    expect(normalizeOfficeSelectionActionPayload({ action: "flip" })).toBeUndefined();
   });
 
   test("bindUiToRuntimeCommand drops malformed entity payloads", () => {
@@ -209,12 +240,15 @@ describe("uiCommands transport", () => {
       screenY: 24,
     });
 
-    expect(emitSpy).toHaveBeenCalledWith(UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP, {
-      type: "terrain",
-      materialId: "stone",
-      brushId: "fill",
-      screenX: 12,
-      screenY: 24,
-    });
+    expect(emitSpy).toHaveBeenCalledWith(
+      UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP,
+      {
+        type: "terrain",
+        materialId: "stone",
+        brushId: "fill",
+        screenX: 12,
+        screenY: 24,
+      },
+    );
   });
 });

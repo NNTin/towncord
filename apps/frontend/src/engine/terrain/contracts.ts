@@ -1,9 +1,10 @@
 export const TERRAIN_CHUNK_SIZE = 32 as const;
-export const TERRAIN_TEXTURE_KEY = "debug.tilesets";
+export const TERRAIN_TEXTURE_KEY = "farmrpg.tilesets";
 const TERRAIN_TILE_FRAME_SIZE = 16;
 const TERRAIN_TILE_SCALE = 1;
 export const DEFAULT_TERRAIN_ANIMATION_FRAME_MS = 120;
-export const TERRAIN_CELL_WORLD_SIZE = TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
+export const TERRAIN_CELL_WORLD_SIZE =
+  TERRAIN_TILE_FRAME_SIZE * TERRAIN_TILE_SCALE;
 export const TERRAIN_RENDER_GRID_WORLD_OFFSET = TERRAIN_CELL_WORLD_SIZE * 0.5;
 
 // Terrain render-layer contract:
@@ -67,6 +68,9 @@ export type TerrainChunkRenderPayload = TerrainChunkCoord & {
   tiles: TerrainRenderTile[];
 };
 
-export function toTerrainChunkId(chunkX: number, chunkY: number): TerrainChunkId {
+export function toTerrainChunkId(
+  chunkX: number,
+  chunkY: number,
+): TerrainChunkId {
   return `${chunkX},${chunkY}`;
 }
