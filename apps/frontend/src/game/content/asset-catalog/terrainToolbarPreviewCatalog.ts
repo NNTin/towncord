@@ -2,6 +2,11 @@ import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json"
 import farmrpgTerrainRulesetJson from "public-assets-json:terrain/rulesets/farmrpg-grass.json";
 import type { TerrainRulesetFile } from "../../../data";
 import {
+  DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  type TerrainContentSourceId,
+} from "./terrainContentRepository";
+import {
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   type TerrainBrushId,
   type TerrainMaterialId,
@@ -30,6 +35,7 @@ export type TerrainToolbarPreviewFrame = {
 };
 
 export type TerrainToolbarPreviewItem = {
+  terrainSourceId: TerrainContentSourceId;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -132,6 +138,7 @@ function resolveTransitionRules(): TerrainRulesetTransitionRule[] {
 }
 
 function createTerrainToolbarPreviewItem(input: {
+  terrainSourceId: TerrainContentSourceId;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -156,6 +163,7 @@ function createTerrainToolbarPreviewItem(input: {
     input.atlas,
   );
   return {
+    terrainSourceId: input.terrainSourceId,
     id: input.id,
     label: input.label,
     materialId: input.materialId,
@@ -191,6 +199,7 @@ const FARMRPG_TERRAIN_PREVIEW_RULES = resolveTransitionRulesFromRuleset(
 
 export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
   createTerrainToolbarPreviewItem({
+    terrainSourceId: DEFAULT_TERRAIN_SOURCE_ID,
     id: "terrain.water.tile",
     label: "Water Tile Brush",
     materialId: "water",
@@ -200,6 +209,7 @@ export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
     atlas: DEBUG_ATLAS_SOURCE,
   }),
   createTerrainToolbarPreviewItem({
+    terrainSourceId: DEFAULT_TERRAIN_SOURCE_ID,
     id: "terrain.ground.tile",
     label: "Ground Tile Brush",
     materialId: "ground",
@@ -214,6 +224,7 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
   try {
     return [
       createTerrainToolbarPreviewItem({
+        terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
         id: "terrain.farmrpg.water.tile",
         label: "FarmRPG Water Tile Brush",
         materialId: "water",
@@ -223,6 +234,7 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
         atlas: FARMRPG_ATLAS_SOURCE,
       }),
       createTerrainToolbarPreviewItem({
+        terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
         id: "terrain.farmrpg.ground.tile",
         label: "FarmRPG Ground Tile Brush",
         materialId: "ground",

@@ -1,6 +1,4 @@
-import type {
-  OfficeSelectionChangedPayload,
-} from "../../contracts/office-editor";
+import type { OfficeSelectionChangedPayload } from "../../contracts/office-editor";
 import type {
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
@@ -66,7 +64,15 @@ export function reduceRuntimeBridgeState(
     case "terrainToolSelected":
       return {
         ...state,
-        activeTerrainTool: action.tool,
+        activeTerrainTool:
+          action.tool &&
+          action.tool.terrainSourceId === undefined &&
+          state.activeTerrainTool?.terrainSourceId
+            ? {
+                ...action.tool,
+                terrainSourceId: state.activeTerrainTool.terrainSourceId,
+              }
+            : action.tool,
         inspectedTile: action.tool ? null : state.inspectedTile,
       };
     case "officeSelectionChanged":

@@ -1013,9 +1013,14 @@ function TerrainSubPanel({
       </div>
       <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
         {items.map((item) => {
+          const activeTerrainSourceId =
+            activeTerrainTool?.terrainSourceId ??
+            DEFAULT_TERRAIN_PREVIEW?.terrainSourceId ??
+            "public-assets:terrain/phase1";
           const isSelected =
             activeTerrainTool?.brushId === item.brushId &&
-            activeTerrainTool?.materialId === item.materialId;
+            activeTerrainTool?.materialId === item.materialId &&
+            activeTerrainSourceId === item.terrainSourceId;
           return (
             <button
               key={item.id}
@@ -1030,6 +1035,7 @@ function TerrainSubPanel({
                 onSelectTerrainTool?.({
                   materialId: item.materialId,
                   brushId: item.brushId,
+                  terrainSourceId: item.terrainSourceId,
                 });
               }}
               style={{
@@ -1490,6 +1496,7 @@ export function BottomToolbar({
     onSelectTerrainTool?.({
       materialId: DEFAULT_TERRAIN_PREVIEW.materialId,
       brushId: DEFAULT_TERRAIN_PREVIEW.brushId,
+      terrainSourceId: DEFAULT_TERRAIN_PREVIEW.terrainSourceId,
     });
   }
 

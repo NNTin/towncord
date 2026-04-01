@@ -122,4 +122,31 @@ describe("runtime sidebar projection owners", () => {
       terrainMs: 1.7,
     });
   });
+
+  test("preserves the active terrain source when source-agnostic terrain tools are selected", () => {
+    const withFarmrpgTool = reduceRuntimeBridgeState(
+      createRuntimeBridgeState(),
+      {
+        type: "terrainToolSelected",
+        tool: {
+          materialId: "water",
+          brushId: "paint",
+          terrainSourceId: "public-assets:terrain/farmrpg-grass",
+        },
+      },
+    );
+    const nextState = reduceRuntimeBridgeState(withFarmrpgTool, {
+      type: "terrainToolSelected",
+      tool: {
+        materialId: "ground",
+        brushId: "paint",
+      },
+    });
+
+    expect(nextState.activeTerrainTool).toEqual({
+      materialId: "ground",
+      brushId: "paint",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
+    });
+  });
 });

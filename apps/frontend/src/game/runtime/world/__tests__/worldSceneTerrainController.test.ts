@@ -16,6 +16,7 @@ const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
 
 function createHarness(input?: {
   entityPositions?: WorldPoint[];
+  runtimeTextureKey?: string;
   worldPoint?: WorldPoint;
   worldToCellResult?: { cellX: number; cellY: number } | null;
   previewTiles?: Array<{
@@ -30,6 +31,8 @@ function createHarness(input?: {
 }) {
   const queueDrop = vi.fn();
   const previewPaintAtWorld = vi.fn(() => input?.previewTiles ?? []);
+  const setTerrainContentSource = vi.fn();
+  const runtimeTextureKey = input?.runtimeTextureKey ?? "debug.tilesets";
   const worldPoint = input?.worldPoint ?? { x: 96, y: 96 };
   const worldToCellResult = input?.worldToCellResult;
   const entityPositions = [...(input?.entityPositions ?? [])];
@@ -85,6 +88,7 @@ function createHarness(input?: {
         getGameplayGrid: () => ({
           worldToCell,
         }),
+        getTextureKey: () => runtimeTextureKey,
         previewPaintAtWorld,
         queueDrop,
       }) as never,
@@ -92,6 +96,7 @@ function createHarness(input?: {
       entityPositions.map((position) => ({
         position,
       })) as never,
+    setTerrainContentSource,
   });
 
   controller.createBrushPreview();
@@ -107,6 +112,7 @@ function createHarness(input?: {
     previewPaintAtWorld,
     queueDrop,
     scene,
+    setTerrainContentSource,
     terrainBrushPreview,
     worldToCell,
   };
@@ -192,7 +198,10 @@ describe("WorldSceneTerrainController", () => {
       previewTiles,
       worldPoint: { x: 96, y: 96 },
     });
-    const syncRenderPreviewTiles = vi.spyOn(controller, "syncRenderPreviewTiles");
+    const syncRenderPreviewTiles = vi.spyOn(
+      controller,
+      "syncRenderPreviewTiles",
+    );
 
     controller.syncPreviewAtScreen(12, 34);
 
@@ -226,6 +235,43 @@ describe("WorldSceneTerrainController", () => {
     ]);
 
     expect(previewImage.setPosition).toHaveBeenCalledWith(128, 128);
+  });
+
+  test("uses the active terrain runtime texture for render preview images", () => {
+    const { controller, previewImage } = createHarness({
+      runtimeTextureKey: "farmrpg.tilesets",
+    });
+
+    controller.syncRenderPreviewTiles([
+      {
+        cellX: 1,
+        cellY: 1,
+        caseId: 1,
+        frame: "tilesets.farmrpg.environment.grass#1",
+        rotate90: 0,
+        flipX: false,
+        flipY: false,
+      },
+    ]);
+
+    expect(previewImage.setTexture).toHaveBeenCalledWith(
+      "farmrpg.tilesets",
+      "tilesets.farmrpg.environment.grass#1",
+    );
+  });
+
+  test("switches the active terrain content source when a terrain tool declares one", () => {
+    const { controller, setTerrainContentSource } = createHarness();
+
+    controller.handleSelectTerrainTool({
+      materialId: "water",
+      brushId: "water",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
+    });
+
+    expect(setTerrainContentSource).toHaveBeenCalledWith(
+      "public-assets:terrain/farmrpg-grass",
+    );
   });
 
   test("hides the brush preview when the hovered placement cell is out of bounds", () => {

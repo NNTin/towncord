@@ -14,6 +14,10 @@ import {
 } from "../../../engine";
 import { createTerrainRuntimeContext } from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
+import {
+  readTerrainContent,
+  type TerrainContentSourceId,
+} from "../../content/asset-catalog/terrainContentRepository";
 import { EntitySystem } from "./entitySystem";
 import type { MovementInput } from "./movementSystem";
 import { WorldSceneCommandBindings } from "./worldSceneCommandBindings";
@@ -71,7 +75,7 @@ export class WorldSceneAssembly {
   private hasPendingTerrainSnapshotChange = false;
   private officeFurnitureBlockingCells = new Set<number>();
 
-  constructor(scene: Phaser.Scene) {
+  constructor(private readonly scene: Phaser.Scene) {
     this.officeLayoutChangedEvents = scene.game.events;
     this.projections = new WorldSceneProjectionEmitter({
       getRuntimeHost: () => scene.game,
@@ -121,6 +125,8 @@ export class WorldSceneAssembly {
       scene,
       getTerrainRuntime: () => this.terrainRuntime,
       getEntities: () => this.entitySystem?.getAll() ?? [],
+      setTerrainContentSource: (sourceId) =>
+        this.setTerrainContentSource(sourceId),
     });
 
     this.placementController = new WorldScenePlacementController(
@@ -382,6 +388,40 @@ export class WorldSceneAssembly {
         terrainRuntimeContext.runtimeOptions.store,
       ),
     });
+  }
+
+  private setTerrainContentSource(sourceId: TerrainContentSourceId): void {
+    const terrainRuntimeContext = this.terrainRuntimeContext;
+    if (!terrainRuntimeContext || terrainRuntimeContext.sourceId === sourceId) {
+      return;
+    }
+
+    const nextSeed = syncFromRuntimeTerrain(
+      terrainRuntimeContext.seedDocument,
+      terrainRuntimeContext.runtimeOptions.store,
+    );
+    const nextContent = readTerrainContent(sourceId);
+    const nextRuntimeContext = createTerrainRuntimeContext(this.scene, {
+      terrainContent: {
+        ...nextContent,
+        seed: nextSeed,
+      },
+      sharedState: {
+        store: terrainRuntimeContext.runtimeOptions.store,
+        gameplayGrid: terrainRuntimeContext.gameplayGrid,
+      },
+    });
+
+    nextRuntimeContext.runtimeOptions.store.markAllChunksDirty();
+    this.terrainRuntime?.destroy();
+    this.terrainRuntimeContext = nextRuntimeContext;
+    this.terrainRuntime = new TerrainRuntime(this.scene, {
+      ...nextRuntimeContext.runtimeOptions,
+      onTerrainChanged: () => {
+        this.hasPendingTerrainSnapshotChange = true;
+      },
+    });
+    this.terrainRuntime.update();
   }
 
   private resolveMovementInput(

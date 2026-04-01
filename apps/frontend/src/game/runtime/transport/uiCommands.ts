@@ -14,7 +14,15 @@ import type {
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
 } from "../../contracts/runtime";
-import type { TerrainBrushId, TerrainMaterialId } from "../../terrain/contracts";
+import {
+  DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  type TerrainContentSourceId,
+} from "../../content/asset-catalog/terrainContentRepository";
+import type {
+  TerrainBrushId,
+  TerrainMaterialId,
+} from "../../terrain/contracts";
 import { isRecord } from "../../utils/typeGuards";
 import type { RuntimeEventHost } from "./host";
 import {
@@ -29,9 +37,7 @@ export type {
   OfficeSetEditorToolPayload,
 } from "../../contracts/office-editor";
 
-export type {
-  SelectedTerrainToolPayload,
-} from "../../contracts/runtime";
+export type { SelectedTerrainToolPayload } from "../../contracts/runtime";
 
 export const UI_TO_RUNTIME_COMMANDS = {
   PLACE_ENTITY_DROP: "placeEntityDrop",
@@ -43,11 +49,15 @@ export const UI_TO_RUNTIME_COMMANDS = {
 } as const;
 
 export const PLACE_ENTITY_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP;
-export const PLACE_TERRAIN_DROP_EVENT = UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP;
-export const SELECT_TERRAIN_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL;
+export const PLACE_TERRAIN_DROP_EVENT =
+  UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP;
+export const SELECT_TERRAIN_TOOL_EVENT =
+  UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL;
 export const SET_ZOOM_EVENT = UI_TO_RUNTIME_COMMANDS.SET_ZOOM;
-export const OFFICE_SET_EDITOR_TOOL_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
-export const OFFICE_SELECTION_ACTION_EVENT = UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION;
+export const OFFICE_SET_EDITOR_TOOL_EVENT =
+  UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
+export const OFFICE_SELECTION_ACTION_EVENT =
+  UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION;
 
 export type SetZoomPayload = {
   zoom: number;
@@ -68,24 +78,29 @@ export type UiToRuntimeCommandPayloadByName = {
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 
 const OFFICE_TILE_COLOR_SET = new Set<string>(OFFICE_TILE_COLORS);
-const FURNITURE_ROTATION_QUARTER_TURNS = new Set<FurnitureRotationQuarterTurns>([
-  0,
-  1,
-  2,
-  3,
+const TERRAIN_SOURCE_ID_SET = new Set<TerrainContentSourceId>([
+  DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
 ]);
+const FURNITURE_ROTATION_QUARTER_TURNS = new Set<FurnitureRotationQuarterTurns>(
+  [0, 1, 2, 3],
+);
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
-function cloneOfficeLayoutColorAdjust(color: OfficeColorAdjust): OfficeColorAdjust {
+function cloneOfficeLayoutColorAdjust(
+  color: OfficeColorAdjust,
+): OfficeColorAdjust {
   return {
     h: color.h,
     s: color.s,
     b: color.b,
     c: color.c,
-    ...(typeof color.colorize === "boolean" ? { colorize: color.colorize } : {}),
+    ...(typeof color.colorize === "boolean"
+      ? { colorize: color.colorize }
+      : {}),
   };
 }
 
@@ -138,8 +153,18 @@ function normalizeNullableOfficeTileColor(
 function normalizeFurnitureRotationQuarterTurns(
   value: unknown,
 ): FurnitureRotationQuarterTurns | undefined {
-  return Number.isInteger(value) && FURNITURE_ROTATION_QUARTER_TURNS.has(value as FurnitureRotationQuarterTurns)
+  return Number.isInteger(value) &&
+    FURNITURE_ROTATION_QUARTER_TURNS.has(value as FurnitureRotationQuarterTurns)
     ? (value as FurnitureRotationQuarterTurns)
+    : undefined;
+}
+
+function normalizeTerrainSourceId(
+  value: unknown,
+): TerrainContentSourceId | undefined {
+  return typeof value === "string" &&
+    TERRAIN_SOURCE_ID_SET.has(value as TerrainContentSourceId)
+    ? (value as TerrainContentSourceId)
     : undefined;
 }
 
@@ -158,13 +183,21 @@ export function normalizeSelectedTerrainToolPayload(
     return undefined;
   }
 
+  const terrainSourceId = normalizeTerrainSourceId(value.terrainSourceId);
+  if (value.terrainSourceId !== undefined && terrainSourceId === undefined) {
+    return undefined;
+  }
+
   return {
     materialId: value.materialId,
     brushId: value.brushId,
+    ...(terrainSourceId ? { terrainSourceId } : {}),
   };
 }
 
-export function normalizeSetZoomPayload(value: unknown): SetZoomPayload | undefined {
+export function normalizeSetZoomPayload(
+  value: unknown,
+): SetZoomPayload | undefined {
   if (!isRecord(value) || !isFiniteNumber(value.zoom) || value.zoom <= 0) {
     return undefined;
   }
@@ -254,20 +287,28 @@ export function normalizeOfficeSelectionActionPayload(
 const uiToRuntimeCommandNormalizers = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
-  [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: normalizeSelectedTerrainToolPayload,
+  [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]:
+    normalizeSelectedTerrainToolPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: normalizeSetZoomPayload,
-  [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]: normalizeOfficeSetEditorToolPayload,
-  [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]: normalizeOfficeSelectionActionPayload,
+  [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]:
+    normalizeOfficeSetEditorToolPayload,
+  [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]:
+    normalizeOfficeSelectionActionPayload,
 } satisfies {
-  [K in UiToRuntimeCommandName]: PayloadNormalizer<UiToRuntimeCommandPayloadByName[K]>;
+  [K in UiToRuntimeCommandName]: PayloadNormalizer<
+    UiToRuntimeCommandPayloadByName[K]
+  >;
 };
 
-export function normalizeUiToRuntimeCommandPayload<K extends UiToRuntimeCommandName>(
+export function normalizeUiToRuntimeCommandPayload<
+  K extends UiToRuntimeCommandName,
+>(
   command: K,
   payload: unknown,
 ): UiToRuntimeCommandPayloadByName[K] | undefined {
-  const normalizer =
-    uiToRuntimeCommandNormalizers[command] as PayloadNormalizer<UiToRuntimeCommandPayloadByName[K]>;
+  const normalizer = uiToRuntimeCommandNormalizers[
+    command
+  ] as PayloadNormalizer<UiToRuntimeCommandPayloadByName[K]>;
   return normalizer(payload);
 }
 
@@ -276,7 +317,10 @@ export function emitUiToRuntimeCommand<K extends UiToRuntimeCommandName>(
   command: K,
   payload: UiToRuntimeCommandPayloadByName[K],
 ): void {
-  const normalizedPayload = normalizeUiToRuntimeCommandPayload(command, payload);
+  const normalizedPayload = normalizeUiToRuntimeCommandPayload(
+    command,
+    payload,
+  );
   if (!host || normalizedPayload === undefined) {
     return;
   }
@@ -289,11 +333,19 @@ export function emitPlaceDropCommand(
   payload: PlaceEntityDropPayload | PlaceTerrainDropPayload,
 ): void {
   if (payload.type === "entity") {
-    emitUiToRuntimeCommand(host, UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP, payload);
+    emitUiToRuntimeCommand(
+      host,
+      UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP,
+      payload,
+    );
     return;
   }
 
-  emitUiToRuntimeCommand(host, UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP, payload);
+  emitUiToRuntimeCommand(
+    host,
+    UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP,
+    payload,
+  );
 }
 
 export function bindUiToRuntimeCommand<K extends UiToRuntimeCommandName>(
