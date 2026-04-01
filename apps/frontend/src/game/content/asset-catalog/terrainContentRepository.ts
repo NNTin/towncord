@@ -5,12 +5,13 @@ import farmrpgTerrainRulesetJson from "public-assets-json:terrain/rulesets/farmr
 import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json";
 import terrainSeedJson from "public-assets-json:terrain/seeds/phase1.json";
 
-export const DEFAULT_TERRAIN_SOURCE_ID = "public-assets:terrain/phase1";
+export const PHASE1_TERRAIN_SOURCE_ID = "public-assets:terrain/phase1";
 export const FARMRPG_GRASS_TERRAIN_SOURCE_ID =
   "public-assets:terrain/farmrpg-grass";
+export const DEFAULT_TERRAIN_SOURCE_ID = FARMRPG_GRASS_TERRAIN_SOURCE_ID;
 
 export type TerrainContentSourceId =
-  | typeof DEFAULT_TERRAIN_SOURCE_ID
+  | typeof PHASE1_TERRAIN_SOURCE_ID
   | typeof FARMRPG_GRASS_TERRAIN_SOURCE_ID;
 
 export type TerrainContent = {
@@ -22,25 +23,27 @@ export type TerrainContent = {
 
 export interface TerrainContentRepository extends ContentRepository<TerrainContent> {}
 
-const DEFAULT_TERRAIN_CONTENT: TerrainContent = {
-  sourceId: DEFAULT_TERRAIN_SOURCE_ID,
+const PHASE1_TERRAIN_CONTENT: TerrainContent = {
+  sourceId: PHASE1_TERRAIN_SOURCE_ID,
   seed: terrainSeedJson as TerrainSeedDocument,
   ruleset: terrainRulesetJson as TerrainRulesetFile,
-  textureKey: TERRAIN_TEXTURE_KEY,
+  textureKey: "debug.tilesets",
 };
 
 const FARMRPG_GRASS_TERRAIN_CONTENT: TerrainContent = {
   sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
   seed: terrainSeedJson as TerrainSeedDocument,
   ruleset: farmrpgTerrainRulesetJson as TerrainRulesetFile,
-  textureKey: "farmrpg.tilesets",
+  textureKey: TERRAIN_TEXTURE_KEY,
 };
+
+const DEFAULT_TERRAIN_CONTENT = FARMRPG_GRASS_TERRAIN_CONTENT;
 
 const TERRAIN_CONTENT_BY_SOURCE_ID: Record<
   TerrainContentSourceId,
   TerrainContent
 > = {
-  [DEFAULT_TERRAIN_SOURCE_ID]: DEFAULT_TERRAIN_CONTENT,
+  [PHASE1_TERRAIN_SOURCE_ID]: PHASE1_TERRAIN_CONTENT,
   [FARMRPG_GRASS_TERRAIN_SOURCE_ID]: FARMRPG_GRASS_TERRAIN_CONTENT,
 };
 

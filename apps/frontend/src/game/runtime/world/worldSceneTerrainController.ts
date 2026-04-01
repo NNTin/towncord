@@ -2,6 +2,7 @@ import type Phaser from "phaser";
 import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
+  TERRAIN_TEXTURE_KEY,
   type TerrainCellCoord,
   type TerrainRenderTile,
   type TerrainRuntime,
@@ -313,7 +314,7 @@ export class WorldSceneTerrainController {
     const image = this.host.scene.add.image(
       0,
       0,
-      this.host.getTerrainRuntime()?.getTextureKey() ?? "debug.tilesets",
+      this.host.getTerrainRuntime()?.getTextureKey() ?? TERRAIN_TEXTURE_KEY,
     );
     image.setAlpha(TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA);
     image.setDepth(RENDER_LAYERS.TERRAIN_BRUSH_PREVIEW - 1);

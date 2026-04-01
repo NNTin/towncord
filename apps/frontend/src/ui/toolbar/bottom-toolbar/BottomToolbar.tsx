@@ -46,6 +46,7 @@ import type {
   EntityToolbarViewModel,
   SelectedOfficePlaceableViewModel,
 } from "../../game-session/contracts";
+import { PHASE1_TERRAIN_SOURCE_ID } from "../../../game/content/asset-catalog/terrainContentRepository";
 
 export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
 
@@ -937,22 +938,32 @@ function TerrainSubPanel({
   onSelectTerrainTool: ((tool: TerrainToolSelection) => void) | undefined;
 }): JSX.Element {
   const [tick, setTick] = useState(0);
-  const [tilesetId, setTilesetId] = useState<"debug" | "farmrpg">(
-    activeTerrainTool?.terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID
+  const resolveTilesetId = (
+    terrainSourceId: TerrainToolSelection["terrainSourceId"],
+  ): "debug" | "farmrpg" => {
+    if (terrainSourceId === PHASE1_TERRAIN_SOURCE_ID) {
+      return "debug";
+    }
+
+    if (terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID) {
+      return "farmrpg";
+    }
+
+    return FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length > 0
       ? "farmrpg"
-      : "debug",
+      : "debug";
+  };
+
+  const [tilesetId, setTilesetId] = useState<"debug" | "farmrpg">(() =>
+    resolveTilesetId(activeTerrainTool?.terrainSourceId),
   );
 
   useEffect(() => {
-    if (activeTerrainTool?.terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID) {
-      setTilesetId("farmrpg");
-    } else if (activeTerrainTool?.terrainSourceId === DEFAULT_TERRAIN_SOURCE_ID) {
-      setTilesetId("debug");
-    }
+    setTilesetId(resolveTilesetId(activeTerrainTool?.terrainSourceId));
   }, [activeTerrainTool?.terrainSourceId]);
 
   const items =
-    tilesetId === "farmrpg"
+    tilesetId === "farmrpg" && FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length > 0
       ? FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS
       : TERRAIN_TOOLBAR_PREVIEW_ITEMS;
 
@@ -1418,6 +1429,10 @@ function EntitiesSubPanel({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DEFAULT_TERRAIN_PREVIEW =
+  FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
+    (item) => item.brushId === "ground",
+  ) ??
+  FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS[0] ??
   TERRAIN_TOOLBAR_PREVIEW_ITEMS.find((item) => item.brushId === "ground") ??
   TERRAIN_TOOLBAR_PREVIEW_ITEMS[0] ??
   null;

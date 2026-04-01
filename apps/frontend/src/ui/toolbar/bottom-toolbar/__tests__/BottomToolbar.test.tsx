@@ -436,7 +436,7 @@ describe("BottomToolbar", () => {
     expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
       materialId: "ground",
       brushId: "ground",
-      terrainSourceId: "public-assets:terrain/phase1",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass",
     });
     expect(props.onSelectTool).not.toHaveBeenCalled();
 
@@ -522,10 +522,10 @@ describe("BottomToolbar", () => {
     expect(getButton(container, "Terrain tool").textContent).toContain(
       "Terrain",
     );
-    expect(getButton(container, "Water Tile Brush")).toBeInstanceOf(
+    expect(getButton(container, "FarmRPG Water Tile Brush")).toBeInstanceOf(
       HTMLButtonElement,
     );
-    expect(getButton(container, "Ground Tile Brush")).toBeInstanceOf(
+    expect(getButton(container, "FarmRPG Ground Tile Brush")).toBeInstanceOf(
       HTMLButtonElement,
     );
 

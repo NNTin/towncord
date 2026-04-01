@@ -2,8 +2,8 @@ import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json"
 import farmrpgTerrainRulesetJson from "public-assets-json:terrain/rulesets/farmrpg-grass.json";
 import type { TerrainRulesetFile } from "../../../data";
 import {
-  DEFAULT_TERRAIN_SOURCE_ID,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  PHASE1_TERRAIN_SOURCE_ID,
   type TerrainContentSourceId,
 } from "./terrainContentRepository";
 import {
@@ -199,7 +199,7 @@ const FARMRPG_TERRAIN_PREVIEW_RULES = resolveTransitionRulesFromRuleset(
 
 export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
   createTerrainToolbarPreviewItem({
-    terrainSourceId: DEFAULT_TERRAIN_SOURCE_ID,
+    terrainSourceId: PHASE1_TERRAIN_SOURCE_ID,
     id: "terrain.water.tile",
     label: "Water Tile Brush",
     materialId: "water",
@@ -209,7 +209,7 @@ export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
     atlas: DEBUG_ATLAS_SOURCE,
   }),
   createTerrainToolbarPreviewItem({
-    terrainSourceId: DEFAULT_TERRAIN_SOURCE_ID,
+    terrainSourceId: PHASE1_TERRAIN_SOURCE_ID,
     id: "terrain.ground.tile",
     label: "Ground Tile Brush",
     materialId: "ground",
