@@ -1,0 +1,24 @@
+{
+  "namespace": "farmrpg",
+  "atlases": [
+    {
+      "category": "characters",
+      "atlasKey": "farmrpg.characters",
+      "textureURL": "assets/farmrpg/atlases/characters.png",
+      "atlasURL": "assets/farmrpg/atlases/characters.json",
+      "frameCount": 665,
+      "width": 2048,
+      "height": 604
+    },
+    {
+      "category": "tilesets",
+      "atlasKey": "farmrpg.tilesets",
+      "textureURL": "assets/farmrpg/atlases/tilesets.png",
+      "atlasURL": "assets/farmrpg/atlases/tilesets.json",
+      "frameCount": 16,
+      "width": 290,
+      "height": 20
+    }
+  ],
+  "animationCount": 130
+}
