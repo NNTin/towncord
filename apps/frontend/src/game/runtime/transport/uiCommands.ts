@@ -15,8 +15,7 @@ import type {
   SelectedTerrainToolPayload,
 } from "../../contracts/runtime";
 import {
-  DEFAULT_TERRAIN_SOURCE_ID,
-  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  ALL_TERRAIN_SOURCE_IDS,
   type TerrainContentSourceId,
 } from "../../content/asset-catalog/terrainContentRepository";
 import type {
@@ -78,10 +77,9 @@ export type UiToRuntimeCommandPayloadByName = {
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
 
 const OFFICE_TILE_COLOR_SET = new Set<string>(OFFICE_TILE_COLORS);
-const TERRAIN_SOURCE_ID_SET = new Set<TerrainContentSourceId>([
-  DEFAULT_TERRAIN_SOURCE_ID,
-  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
-]);
+const TERRAIN_SOURCE_ID_SET = new Set<TerrainContentSourceId>(
+  ALL_TERRAIN_SOURCE_IDS,
+);
 const FURNITURE_ROTATION_QUARTER_TURNS = new Set<FurnitureRotationQuarterTurns>(
   [0, 1, 2, 3],
 );

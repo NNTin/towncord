@@ -14,10 +14,10 @@ export type TerrainContentSourceId =
   | typeof FARMRPG_GRASS_TERRAIN_SOURCE_ID;
 
 export type TerrainContent = {
-  sourceId: string;
+  sourceId: TerrainContentSourceId;
   seed: TerrainSeedDocument;
   ruleset: TerrainRulesetFile;
-  textureKey: string;
+  textureKey: typeof TERRAIN_TEXTURE_KEY | "farmrpg.tilesets";
 };
 
 export interface TerrainContentRepository extends ContentRepository<TerrainContent> {}
@@ -43,6 +43,11 @@ const TERRAIN_CONTENT_BY_SOURCE_ID: Record<
   [DEFAULT_TERRAIN_SOURCE_ID]: DEFAULT_TERRAIN_CONTENT,
   [FARMRPG_GRASS_TERRAIN_SOURCE_ID]: FARMRPG_GRASS_TERRAIN_CONTENT,
 };
+
+export const ALL_TERRAIN_SOURCE_IDS: readonly TerrainContentSourceId[] = [
+  DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+];
 
 function cloneTerrainContent(content: TerrainContent): TerrainContent {
   return {

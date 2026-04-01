@@ -9,10 +9,12 @@ import {
   DEFAULT_FLOOR_COLOR_ADJUST,
   DEFAULT_WALL_COLOR_ADJUST,
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+  DEFAULT_TERRAIN_SOURCE_ID,
   ENVIRONMENT_ATLAS_FRAMES,
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_IMAGE_URL,
   ENVIRONMENT_ATLAS_W,
+  FARMRPG_GRASS_TERRAIN_SOURCE_ID,
   FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   FARMRPG_ATLAS_H,
   FARMRPG_ATLAS_IMAGE_URL,
@@ -935,7 +937,19 @@ function TerrainSubPanel({
   onSelectTerrainTool: ((tool: TerrainToolSelection) => void) | undefined;
 }): JSX.Element {
   const [tick, setTick] = useState(0);
-  const [tilesetId, setTilesetId] = useState<"debug" | "farmrpg">("debug");
+  const [tilesetId, setTilesetId] = useState<"debug" | "farmrpg">(
+    activeTerrainTool?.terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID
+      ? "farmrpg"
+      : "debug",
+  );
+
+  useEffect(() => {
+    if (activeTerrainTool?.terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID) {
+      setTilesetId("farmrpg");
+    } else if (activeTerrainTool?.terrainSourceId === DEFAULT_TERRAIN_SOURCE_ID) {
+      setTilesetId("debug");
+    }
+  }, [activeTerrainTool?.terrainSourceId]);
 
   const items =
     tilesetId === "farmrpg"
@@ -1016,7 +1030,7 @@ function TerrainSubPanel({
           const activeTerrainSourceId =
             activeTerrainTool?.terrainSourceId ??
             DEFAULT_TERRAIN_PREVIEW?.terrainSourceId ??
-            "public-assets:terrain/phase1";
+            DEFAULT_TERRAIN_SOURCE_ID;
           const isSelected =
             activeTerrainTool?.brushId === item.brushId &&
             activeTerrainTool?.materialId === item.materialId &&

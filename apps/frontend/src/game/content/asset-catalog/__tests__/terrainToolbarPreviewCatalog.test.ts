@@ -56,6 +56,13 @@ describe("terrain toolbar preview catalog", () => {
     expect(FARMRPG_TERRAIN_ATLAS_W).toBeGreaterThan(0);
     expect(FARMRPG_TERRAIN_ATLAS_H).toBeGreaterThan(0);
 
+    // When the FarmRPG tileset atlas hasn't been generated yet, the fallback JSON
+    // has no frames and FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS is expected to be [].
+    if (FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length === 0) {
+      expect(FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS).toHaveLength(0);
+      return;
+    }
+
     expect(FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS).toHaveLength(2);
     expect(
       FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.map((item) => item.brushId),

@@ -32,6 +32,7 @@ import type { TerrainSeedDocument } from "../../data";
 import {
   readTerrainContent,
   type TerrainContent,
+  type TerrainContentSourceId,
 } from "../content/asset-catalog/terrainContentRepository";
 
 type TerrainRuntimeSharedState = {
@@ -40,7 +41,7 @@ type TerrainRuntimeSharedState = {
 };
 
 export type TerrainRuntimeContext = {
-  sourceId: string;
+  sourceId: TerrainContentSourceId;
   seedDocument: TerrainSeedDocument;
   gameplayGrid: TerrainGameplayGrid;
   runtimeOptions: Omit<TerrainRuntimeOptions, "store"> & {
