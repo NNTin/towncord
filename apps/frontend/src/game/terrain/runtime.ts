@@ -15,7 +15,6 @@ import {
   DEFAULT_TERRAIN_MATERIAL_RULES,
   TerrainGameplayGrid,
 } from "./gameplayGrid";
-import { TERRAIN_TEXTURE_KEY } from "./contracts";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainQueries } from "./queries";
 import type { TerrainRenderSurface } from "./renderSurface";
@@ -40,8 +39,11 @@ export function createTerrainRuntimeContext(
   scene: TerrainRenderSurface,
 ): TerrainRuntimeContext {
   const terrainContent = terrainContentRepository.read();
-  const bootstrap = loadTerrainBootstrap(terrainContent.seed, terrainContent.ruleset);
-  validateTerrainBootstrap(scene, bootstrap);
+  const bootstrap = loadTerrainBootstrap(
+    terrainContent.seed,
+    terrainContent.ruleset,
+  );
+  validateTerrainBootstrap(scene, bootstrap, terrainContent.textureKey);
   const debugAnimationManifest = readOptionalAnimationManifest(
     scene as unknown as Record<string, unknown>,
     DEBUG_ANIMATIONS_JSON_KEY,
@@ -84,7 +86,7 @@ export function createTerrainRuntimeContext(
       commands,
       queries,
       visibleChunks,
-      textureKey: TERRAIN_TEXTURE_KEY,
+      textureKey: terrainContent.textureKey,
       animationPhaseDurationsById: phaseDurationsByAnimationId,
     },
   };

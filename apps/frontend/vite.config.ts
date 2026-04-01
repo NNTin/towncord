@@ -33,9 +33,16 @@ const FARMRPG_ATLAS_FALLBACK_PATH = path.resolve(
   __dirname,
   "./src/assets/farmrpg-atlas-fallback.json",
 );
+const FARMRPG_TILESETS_ATLAS_FALLBACK_PATH = path.resolve(
+  __dirname,
+  "./src/assets/farmrpg-tilesets-atlas-fallback.json",
+);
 
 const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
-  ["donarg-office/atlas.json", path.resolve(DONARG_OFFICE_ASSETS_ROOT, "atlas.json")],
+  [
+    "donarg-office/atlas.json",
+    path.resolve(DONARG_OFFICE_ASSETS_ROOT, "atlas.json"),
+  ],
   ["office/default-layout.json", OFFICE_LAYOUT_PATH],
   [
     "donarg-office/furniture-catalog.json",
@@ -43,6 +50,7 @@ const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   ],
   ["bloomseed/atlas.json", BLOOMSEED_ATLAS_FALLBACK_PATH],
   ["farmrpg/atlas.json", FARMRPG_ATLAS_FALLBACK_PATH],
+  ["farmrpg/atlases/tilesets.json", FARMRPG_TILESETS_ATLAS_FALLBACK_PATH],
 ]);
 
 function publicJsonImportPlugin(): Plugin {
@@ -65,10 +73,13 @@ function publicJsonImportPlugin(): Plugin {
         id.slice(`\0${PUBLIC_ASSETS_JSON_PREFIX}`.length),
         "base64url",
       ).toString("utf8");
-      const filePath = await resolvePublicJsonImportFilePath(relativeAssetPath, {
-        publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-        fallbackEntries: PUBLIC_JSON_FALLBACKS,
-      });
+      const filePath = await resolvePublicJsonImportFilePath(
+        relativeAssetPath,
+        {
+          publicAssetsRoot: PUBLIC_ASSETS_ROOT,
+          fallbackEntries: PUBLIC_JSON_FALLBACKS,
+        },
+      );
       const raw = await fs.readFile(filePath, "utf8");
       const parsed = JSON.parse(raw) as unknown;
       return `export default ${JSON.stringify(parsed)};`;
@@ -83,10 +94,13 @@ function publicJsonImportPlugin(): Plugin {
       };
 
       const invalidateFromFilePath = (filePath: string): void => {
-        const relativeAssetPath = resolvePublicJsonImportRelativeAssetPath(filePath, {
-          publicAssetsRoot: PUBLIC_ASSETS_ROOT,
-          fallbackEntries: PUBLIC_JSON_FALLBACKS,
-        });
+        const relativeAssetPath = resolvePublicJsonImportRelativeAssetPath(
+          filePath,
+          {
+            publicAssetsRoot: PUBLIC_ASSETS_ROOT,
+            fallbackEntries: PUBLIC_JSON_FALLBACKS,
+          },
+        );
 
         if (relativeAssetPath) {
           invalidateRelativeAsset(relativeAssetPath);
