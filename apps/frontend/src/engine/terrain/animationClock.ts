@@ -1,5 +1,6 @@
 import { DEFAULT_TERRAIN_ANIMATION_FRAME_MS } from "./contracts";
 import {
+  buildTerrainPingPongFrameIndices,
   getTerrainAnimationId,
   normalizeTerrainPhaseDurations,
   resolveTerrainPhaseIndex,
@@ -10,24 +11,37 @@ export class TerrainAnimationClock {
   private readonly animationPhaseDurationsById = new Map<string, number[]>();
 
   constructor(
-    animationPhaseDurationsById: Readonly<Record<string, readonly number[]>> = {},
+    animationPhaseDurationsById: Readonly<
+      Record<string, readonly number[]>
+    > = {},
     private readonly fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ) {
-    for (const [animationId, durationsMs] of Object.entries(animationPhaseDurationsById)) {
+    for (const [animationId, durationsMs] of Object.entries(
+      animationPhaseDurationsById,
+    )) {
       if (
         Array.isArray(durationsMs) &&
         durationsMs.length > 0 &&
-        durationsMs.every((duration) => Number.isInteger(duration) && duration > 0)
+        durationsMs.every(
+          (duration) => Number.isInteger(duration) && duration > 0,
+        )
       ) {
         this.animationPhaseDurationsById.set(animationId, [...durationsMs]);
       }
     }
   }
 
-  public getPhaseDurationsForBaseFrame(baseFrame: string, variantCount: number): number[] {
+  public getPhaseDurationsForBaseFrame(
+    baseFrame: string,
+    variantCount: number,
+  ): number[] {
     const animationId = getTerrainAnimationId(baseFrame);
     const durationsMs = this.animationPhaseDurationsById.get(animationId);
-    return normalizeTerrainPhaseDurations(durationsMs, variantCount, this.fallbackPhaseDurationMs);
+    return normalizeTerrainPhaseDurations(
+      durationsMs,
+      variantCount,
+      this.fallbackPhaseDurationMs,
+    );
   }
 
   public getCurrentPhase(animationId: string): number {
@@ -46,8 +60,25 @@ export class TerrainAnimationClock {
       const animationId = getTerrainAnimationId(baseFrame);
       if (nextPhaseByAnimationId.has(animationId)) continue;
 
-      const durationsMs = this.getPhaseDurationsForBaseFrame(baseFrame, variants.length);
-      nextPhaseByAnimationId.set(animationId, resolveTerrainPhaseIndex(nowMs, durationsMs));
+      const phaseDurationsMs = this.getPhaseDurationsForBaseFrame(
+        baseFrame,
+        variants.length,
+      );
+      const playbackFrameIndices = buildTerrainPingPongFrameIndices(
+        variants.length,
+      );
+      const playbackDurationsMs = playbackFrameIndices.map(
+        (frameIndex) =>
+          phaseDurationsMs[frameIndex] ?? this.fallbackPhaseDurationMs,
+      );
+      const playbackPhaseIndex = resolveTerrainPhaseIndex(
+        nowMs,
+        playbackDurationsMs,
+      );
+      nextPhaseByAnimationId.set(
+        animationId,
+        playbackFrameIndices[playbackPhaseIndex] ?? 0,
+      );
     }
 
     if (nextPhaseByAnimationId.size === 0) {
@@ -62,7 +93,10 @@ export class TerrainAnimationClock {
       }
     }
 
-    if (!changed && this.currentPhaseByAnimationId.size === nextPhaseByAnimationId.size) {
+    if (
+      !changed &&
+      this.currentPhaseByAnimationId.size === nextPhaseByAnimationId.size
+    ) {
       return false;
     }
 

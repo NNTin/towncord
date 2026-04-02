@@ -21,6 +21,7 @@ import {
   FARMRPG_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
   PHASE1_TERRAIN_SOURCE_ID,
+  resolveTerrainPingPongFrameIndex,
   canRotateFurniturePaletteItem,
   FURNITURE_ALL_ITEMS,
   FURNITURE_PALETTE_CATEGORIES,
@@ -324,8 +325,10 @@ function TerrainPreviewSprite({
   item: TerrainToolbarPreviewItem;
   tick: number;
 }): JSX.Element {
-  const phaseIndex =
-    item.animationFrames.length > 1 ? tick % item.animationFrames.length : 0;
+  const phaseIndex = resolveTerrainPingPongFrameIndex(
+    tick,
+    item.animationFrames.length,
+  );
   const frame = item.animationFrames[phaseIndex] ?? item.representativeFrame;
   return <TerrainAtlasSprite frame={frame} />;
 }

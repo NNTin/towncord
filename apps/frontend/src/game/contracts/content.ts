@@ -82,6 +82,10 @@ export type {
   TerrainToolbarPreviewItem,
 } from "../content/asset-catalog/terrainToolbarPreviewCatalog";
 export {
+  buildTerrainPingPongFrameIndices,
+  resolveTerrainPingPongFrameIndex,
+} from "../terrain/renderer";
+export {
   DEFAULT_TERRAIN_SOURCE_ID,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
   PHASE1_TERRAIN_SOURCE_ID,

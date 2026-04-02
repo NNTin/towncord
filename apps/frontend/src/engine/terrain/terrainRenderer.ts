@@ -30,6 +30,36 @@ export function getTerrainAnimationId(baseFrame: string): string {
   return baseFrame.replace(BASE_FRAME_CASE_SUFFIX_RE, "");
 }
 
+export function buildTerrainPingPongFrameIndices(
+  variantCount: number,
+): number[] {
+  if (!Number.isInteger(variantCount) || variantCount <= 0) {
+    return [];
+  }
+
+  const forward = Array.from({ length: variantCount }, (_, index) => index);
+  if (variantCount <= 2) {
+    return forward;
+  }
+
+  return [...forward, ...forward.slice(1, -1).reverse()];
+}
+
+export function resolveTerrainPingPongFrameIndex(
+  step: number,
+  variantCount: number,
+): number {
+  const frameIndices = buildTerrainPingPongFrameIndices(variantCount);
+  if (frameIndices.length === 0) {
+    return 0;
+  }
+
+  const normalizedStep =
+    ((Math.floor(step) % frameIndices.length) + frameIndices.length) %
+    frameIndices.length;
+  return frameIndices[normalizedStep] ?? 0;
+}
+
 export function normalizeTerrainPhaseDurations(
   durationsMs: readonly number[] | undefined,
   variantCount: number,
