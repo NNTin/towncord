@@ -198,6 +198,12 @@ const TERRAIN_PREVIEW_RULES = resolveTransitionRules();
 const FARMRPG_TERRAIN_PREVIEW_RULES = resolveTransitionRulesFromRuleset(
   farmrpgTerrainRulesetJson,
 );
+const FARMRPG_WATER_TILE_PREVIEW_RULES: TerrainRulesetTransitionRule[] = [
+  {
+    caseId: 0,
+    frame: "tilesets.farmrpg.water.tile#0",
+  },
+];
 
 const FARMRPG_TERRAIN_PREVIEW_VARIANTS: ReadonlyArray<{
   season: FarmrpgTerrainSeason;
@@ -239,16 +245,6 @@ function remapFramePrefix(
   }));
 }
 
-function resolveFarmrpgWaterRules(
-  season: FarmrpgTerrainSeason,
-): TerrainRulesetTransitionRule[] {
-  return remapFramePrefix(
-    FARMRPG_TERRAIN_PREVIEW_RULES,
-    "tilesets.farmrpg.grass-water.spring#",
-    `tilesets.farmrpg.grass-water.${season}#`,
-  );
-}
-
 function resolveFarmrpgGroundRules(
   season: FarmrpgTerrainSeason,
 ): TerrainRulesetTransitionRule[] {
@@ -287,7 +283,6 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
 
   for (const variant of FARMRPG_TERRAIN_PREVIEW_VARIANTS) {
     try {
-      const waterRules = resolveFarmrpgWaterRules(variant.season);
       const groundRules = resolveFarmrpgGroundRules(variant.season);
 
       previewItems.push(
@@ -297,10 +292,10 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
           label: `FarmRPG ${variant.label} Water Tile Brush`,
           materialId: "water",
           brushId: "water",
-          representativeCaseId: 15,
+          representativeCaseId: 0,
           groupKey: `farmrpg-${variant.season}`,
           groupLabel: variant.label,
-          rules: waterRules,
+          rules: FARMRPG_WATER_TILE_PREVIEW_RULES,
           atlas: FARMRPG_ATLAS_SOURCE,
         }),
       );
@@ -336,10 +331,10 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
         label: "FarmRPG Spring Water Tile Brush",
         materialId: "water",
         brushId: "water",
-        representativeCaseId: 15,
+        representativeCaseId: 0,
         groupKey: "farmrpg-spring",
         groupLabel: "Spring",
-        rules: resolveFarmrpgWaterRules("spring"),
+        rules: FARMRPG_WATER_TILE_PREVIEW_RULES,
         atlas: FARMRPG_ATLAS_SOURCE,
       }),
       createTerrainToolbarPreviewItem({

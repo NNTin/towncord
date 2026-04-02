@@ -1,13 +1,21 @@
 import type { TerrainTileInspectedPayload } from "../contracts/runtime";
-import { TERRAIN_TEXTURE_KEY, type TerrainMaterialId, type TerrainRenderTile } from "./contracts";
+import {
+  TERRAIN_TEXTURE_KEY,
+  type TerrainMaterialId,
+  type TerrainRenderTile,
+} from "./contracts";
 import { TerrainCaseMapper } from "./caseMapper";
-import { MarchingSquaresKernel, type TerrainMaterialLookup } from "./marchingSquaresKernel";
+import {
+  MarchingSquaresKernel,
+  type TerrainMaterialLookup,
+} from "./marchingSquaresKernel";
 
 export class TerrainTileResolver {
   constructor(
     private readonly kernel: MarchingSquaresKernel,
     private readonly mapper: TerrainCaseMapper,
     private readonly insideMaterial: TerrainMaterialId,
+    private readonly insideFillFrame?: string,
   ) {}
 
   public resolveRenderTile(
@@ -15,13 +23,21 @@ export class TerrainTileResolver {
     cellX: number,
     cellY: number,
   ): TerrainRenderTile {
-    const caseId = this.kernel.deriveCaseId(materialAt, cellX, cellY, this.insideMaterial);
+    const caseId = this.kernel.deriveCaseId(
+      materialAt,
+      cellX,
+      cellY,
+      this.insideMaterial,
+    );
     const mapped = this.mapper.getRule(caseId);
+    const underlayFrame =
+      caseId !== 0 && this.insideFillFrame ? this.insideFillFrame : undefined;
 
     return {
       cellX,
       cellY,
       caseId,
+      ...(underlayFrame ? { underlayFrame } : {}),
       frame: mapped.frame,
       rotate90: mapped.rotate90 ?? 0,
       flipX: mapped.flipX ?? false,

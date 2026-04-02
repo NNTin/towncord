@@ -203,6 +203,28 @@ export class TerrainRenderer {
     );
   }
 
+  private drawTileLayer(
+    scratch: Phaser.GameObjects.Image,
+    rt: Phaser.GameObjects.RenderTexture,
+    frame: string,
+    localCellX: number,
+    localCellY: number,
+    rotate90: 0 | 1 | 2 | 3,
+    flipX: boolean,
+    flipY: boolean,
+  ): void {
+    scratch.setTexture(this.textureKey, frame);
+    scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
+    scratch.setRotation(rotate90 * (Math.PI / 2));
+    scratch.setFlip(flipX, flipY);
+    scratch.setPosition(
+      localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+      localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+    );
+
+    rt.batchDraw(scratch);
+  }
+
   private renderTilesToRT(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
@@ -223,19 +245,35 @@ export class TerrainRenderer {
     for (const tile of tiles) {
       const localCellX = tile.cellX - chunkStartX;
       const localCellY = tile.cellY - chunkStartY;
+      if (tile.underlayFrame) {
+        const underlayFrame = resolveFrame(tile.underlayFrame);
+        const resolvedUnderlayFrame = texture.has(underlayFrame)
+          ? underlayFrame
+          : tile.underlayFrame;
+        this.drawTileLayer(
+          scratch,
+          rt,
+          resolvedUnderlayFrame,
+          localCellX,
+          localCellY,
+          0,
+          false,
+          false,
+        );
+      }
+
       const frame = resolveFrame(tile.frame);
       const resolvedFrame = texture.has(frame) ? frame : tile.frame;
-
-      scratch.setTexture(this.textureKey, resolvedFrame);
-      scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
-      scratch.setRotation(tile.rotate90 * (Math.PI / 2));
-      scratch.setFlip(tile.flipX, tile.flipY);
-      scratch.setPosition(
-        localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
-        localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+      this.drawTileLayer(
+        scratch,
+        rt,
+        resolvedFrame,
+        localCellX,
+        localCellY,
+        tile.rotate90,
+        tile.flipX,
+        tile.flipY,
       );
-
-      rt.batchDraw(scratch);
     }
     rt.endDraw();
   }
@@ -337,7 +375,11 @@ export class TerrainRenderer {
     const animatedTiles: TerrainRenderTile[] = [];
 
     for (const tile of payload.tiles) {
-      if (this.isAnimatedBaseFrame(tile.frame)) {
+      if (
+        this.isAnimatedBaseFrame(tile.frame) ||
+        (tile.underlayFrame !== undefined &&
+          this.isAnimatedBaseFrame(tile.underlayFrame))
+      ) {
         animatedTiles.push(tile);
       } else {
         staticTiles.push(tile);

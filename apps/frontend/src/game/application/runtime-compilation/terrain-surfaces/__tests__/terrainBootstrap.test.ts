@@ -34,6 +34,7 @@ describe("terrain bootstrap compilation", () => {
       id: "farmrpg-grass-water-over-ground",
       insideMaterial: "water",
       outsideMaterial: "ground",
+      insideFillFrame: "tilesets.farmrpg.water.tile#0",
     });
     expect(bootstrap.transition.rules).toHaveLength(16);
   });
