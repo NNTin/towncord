@@ -522,12 +522,16 @@ describe("BottomToolbar", () => {
     expect(getButton(container, "Terrain tool").textContent).toContain(
       "Terrain",
     );
-    expect(getButton(container, "FarmRPG Water Tile Brush")).toBeInstanceOf(
-      HTMLButtonElement,
-    );
-    expect(getButton(container, "FarmRPG Ground Tile Brush")).toBeInstanceOf(
-      HTMLButtonElement,
-    );
+    expect(
+      getButton(container, "FarmRPG Spring Water Tile Brush"),
+    ).toBeInstanceOf(HTMLButtonElement);
+    expect(
+      getButton(container, "FarmRPG Spring Ground Tile Brush"),
+    ).toBeInstanceOf(HTMLButtonElement);
+    expect(container.textContent).toContain("Spring");
+    expect(container.textContent).toContain("Summer");
+    expect(container.textContent).toContain("Fall");
+    expect(container.textContent).toContain("Winter");
 
     act(() => {
       root.unmount();
@@ -536,7 +540,7 @@ describe("BottomToolbar", () => {
     vi.useRealTimers();
   });
 
-  test("the FarmRPG terrain tab selects FarmRPG terrain content", () => {
+  test("the FarmRPG terrain tab selects seasonal FarmRPG terrain content", () => {
     const props = {
       ...baseProps,
       activeTerrainTool: {
@@ -558,13 +562,13 @@ describe("BottomToolbar", () => {
     });
 
     act(() => {
-      getButton(container, "FarmRPG Water Tile Brush").click();
+      getButton(container, "FarmRPG Summer Water Tile Brush").click();
     });
 
     expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
       materialId: "water",
       brushId: "water",
-      terrainSourceId: "public-assets:terrain/farmrpg-grass",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass-summer",
     });
 
     act(() => {

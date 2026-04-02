@@ -49,7 +49,7 @@ describe("terrain toolbar preview catalog", () => {
     );
   });
 
-  test("exposes water and ground preview items backed by the FarmRPG terrain atlas", () => {
+  test("exposes seasonal FarmRPG preview items backed by the terrain atlas", () => {
     expect(FARMRPG_TERRAIN_ATLAS_IMAGE_URL).toBe(
       "/assets/farmrpg/atlases/tilesets.png",
     );
@@ -63,30 +63,43 @@ describe("terrain toolbar preview catalog", () => {
       return;
     }
 
-    expect(FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS).toHaveLength(2);
-    expect(
-      FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.map((item) => item.brushId),
-    ).toEqual(["water", "ground"]);
-    expect(
-      FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.map((item) => item.label),
-    ).toEqual(["FarmRPG Water Tile Brush", "FarmRPG Ground Tile Brush"]);
+    expect(FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length).toBeGreaterThanOrEqual(
+      8,
+    );
 
-    const water = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS[0];
-    const ground = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS[1];
+    const springWater = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
+      (item) => item.id === "terrain.farmrpg.spring.water.tile",
+    );
+    const summerGround = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
+      (item) => item.id === "terrain.farmrpg.summer.ground.tile",
+    );
+    const winterWater = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
+      (item) => item.id === "terrain.farmrpg.winter.water.tile",
+    );
 
-    expect(water?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#15",
+    expect(springWater?.label).toBe("FarmRPG Spring Water Tile Brush");
+    expect(springWater?.groupLabel).toBe("Spring");
+    expect(springWater?.representativeFrame.frameKey).toBe(
+      "tilesets.farmrpg.grass-water.spring#15",
     );
-    expect(ground?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#0",
+    expect(springWater?.animationFrames).toHaveLength(4);
+    expect(springWater?.animationFrames[0]?.frameKey).toBe(
+      "tilesets.farmrpg.grass-water.spring#15@0",
     );
-    expect(water?.animationFrames).toHaveLength(1);
-    expect(ground?.animationFrames).toHaveLength(1);
-    expect(water?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#15",
+
+    expect(summerGround?.label).toBe("FarmRPG Summer Ground Tile Brush");
+    expect(summerGround?.groupLabel).toBe("Summer");
+    expect(summerGround?.representativeFrame.frameKey).toBe(
+      "tilesets.farmrpg.grass.summer#0",
     );
-    expect(ground?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#0",
+    expect(summerGround?.animationFrames).toHaveLength(1);
+
+    expect(winterWater?.representativeFrame.frameKey).toBe(
+      "tilesets.farmrpg.grass-water.winter#15",
+    );
+    expect(winterWater?.animationFrames).toHaveLength(2);
+    expect(winterWater?.animationFrames[0]?.frameKey).toBe(
+      "tilesets.farmrpg.grass-water.winter#15@0",
     );
   });
 });

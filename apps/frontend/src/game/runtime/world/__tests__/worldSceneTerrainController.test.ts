@@ -247,7 +247,7 @@ describe("WorldSceneTerrainController", () => {
         cellX: 1,
         cellY: 1,
         caseId: 1,
-        frame: "tilesets.farmrpg.environment.grass#1",
+        frame: "tilesets.farmrpg.grass-water.spring#1",
         rotate90: 0,
         flipX: false,
         flipY: false,
@@ -256,7 +256,7 @@ describe("WorldSceneTerrainController", () => {
 
     expect(previewImage.setTexture).toHaveBeenCalledWith(
       "farmrpg.tilesets",
-      "tilesets.farmrpg.environment.grass#1",
+      "tilesets.farmrpg.grass-water.spring#1",
     );
   });
 
