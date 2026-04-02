@@ -56,6 +56,7 @@ export type TerrainRenderTile = {
   cellX: number;
   cellY: number;
   caseId: number;
+  underlayFrame?: string;
   frame: string;
   rotate90: 0 | 1 | 2 | 3;
   flipX: boolean;

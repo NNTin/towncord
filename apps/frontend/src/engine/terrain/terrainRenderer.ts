@@ -62,12 +62,16 @@ export function resolveTerrainPhaseIndex(
     return 0;
   }
 
-  const cycleDurationMs = durationsMs.reduce((total, duration) => total + duration, 0);
+  const cycleDurationMs = durationsMs.reduce(
+    (total, duration) => total + duration,
+    0,
+  );
   if (cycleDurationMs <= 0) {
     return 0;
   }
 
-  let offsetMs = ((Math.floor(nowMs) % cycleDurationMs) + cycleDurationMs) % cycleDurationMs;
+  let offsetMs =
+    ((Math.floor(nowMs) % cycleDurationMs) + cycleDurationMs) % cycleDurationMs;
   for (const [index, duration] of durationsMs.entries()) {
     if (offsetMs < duration) {
       return index;
@@ -90,7 +94,9 @@ export class TerrainRenderer {
     private readonly scene: TerrainRenderSurface,
     private readonly grid: TerrainGridSpec,
     private readonly textureKey: string = TERRAIN_TEXTURE_KEY,
-    animationPhaseDurationsById: Readonly<Record<string, readonly number[]>> = {},
+    animationPhaseDurationsById: Readonly<
+      Record<string, readonly number[]>
+    > = {},
     fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ) {
     this.animationClock = new TerrainAnimationClock(
@@ -101,7 +107,10 @@ export class TerrainRenderer {
 
   private getScratchImage(): Phaser.GameObjects.Image {
     if (!this.scratchImage) {
-      this.scratchImage = this.scene.make.image({ key: this.textureKey, add: false });
+      this.scratchImage = this.scene.make.image({
+        key: this.textureKey,
+        add: false,
+      });
     }
     return this.scratchImage;
   }
@@ -164,6 +173,28 @@ export class TerrainRenderer {
     );
   }
 
+  private drawTileLayer(
+    scratch: Phaser.GameObjects.Image,
+    rt: Phaser.GameObjects.RenderTexture,
+    frame: string,
+    localCellX: number,
+    localCellY: number,
+    rotate90: 0 | 1 | 2 | 3,
+    flipX: boolean,
+    flipY: boolean,
+  ): void {
+    scratch.setTexture(this.textureKey, frame);
+    scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
+    scratch.setRotation(rotate90 * (Math.PI / 2));
+    scratch.setFlip(flipX, flipY);
+    scratch.setPosition(
+      localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+      localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+    );
+
+    rt.batchDraw(scratch);
+  }
+
   private renderTilesToRT(
     rt: Phaser.GameObjects.RenderTexture,
     tiles: TerrainRenderTile[],
@@ -184,19 +215,35 @@ export class TerrainRenderer {
     for (const tile of tiles) {
       const localCellX = tile.cellX - chunkStartX;
       const localCellY = tile.cellY - chunkStartY;
+      if (tile.underlayFrame) {
+        const underlayFrame = resolveFrame(tile.underlayFrame);
+        const resolvedUnderlayFrame = texture.has(underlayFrame)
+          ? underlayFrame
+          : tile.underlayFrame;
+        this.drawTileLayer(
+          scratch,
+          rt,
+          resolvedUnderlayFrame,
+          localCellX,
+          localCellY,
+          0,
+          false,
+          false,
+        );
+      }
+
       const frame = resolveFrame(tile.frame);
       const resolvedFrame = texture.has(frame) ? frame : tile.frame;
-
-      scratch.setTexture(this.textureKey, resolvedFrame);
-      scratch.setScale(TERRAIN_CELL_WORLD_SIZE / scratch.width);
-      scratch.setRotation(tile.rotate90 * (Math.PI / 2));
-      scratch.setFlip(tile.flipX, tile.flipY);
-      scratch.setPosition(
-        localCellX * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
-        localCellY * TERRAIN_CELL_WORLD_SIZE + TERRAIN_CELL_WORLD_SIZE * 0.5,
+      this.drawTileLayer(
+        scratch,
+        rt,
+        resolvedFrame,
+        localCellX,
+        localCellY,
+        tile.rotate90,
+        tile.flipX,
+        tile.flipY,
       );
-
-      rt.batchDraw(scratch);
     }
     rt.endDraw();
   }
@@ -218,14 +265,19 @@ export class TerrainRenderer {
     return rt;
   }
 
-  private setChunkVisibility(state: ChunkRenderState, isVisible: boolean): void {
+  private setChunkVisibility(
+    state: ChunkRenderState,
+    isVisible: boolean,
+  ): void {
     state.staticRT.setVisible(isVisible);
     if (state.animatedRT) {
       state.animatedRT.setVisible(isVisible);
     }
   }
 
-  private ensureChunkState(payload: TerrainChunkRenderPayload): ChunkRenderState {
+  private ensureChunkState(
+    payload: TerrainChunkRenderPayload,
+  ): ChunkRenderState {
     const chunkStartX = payload.chunkX * this.grid.chunkSize;
     const chunkStartY = payload.chunkY * this.grid.chunkSize;
 
@@ -238,7 +290,11 @@ export class TerrainRenderer {
       chunkId: payload.id,
       chunkStartX,
       chunkStartY,
-      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_STATIC_DEPTH),
+      staticRT: this.createRenderTexture(
+        chunkStartX,
+        chunkStartY,
+        TERRAIN_STATIC_DEPTH,
+      ),
       animatedRT: null,
       staticTiles: [],
       animatedTiles: [],
@@ -248,7 +304,10 @@ export class TerrainRenderer {
     return state;
   }
 
-  private areSetsEqual(a: Set<TerrainChunkId>, b: Set<TerrainChunkId>): boolean {
+  private areSetsEqual(
+    a: Set<TerrainChunkId>,
+    b: Set<TerrainChunkId>,
+  ): boolean {
     if (a.size !== b.size) return false;
     for (const id of a) {
       if (!b.has(id)) return false;
@@ -286,7 +345,11 @@ export class TerrainRenderer {
     const animatedTiles: TerrainRenderTile[] = [];
 
     for (const tile of payload.tiles) {
-      if (this.isAnimatedBaseFrame(tile.frame)) {
+      if (
+        this.isAnimatedBaseFrame(tile.frame) ||
+        (tile.underlayFrame !== undefined &&
+          this.isAnimatedBaseFrame(tile.underlayFrame))
+      ) {
         animatedTiles.push(tile);
       } else {
         staticTiles.push(tile);
@@ -309,17 +372,30 @@ export class TerrainRenderer {
       state.animatedRT = null;
     }
 
-    this.drawStaticTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY);
+    this.drawStaticTiles(
+      state.staticRT,
+      state.staticTiles,
+      state.chunkStartX,
+      state.chunkStartY,
+    );
 
     if (state.animatedRT) {
-      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
+      this.drawAnimatedTiles(
+        state.animatedRT,
+        state.animatedTiles,
+        state.chunkStartX,
+        state.chunkStartY,
+      );
     }
 
     this.setChunkVisibility(state, this.visibleChunkIds.has(state.chunkId));
   }
 
   public updateAnimation(nowMs: number = this.scene.time.now): void {
-    const visibleAnimatedTileVariants: Array<{ baseFrame: string; variants: string[] }> = [];
+    const visibleAnimatedTileVariants: Array<{
+      baseFrame: string;
+      variants: string[];
+    }> = [];
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
@@ -333,16 +409,25 @@ export class TerrainRenderer {
       }
     }
 
-    const changed = this.animationClock.tick(nowMs, visibleAnimatedTileVariants);
+    const changed = this.animationClock.tick(
+      nowMs,
+      visibleAnimatedTileVariants,
+    );
     if (!changed) {
       return;
     }
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
-      if (!state || !state.animatedRT || state.animatedTiles.length === 0) continue;
+      if (!state || !state.animatedRT || state.animatedTiles.length === 0)
+        continue;
 
-      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
+      this.drawAnimatedTiles(
+        state.animatedRT,
+        state.animatedTiles,
+        state.chunkStartX,
+        state.chunkStartY,
+      );
     }
   }
 

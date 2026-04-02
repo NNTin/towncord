@@ -224,7 +224,28 @@ export class WorldSceneTerrainController {
       return;
     }
 
-    tiles.forEach((tile, index) => {
+    let previewIndex = 0;
+    tiles.forEach((tile) => {
+      if (tile.underlayFrame) {
+        const underlayImage =
+          this.getTerrainBrushRenderPreviewImage(previewIndex);
+        underlayImage.setTexture(textureKey, tile.underlayFrame);
+        underlayImage.setScale(TERRAIN_CELL_WORLD_SIZE / underlayImage.width);
+        underlayImage.setRotation(0);
+        underlayImage.setFlip(false, false);
+        underlayImage.setPosition(
+          tile.cellX * TERRAIN_CELL_WORLD_SIZE +
+            TERRAIN_CELL_WORLD_SIZE * 0.5 +
+            TERRAIN_RENDER_GRID_WORLD_OFFSET,
+          tile.cellY * TERRAIN_CELL_WORLD_SIZE +
+            TERRAIN_CELL_WORLD_SIZE * 0.5 +
+            TERRAIN_RENDER_GRID_WORLD_OFFSET,
+        );
+        underlayImage.setVisible(true);
+        previewIndex += 1;
+      }
+
+      const index = previewIndex;
       const image = this.getTerrainBrushRenderPreviewImage(index);
       image.setTexture(textureKey, tile.frame);
       image.setScale(TERRAIN_CELL_WORLD_SIZE / image.width);
@@ -239,10 +260,11 @@ export class WorldSceneTerrainController {
           TERRAIN_RENDER_GRID_WORLD_OFFSET,
       );
       image.setVisible(true);
+      previewIndex += 1;
     });
 
     for (
-      let index = tiles.length;
+      let index = previewIndex;
       index < this.terrainBrushRenderPreviewImages.length;
       index += 1
     ) {

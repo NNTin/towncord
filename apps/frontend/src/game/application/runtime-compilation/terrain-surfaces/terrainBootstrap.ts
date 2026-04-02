@@ -1,6 +1,4 @@
-import {
-  type TerrainSeedDocument,
-} from "../../../../data";
+import { type TerrainSeedDocument } from "../../../../data";
 import { terrainContentRepository } from "../../../content/asset-catalog/terrainContentRepository";
 import {
   TERRAIN_CHUNK_SIZE,
@@ -22,15 +20,8 @@ export type TerrainBootstrap = {
 };
 
 function toTerrainGridSpec(fixture: TerrainSeedDocument): TerrainGridSpec {
-  const {
-    width,
-    height,
-    chunkSize,
-    defaultMaterial,
-    materials,
-    legend,
-    rows,
-  } = fixture;
+  const { width, height, chunkSize, defaultMaterial, materials, legend, rows } =
+    fixture;
   const cells: TerrainMaterialId[] = [];
 
   if (rows.length !== height) {
@@ -158,6 +149,14 @@ export function validateTerrainBootstrap(
     errors.push(`texture key "${textureKey}" is not loaded.`);
   } else {
     const texture = scene.textures.get(textureKey);
+    if (
+      transition.insideFillFrame &&
+      !texture.has(transition.insideFillFrame)
+    ) {
+      errors.push(
+        `insideFillFrame missing from texture "${textureKey}": "${transition.insideFillFrame}".`,
+      );
+    }
     for (const rule of transition.rules) {
       if (!texture.has(rule.frame)) {
         errors.push(

@@ -106,6 +106,7 @@ export function createTerrainRuntimeContext(
     kernel,
     mapper,
     bootstrap.transition.insideMaterial,
+    bootstrap.transition.insideFillFrame,
   );
   const chunkBuilder = new TerrainChunkBuilder(store, tileResolver);
   const commands = new TerrainCommands(
