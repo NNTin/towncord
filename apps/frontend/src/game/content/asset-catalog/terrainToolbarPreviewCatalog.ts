@@ -245,7 +245,7 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
       }),
     ];
   } catch {
-    // FarmRPG tileset atlas not yet generated — run slice_tileset_png.py first.
+    // FarmRPG tileset atlas not yet generated — run FarmRPG asset export first.
     return [];
   }
 }

@@ -75,18 +75,18 @@ describe("terrain toolbar preview catalog", () => {
     const ground = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS[1];
 
     expect(water?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#15",
+      "tilesets.farmrpg.grass-water.spring#15",
     );
     expect(ground?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#0",
+      "tilesets.farmrpg.grass-water.spring#0",
     );
-    expect(water?.animationFrames).toHaveLength(1);
-    expect(ground?.animationFrames).toHaveLength(1);
+    expect(water?.animationFrames).toHaveLength(4);
+    expect(ground?.animationFrames).toHaveLength(4);
     expect(water?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#15",
+      "tilesets.farmrpg.grass-water.spring#15@0",
     );
     expect(ground?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.environment.grass#0",
+      "tilesets.farmrpg.grass-water.spring#0@0",
     );
   });
 });
