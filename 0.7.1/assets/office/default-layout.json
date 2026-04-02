@@ -1,0 +1,5399 @@
+{
+  "version": 2,
+  "anchor": {
+    "x": 1,
+    "y": 1
+  },
+  "cols": 21,
+  "rows": 21,
+  "cellSize": 16,
+  "tiles": [
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8
+    },
+    {
+      "kind": "void",
+      "tileId": 0,
+      "tint": 8149819
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 0,
+      "tint": 8149819
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 11113342,
+      "colorAdjust": {
+        "h": 30,
+        "s": 20,
+        "b": 93,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "void",
+      "tileId": 8,
+      "tint": 3359061
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 0,
+      "pattern": "environment.floors.pattern-01",
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 0,
+      "pattern": "environment.floors.pattern-01",
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 0,
+      "pattern": "environment.floors.pattern-01",
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 0,
+      "pattern": "environment.floors.pattern-01",
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 6,
+      "tint": 9466206,
+      "colorAdjust": {
+        "h": 23,
+        "s": 21,
+        "b": 46,
+        "c": 0
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 2,
+      "tint": 6176031,
+      "colorAdjust": {
+        "h": 28,
+        "s": 50,
+        "b": -50,
+        "c": -37
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "floor",
+      "tileId": 1,
+      "tint": 3562101,
+      "colorAdjust": {
+        "h": 205,
+        "s": 37,
+        "b": -20,
+        "c": 12
+      }
+    },
+    {
+      "kind": "wall",
+      "tileId": 8,
+      "tint": 7248577,
+      "colorAdjust": {
+        "h": 208,
+        "s": 40,
+        "b": 100,
+        "c": 25
+      }
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f-1770720603403-9vfr",
+      "assetId": "ASSET_40",
+      "label": "Snack Vending Machine",
+      "category": "misc",
+      "placement": "floor",
+      "col": 11,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 4405450,
+      "accentColor": 12891645,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.vending-machine#0",
+        "atlasFrame": {
+          "x": 628,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 0
+    },
+    {
+      "id": "f-1770720612017-f2f0",
+      "assetId": "ASSET_44",
+      "label": "Trash Bin",
+      "category": "misc",
+      "placement": "floor",
+      "col": 16,
+      "row": 11,
+      "width": 1,
+      "height": 1,
+      "color": 10105874,
+      "accentColor": 16628340,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.bin#0",
+        "atlasFrame": {
+          "x": 570,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 1
+    },
+    {
+      "id": "f-1770738908507-t1xd",
+      "assetId": "ASSET_42",
+      "label": "Water Cooler",
+      "category": "misc",
+      "placement": "floor",
+      "col": 13,
+      "row": 10,
+      "width": 1,
+      "height": 2,
+      "color": 10105874,
+      "accentColor": 16628340,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.water-cooler#0",
+        "atlasFrame": {
+          "x": 1844,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 2
+    },
+    {
+      "id": "f-1770738932007-u7ju",
+      "assetId": "ASSET_61",
+      "label": "Telephone",
+      "category": "electronics",
+      "placement": "wall",
+      "col": 11,
+      "row": 16,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.telephone#0",
+        "atlasFrame": {
+          "x": 926,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 3
+    },
+    {
+      "id": "f-1770825889942-ft1f",
+      "assetId": "ASSET_49",
+      "label": "Small Wooden Stool",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 8,
+      "row": 18,
+      "width": 1,
+      "height": 1,
+      "color": 9584654,
+      "accentColor": 16569165,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.stool#0",
+        "atlasFrame": {
+          "x": 820,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 4
+    },
+    {
+      "id": "f-1770829214421-uu44",
+      "assetId": "ASSET_41_0_1",
+      "label": "Fridge",
+      "category": "storage",
+      "placement": "floor",
+      "col": 19,
+      "row": 10,
+      "width": 1,
+      "height": 2,
+      "color": 15067115,
+      "accentColor": 9741240,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.fridge#0",
+        "atlasFrame": {
+          "x": 144,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 5
+    },
+    {
+      "id": "f-1770829235442-8cvj",
+      "assetId": "ASSET_7",
+      "label": "Small White Counter",
+      "category": "desks",
+      "placement": "floor",
+      "col": 17,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 14870768,
+      "accentColor": 9741240,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.counter-white-sm#0",
+        "atlasFrame": {
+          "x": 1050,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 6
+    },
+    {
+      "id": "f-1770831748000-ksmj",
+      "assetId": "ASSET_18",
+      "label": "Full Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 1,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.full-wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1864,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 7
+    },
+    {
+      "id": "f-1770831767041-zaxr",
+      "assetId": "ASSET_18",
+      "label": "Full Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 7,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.full-wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1864,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 8
+    },
+    {
+      "id": "f-1770831768596-kx8j",
+      "assetId": "ASSET_17",
+      "label": "Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 3,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1528,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 9
+    },
+    {
+      "id": "f-1770831788343-fbxl",
+      "assetId": "ASSET_143",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 1,
+      "row": 11,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.plant-3#0",
+        "atlasFrame": {
+          "x": 1334,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 10,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1770831791526-md8k",
+      "assetId": "ASSET_142",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 1,
+      "row": 19,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.plant-2#0",
+        "atlasFrame": {
+          "x": 304,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 11,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771117697507-gcxt",
+      "assetId": "ASSET_101",
+      "label": "Landscape Painting",
+      "category": "wall",
+      "placement": "wall",
+      "col": 15,
+      "row": 14,
+      "width": 2,
+      "height": 2,
+      "color": 16317180,
+      "accentColor": 16096779,
+      "renderAsset": {
+        "atlasKey": "furniture.wall.painting-landscape#0",
+        "atlasFrame": {
+          "x": 1248,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 13
+    },
+    {
+      "id": "f-1771119388928-dbrf",
+      "assetId": "ASSET_NEW_110",
+      "label": "Large Cushioned Chair",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 14,
+      "row": 17,
+      "width": 1,
+      "height": 2,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-lg-right#0",
+        "atlasFrame": {
+          "x": 1934,
+          "y": 36,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 14,
+      "orientation": "right",
+      "groupId": "CUSHIONED_CHAIR_LG"
+    },
+    {
+      "id": "f-1771119393112-vl9b",
+      "assetId": "ASSET_NEW_111",
+      "label": "Large Cushioned Chair",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 17,
+      "row": 17,
+      "width": 1,
+      "height": 2,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-lg-left#0",
+        "atlasFrame": {
+          "x": 234,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 15,
+      "orientation": "left",
+      "groupId": "CUSHIONED_CHAIR_LG"
+    },
+    {
+      "id": "f-1771253485902-4ipo",
+      "assetId": "ASSET_NEW_106",
+      "label": "Wooden Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 2,
+      "row": 14,
+      "width": 3,
+      "height": 2,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.table-wood#0",
+        "atlasFrame": {
+          "x": 1616,
+          "y": 2,
+          "w": 48,
+          "h": 32
+        }
+      },
+      "sourceOrder": 16
+    },
+    {
+      "id": "f-1771253487232-60st",
+      "assetId": "ASSET_NEW_106",
+      "label": "Wooden Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 7,
+      "row": 14,
+      "width": 3,
+      "height": 2,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.table-wood#0",
+        "atlasFrame": {
+          "x": 1616,
+          "y": 2,
+          "w": 48,
+          "h": 32
+        }
+      },
+      "sourceOrder": 17
+    },
+    {
+      "id": "f-1771253497231-n2au",
+      "assetId": "ASSET_49",
+      "label": "Small Wooden Stool",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 3,
+      "row": 16,
+      "width": 1,
+      "height": 1,
+      "color": 9584654,
+      "accentColor": 16569165,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.stool#0",
+        "atlasFrame": {
+          "x": 820,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 18
+    },
+    {
+      "id": "f-1771253498608-apjl",
+      "assetId": "ASSET_49",
+      "label": "Small Wooden Stool",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 8,
+      "row": 16,
+      "width": 1,
+      "height": 1,
+      "color": 9584654,
+      "accentColor": 16569165,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.stool#0",
+        "atlasFrame": {
+          "x": 820,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 19
+    },
+    {
+      "id": "f-1771253522193-5zaf",
+      "assetId": "ASSET_NEW_106",
+      "label": "Wooden Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 7,
+      "row": 18,
+      "width": 3,
+      "height": 2,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.table-wood#0",
+        "atlasFrame": {
+          "x": 1616,
+          "y": 2,
+          "w": 48,
+          "h": 32
+        }
+      },
+      "sourceOrder": 20
+    },
+    {
+      "id": "f-1771253587796-nwgi",
+      "assetId": "ASSET_49",
+      "label": "Small Wooden Stool",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 3,
+      "row": 18,
+      "width": 1,
+      "height": 1,
+      "color": 9584654,
+      "accentColor": 16569165,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.stool#0",
+        "atlasFrame": {
+          "x": 820,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 21
+    },
+    {
+      "id": "f-1771253595155-yets",
+      "assetId": "ASSET_NEW_106",
+      "label": "Wooden Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 2,
+      "row": 18,
+      "width": 3,
+      "height": 2,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.table-wood#0",
+        "atlasFrame": {
+          "x": 1616,
+          "y": 2,
+          "w": 48,
+          "h": 32
+        }
+      },
+      "sourceOrder": 22
+    },
+    {
+      "id": "f-1771254122890-desz",
+      "assetId": "ASSET_142",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 10,
+      "row": 19,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.plant-2#0",
+        "atlasFrame": {
+          "x": 304,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 23,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771254147816-bpkr",
+      "assetId": "ASSET_140",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 14,
+      "row": 15,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.white-plant-2#0",
+        "atlasFrame": {
+          "x": 2,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 24,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771254151704-exrz",
+      "assetId": "ASSET_141",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 17,
+      "row": 15,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.white-plant-3#0",
+        "atlasFrame": {
+          "x": 944,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 25,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771273583560-z9r1",
+      "assetId": "ASSET_NEW_112",
+      "label": "Large Coffee Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 15,
+      "row": 17,
+      "width": 2,
+      "height": 2,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.coffee-table-lg#0",
+        "atlasFrame": {
+          "x": 1880,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 26
+    },
+    {
+      "id": "f-1771273618430-t3u3",
+      "assetId": "ASSET_18",
+      "label": "Full Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 18,
+      "row": 15,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.full-wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1864,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 27
+    },
+    {
+      "id": "f-1771273619213-ylzf",
+      "assetId": "ASSET_18",
+      "label": "Full Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 12,
+      "row": 15,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.full-wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1864,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 28
+    },
+    {
+      "id": "f-1771275688296-pyz3",
+      "assetId": "ASSET_109",
+      "label": "Laptop - Back",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 8,
+      "row": 18,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.laptop-back#0",
+        "atlasFrame": {
+          "x": 556,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 29,
+      "orientation": "back",
+      "groupId": "LAPTOP"
+    },
+    {
+      "id": "f-1771275690326-y60x",
+      "assetId": "ASSET_99",
+      "label": "Laptop - Left",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 5,
+      "row": 3,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.laptop-left#0",
+        "atlasFrame": {
+          "x": 1230,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 30,
+      "orientation": "left",
+      "groupId": "LAPTOP"
+    },
+    {
+      "id": "f-1771275699466-nwdh",
+      "assetId": "ASSET_109",
+      "label": "Laptop - Back",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 3,
+      "row": 18,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.laptop-back#0",
+        "atlasFrame": {
+          "x": 556,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 31,
+      "orientation": "back",
+      "groupId": "LAPTOP"
+    },
+    {
+      "id": "f-1771275984894-29h8",
+      "assetId": "ASSET_51",
+      "label": "Coffee Mug",
+      "category": "misc",
+      "placement": "surface",
+      "col": 6,
+      "row": 4,
+      "width": 1,
+      "height": 1,
+      "color": 10105874,
+      "accentColor": 16628340,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.coffee-mug#0",
+        "atlasFrame": {
+          "x": 1226,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 32
+    },
+    {
+      "id": "f-1771275987306-bts7",
+      "assetId": "ASSET_51",
+      "label": "Coffee Mug",
+      "category": "misc",
+      "placement": "surface",
+      "col": 16,
+      "row": 17,
+      "width": 1,
+      "height": 1,
+      "color": 10105874,
+      "accentColor": 16628340,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.coffee-mug#0",
+        "atlasFrame": {
+          "x": 1226,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 33
+    },
+    {
+      "id": "f-1771277148633-u8j9",
+      "assetId": "ASSET_18",
+      "label": "Full Small Wooden Bookshelf",
+      "category": "storage",
+      "placement": "floor",
+      "col": 9,
+      "row": 10,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.full-wooden-bookshelf-small#0",
+        "atlasFrame": {
+          "x": 1864,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 34
+    },
+    {
+      "id": "f-1771277212373-enh1",
+      "assetId": "ASSET_27_A",
+      "label": "Large Table",
+      "category": "desks",
+      "placement": "floor",
+      "col": 5,
+      "row": 2,
+      "width": 2,
+      "height": 4,
+      "color": 9132587,
+      "accentColor": 16032353,
+      "renderAsset": {
+        "atlasKey": "furniture.desks.table-wood-lg#0",
+        "atlasFrame": {
+          "x": 606,
+          "y": 36,
+          "w": 32,
+          "h": 64
+        }
+      },
+      "sourceOrder": 35,
+      "orientation": "front",
+      "groupId": "TABLE_LG"
+    },
+    {
+      "id": "f-1771277253664-6618",
+      "assetId": "ASSET_34",
+      "label": "Cushioned Chair - Left",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 7,
+      "row": 3,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-left#0",
+        "atlasFrame": {
+          "x": 836,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 36,
+      "orientation": "left",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277346180-prsv",
+      "assetId": "ASSET_34",
+      "label": "Cushioned Chair - Left",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 7,
+      "row": 4,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-left#0",
+        "atlasFrame": {
+          "x": 836,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 37,
+      "orientation": "left",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277346584-y3x4",
+      "assetId": "ASSET_34",
+      "label": "Cushioned Chair - Left",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 7,
+      "row": 5,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-left#0",
+        "atlasFrame": {
+          "x": 836,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 38,
+      "orientation": "left",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277358914-5w7p",
+      "assetId": "ASSET_33",
+      "label": "Cushioned Chair - Right",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 4,
+      "row": 5,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-right#0",
+        "atlasFrame": {
+          "x": 250,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 39,
+      "orientation": "right",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277359246-bk4b",
+      "assetId": "ASSET_33",
+      "label": "Cushioned Chair - Right",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 4,
+      "row": 4,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-right#0",
+        "atlasFrame": {
+          "x": 250,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 40,
+      "orientation": "right",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277359490-pqu5",
+      "assetId": "ASSET_33",
+      "label": "Cushioned Chair - Right",
+      "category": "chairs",
+      "placement": "floor",
+      "col": 4,
+      "row": 3,
+      "width": 1,
+      "height": 1,
+      "color": 1920728,
+      "accentColor": 12573694,
+      "renderAsset": {
+        "atlasKey": "furniture.chairs.chair-cushioned-right#0",
+        "atlasFrame": {
+          "x": 250,
+          "y": 102,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 41,
+      "orientation": "right",
+      "groupId": "CUSHIONED_CHAIR"
+    },
+    {
+      "id": "f-1771277574471-hcv0",
+      "assetId": "ASSET_142",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 3,
+      "row": 1,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.plant-2#0",
+        "atlasFrame": {
+          "x": 304,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 42,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771277575299-mfxh",
+      "assetId": "ASSET_142",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 8,
+      "row": 1,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.plant-2#0",
+        "atlasFrame": {
+          "x": 304,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 43,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771277802319-1joi",
+      "assetId": "ASSET_140",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 19,
+      "row": 19,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.white-plant-2#0",
+        "atlasFrame": {
+          "x": 2,
+          "y": 102,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 44,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771277804247-jvcl",
+      "assetId": "ASSET_141",
+      "label": "Plant",
+      "category": "decor",
+      "placement": "floor",
+      "col": 12,
+      "row": 19,
+      "width": 1,
+      "height": 2,
+      "color": 1467700,
+      "accentColor": 8843180,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.white-plant-3#0",
+        "atlasFrame": {
+          "x": 944,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 45,
+      "groupId": "WHITE_PLANT"
+    },
+    {
+      "id": "f-1771279067027-ia1a",
+      "assetId": "ASSET_99",
+      "label": "Laptop - Left",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 15,
+      "row": 17,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.laptop-left#0",
+        "atlasFrame": {
+          "x": 1230,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 46,
+      "orientation": "left",
+      "groupId": "LAPTOP"
+    },
+    {
+      "id": "f-1771279925079-5ts8",
+      "assetId": "ASSET_44",
+      "label": "Trash Bin",
+      "category": "misc",
+      "placement": "floor",
+      "col": 1,
+      "row": 19,
+      "width": 1,
+      "height": 1,
+      "color": 10105874,
+      "accentColor": 16628340,
+      "renderAsset": {
+        "atlasKey": "furniture.misc.bin#0",
+        "atlasFrame": {
+          "x": 570,
+          "y": 36,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 47
+    },
+    {
+      "id": "f-1771280121112-6ffk",
+      "assetId": "ASSET_72",
+      "label": "Small Book",
+      "category": "decor",
+      "placement": "surface",
+      "col": 6,
+      "row": 3,
+      "width": 1,
+      "height": 1,
+      "color": 1013358,
+      "accentColor": 10090212,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.book-single-red#0",
+        "atlasFrame": {
+          "x": 1718,
+          "y": 2,
+          "w": 16,
+          "h": 16
+        }
+      },
+      "sourceOrder": 48
+    },
+    {
+      "id": "f-1771280128756-ylw9",
+      "assetId": "ASSET_100",
+      "label": "Paper - Side",
+      "category": "decor",
+      "placement": "surface",
+      "col": 2,
+      "row": 14,
+      "width": 1,
+      "height": 2,
+      "color": 1013358,
+      "accentColor": 10090212,
+      "renderAsset": {
+        "atlasKey": "furniture.decor.paper-side#0",
+        "atlasFrame": {
+          "x": 268,
+          "y": 36,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 49,
+      "orientation": "front",
+      "groupId": "PAPER"
+    },
+    {
+      "id": "f-1771280255329-3x6d",
+      "assetId": "ASSET_139",
+      "label": "Crates",
+      "category": "storage",
+      "placement": "floor",
+      "col": 2,
+      "row": 11,
+      "width": 2,
+      "height": 2,
+      "color": 4674921,
+      "accentColor": 13358561,
+      "renderAsset": {
+        "atlasKey": "furniture.storage.crates-3#0",
+        "atlasFrame": {
+          "x": 1070,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 50
+    },
+    {
+      "id": "f-1771282426463-of9k",
+      "assetId": "ASSET_90",
+      "label": "Full Computer with Coffee",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 8,
+      "row": 14,
+      "width": 2,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.full-computer-coffee-off#0",
+        "atlasFrame": {
+          "x": 1280,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 51,
+      "orientation": "front",
+      "groupId": "FULL_COMPUTER_COFFEE"
+    },
+    {
+      "id": "f-1771282455174-4ohy",
+      "assetId": "ASSET_90",
+      "label": "Full Computer with Coffee",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 3,
+      "row": 14,
+      "width": 2,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.full-computer-coffee-off#0",
+        "atlasFrame": {
+          "x": 1280,
+          "y": 36,
+          "w": 32,
+          "h": 32
+        }
+      },
+      "sourceOrder": 52,
+      "orientation": "front",
+      "groupId": "FULL_COMPUTER_COFFEE"
+    },
+    {
+      "id": "f-1771282481279-lthm",
+      "assetId": "ASSET_123",
+      "label": "Server",
+      "category": "electronics",
+      "placement": "surface",
+      "col": 2,
+      "row": 19,
+      "width": 1,
+      "height": 2,
+      "color": 3359061,
+      "accentColor": 9684477,
+      "renderAsset": {
+        "atlasKey": "furniture.electronics.server#0",
+        "atlasFrame": {
+          "x": 1190,
+          "y": 36,
+          "w": 16,
+          "h": 32
+        }
+      },
+      "sourceOrder": 53,
+      "groupId": "PC"
+    },
+    {
+      "id": "placed-ASSET_119-2",
+      "assetId": "ASSET_119",
+      "label": "Small Chart",
+      "category": "wall",
+      "placement": "wall",
+      "col": 5,
+      "row": 0,
+      "width": 2,
+      "height": 2,
+      "color": 16317180,
+      "accentColor": 16096779,
+      "renderAsset": {
+        "atlasKey": "furniture.wall.chart-sm-2#0",
+        "atlasFrame": {
+          "x": 786,
+          "y": 2,
+          "w": 32,
+          "h": 32
+        }
+      }
+    },
+    {
+      "id": "placed-ASSET_82-3",
+      "assetId": "ASSET_82",
+      "label": "Small White Window",
+      "category": "wall",
+      "placement": "wall",
+      "col": 14,
+      "row": 9,
+      "width": 1,
+      "height": 2,
+      "color": 16317180,
+      "accentColor": 16096779,
+      "renderAsset": {
+        "atlasKey": "furniture.wall.white-window-sm-2#0",
+        "atlasFrame": {
+          "x": 162,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      }
+    },
+    {
+      "id": "placed-ASSET_84-4",
+      "assetId": "ASSET_84",
+      "label": "Colorful Wall Clock",
+      "category": "wall",
+      "placement": "wall",
+      "col": 15,
+      "row": 9,
+      "width": 1,
+      "height": 2,
+      "color": 16317180,
+      "accentColor": 16096779,
+      "renderAsset": {
+        "atlasKey": "furniture.wall.clock-wall-color#0",
+        "atlasFrame": {
+          "x": 288,
+          "y": 2,
+          "w": 16,
+          "h": 32
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "id": "worker-1",
+      "label": "Ari",
+      "glyph": "A",
+      "col": 8,
+      "row": 18,
+      "color": 2450411,
+      "accentColor": 12573694
+    },
+    {
+      "id": "worker-2",
+      "label": "Bea",
+      "glyph": "B",
+      "col": 4,
+      "row": 3,
+      "color": 14362487,
+      "accentColor": 16502760
+    },
+    {
+      "id": "worker-3",
+      "label": "Cai",
+      "glyph": "C",
+      "col": 3,
+      "row": 16,
+      "color": 366185,
+      "accentColor": 11006928
+    },
+    {
+      "id": "worker-4",
+      "label": "Dia",
+      "glyph": "D",
+      "col": 14,
+      "row": 17,
+      "color": 14251782,
+      "accentColor": 16639626
+    },
+    {
+      "id": "worker-5",
+      "label": "Eli",
+      "glyph": "E",
+      "col": 8,
+      "row": 16,
+      "color": 8141549,
+      "accentColor": 14538494
+    },
+    {
+      "id": "worker-6",
+      "label": "Faye",
+      "glyph": "F",
+      "col": 3,
+      "row": 18,
+      "color": 15357964,
+      "accentColor": 16628340
+    }
+  ]
+}

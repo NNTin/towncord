@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "generatedAt": "2026-04-02T19:00:42.303518+00:00",
+    "generator": "packages/public-assets/pipeline/export_public_assets.py",
+    "namespace": "bloomseed",
+    "seed": "257263088",
+    "format": "phaser-asset-pack"
+  },
+  "bloomseed": {
+    "files": [
+      {
+        "type": "atlas",
+        "key": "bloomseed.characters",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "bloomseed.equipment",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "bloomseed.mobs",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "bloomseed.props",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "bloomseed.tilesets",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "bloomseed.ui",
+        "textureURL": "assets/bloomseed/atlas.png",
+        "atlasURL": "assets/bloomseed/atlas.json"
+      },
+      {
+        "type": "json",
+        "key": "bloomseed.animations",
+        "url": "assets/bloomseed/animations.json"
+      }
+    ]
+  }
+}

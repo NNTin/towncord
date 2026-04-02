@@ -1,0 +1,4483 @@
+{
+  "generatedAt": "2026-04-02T19:00:49.057386+00:00",
+  "namespace": "farmrpg",
+  "animations": {
+    "characters.farmrpg.npc.child.idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.idle.down#0",
+        "characters.farmrpg.npc.child.idle.down#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/idle.aseprite"
+    },
+    "characters.farmrpg.npc.child.idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.idle.side#0",
+        "characters.farmrpg.npc.child.idle.side#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/idle.aseprite"
+    },
+    "characters.farmrpg.npc.child.idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.idle.up#0",
+        "characters.farmrpg.npc.child.idle.up#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/idle.aseprite"
+    },
+    "characters.farmrpg.npc.child.play-soccer.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.play-soccer.down#0",
+        "characters.farmrpg.npc.child.play-soccer.down#1",
+        "characters.farmrpg.npc.child.play-soccer.down#2",
+        "characters.farmrpg.npc.child.play-soccer.down#3",
+        "characters.farmrpg.npc.child.play-soccer.down#4",
+        "characters.farmrpg.npc.child.play-soccer.down#5",
+        "characters.farmrpg.npc.child.play-soccer.down#6",
+        "characters.farmrpg.npc.child.play-soccer.down#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 80,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/play-soccer.aseprite"
+    },
+    "characters.farmrpg.npc.child.walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.walk.down#0",
+        "characters.farmrpg.npc.child.walk.down#1",
+        "characters.farmrpg.npc.child.walk.down#2",
+        "characters.farmrpg.npc.child.walk.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/walk.aseprite"
+    },
+    "characters.farmrpg.npc.child.walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.walk.side#0",
+        "characters.farmrpg.npc.child.walk.side#1",
+        "characters.farmrpg.npc.child.walk.side#2",
+        "characters.farmrpg.npc.child.walk.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/walk.aseprite"
+    },
+    "characters.farmrpg.npc.child.walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.npc.child.walk.up#0",
+        "characters.farmrpg.npc.child.walk.up#1",
+        "characters.farmrpg.npc.child.walk.up#2",
+        "characters.farmrpg.npc.child.walk.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/npcs/child/walk.aseprite"
+    },
+    "characters.farmrpg.player.default.archer.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.archer.down#0",
+        "characters.farmrpg.player.default.archer.down#1",
+        "characters.farmrpg.player.default.archer.down#2",
+        "characters.farmrpg.player.default.archer.down#3",
+        "characters.farmrpg.player.default.archer.down#4",
+        "characters.farmrpg.player.default.archer.down#5",
+        "characters.farmrpg.player.default.archer.down#6"
+      ],
+      "durationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "phaseDurationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "frameCount": 7,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/9-archer.aseprite"
+    },
+    "characters.farmrpg.player.default.archer.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.archer.side#0",
+        "characters.farmrpg.player.default.archer.side#1",
+        "characters.farmrpg.player.default.archer.side#2",
+        "characters.farmrpg.player.default.archer.side#3",
+        "characters.farmrpg.player.default.archer.side#4",
+        "characters.farmrpg.player.default.archer.side#5",
+        "characters.farmrpg.player.default.archer.side#6"
+      ],
+      "durationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "phaseDurationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "frameCount": 7,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/9-archer.aseprite"
+    },
+    "characters.farmrpg.player.default.archer.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.archer.up#0",
+        "characters.farmrpg.player.default.archer.up#1",
+        "characters.farmrpg.player.default.archer.up#2",
+        "characters.farmrpg.player.default.archer.up#3",
+        "characters.farmrpg.player.default.archer.up#4",
+        "characters.farmrpg.player.default.archer.up#5",
+        "characters.farmrpg.player.default.archer.up#6"
+      ],
+      "durationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "phaseDurationsMs": [
+        60,
+        60,
+        60,
+        60,
+        60,
+        60,
+        60
+      ],
+      "frameCount": 7,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/9-archer.aseprite"
+    },
+    "characters.farmrpg.player.default.axe-and-scythe.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.axe-and-scythe.down#0",
+        "characters.farmrpg.player.default.axe-and-scythe.down#1",
+        "characters.farmrpg.player.default.axe-and-scythe.down#2",
+        "characters.farmrpg.player.default.axe-and-scythe.down#3",
+        "characters.farmrpg.player.default.axe-and-scythe.down#4",
+        "characters.farmrpg.player.default.axe-and-scythe.down#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/5-axe-and-scythe.aseprite"
+    },
+    "characters.farmrpg.player.default.axe-and-scythe.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.axe-and-scythe.side#0",
+        "characters.farmrpg.player.default.axe-and-scythe.side#1",
+        "characters.farmrpg.player.default.axe-and-scythe.side#2",
+        "characters.farmrpg.player.default.axe-and-scythe.side#3",
+        "characters.farmrpg.player.default.axe-and-scythe.side#4",
+        "characters.farmrpg.player.default.axe-and-scythe.side#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/5-axe-and-scythe.aseprite"
+    },
+    "characters.farmrpg.player.default.axe-and-scythe.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.axe-and-scythe.up#0",
+        "characters.farmrpg.player.default.axe-and-scythe.up#1",
+        "characters.farmrpg.player.default.axe-and-scythe.up#2",
+        "characters.farmrpg.player.default.axe-and-scythe.up#3",
+        "characters.farmrpg.player.default.axe-and-scythe.up#4",
+        "characters.farmrpg.player.default.axe-and-scythe.up#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/5-axe-and-scythe.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-attack.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-attack.down#0",
+        "characters.farmrpg.player.default.bear-attack.down#1",
+        "characters.farmrpg.player.default.bear-attack.down#2",
+        "characters.farmrpg.player.default.bear-attack.down#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-3-bear-attack.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-attack.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-attack.side#0",
+        "characters.farmrpg.player.default.bear-attack.side#1",
+        "characters.farmrpg.player.default.bear-attack.side#2",
+        "characters.farmrpg.player.default.bear-attack.side#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-3-bear-attack.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-attack.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-attack.up#0",
+        "characters.farmrpg.player.default.bear-attack.up#1",
+        "characters.farmrpg.player.default.bear-attack.up#2",
+        "characters.farmrpg.player.default.bear-attack.up#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-3-bear-attack.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-dead.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-dead.down#0",
+        "characters.farmrpg.player.default.bear-dead.down#1",
+        "characters.farmrpg.player.default.bear-dead.down#2",
+        "characters.farmrpg.player.default.bear-dead.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-5-bear-dead.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-dead.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-dead.side#0",
+        "characters.farmrpg.player.default.bear-dead.side#1",
+        "characters.farmrpg.player.default.bear-dead.side#2",
+        "characters.farmrpg.player.default.bear-dead.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-5-bear-dead.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-dead.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-dead.up#0",
+        "characters.farmrpg.player.default.bear-dead.up#1",
+        "characters.farmrpg.player.default.bear-dead.up#2",
+        "characters.farmrpg.player.default.bear-dead.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-5-bear-dead.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-hit.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-hit.down#0",
+        "characters.farmrpg.player.default.bear-hit.down#1",
+        "characters.farmrpg.player.default.bear-hit.down#2"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200
+      ],
+      "frameCount": 3,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-4-bear-hit.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-hit.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-hit.side#0",
+        "characters.farmrpg.player.default.bear-hit.side#1",
+        "characters.farmrpg.player.default.bear-hit.side#2"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200
+      ],
+      "frameCount": 3,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-4-bear-hit.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-hit.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-hit.up#0",
+        "characters.farmrpg.player.default.bear-hit.up#1",
+        "characters.farmrpg.player.default.bear-hit.up#2"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200
+      ],
+      "frameCount": 3,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-4-bear-hit.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-idle.down#0",
+        "characters.farmrpg.player.default.bear-idle.down#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-bear-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-idle.side#0",
+        "characters.farmrpg.player.default.bear-idle.side#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-bear-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-idle.up#0",
+        "characters.farmrpg.player.default.bear-idle.up#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-bear-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-run.down#0",
+        "characters.farmrpg.player.default.bear-run.down#1",
+        "characters.farmrpg.player.default.bear-run.down#2",
+        "characters.farmrpg.player.default.bear-run.down#3",
+        "characters.farmrpg.player.default.bear-run.down#4",
+        "characters.farmrpg.player.default.bear-run.down#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-2-bear-run.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-run.side#0",
+        "characters.farmrpg.player.default.bear-run.side#1",
+        "characters.farmrpg.player.default.bear-run.side#2",
+        "characters.farmrpg.player.default.bear-run.side#3",
+        "characters.farmrpg.player.default.bear-run.side#4",
+        "characters.farmrpg.player.default.bear-run.side#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-2-bear-run.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-run.up#0",
+        "characters.farmrpg.player.default.bear-run.up#1",
+        "characters.farmrpg.player.default.bear-run.up#2",
+        "characters.farmrpg.player.default.bear-run.up#3",
+        "characters.farmrpg.player.default.bear-run.up#4",
+        "characters.farmrpg.player.default.bear-run.up#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-2-bear-run.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-walk.down#0",
+        "characters.farmrpg.player.default.bear-walk.down#1",
+        "characters.farmrpg.player.default.bear-walk.down#2",
+        "characters.farmrpg.player.default.bear-walk.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-1-bear-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-walk.side#0",
+        "characters.farmrpg.player.default.bear-walk.side#1",
+        "characters.farmrpg.player.default.bear-walk.side#2",
+        "characters.farmrpg.player.default.bear-walk.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-1-bear-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.bear-walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bear-walk.up#0",
+        "characters.farmrpg.player.default.bear-walk.up#1",
+        "characters.farmrpg.player.default.bear-walk.up#2",
+        "characters.farmrpg.player.default.bear-walk.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 48
+      },
+      "sourceFile": "aseprite/characters/16-1-bear-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-idle.down#0",
+        "characters.farmrpg.player.default.bicycle-idle.down#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-bicycle-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-idle.side#0",
+        "characters.farmrpg.player.default.bicycle-idle.side#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-bicycle-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-idle.up#0",
+        "characters.farmrpg.player.default.bicycle-idle.up#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-bicycle-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-run.down#0",
+        "characters.farmrpg.player.default.bicycle-run.down#1",
+        "characters.farmrpg.player.default.bicycle-run.down#2",
+        "characters.farmrpg.player.default.bicycle-run.down#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-1-bicycle-run.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-run.side#0",
+        "characters.farmrpg.player.default.bicycle-run.side#1",
+        "characters.farmrpg.player.default.bicycle-run.side#2",
+        "characters.farmrpg.player.default.bicycle-run.side#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-1-bicycle-run.aseprite"
+    },
+    "characters.farmrpg.player.default.bicycle-run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.bicycle-run.up#0",
+        "characters.farmrpg.player.default.bicycle-run.up#1",
+        "characters.farmrpg.player.default.bicycle-run.up#2",
+        "characters.farmrpg.player.default.bicycle-run.up#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/15-1-bicycle-run.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-idle.down#0",
+        "characters.farmrpg.player.default.carrying-idle.down#1",
+        "characters.farmrpg.player.default.carrying-idle.down#2",
+        "characters.farmrpg.player.default.carrying-idle.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-carrying-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-idle.side#0",
+        "characters.farmrpg.player.default.carrying-idle.side#1",
+        "characters.farmrpg.player.default.carrying-idle.side#2",
+        "characters.farmrpg.player.default.carrying-idle.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-carrying-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-idle.up#0",
+        "characters.farmrpg.player.default.carrying-idle.up#1",
+        "characters.farmrpg.player.default.carrying-idle.up#2",
+        "characters.farmrpg.player.default.carrying-idle.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-carrying-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-pick-up.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-pick-up.down#0",
+        "characters.farmrpg.player.default.carrying-pick-up.down#1",
+        "characters.farmrpg.player.default.carrying-pick-up.down#2",
+        "characters.farmrpg.player.default.carrying-pick-up.down#3"
+      ],
+      "durationsMs": [
+        100,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        100,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-3-carrying-pick-up.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-pick-up.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-pick-up.side#0",
+        "characters.farmrpg.player.default.carrying-pick-up.side#1",
+        "characters.farmrpg.player.default.carrying-pick-up.side#2",
+        "characters.farmrpg.player.default.carrying-pick-up.side#3"
+      ],
+      "durationsMs": [
+        100,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        100,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-3-carrying-pick-up.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-pick-up.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-pick-up.up#0",
+        "characters.farmrpg.player.default.carrying-pick-up.up#1",
+        "characters.farmrpg.player.default.carrying-pick-up.up#2",
+        "characters.farmrpg.player.default.carrying-pick-up.up#3",
+        "characters.farmrpg.player.default.carrying-pick-up.up#4",
+        "characters.farmrpg.player.default.carrying-pick-up.up#5",
+        "characters.farmrpg.player.default.carrying-pick-up.up#6",
+        "characters.farmrpg.player.default.carrying-pick-up.up#7",
+        "characters.farmrpg.player.default.carrying-pick-up.up#8",
+        "characters.farmrpg.player.default.carrying-pick-up.up#9",
+        "characters.farmrpg.player.default.carrying-pick-up.up#10",
+        "characters.farmrpg.player.default.carrying-pick-up.up#11",
+        "characters.farmrpg.player.default.carrying-pick-up.up#12",
+        "characters.farmrpg.player.default.carrying-pick-up.up#13",
+        "characters.farmrpg.player.default.carrying-pick-up.up#14",
+        "characters.farmrpg.player.default.carrying-pick-up.up#15"
+      ],
+      "durationsMs": [
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200,
+        100,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-3-carrying-pick-up.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-run.down#0",
+        "characters.farmrpg.player.default.carrying-run.down#1",
+        "characters.farmrpg.player.default.carrying-run.down#2",
+        "characters.farmrpg.player.default.carrying-run.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-2-carrying-run.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-run.side#0",
+        "characters.farmrpg.player.default.carrying-run.side#1",
+        "characters.farmrpg.player.default.carrying-run.side#2",
+        "characters.farmrpg.player.default.carrying-run.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-2-carrying-run.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-run.up#0",
+        "characters.farmrpg.player.default.carrying-run.up#1",
+        "characters.farmrpg.player.default.carrying-run.up#2",
+        "characters.farmrpg.player.default.carrying-run.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-2-carrying-run.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-throwing-items.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-throwing-items.down#0",
+        "characters.farmrpg.player.default.carrying-throwing-items.down#1",
+        "characters.farmrpg.player.default.carrying-throwing-items.down#2",
+        "characters.farmrpg.player.default.carrying-throwing-items.down#3",
+        "characters.farmrpg.player.default.carrying-throwing-items.down#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-4-carrying-throwing-items.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-throwing-items.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-throwing-items.side#0",
+        "characters.farmrpg.player.default.carrying-throwing-items.side#1",
+        "characters.farmrpg.player.default.carrying-throwing-items.side#2",
+        "characters.farmrpg.player.default.carrying-throwing-items.side#3",
+        "characters.farmrpg.player.default.carrying-throwing-items.side#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-4-carrying-throwing-items.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-throwing-items.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-throwing-items.up#0",
+        "characters.farmrpg.player.default.carrying-throwing-items.up#1",
+        "characters.farmrpg.player.default.carrying-throwing-items.up#2",
+        "characters.farmrpg.player.default.carrying-throwing-items.up#3",
+        "characters.farmrpg.player.default.carrying-throwing-items.up#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-4-carrying-throwing-items.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-walk.down#0",
+        "characters.farmrpg.player.default.carrying-walk.down#1",
+        "characters.farmrpg.player.default.carrying-walk.down#2",
+        "characters.farmrpg.player.default.carrying-walk.down#3",
+        "characters.farmrpg.player.default.carrying-walk.down#4",
+        "characters.farmrpg.player.default.carrying-walk.down#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-1-carrying-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-walk.side#0",
+        "characters.farmrpg.player.default.carrying-walk.side#1",
+        "characters.farmrpg.player.default.carrying-walk.side#2",
+        "characters.farmrpg.player.default.carrying-walk.side#3",
+        "characters.farmrpg.player.default.carrying-walk.side#4",
+        "characters.farmrpg.player.default.carrying-walk.side#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-1-carrying-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.carrying-walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.carrying-walk.up#0",
+        "characters.farmrpg.player.default.carrying-walk.up#1",
+        "characters.farmrpg.player.default.carrying-walk.up#2",
+        "characters.farmrpg.player.default.carrying-walk.up#3",
+        "characters.farmrpg.player.default.carrying-walk.up#4",
+        "characters.farmrpg.player.default.carrying-walk.up#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/13-1-carrying-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.climbing.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.climbing.up#0",
+        "characters.farmrpg.player.default.climbing.up#1",
+        "characters.farmrpg.player.default.climbing.up#2",
+        "characters.farmrpg.player.default.climbing.up#3",
+        "characters.farmrpg.player.default.climbing.up#4"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/21-climbing.aseprite"
+    },
+    "characters.farmrpg.player.default.damage.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.damage.down#0",
+        "characters.farmrpg.player.default.damage.down#1",
+        "characters.farmrpg.player.default.damage.down#2",
+        "characters.farmrpg.player.default.damage.down#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/10-damage.aseprite"
+    },
+    "characters.farmrpg.player.default.damage.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.damage.side#0",
+        "characters.farmrpg.player.default.damage.side#1",
+        "characters.farmrpg.player.default.damage.side#2",
+        "characters.farmrpg.player.default.damage.side#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/10-damage.aseprite"
+    },
+    "characters.farmrpg.player.default.damage.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.damage.up#0",
+        "characters.farmrpg.player.default.damage.up#1",
+        "characters.farmrpg.player.default.damage.up#2",
+        "characters.farmrpg.player.default.damage.up#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/10-damage.aseprite"
+    },
+    "characters.farmrpg.player.default.death.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.death.down#0",
+        "characters.farmrpg.player.default.death.down#1",
+        "characters.farmrpg.player.default.death.down#2",
+        "characters.farmrpg.player.default.death.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/11-death.aseprite"
+    },
+    "characters.farmrpg.player.default.death.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.death.side#0",
+        "characters.farmrpg.player.default.death.side#1",
+        "characters.farmrpg.player.default.death.side#2",
+        "characters.farmrpg.player.default.death.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/11-death.aseprite"
+    },
+    "characters.farmrpg.player.default.death.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.death.up#0",
+        "characters.farmrpg.player.default.death.up#1",
+        "characters.farmrpg.player.default.death.up#2",
+        "characters.farmrpg.player.default.death.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/11-death.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-bite.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-bite.down#0",
+        "characters.farmrpg.player.default.fishing-bite.down#1",
+        "characters.farmrpg.player.default.fishing-bite.down#2",
+        "characters.farmrpg.player.default.fishing-bite.down#3",
+        "characters.farmrpg.player.default.fishing-bite.down#4",
+        "characters.farmrpg.player.default.fishing-bite.down#5",
+        "characters.farmrpg.player.default.fishing-bite.down#6",
+        "characters.farmrpg.player.default.fishing-bite.down#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-2-fishing-bite.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-bite.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-bite.side#0",
+        "characters.farmrpg.player.default.fishing-bite.side#1",
+        "characters.farmrpg.player.default.fishing-bite.side#2",
+        "characters.farmrpg.player.default.fishing-bite.side#3",
+        "characters.farmrpg.player.default.fishing-bite.side#4",
+        "characters.farmrpg.player.default.fishing-bite.side#5",
+        "characters.farmrpg.player.default.fishing-bite.side#6",
+        "characters.farmrpg.player.default.fishing-bite.side#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-2-fishing-bite.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-bite.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-bite.up#0",
+        "characters.farmrpg.player.default.fishing-bite.up#1",
+        "characters.farmrpg.player.default.fishing-bite.up#2",
+        "characters.farmrpg.player.default.fishing-bite.up#3",
+        "characters.farmrpg.player.default.fishing-bite.up#4",
+        "characters.farmrpg.player.default.fishing-bite.up#5",
+        "characters.farmrpg.player.default.fishing-bite.up#6",
+        "characters.farmrpg.player.default.fishing-bite.up#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-2-fishing-bite.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-cast.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-cast.down#0",
+        "characters.farmrpg.player.default.fishing-cast.down#1",
+        "characters.farmrpg.player.default.fishing-cast.down#2",
+        "characters.farmrpg.player.default.fishing-cast.down#3",
+        "characters.farmrpg.player.default.fishing-cast.down#4",
+        "characters.farmrpg.player.default.fishing-cast.down#5",
+        "characters.farmrpg.player.default.fishing-cast.down#6",
+        "characters.farmrpg.player.default.fishing-cast.down#7",
+        "characters.farmrpg.player.default.fishing-cast.down#8",
+        "characters.farmrpg.player.default.fishing-cast.down#9",
+        "characters.farmrpg.player.default.fishing-cast.down#10",
+        "characters.farmrpg.player.default.fishing-cast.down#11",
+        "characters.farmrpg.player.default.fishing-cast.down#12",
+        "characters.farmrpg.player.default.fishing-cast.down#13",
+        "characters.farmrpg.player.default.fishing-cast.down#14"
+      ],
+      "durationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "phaseDurationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "frameCount": 15,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-fishing-cast.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-cast.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-cast.side#0",
+        "characters.farmrpg.player.default.fishing-cast.side#1",
+        "characters.farmrpg.player.default.fishing-cast.side#2",
+        "characters.farmrpg.player.default.fishing-cast.side#3",
+        "characters.farmrpg.player.default.fishing-cast.side#4",
+        "characters.farmrpg.player.default.fishing-cast.side#5",
+        "characters.farmrpg.player.default.fishing-cast.side#6",
+        "characters.farmrpg.player.default.fishing-cast.side#7",
+        "characters.farmrpg.player.default.fishing-cast.side#8",
+        "characters.farmrpg.player.default.fishing-cast.side#9",
+        "characters.farmrpg.player.default.fishing-cast.side#10",
+        "characters.farmrpg.player.default.fishing-cast.side#11",
+        "characters.farmrpg.player.default.fishing-cast.side#12",
+        "characters.farmrpg.player.default.fishing-cast.side#13",
+        "characters.farmrpg.player.default.fishing-cast.side#14"
+      ],
+      "durationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "phaseDurationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "frameCount": 15,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-fishing-cast.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-cast.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-cast.up#0",
+        "characters.farmrpg.player.default.fishing-cast.up#1",
+        "characters.farmrpg.player.default.fishing-cast.up#2",
+        "characters.farmrpg.player.default.fishing-cast.up#3",
+        "characters.farmrpg.player.default.fishing-cast.up#4",
+        "characters.farmrpg.player.default.fishing-cast.up#5",
+        "characters.farmrpg.player.default.fishing-cast.up#6",
+        "characters.farmrpg.player.default.fishing-cast.up#7",
+        "characters.farmrpg.player.default.fishing-cast.up#8",
+        "characters.farmrpg.player.default.fishing-cast.up#9",
+        "characters.farmrpg.player.default.fishing-cast.up#10",
+        "characters.farmrpg.player.default.fishing-cast.up#11",
+        "characters.farmrpg.player.default.fishing-cast.up#12",
+        "characters.farmrpg.player.default.fishing-cast.up#13",
+        "characters.farmrpg.player.default.fishing-cast.up#14"
+      ],
+      "durationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "phaseDurationsMs": [
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80,
+        80
+      ],
+      "frameCount": 15,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-fishing-cast.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-catch.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-catch.down#0",
+        "characters.farmrpg.player.default.fishing-catch.down#1",
+        "characters.farmrpg.player.default.fishing-catch.down#2",
+        "characters.farmrpg.player.default.fishing-catch.down#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-4-fishing-catch.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-catch.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-catch.side#0",
+        "characters.farmrpg.player.default.fishing-catch.side#1",
+        "characters.farmrpg.player.default.fishing-catch.side#2",
+        "characters.farmrpg.player.default.fishing-catch.side#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-4-fishing-catch.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-catch.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-catch.up#0",
+        "characters.farmrpg.player.default.fishing-catch.up#1",
+        "characters.farmrpg.player.default.fishing-catch.up#2",
+        "characters.farmrpg.player.default.fishing-catch.up#3"
+      ],
+      "durationsMs": [
+        100,
+        150,
+        150,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        150,
+        150,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-4-fishing-catch.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-reel.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-reel.down#0",
+        "characters.farmrpg.player.default.fishing-reel.down#1",
+        "characters.farmrpg.player.default.fishing-reel.down#2",
+        "characters.farmrpg.player.default.fishing-reel.down#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-3-fishing-reel.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-reel.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-reel.side#0",
+        "characters.farmrpg.player.default.fishing-reel.side#1",
+        "characters.farmrpg.player.default.fishing-reel.side#2",
+        "characters.farmrpg.player.default.fishing-reel.side#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-3-fishing-reel.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-reel.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-reel.up#0",
+        "characters.farmrpg.player.default.fishing-reel.up#1",
+        "characters.farmrpg.player.default.fishing-reel.up#2",
+        "characters.farmrpg.player.default.fishing-reel.up#3"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-3-fishing-reel.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-wait.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-wait.down#0",
+        "characters.farmrpg.player.default.fishing-wait.down#1",
+        "characters.farmrpg.player.default.fishing-wait.down#2",
+        "characters.farmrpg.player.default.fishing-wait.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-1-fishing-wait.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-wait.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-wait.side#0",
+        "characters.farmrpg.player.default.fishing-wait.side#1",
+        "characters.farmrpg.player.default.fishing-wait.side#2",
+        "characters.farmrpg.player.default.fishing-wait.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-1-fishing-wait.aseprite"
+    },
+    "characters.farmrpg.player.default.fishing-wait.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.fishing-wait.up#0",
+        "characters.farmrpg.player.default.fishing-wait.up#1",
+        "characters.farmrpg.player.default.fishing-wait.up#2",
+        "characters.farmrpg.player.default.fishing-wait.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 64,
+        "h": 64
+      },
+      "sourceFile": "aseprite/characters/12-1-fishing-wait.aseprite"
+    },
+    "characters.farmrpg.player.default.flute.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.flute.down#0",
+        "characters.farmrpg.player.default.flute.down#1",
+        "characters.farmrpg.player.default.flute.down#2",
+        "characters.farmrpg.player.default.flute.down#3",
+        "characters.farmrpg.player.default.flute.down#4",
+        "characters.farmrpg.player.default.flute.down#5"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/22-flute.aseprite"
+    },
+    "characters.farmrpg.player.default.flute.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.flute.side#0",
+        "characters.farmrpg.player.default.flute.side#1",
+        "characters.farmrpg.player.default.flute.side#2",
+        "characters.farmrpg.player.default.flute.side#3",
+        "characters.farmrpg.player.default.flute.side#4",
+        "characters.farmrpg.player.default.flute.side#5"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/22-flute.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-eating.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-eating.down#0",
+        "characters.farmrpg.player.default.horse-eating.down#1",
+        "characters.farmrpg.player.default.horse-eating.down#2",
+        "characters.farmrpg.player.default.horse-eating.down#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-4-horse-eating.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-eating.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-eating.side#0",
+        "characters.farmrpg.player.default.horse-eating.side#1",
+        "characters.farmrpg.player.default.horse-eating.side#2",
+        "characters.farmrpg.player.default.horse-eating.side#3"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-4-horse-eating.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-eating.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-eating.up#0",
+        "characters.farmrpg.player.default.horse-eating.up#1",
+        "characters.farmrpg.player.default.horse-eating.up#2",
+        "characters.farmrpg.player.default.horse-eating.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-4-horse-eating.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-idle.down#0",
+        "characters.farmrpg.player.default.horse-idle.down#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-horse-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-idle.side#0",
+        "characters.farmrpg.player.default.horse-idle.side#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-horse-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-idle.up#0",
+        "characters.farmrpg.player.default.horse-idle.up#1"
+      ],
+      "durationsMs": [
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-horse-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-lower.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-lower.down#0",
+        "characters.farmrpg.player.default.horse-lower.down#1",
+        "characters.farmrpg.player.default.horse-lower.down#2",
+        "characters.farmrpg.player.default.horse-lower.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-3-horse-lower.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-lower.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-lower.side#0",
+        "characters.farmrpg.player.default.horse-lower.side#1",
+        "characters.farmrpg.player.default.horse-lower.side#2",
+        "characters.farmrpg.player.default.horse-lower.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-3-horse-lower.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-lower.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-lower.up#0",
+        "characters.farmrpg.player.default.horse-lower.up#1",
+        "characters.farmrpg.player.default.horse-lower.up#2",
+        "characters.farmrpg.player.default.horse-lower.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-3-horse-lower.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-run.down#0",
+        "characters.farmrpg.player.default.horse-run.down#1",
+        "characters.farmrpg.player.default.horse-run.down#2",
+        "characters.farmrpg.player.default.horse-run.down#3",
+        "characters.farmrpg.player.default.horse-run.down#4",
+        "characters.farmrpg.player.default.horse-run.down#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-2-horse-run.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-run.side#0",
+        "characters.farmrpg.player.default.horse-run.side#1",
+        "characters.farmrpg.player.default.horse-run.side#2",
+        "characters.farmrpg.player.default.horse-run.side#3",
+        "characters.farmrpg.player.default.horse-run.side#4",
+        "characters.farmrpg.player.default.horse-run.side#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-2-horse-run.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-run.up#0",
+        "characters.farmrpg.player.default.horse-run.up#1",
+        "characters.farmrpg.player.default.horse-run.up#2",
+        "characters.farmrpg.player.default.horse-run.up#3",
+        "characters.farmrpg.player.default.horse-run.up#4",
+        "characters.farmrpg.player.default.horse-run.up#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-2-horse-run.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-walk.down#0",
+        "characters.farmrpg.player.default.horse-walk.down#1",
+        "characters.farmrpg.player.default.horse-walk.down#2",
+        "characters.farmrpg.player.default.horse-walk.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-1-horse-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-walk.side#0",
+        "characters.farmrpg.player.default.horse-walk.side#1",
+        "characters.farmrpg.player.default.horse-walk.side#2",
+        "characters.farmrpg.player.default.horse-walk.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-1-horse-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.horse-walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.horse-walk.up#0",
+        "characters.farmrpg.player.default.horse-walk.up#1",
+        "characters.farmrpg.player.default.horse-walk.up#2",
+        "characters.farmrpg.player.default.horse-walk.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/14-1-horse-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.idle.down#0",
+        "characters.farmrpg.player.default.idle.down#1",
+        "characters.farmrpg.player.default.idle.down#2",
+        "characters.farmrpg.player.default.idle.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/1-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.idle.side#0",
+        "characters.farmrpg.player.default.idle.side#1",
+        "characters.farmrpg.player.default.idle.side#2",
+        "characters.farmrpg.player.default.idle.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/1-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.idle.up#0",
+        "characters.farmrpg.player.default.idle.up#1",
+        "characters.farmrpg.player.default.idle.up#2",
+        "characters.farmrpg.player.default.idle.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/1-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.mage.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.mage.down#0",
+        "characters.farmrpg.player.default.mage.down#1",
+        "characters.farmrpg.player.default.mage.down#2",
+        "characters.farmrpg.player.default.mage.down#3",
+        "characters.farmrpg.player.default.mage.down#4",
+        "characters.farmrpg.player.default.mage.down#5"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/23-mage.aseprite"
+    },
+    "characters.farmrpg.player.default.mage.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.mage.side#0",
+        "characters.farmrpg.player.default.mage.side#1",
+        "characters.farmrpg.player.default.mage.side#2",
+        "characters.farmrpg.player.default.mage.side#3",
+        "characters.farmrpg.player.default.mage.side#4",
+        "characters.farmrpg.player.default.mage.side#5"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/23-mage.aseprite"
+    },
+    "characters.farmrpg.player.default.mage.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.mage.up#0",
+        "characters.farmrpg.player.default.mage.up#1",
+        "characters.farmrpg.player.default.mage.up#2",
+        "characters.farmrpg.player.default.mage.up#3",
+        "characters.farmrpg.player.default.mage.up#4",
+        "characters.farmrpg.player.default.mage.up#5"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/23-mage.aseprite"
+    },
+    "characters.farmrpg.player.default.petting.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.petting.side#0",
+        "characters.farmrpg.player.default.petting.side#1",
+        "characters.farmrpg.player.default.petting.side#2",
+        "characters.farmrpg.player.default.petting.side#3",
+        "characters.farmrpg.player.default.petting.side#4",
+        "characters.farmrpg.player.default.petting.side#5"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/20-petting.aseprite"
+    },
+    "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#0",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#1",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#2",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#3",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#4",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.down#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/4-pickaxe-hoe-and-catching-insects.aseprite"
+    },
+    "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#0",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#1",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#2",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#3",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#4",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.side#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/4-pickaxe-hoe-and-catching-insects.aseprite"
+    },
+    "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#0",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#1",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#2",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#3",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#4",
+        "characters.farmrpg.player.default.pickaxe-hoe-and-catching-insects.up#5"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/4-pickaxe-hoe-and-catching-insects.aseprite"
+    },
+    "characters.farmrpg.player.default.run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.run.down#0",
+        "characters.farmrpg.player.default.run.down#1",
+        "characters.farmrpg.player.default.run.down#2",
+        "characters.farmrpg.player.default.run.down#3",
+        "characters.farmrpg.player.default.run.down#4",
+        "characters.farmrpg.player.default.run.down#5",
+        "characters.farmrpg.player.default.run.down#6",
+        "characters.farmrpg.player.default.run.down#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/3-run.aseprite"
+    },
+    "characters.farmrpg.player.default.run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.run.side#0",
+        "characters.farmrpg.player.default.run.side#1",
+        "characters.farmrpg.player.default.run.side#2",
+        "characters.farmrpg.player.default.run.side#3",
+        "characters.farmrpg.player.default.run.side#4",
+        "characters.farmrpg.player.default.run.side#5",
+        "characters.farmrpg.player.default.run.side#6",
+        "characters.farmrpg.player.default.run.side#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/3-run.aseprite"
+    },
+    "characters.farmrpg.player.default.run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.run.up#0",
+        "characters.farmrpg.player.default.run.up#1",
+        "characters.farmrpg.player.default.run.up#2",
+        "characters.farmrpg.player.default.run.up#3",
+        "characters.farmrpg.player.default.run.up#4",
+        "characters.farmrpg.player.default.run.up#5",
+        "characters.farmrpg.player.default.run.up#6",
+        "characters.farmrpg.player.default.run.up#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/3-run.aseprite"
+    },
+    "characters.farmrpg.player.default.setting.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.setting.down#0"
+      ],
+      "durationsMs": [
+        200
+      ],
+      "phaseDurationsMs": [
+        200
+      ],
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/18-setting.aseprite"
+    },
+    "characters.farmrpg.player.default.setting.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.setting.side#0"
+      ],
+      "durationsMs": [
+        200
+      ],
+      "phaseDurationsMs": [
+        200
+      ],
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/18-setting.aseprite"
+    },
+    "characters.farmrpg.player.default.setting.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.setting.up#0"
+      ],
+      "durationsMs": [
+        200
+      ],
+      "phaseDurationsMs": [
+        200
+      ],
+      "frameCount": 1,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/18-setting.aseprite"
+    },
+    "characters.farmrpg.player.default.shovel.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.shovel.down#0",
+        "characters.farmrpg.player.default.shovel.down#1",
+        "characters.farmrpg.player.default.shovel.down#2",
+        "characters.farmrpg.player.default.shovel.down#3",
+        "characters.farmrpg.player.default.shovel.down#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/6-shovel.aseprite"
+    },
+    "characters.farmrpg.player.default.shovel.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.shovel.side#0",
+        "characters.farmrpg.player.default.shovel.side#1",
+        "characters.farmrpg.player.default.shovel.side#2",
+        "characters.farmrpg.player.default.shovel.side#3",
+        "characters.farmrpg.player.default.shovel.side#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/6-shovel.aseprite"
+    },
+    "characters.farmrpg.player.default.shovel.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.shovel.up#0",
+        "characters.farmrpg.player.default.shovel.up#1",
+        "characters.farmrpg.player.default.shovel.up#2",
+        "characters.farmrpg.player.default.shovel.up#3",
+        "characters.farmrpg.player.default.shovel.up#4"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 5,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/6-shovel.aseprite"
+    },
+    "characters.farmrpg.player.default.sleep.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.sleep.down#0",
+        "characters.farmrpg.player.default.sleep.down#1"
+      ],
+      "durationsMs": [
+        500,
+        500
+      ],
+      "phaseDurationsMs": [
+        500,
+        500
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/19-sleep.aseprite"
+    },
+    "characters.farmrpg.player.default.sleep.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.sleep.side#0",
+        "characters.farmrpg.player.default.sleep.side#1"
+      ],
+      "durationsMs": [
+        500,
+        500
+      ],
+      "phaseDurationsMs": [
+        500,
+        500
+      ],
+      "frameCount": 2,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/19-sleep.aseprite"
+    },
+    "characters.farmrpg.player.default.swordattack.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.swordattack.down#0",
+        "characters.farmrpg.player.default.swordattack.down#1",
+        "characters.farmrpg.player.default.swordattack.down#2",
+        "characters.farmrpg.player.default.swordattack.down#3",
+        "characters.farmrpg.player.default.swordattack.down#4",
+        "characters.farmrpg.player.default.swordattack.down#5",
+        "characters.farmrpg.player.default.swordattack.down#6",
+        "characters.farmrpg.player.default.swordattack.down#7",
+        "characters.farmrpg.player.default.swordattack.down#8",
+        "characters.farmrpg.player.default.swordattack.down#9"
+      ],
+      "durationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "phaseDurationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "frameCount": 10,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/8-swordattack.aseprite"
+    },
+    "characters.farmrpg.player.default.swordattack.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.swordattack.side#0",
+        "characters.farmrpg.player.default.swordattack.side#1",
+        "characters.farmrpg.player.default.swordattack.side#2",
+        "characters.farmrpg.player.default.swordattack.side#3",
+        "characters.farmrpg.player.default.swordattack.side#4",
+        "characters.farmrpg.player.default.swordattack.side#5",
+        "characters.farmrpg.player.default.swordattack.side#6",
+        "characters.farmrpg.player.default.swordattack.side#7",
+        "characters.farmrpg.player.default.swordattack.side#8",
+        "characters.farmrpg.player.default.swordattack.side#9"
+      ],
+      "durationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "phaseDurationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "frameCount": 10,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/8-swordattack.aseprite"
+    },
+    "characters.farmrpg.player.default.swordattack.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.swordattack.up#0",
+        "characters.farmrpg.player.default.swordattack.up#1",
+        "characters.farmrpg.player.default.swordattack.up#2",
+        "characters.farmrpg.player.default.swordattack.up#3",
+        "characters.farmrpg.player.default.swordattack.up#4",
+        "characters.farmrpg.player.default.swordattack.up#5",
+        "characters.farmrpg.player.default.swordattack.up#6",
+        "characters.farmrpg.player.default.swordattack.up#7",
+        "characters.farmrpg.player.default.swordattack.up#8",
+        "characters.farmrpg.player.default.swordattack.up#9"
+      ],
+      "durationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "phaseDurationsMs": [
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70,
+        70
+      ],
+      "frameCount": 10,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/8-swordattack.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-idle.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-idle.down#0",
+        "characters.farmrpg.player.default.umbrela-idle.down#1",
+        "characters.farmrpg.player.default.umbrela-idle.down#2",
+        "characters.farmrpg.player.default.umbrela-idle.down#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-umbrela-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-idle.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-idle.side#0",
+        "characters.farmrpg.player.default.umbrela-idle.side#1",
+        "characters.farmrpg.player.default.umbrela-idle.side#2",
+        "characters.farmrpg.player.default.umbrela-idle.side#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-umbrela-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-idle.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-idle.up#0",
+        "characters.farmrpg.player.default.umbrela-idle.up#1",
+        "characters.farmrpg.player.default.umbrela-idle.up#2",
+        "characters.farmrpg.player.default.umbrela-idle.up#3"
+      ],
+      "durationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "phaseDurationsMs": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "frameCount": 4,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-umbrela-idle.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-run.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-run.down#0",
+        "characters.farmrpg.player.default.umbrela-run.down#1",
+        "characters.farmrpg.player.default.umbrela-run.down#2",
+        "characters.farmrpg.player.default.umbrela-run.down#3",
+        "characters.farmrpg.player.default.umbrela-run.down#4",
+        "characters.farmrpg.player.default.umbrela-run.down#5",
+        "characters.farmrpg.player.default.umbrela-run.down#6",
+        "characters.farmrpg.player.default.umbrela-run.down#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-2-umbrela-run.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-run.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-run.side#0",
+        "characters.farmrpg.player.default.umbrela-run.side#1",
+        "characters.farmrpg.player.default.umbrela-run.side#2",
+        "characters.farmrpg.player.default.umbrela-run.side#3",
+        "characters.farmrpg.player.default.umbrela-run.side#4",
+        "characters.farmrpg.player.default.umbrela-run.side#5",
+        "characters.farmrpg.player.default.umbrela-run.side#6",
+        "characters.farmrpg.player.default.umbrela-run.side#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-2-umbrela-run.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-run.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-run.up#0",
+        "characters.farmrpg.player.default.umbrela-run.up#1",
+        "characters.farmrpg.player.default.umbrela-run.up#2",
+        "characters.farmrpg.player.default.umbrela-run.up#3",
+        "characters.farmrpg.player.default.umbrela-run.up#4",
+        "characters.farmrpg.player.default.umbrela-run.up#5",
+        "characters.farmrpg.player.default.umbrela-run.up#6",
+        "characters.farmrpg.player.default.umbrela-run.up#7"
+      ],
+      "durationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "phaseDurationsMs": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-2-umbrela-run.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-walk.down#0",
+        "characters.farmrpg.player.default.umbrela-walk.down#1",
+        "characters.farmrpg.player.default.umbrela-walk.down#2",
+        "characters.farmrpg.player.default.umbrela-walk.down#3",
+        "characters.farmrpg.player.default.umbrela-walk.down#4",
+        "characters.farmrpg.player.default.umbrela-walk.down#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-1-umbrela-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-walk.side#0",
+        "characters.farmrpg.player.default.umbrela-walk.side#1",
+        "characters.farmrpg.player.default.umbrela-walk.side#2",
+        "characters.farmrpg.player.default.umbrela-walk.side#3",
+        "characters.farmrpg.player.default.umbrela-walk.side#4",
+        "characters.farmrpg.player.default.umbrela-walk.side#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-1-umbrela-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.umbrela-walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.umbrela-walk.up#0",
+        "characters.farmrpg.player.default.umbrela-walk.up#1",
+        "characters.farmrpg.player.default.umbrela-walk.up#2",
+        "characters.farmrpg.player.default.umbrela-walk.up#3",
+        "characters.farmrpg.player.default.umbrela-walk.up#4",
+        "characters.farmrpg.player.default.umbrela-walk.up#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/17-1-umbrela-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.walk.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.walk.down#0",
+        "characters.farmrpg.player.default.walk.down#1",
+        "characters.farmrpg.player.default.walk.down#2",
+        "characters.farmrpg.player.default.walk.down#3",
+        "characters.farmrpg.player.default.walk.down#4",
+        "characters.farmrpg.player.default.walk.down#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/2-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.walk.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.walk.side#0",
+        "characters.farmrpg.player.default.walk.side#1",
+        "characters.farmrpg.player.default.walk.side#2",
+        "characters.farmrpg.player.default.walk.side#3",
+        "characters.farmrpg.player.default.walk.side#4",
+        "characters.farmrpg.player.default.walk.side#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/2-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.walk.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.walk.up#0",
+        "characters.farmrpg.player.default.walk.up#1",
+        "characters.farmrpg.player.default.walk.up#2",
+        "characters.farmrpg.player.default.walk.up#3",
+        "characters.farmrpg.player.default.walk.up#4",
+        "characters.farmrpg.player.default.walk.up#5"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 6,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/2-walk.aseprite"
+    },
+    "characters.farmrpg.player.default.watering.down": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.watering.down#0",
+        "characters.farmrpg.player.default.watering.down#1",
+        "characters.farmrpg.player.default.watering.down#2",
+        "characters.farmrpg.player.default.watering.down#3",
+        "characters.farmrpg.player.default.watering.down#4",
+        "characters.farmrpg.player.default.watering.down#5",
+        "characters.farmrpg.player.default.watering.down#6",
+        "characters.farmrpg.player.default.watering.down#7"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/7-watering.aseprite"
+    },
+    "characters.farmrpg.player.default.watering.side": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.watering.side#0",
+        "characters.farmrpg.player.default.watering.side#1",
+        "characters.farmrpg.player.default.watering.side#2",
+        "characters.farmrpg.player.default.watering.side#3",
+        "characters.farmrpg.player.default.watering.side#4",
+        "characters.farmrpg.player.default.watering.side#5",
+        "characters.farmrpg.player.default.watering.side#6",
+        "characters.farmrpg.player.default.watering.side#7"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/7-watering.aseprite"
+    },
+    "characters.farmrpg.player.default.watering.up": {
+      "atlasKey": "farmrpg.characters",
+      "category": "characters",
+      "frames": [
+        "characters.farmrpg.player.default.watering.up#0",
+        "characters.farmrpg.player.default.watering.up#1",
+        "characters.farmrpg.player.default.watering.up#2",
+        "characters.farmrpg.player.default.watering.up#3",
+        "characters.farmrpg.player.default.watering.up#4",
+        "characters.farmrpg.player.default.watering.up#5",
+        "characters.farmrpg.player.default.watering.up#6",
+        "characters.farmrpg.player.default.watering.up#7"
+      ],
+      "durationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "phaseDurationsMs": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frameCount": 8,
+      "frameSize": {
+        "w": 32,
+        "h": 32
+      },
+      "sourceFile": "aseprite/characters/7-watering.aseprite"
+    },
+    "tilesets.farmrpg.grass-water.fall": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass-water.fall#0",
+        "tilesets.farmrpg.grass-water.fall#1",
+        "tilesets.farmrpg.grass-water.fall#2",
+        "tilesets.farmrpg.grass-water.fall#3",
+        "tilesets.farmrpg.grass-water.fall#4",
+        "tilesets.farmrpg.grass-water.fall#5",
+        "tilesets.farmrpg.grass-water.fall#6",
+        "tilesets.farmrpg.grass-water.fall#7",
+        "tilesets.farmrpg.grass-water.fall#8",
+        "tilesets.farmrpg.grass-water.fall#9",
+        "tilesets.farmrpg.grass-water.fall#10",
+        "tilesets.farmrpg.grass-water.fall#11",
+        "tilesets.farmrpg.grass-water.fall#12",
+        "tilesets.farmrpg.grass-water.fall#13",
+        "tilesets.farmrpg.grass-water.fall#14",
+        "tilesets.farmrpg.grass-water.fall#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass-water/fall.aseprite"
+    },
+    "tilesets.farmrpg.grass-water.spring": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass-water.spring#0",
+        "tilesets.farmrpg.grass-water.spring#1",
+        "tilesets.farmrpg.grass-water.spring#2",
+        "tilesets.farmrpg.grass-water.spring#3",
+        "tilesets.farmrpg.grass-water.spring#4",
+        "tilesets.farmrpg.grass-water.spring#5",
+        "tilesets.farmrpg.grass-water.spring#6",
+        "tilesets.farmrpg.grass-water.spring#7",
+        "tilesets.farmrpg.grass-water.spring#8",
+        "tilesets.farmrpg.grass-water.spring#9",
+        "tilesets.farmrpg.grass-water.spring#10",
+        "tilesets.farmrpg.grass-water.spring#11",
+        "tilesets.farmrpg.grass-water.spring#12",
+        "tilesets.farmrpg.grass-water.spring#13",
+        "tilesets.farmrpg.grass-water.spring#14",
+        "tilesets.farmrpg.grass-water.spring#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass-water/spring.aseprite"
+    },
+    "tilesets.farmrpg.grass-water.summer": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass-water.summer#0",
+        "tilesets.farmrpg.grass-water.summer#1",
+        "tilesets.farmrpg.grass-water.summer#2",
+        "tilesets.farmrpg.grass-water.summer#3",
+        "tilesets.farmrpg.grass-water.summer#4",
+        "tilesets.farmrpg.grass-water.summer#5",
+        "tilesets.farmrpg.grass-water.summer#6",
+        "tilesets.farmrpg.grass-water.summer#7",
+        "tilesets.farmrpg.grass-water.summer#8",
+        "tilesets.farmrpg.grass-water.summer#9",
+        "tilesets.farmrpg.grass-water.summer#10",
+        "tilesets.farmrpg.grass-water.summer#11",
+        "tilesets.farmrpg.grass-water.summer#12",
+        "tilesets.farmrpg.grass-water.summer#13",
+        "tilesets.farmrpg.grass-water.summer#14",
+        "tilesets.farmrpg.grass-water.summer#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120,
+        120,
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass-water/summer.aseprite"
+    },
+    "tilesets.farmrpg.grass-water.winter": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass-water.winter#0",
+        "tilesets.farmrpg.grass-water.winter#1",
+        "tilesets.farmrpg.grass-water.winter#2",
+        "tilesets.farmrpg.grass-water.winter#3",
+        "tilesets.farmrpg.grass-water.winter#4",
+        "tilesets.farmrpg.grass-water.winter#5",
+        "tilesets.farmrpg.grass-water.winter#6",
+        "tilesets.farmrpg.grass-water.winter#7",
+        "tilesets.farmrpg.grass-water.winter#8",
+        "tilesets.farmrpg.grass-water.winter#9",
+        "tilesets.farmrpg.grass-water.winter#10",
+        "tilesets.farmrpg.grass-water.winter#11",
+        "tilesets.farmrpg.grass-water.winter#12",
+        "tilesets.farmrpg.grass-water.winter#13",
+        "tilesets.farmrpg.grass-water.winter#14",
+        "tilesets.farmrpg.grass-water.winter#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120,
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass-water/winter.aseprite"
+    },
+    "tilesets.farmrpg.grass.fall": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass.fall#0",
+        "tilesets.farmrpg.grass.fall#1",
+        "tilesets.farmrpg.grass.fall#2",
+        "tilesets.farmrpg.grass.fall#3",
+        "tilesets.farmrpg.grass.fall#4",
+        "tilesets.farmrpg.grass.fall#5",
+        "tilesets.farmrpg.grass.fall#6",
+        "tilesets.farmrpg.grass.fall#7",
+        "tilesets.farmrpg.grass.fall#8",
+        "tilesets.farmrpg.grass.fall#9",
+        "tilesets.farmrpg.grass.fall#10",
+        "tilesets.farmrpg.grass.fall#11",
+        "tilesets.farmrpg.grass.fall#12",
+        "tilesets.farmrpg.grass.fall#13",
+        "tilesets.farmrpg.grass.fall#14",
+        "tilesets.farmrpg.grass.fall#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass/fall.aseprite"
+    },
+    "tilesets.farmrpg.grass.spring": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass.spring#0",
+        "tilesets.farmrpg.grass.spring#1",
+        "tilesets.farmrpg.grass.spring#2",
+        "tilesets.farmrpg.grass.spring#3",
+        "tilesets.farmrpg.grass.spring#4",
+        "tilesets.farmrpg.grass.spring#5",
+        "tilesets.farmrpg.grass.spring#6",
+        "tilesets.farmrpg.grass.spring#7",
+        "tilesets.farmrpg.grass.spring#8",
+        "tilesets.farmrpg.grass.spring#9",
+        "tilesets.farmrpg.grass.spring#10",
+        "tilesets.farmrpg.grass.spring#11",
+        "tilesets.farmrpg.grass.spring#12",
+        "tilesets.farmrpg.grass.spring#13",
+        "tilesets.farmrpg.grass.spring#14",
+        "tilesets.farmrpg.grass.spring#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass/spring.aseprite"
+    },
+    "tilesets.farmrpg.grass.summer": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass.summer#0",
+        "tilesets.farmrpg.grass.summer#1",
+        "tilesets.farmrpg.grass.summer#2",
+        "tilesets.farmrpg.grass.summer#3",
+        "tilesets.farmrpg.grass.summer#4",
+        "tilesets.farmrpg.grass.summer#5",
+        "tilesets.farmrpg.grass.summer#6",
+        "tilesets.farmrpg.grass.summer#7",
+        "tilesets.farmrpg.grass.summer#8",
+        "tilesets.farmrpg.grass.summer#9",
+        "tilesets.farmrpg.grass.summer#10",
+        "tilesets.farmrpg.grass.summer#11",
+        "tilesets.farmrpg.grass.summer#12",
+        "tilesets.farmrpg.grass.summer#13",
+        "tilesets.farmrpg.grass.summer#14",
+        "tilesets.farmrpg.grass.summer#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass/summer.aseprite"
+    },
+    "tilesets.farmrpg.grass.winter": {
+      "atlasKey": "farmrpg.tilesets",
+      "category": "tilesets",
+      "frames": [
+        "tilesets.farmrpg.grass.winter#0",
+        "tilesets.farmrpg.grass.winter#1",
+        "tilesets.farmrpg.grass.winter#2",
+        "tilesets.farmrpg.grass.winter#3",
+        "tilesets.farmrpg.grass.winter#4",
+        "tilesets.farmrpg.grass.winter#5",
+        "tilesets.farmrpg.grass.winter#6",
+        "tilesets.farmrpg.grass.winter#7",
+        "tilesets.farmrpg.grass.winter#8",
+        "tilesets.farmrpg.grass.winter#9",
+        "tilesets.farmrpg.grass.winter#10",
+        "tilesets.farmrpg.grass.winter#11",
+        "tilesets.farmrpg.grass.winter#12",
+        "tilesets.farmrpg.grass.winter#13",
+        "tilesets.farmrpg.grass.winter#14",
+        "tilesets.farmrpg.grass.winter#15"
+      ],
+      "durationsMs": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "phaseDurationsMs": [
+        120
+      ],
+      "frameCount": 16,
+      "frameSize": {
+        "w": 16,
+        "h": 16
+      },
+      "sourceFile": "aseprite/tilesets/grass/winter.aseprite"
+    }
+  }
+}
