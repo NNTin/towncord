@@ -30,6 +30,36 @@ export function getTerrainAnimationId(baseFrame: string): string {
   return baseFrame.replace(BASE_FRAME_CASE_SUFFIX_RE, "");
 }
 
+export function buildTerrainPingPongFrameIndices(
+  variantCount: number,
+): number[] {
+  if (!Number.isInteger(variantCount) || variantCount <= 0) {
+    return [];
+  }
+
+  const forward = Array.from({ length: variantCount }, (_, index) => index);
+  if (variantCount <= 2) {
+    return forward;
+  }
+
+  return [...forward, ...forward.slice(1, -1).reverse()];
+}
+
+export function resolveTerrainPingPongFrameIndex(
+  step: number,
+  variantCount: number,
+): number {
+  const frameIndices = buildTerrainPingPongFrameIndices(variantCount);
+  if (frameIndices.length === 0) {
+    return 0;
+  }
+
+  const normalizedStep =
+    ((Math.floor(step) % frameIndices.length) + frameIndices.length) %
+    frameIndices.length;
+  return frameIndices[normalizedStep] ?? 0;
+}
+
 export function normalizeTerrainPhaseDurations(
   durationsMs: readonly number[] | undefined,
   variantCount: number,
@@ -62,12 +92,16 @@ export function resolveTerrainPhaseIndex(
     return 0;
   }
 
-  const cycleDurationMs = durationsMs.reduce((total, duration) => total + duration, 0);
+  const cycleDurationMs = durationsMs.reduce(
+    (total, duration) => total + duration,
+    0,
+  );
   if (cycleDurationMs <= 0) {
     return 0;
   }
 
-  let offsetMs = ((Math.floor(nowMs) % cycleDurationMs) + cycleDurationMs) % cycleDurationMs;
+  let offsetMs =
+    ((Math.floor(nowMs) % cycleDurationMs) + cycleDurationMs) % cycleDurationMs;
   for (const [index, duration] of durationsMs.entries()) {
     if (offsetMs < duration) {
       return index;
@@ -90,7 +124,9 @@ export class TerrainRenderer {
     private readonly scene: TerrainRenderSurface,
     private readonly grid: TerrainGridSpec,
     private readonly textureKey: string = TERRAIN_TEXTURE_KEY,
-    animationPhaseDurationsById: Readonly<Record<string, readonly number[]>> = {},
+    animationPhaseDurationsById: Readonly<
+      Record<string, readonly number[]>
+    > = {},
     fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   ) {
     this.animationClock = new TerrainAnimationClock(
@@ -101,7 +137,10 @@ export class TerrainRenderer {
 
   private getScratchImage(): Phaser.GameObjects.Image {
     if (!this.scratchImage) {
-      this.scratchImage = this.scene.make.image({ key: this.textureKey, add: false });
+      this.scratchImage = this.scene.make.image({
+        key: this.textureKey,
+        add: false,
+      });
     }
     return this.scratchImage;
   }
@@ -218,14 +257,19 @@ export class TerrainRenderer {
     return rt;
   }
 
-  private setChunkVisibility(state: ChunkRenderState, isVisible: boolean): void {
+  private setChunkVisibility(
+    state: ChunkRenderState,
+    isVisible: boolean,
+  ): void {
     state.staticRT.setVisible(isVisible);
     if (state.animatedRT) {
       state.animatedRT.setVisible(isVisible);
     }
   }
 
-  private ensureChunkState(payload: TerrainChunkRenderPayload): ChunkRenderState {
+  private ensureChunkState(
+    payload: TerrainChunkRenderPayload,
+  ): ChunkRenderState {
     const chunkStartX = payload.chunkX * this.grid.chunkSize;
     const chunkStartY = payload.chunkY * this.grid.chunkSize;
 
@@ -238,7 +282,11 @@ export class TerrainRenderer {
       chunkId: payload.id,
       chunkStartX,
       chunkStartY,
-      staticRT: this.createRenderTexture(chunkStartX, chunkStartY, TERRAIN_STATIC_DEPTH),
+      staticRT: this.createRenderTexture(
+        chunkStartX,
+        chunkStartY,
+        TERRAIN_STATIC_DEPTH,
+      ),
       animatedRT: null,
       staticTiles: [],
       animatedTiles: [],
@@ -248,7 +296,10 @@ export class TerrainRenderer {
     return state;
   }
 
-  private areSetsEqual(a: Set<TerrainChunkId>, b: Set<TerrainChunkId>): boolean {
+  private areSetsEqual(
+    a: Set<TerrainChunkId>,
+    b: Set<TerrainChunkId>,
+  ): boolean {
     if (a.size !== b.size) return false;
     for (const id of a) {
       if (!b.has(id)) return false;
@@ -309,17 +360,30 @@ export class TerrainRenderer {
       state.animatedRT = null;
     }
 
-    this.drawStaticTiles(state.staticRT, state.staticTiles, state.chunkStartX, state.chunkStartY);
+    this.drawStaticTiles(
+      state.staticRT,
+      state.staticTiles,
+      state.chunkStartX,
+      state.chunkStartY,
+    );
 
     if (state.animatedRT) {
-      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
+      this.drawAnimatedTiles(
+        state.animatedRT,
+        state.animatedTiles,
+        state.chunkStartX,
+        state.chunkStartY,
+      );
     }
 
     this.setChunkVisibility(state, this.visibleChunkIds.has(state.chunkId));
   }
 
   public updateAnimation(nowMs: number = this.scene.time.now): void {
-    const visibleAnimatedTileVariants: Array<{ baseFrame: string; variants: string[] }> = [];
+    const visibleAnimatedTileVariants: Array<{
+      baseFrame: string;
+      variants: string[];
+    }> = [];
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
@@ -333,16 +397,25 @@ export class TerrainRenderer {
       }
     }
 
-    const changed = this.animationClock.tick(nowMs, visibleAnimatedTileVariants);
+    const changed = this.animationClock.tick(
+      nowMs,
+      visibleAnimatedTileVariants,
+    );
     if (!changed) {
       return;
     }
 
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
-      if (!state || !state.animatedRT || state.animatedTiles.length === 0) continue;
+      if (!state || !state.animatedRT || state.animatedTiles.length === 0)
+        continue;
 
-      this.drawAnimatedTiles(state.animatedRT, state.animatedTiles, state.chunkStartX, state.chunkStartY);
+      this.drawAnimatedTiles(
+        state.animatedRT,
+        state.animatedTiles,
+        state.chunkStartX,
+        state.chunkStartY,
+      );
     }
   }
 
