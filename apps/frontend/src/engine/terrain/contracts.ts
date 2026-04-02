@@ -60,6 +60,7 @@ export type TerrainRenderTile = {
   rotate90: 0 | 1 | 2 | 3;
   flipX: boolean;
   flipY: boolean;
+  phaseOffsetMs?: number;
 };
 
 export type TerrainChunkRenderPayload = TerrainChunkCoord & {

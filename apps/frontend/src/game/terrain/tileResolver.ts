@@ -1,7 +1,15 @@
 import type { TerrainTileInspectedPayload } from "../contracts/runtime";
-import { TERRAIN_TEXTURE_KEY, type TerrainMaterialId, type TerrainRenderTile } from "./contracts";
+import {
+  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+  TERRAIN_TEXTURE_KEY,
+  type TerrainMaterialId,
+  type TerrainRenderTile,
+} from "./contracts";
 import { TerrainCaseMapper } from "./caseMapper";
-import { MarchingSquaresKernel, type TerrainMaterialLookup } from "./marchingSquaresKernel";
+import {
+  MarchingSquaresKernel,
+  type TerrainMaterialLookup,
+} from "./marchingSquaresKernel";
 
 export class TerrainTileResolver {
   constructor(
@@ -15,7 +23,12 @@ export class TerrainTileResolver {
     cellX: number,
     cellY: number,
   ): TerrainRenderTile {
-    const caseId = this.kernel.deriveCaseId(materialAt, cellX, cellY, this.insideMaterial);
+    const caseId = this.kernel.deriveCaseId(
+      materialAt,
+      cellX,
+      cellY,
+      this.insideMaterial,
+    );
     const mapped = this.mapper.getRule(caseId);
 
     return {
@@ -26,6 +39,7 @@ export class TerrainTileResolver {
       rotate90: mapped.rotate90 ?? 0,
       flipX: mapped.flipX ?? false,
       flipY: mapped.flipY ?? false,
+      phaseOffsetMs: ((cellX + cellY) % 2) * DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
     };
   }
 
