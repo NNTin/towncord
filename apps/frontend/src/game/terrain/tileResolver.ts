@@ -1,6 +1,5 @@
 import type { TerrainTileInspectedPayload } from "../contracts/runtime";
 import {
-  DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   TERRAIN_TEXTURE_KEY,
   type TerrainMaterialId,
   type TerrainRenderTile,
@@ -39,7 +38,6 @@ export class TerrainTileResolver {
       rotate90: mapped.rotate90 ?? 0,
       flipX: mapped.flipX ?? false,
       flipY: mapped.flipY ?? false,
-      phaseOffsetMs: ((cellX + cellY) % 2) * DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
     };
   }
 

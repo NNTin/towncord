@@ -26,6 +26,10 @@ type ChunkRenderState = {
 
 const BASE_FRAME_CASE_SUFFIX_RE = /#[0-9]+$/;
 
+// Slow water tiles to ~1/3 of their source frame rate so the animation
+// reads as a gentle ripple rather than a fast strobe.
+const WATER_ANIMATION_SPEED_FACTOR = 0.3;
+
 export function getTerrainAnimationId(baseFrame: string): string {
   return baseFrame.replace(BASE_FRAME_CASE_SUFFIX_RE, "");
 }
@@ -80,6 +84,37 @@ export function resolveTerrainPhaseIndex(
   }
 
   return durationsMs.length - 1;
+}
+
+/**
+ * Computes a per-tile animation phase offset in milliseconds (animation-time
+ * units) that creates an organic, wave-like ripple across water tiles.
+ *
+ * Three overlapping sine waves with incommensurable spatial frequencies and
+ * drift speeds produce a quasiperiodic interference pattern.  The pattern
+ * drifts in real time so it continuously evolves without repeating.
+ *
+ * The result is always 0 or `phaseDurationMs`, so any two adjacent tiles
+ * differ by at most one phase — the neighbour-sync constraint is always
+ * satisfied.
+ *
+ * @param cellX          World cell column.
+ * @param cellY          World cell row.
+ * @param nowMs          Real wall-clock time in milliseconds.
+ * @param phaseDurationMs  Duration of one animation phase (animation-time ms).
+ */
+export function computeTerrainWaveOffsetMs(
+  cellX: number,
+  cellY: number,
+  nowMs: number,
+  phaseDurationMs: number,
+): number {
+  // T advances ~1 radian per second — full wave pattern cycles every ~6 s.
+  const T = nowMs * 0.001;
+  const w1 = Math.sin(cellX * 0.3 + cellY * 0.15 - T);
+  const w2 = Math.sin(cellX * 0.1 + cellY * 0.35 + T * 0.7);
+  const w3 = Math.sin(cellX * 0.2 - cellY * 0.22 + T * 1.1);
+  return w1 + w2 + w3 > 0 ? phaseDurationMs : 0;
 }
 
 export class TerrainRenderer {
@@ -150,7 +185,8 @@ export class TerrainRenderer {
 
   private resolveFrameForCurrentPhase(
     baseFrame: string,
-    phaseOffsetMs: number = 0,
+    cellX: number,
+    cellY: number,
   ): string {
     const variants = this.resolveFrameVariants(baseFrame);
     if (variants.length <= 1) return baseFrame;
@@ -158,8 +194,16 @@ export class TerrainRenderer {
       baseFrame,
       variants.length,
     );
+    const phaseDurationMs =
+      durationsMs[0] ?? DEFAULT_TERRAIN_ANIMATION_FRAME_MS;
+    const waveOffsetMs = computeTerrainWaveOffsetMs(
+      cellX,
+      cellY,
+      this.scene.time.now,
+      phaseDurationMs,
+    );
     const phaseIndex = resolveTerrainPhaseIndex(
-      this.scene.time.now + phaseOffsetMs,
+      this.scene.time.now * WATER_ANIMATION_SPEED_FACTOR + waveOffsetMs,
       durationsMs,
     );
     return variants[phaseIndex] ?? baseFrame;
@@ -181,7 +225,7 @@ export class TerrainRenderer {
     chunkStartY: number,
   ): void {
     this.renderTilesToRT(rt, tiles, chunkStartX, chunkStartY, (frame, tile) =>
-      this.resolveFrameForCurrentPhase(frame, tile.phaseOffsetMs ?? 0),
+      this.resolveFrameForCurrentPhase(frame, tile.cellX, tile.cellY),
     );
   }
 
@@ -361,32 +405,10 @@ export class TerrainRenderer {
     this.setChunkVisibility(state, this.visibleChunkIds.has(state.chunkId));
   }
 
-  public updateAnimation(nowMs: number = this.scene.time.now): void {
-    const visibleAnimatedTileVariants: Array<{
-      baseFrame: string;
-      variants: string[];
-    }> = [];
-
-    for (const chunkId of this.visibleChunkIds) {
-      const state = this.chunkStates.get(chunkId);
-      if (!state || state.animatedTiles.length === 0) continue;
-
-      for (const tile of state.animatedTiles) {
-        const variants = this.resolveFrameVariants(tile.frame);
-        if (variants.length <= 1) continue;
-
-        visibleAnimatedTileVariants.push({ baseFrame: tile.frame, variants });
-      }
-    }
-
-    const changed = this.animationClock.tick(
-      nowMs,
-      visibleAnimatedTileVariants,
-    );
-    if (!changed) {
-      return;
-    }
-
+  // The wave offset changes continuously, so animated chunks are always
+  // redrawn every update.  Each redraw is a GPU render-texture blit —
+  // fast enough for per-frame use.
+  public updateAnimation(): void {
     for (const chunkId of this.visibleChunkIds) {
       const state = this.chunkStates.get(chunkId);
       if (!state || !state.animatedRT || state.animatedTiles.length === 0)
