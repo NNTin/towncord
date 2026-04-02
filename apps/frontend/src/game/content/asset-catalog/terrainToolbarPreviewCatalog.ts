@@ -77,6 +77,13 @@ const FARMRPG_ATLAS_SOURCE: AtlasSource = {
   h: FARMRPG_TERRAIN_ATLAS_H,
 };
 
+function isMissingTerrainAtlasFrameError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    error.message.startsWith('Missing terrain atlas frame "')
+  );
+}
+
 function resolvePreviewFrame(
   rule: TerrainRulesetTransitionRule,
   atlas: AtlasSource,
@@ -319,7 +326,10 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
           atlas: FARMRPG_ATLAS_SOURCE,
         }),
       );
-    } catch {
+    } catch (error) {
+      if (!isMissingTerrainAtlasFrameError(error)) {
+        throw error;
+      }
       // Skip variants not available in the currently generated atlas.
     }
   }
@@ -355,7 +365,10 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
         atlas: FARMRPG_ATLAS_SOURCE,
       }),
     ];
-  } catch {
+  } catch (error) {
+    if (!isMissingTerrainAtlasFrameError(error)) {
+      throw error;
+    }
     // FarmRPG tileset atlas not yet generated — run FarmRPG asset export first.
     return [];
   }
