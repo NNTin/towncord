@@ -4,6 +4,7 @@
       "id": "farmrpg-grass-water-over-ground",
       "insideMaterial": "water",
       "outsideMaterial": "ground",
+      "insideFillFrame": "tilesets.farmrpg.water.tile#0",
       "rules": [
         { "caseId": 0, "frame": "tilesets.farmrpg.grass-water.spring#0" },
         { "caseId": 1, "frame": "tilesets.farmrpg.grass-water.spring#1" },

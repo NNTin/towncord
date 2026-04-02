@@ -80,11 +80,11 @@ describe("terrain toolbar preview catalog", () => {
     expect(springWater?.label).toBe("FarmRPG Spring Water Tile Brush");
     expect(springWater?.groupLabel).toBe("Spring");
     expect(springWater?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.grass-water.spring#15",
+      "tilesets.farmrpg.water.tile#0",
     );
-    expect(springWater?.animationFrames).toHaveLength(4);
+    expect(springWater?.animationFrames).toHaveLength(1);
     expect(springWater?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.grass-water.spring#15@0",
+      "tilesets.farmrpg.water.tile#0@0",
     );
 
     expect(summerGround?.label).toBe("FarmRPG Summer Ground Tile Brush");
@@ -95,11 +95,11 @@ describe("terrain toolbar preview catalog", () => {
     expect(summerGround?.animationFrames).toHaveLength(1);
 
     expect(winterWater?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.grass-water.winter#15",
+      "tilesets.farmrpg.water.tile#0",
     );
-    expect(winterWater?.animationFrames).toHaveLength(2);
+    expect(winterWater?.animationFrames).toHaveLength(1);
     expect(winterWater?.animationFrames[0]?.frameKey).toBe(
-      "tilesets.farmrpg.grass-water.winter#15@0",
+      "tilesets.farmrpg.water.tile#0@0",
     );
   });
 });

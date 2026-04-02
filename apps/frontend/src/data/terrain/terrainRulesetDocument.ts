@@ -11,6 +11,7 @@ export type TerrainTransitionRuleset = {
   id: string;
   insideMaterial: string;
   outsideMaterial: string;
+  insideFillFrame?: string;
   rules: MarchingCaseRule[];
 };
 
