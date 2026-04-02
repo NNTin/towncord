@@ -165,6 +165,21 @@ describe("uiCommands transport", () => {
       brushId: "water",
       terrainSourceId: "public-assets:terrain/farmrpg-grass",
     });
+
+    expect(
+      normalizeUiToRuntimeCommandPayload(
+        UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
+        {
+          materialId: "water",
+          brushId: "water",
+          terrainSourceId: "public-assets:terrain/farmrpg-grass-summer",
+        },
+      ),
+    ).toEqual({
+      materialId: "water",
+      brushId: "water",
+      terrainSourceId: "public-assets:terrain/farmrpg-grass-summer",
+    });
   });
 
   test("bindUiToRuntimeCommand drops malformed entity payloads", () => {

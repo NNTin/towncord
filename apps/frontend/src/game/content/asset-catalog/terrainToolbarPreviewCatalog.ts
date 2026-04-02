@@ -2,7 +2,9 @@ import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json"
 import farmrpgTerrainRulesetJson from "public-assets-json:terrain/rulesets/farmrpg-grass.json";
 import type { TerrainRulesetFile } from "../../../data";
 import {
+  FARMRPG_GRASS_TERRAIN_SOURCE_IDS,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
+  type FarmrpgTerrainSeason,
   PHASE1_TERRAIN_SOURCE_ID,
   type TerrainContentSourceId,
 } from "./terrainContentRepository";
@@ -197,6 +199,66 @@ const FARMRPG_TERRAIN_PREVIEW_RULES = resolveTransitionRulesFromRuleset(
   farmrpgTerrainRulesetJson,
 );
 
+const FARMRPG_TERRAIN_PREVIEW_VARIANTS: ReadonlyArray<{
+  season: FarmrpgTerrainSeason;
+  label: string;
+  terrainSourceId: TerrainContentSourceId;
+}> = [
+  {
+    season: "spring",
+    label: "Spring",
+    terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.spring,
+  },
+  {
+    season: "summer",
+    label: "Summer",
+    terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.summer,
+  },
+  {
+    season: "fall",
+    label: "Fall",
+    terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.fall,
+  },
+  {
+    season: "winter",
+    label: "Winter",
+    terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.winter,
+  },
+];
+
+function remapFramePrefix(
+  rules: TerrainRulesetTransitionRule[],
+  sourcePrefix: string,
+  targetPrefix: string,
+): TerrainRulesetTransitionRule[] {
+  return rules.map((rule) => ({
+    caseId: rule.caseId,
+    frame: rule.frame.startsWith(sourcePrefix)
+      ? `${targetPrefix}${rule.frame.slice(sourcePrefix.length)}`
+      : rule.frame,
+  }));
+}
+
+function resolveFarmrpgWaterRules(
+  season: FarmrpgTerrainSeason,
+): TerrainRulesetTransitionRule[] {
+  return remapFramePrefix(
+    FARMRPG_TERRAIN_PREVIEW_RULES,
+    "tilesets.farmrpg.grass-water.spring#",
+    `tilesets.farmrpg.grass-water.${season}#`,
+  );
+}
+
+function resolveFarmrpgGroundRules(
+  season: FarmrpgTerrainSeason,
+): TerrainRulesetTransitionRule[] {
+  return remapFramePrefix(
+    FARMRPG_TERRAIN_PREVIEW_RULES,
+    "tilesets.farmrpg.grass-water.spring#",
+    `tilesets.farmrpg.grass.${season}#`,
+  );
+}
+
 export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
   createTerrainToolbarPreviewItem({
     terrainSourceId: PHASE1_TERRAIN_SOURCE_ID,
@@ -221,26 +283,75 @@ export const TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] = [
 ];
 
 function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
+  const previewItems: TerrainToolbarPreviewItem[] = [];
+
+  for (const variant of FARMRPG_TERRAIN_PREVIEW_VARIANTS) {
+    try {
+      const waterRules = resolveFarmrpgWaterRules(variant.season);
+      const groundRules = resolveFarmrpgGroundRules(variant.season);
+
+      previewItems.push(
+        createTerrainToolbarPreviewItem({
+          terrainSourceId: variant.terrainSourceId,
+          id: `terrain.farmrpg.${variant.season}.water.tile`,
+          label: `FarmRPG ${variant.label} Water Tile Brush`,
+          materialId: "water",
+          brushId: "water",
+          representativeCaseId: 15,
+          groupKey: `farmrpg-${variant.season}`,
+          groupLabel: variant.label,
+          rules: waterRules,
+          atlas: FARMRPG_ATLAS_SOURCE,
+        }),
+      );
+
+      previewItems.push(
+        createTerrainToolbarPreviewItem({
+          terrainSourceId: variant.terrainSourceId,
+          id: `terrain.farmrpg.${variant.season}.ground.tile`,
+          label: `FarmRPG ${variant.label} Ground Tile Brush`,
+          materialId: "ground",
+          brushId: "ground",
+          representativeCaseId: 0,
+          groupKey: `farmrpg-${variant.season}`,
+          groupLabel: variant.label,
+          rules: groundRules,
+          atlas: FARMRPG_ATLAS_SOURCE,
+        }),
+      );
+    } catch {
+      // Skip variants not available in the currently generated atlas.
+    }
+  }
+
+  if (previewItems.length > 0) {
+    return previewItems;
+  }
+
   try {
     return [
       createTerrainToolbarPreviewItem({
         terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
-        id: "terrain.farmrpg.water.tile",
-        label: "FarmRPG Water Tile Brush",
+        id: "terrain.farmrpg.spring.water.tile",
+        label: "FarmRPG Spring Water Tile Brush",
         materialId: "water",
         brushId: "water",
         representativeCaseId: 15,
-        rules: FARMRPG_TERRAIN_PREVIEW_RULES,
+        groupKey: "farmrpg-spring",
+        groupLabel: "Spring",
+        rules: resolveFarmrpgWaterRules("spring"),
         atlas: FARMRPG_ATLAS_SOURCE,
       }),
       createTerrainToolbarPreviewItem({
         terrainSourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
-        id: "terrain.farmrpg.ground.tile",
-        label: "FarmRPG Ground Tile Brush",
+        id: "terrain.farmrpg.spring.ground.tile",
+        label: "FarmRPG Spring Ground Tile Brush",
         materialId: "ground",
         brushId: "ground",
         representativeCaseId: 0,
-        rules: FARMRPG_TERRAIN_PREVIEW_RULES,
+        groupKey: "farmrpg-spring",
+        groupLabel: "Spring",
+        rules: resolveFarmrpgGroundRules("spring"),
         atlas: FARMRPG_ATLAS_SOURCE,
       }),
     ];

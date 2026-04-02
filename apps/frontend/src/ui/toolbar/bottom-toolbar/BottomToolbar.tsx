@@ -945,7 +945,10 @@ function TerrainSubPanel({
       return "debug";
     }
 
-    if (terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID) {
+    if (
+      terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID ||
+      terrainSourceId?.startsWith("public-assets:terrain/farmrpg-grass")
+    ) {
       return "farmrpg";
     }
 
@@ -966,6 +969,34 @@ function TerrainSubPanel({
     tilesetId === "farmrpg" && FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length > 0
       ? FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS
       : TERRAIN_TOOLBAR_PREVIEW_ITEMS;
+  const groupedItems = Array.from(
+    items
+      .reduce(
+        (groups, item) => {
+          const group = groups.get(item.groupKey);
+          if (group) {
+            group.items.push(item);
+            return groups;
+          }
+
+          groups.set(item.groupKey, {
+            key: item.groupKey,
+            label: item.groupLabel,
+            items: [item],
+          });
+          return groups;
+        },
+        new Map<
+          string,
+          {
+            key: string;
+            label: string;
+            items: TerrainToolbarPreviewItem[];
+          }
+        >(),
+      )
+      .values(),
+  );
 
   useEffect(() => {
     const hasAnimated = items.some((item) => item.animationFrames.length > 1);
@@ -1036,48 +1067,60 @@ function TerrainSubPanel({
           FarmRPG
         </button>
       </div>
-      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-        {items.map((item) => {
-          const activeTerrainSourceId =
-            activeTerrainTool?.terrainSourceId ??
-            DEFAULT_TERRAIN_PREVIEW?.terrainSourceId ??
-            DEFAULT_TERRAIN_SOURCE_ID;
-          const isSelected =
-            activeTerrainTool?.brushId === item.brushId &&
-            activeTerrainTool?.materialId === item.materialId &&
-            activeTerrainSourceId === item.terrainSourceId;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              title={item.label}
-              onClick={() => {
-                if (isSelected) {
-                  onSelectTerrainTool?.(null);
-                  return;
-                }
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {groupedItems.map((group) => (
+          <div
+            key={group.key}
+            style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          >
+            {groupedItems.length > 1 ? (
+              <div style={sectionLabel}>{group.label}</div>
+            ) : null}
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {group.items.map((item) => {
+                const activeTerrainSourceId =
+                  activeTerrainTool?.terrainSourceId ??
+                  DEFAULT_TERRAIN_PREVIEW?.terrainSourceId ??
+                  DEFAULT_TERRAIN_SOURCE_ID;
+                const isSelected =
+                  activeTerrainTool?.brushId === item.brushId &&
+                  activeTerrainTool?.materialId === item.materialId &&
+                  activeTerrainSourceId === item.terrainSourceId;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    title={item.label}
+                    onClick={() => {
+                      if (isSelected) {
+                        onSelectTerrainTool?.(null);
+                        return;
+                      }
 
-                onSelectTerrainTool?.({
-                  materialId: item.materialId,
-                  brushId: item.brushId,
-                  terrainSourceId: item.terrainSourceId,
-                });
-              }}
-              style={{
-                background: isSelected
-                  ? "var(--pixel-active-bg)"
-                  : "var(--pixel-btn-bg)",
-                border: isSelected
-                  ? "2px solid var(--pixel-accent)"
-                  : "2px solid transparent",
-                cursor: "pointer",
-                padding: 2,
-              }}
-            >
-              <TerrainPreviewSprite item={item} tick={tick} />
-            </button>
-          );
-        })}
+                      onSelectTerrainTool?.({
+                        materialId: item.materialId,
+                        brushId: item.brushId,
+                        terrainSourceId: item.terrainSourceId,
+                      });
+                    }}
+                    style={{
+                      background: isSelected
+                        ? "var(--pixel-active-bg)"
+                        : "var(--pixel-btn-bg)",
+                      border: isSelected
+                        ? "2px solid var(--pixel-accent)"
+                        : "2px solid transparent",
+                      cursor: "pointer",
+                      padding: 2,
+                    }}
+                  >
+                    <TerrainPreviewSprite item={item} tick={tick} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

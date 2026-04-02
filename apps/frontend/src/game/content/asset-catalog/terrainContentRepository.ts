@@ -6,13 +6,27 @@ import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json"
 import terrainSeedJson from "public-assets-json:terrain/seeds/phase1.json";
 
 export const PHASE1_TERRAIN_SOURCE_ID = "public-assets:terrain/phase1";
+
+export const FARMRPG_GRASS_TERRAIN_SOURCE_IDS = {
+  spring: "public-assets:terrain/farmrpg-grass",
+  summer: "public-assets:terrain/farmrpg-grass-summer",
+  fall: "public-assets:terrain/farmrpg-grass-fall",
+  winter: "public-assets:terrain/farmrpg-grass-winter",
+} as const;
+
+export type FarmrpgTerrainSeason =
+  keyof typeof FARMRPG_GRASS_TERRAIN_SOURCE_IDS;
+
 export const FARMRPG_GRASS_TERRAIN_SOURCE_ID =
-  "public-assets:terrain/farmrpg-grass";
+  FARMRPG_GRASS_TERRAIN_SOURCE_IDS.spring;
 export const DEFAULT_TERRAIN_SOURCE_ID = FARMRPG_GRASS_TERRAIN_SOURCE_ID;
+
+export type FarmrpgTerrainSourceId =
+  (typeof FARMRPG_GRASS_TERRAIN_SOURCE_IDS)[FarmrpgTerrainSeason];
 
 export type TerrainContentSourceId =
   | typeof PHASE1_TERRAIN_SOURCE_ID
-  | typeof FARMRPG_GRASS_TERRAIN_SOURCE_ID;
+  | FarmrpgTerrainSourceId;
 
 export type TerrainTextureKey = typeof TERRAIN_TEXTURE_KEY | "debug.tilesets";
 
@@ -37,25 +51,77 @@ const PHASE1_TERRAIN_CONTENT: TerrainContent = {
   textureKey: "debug.tilesets",
 };
 
-const FARMRPG_GRASS_TERRAIN_CONTENT: TerrainContent = {
-  sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_ID,
-  seed: terrainSeedJson as TerrainSeedDocument,
-  ruleset: farmrpgTerrainRulesetJson as TerrainRulesetFile,
-  textureKey: TERRAIN_TEXTURE_KEY,
+function createFarmrpgTerrainRuleset(
+  season: FarmrpgTerrainSeason,
+): TerrainRulesetFile {
+  const ruleset = structuredClone(
+    farmrpgTerrainRulesetJson,
+  ) as TerrainRulesetFile;
+  if (season === "spring") {
+    return ruleset;
+  }
+
+  const sourcePrefix = "tilesets.farmrpg.grass-water.spring#";
+  const targetPrefix = `tilesets.farmrpg.grass-water.${season}#`;
+
+  for (const transition of ruleset.transitions) {
+    transition.id = transition.id.replace("spring", season);
+    for (const rule of transition.rules) {
+      if (rule.frame.startsWith(sourcePrefix)) {
+        rule.frame = `${targetPrefix}${rule.frame.slice(sourcePrefix.length)}`;
+      }
+    }
+  }
+
+  return ruleset;
+}
+
+const FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID: Record<
+  FarmrpgTerrainSourceId,
+  TerrainContent
+> = {
+  [FARMRPG_GRASS_TERRAIN_SOURCE_IDS.spring]: {
+    sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.spring,
+    seed: terrainSeedJson as TerrainSeedDocument,
+    ruleset: createFarmrpgTerrainRuleset("spring"),
+    textureKey: TERRAIN_TEXTURE_KEY,
+  },
+  [FARMRPG_GRASS_TERRAIN_SOURCE_IDS.summer]: {
+    sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.summer,
+    seed: terrainSeedJson as TerrainSeedDocument,
+    ruleset: createFarmrpgTerrainRuleset("summer"),
+    textureKey: TERRAIN_TEXTURE_KEY,
+  },
+  [FARMRPG_GRASS_TERRAIN_SOURCE_IDS.fall]: {
+    sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.fall,
+    seed: terrainSeedJson as TerrainSeedDocument,
+    ruleset: createFarmrpgTerrainRuleset("fall"),
+    textureKey: TERRAIN_TEXTURE_KEY,
+  },
+  [FARMRPG_GRASS_TERRAIN_SOURCE_IDS.winter]: {
+    sourceId: FARMRPG_GRASS_TERRAIN_SOURCE_IDS.winter,
+    seed: terrainSeedJson as TerrainSeedDocument,
+    ruleset: createFarmrpgTerrainRuleset("winter"),
+    textureKey: TERRAIN_TEXTURE_KEY,
+  },
 };
 
-const DEFAULT_TERRAIN_CONTENT = FARMRPG_GRASS_TERRAIN_CONTENT;
+const DEFAULT_TERRAIN_CONTENT =
+  FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID[DEFAULT_TERRAIN_SOURCE_ID];
 
 const TERRAIN_CONTENT_BY_SOURCE_ID: Record<
   TerrainContentSourceId,
   TerrainContent
 > = {
   [PHASE1_TERRAIN_SOURCE_ID]: PHASE1_TERRAIN_CONTENT,
-  [FARMRPG_GRASS_TERRAIN_SOURCE_ID]: FARMRPG_GRASS_TERRAIN_CONTENT,
+  ...FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID,
 };
 
 export const ALL_TERRAIN_SOURCE_IDS: readonly TerrainContentSourceId[] = [
   DEFAULT_TERRAIN_SOURCE_ID,
+  FARMRPG_GRASS_TERRAIN_SOURCE_IDS.summer,
+  FARMRPG_GRASS_TERRAIN_SOURCE_IDS.fall,
+  FARMRPG_GRASS_TERRAIN_SOURCE_IDS.winter,
   PHASE1_TERRAIN_SOURCE_ID,
 ];
 
