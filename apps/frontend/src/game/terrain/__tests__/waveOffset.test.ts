@@ -116,7 +116,7 @@ describe("water tile wave-offset invariants", () => {
             cellPhaseOffsetMs(x, y),
             durationsMs,
           );
-          const neighbours = [
+          const neighbours: [number, number][] = [
             [x + 1, y],
             [x - 1, y],
             [x, y + 1],
