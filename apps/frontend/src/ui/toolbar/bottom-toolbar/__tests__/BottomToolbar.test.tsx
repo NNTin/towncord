@@ -6,6 +6,53 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { TerrainToolSelection } from "../../../../game/contracts/runtime";
 import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
+
+vi.mock("public-assets-json:farmrpg/atlases/characters.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:farmrpg/atlases/props.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
+  default: {
+    meta: { size: { w: 256, h: 256 } },
+    frames: {
+      "tilesets.farmrpg.water.tile#0": {
+        frame: { x: 0, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.spring#0": {
+        frame: { x: 16, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.summer#0": {
+        frame: { x: 32, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.fall#0": {
+        frame: { x: 48, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.winter#0": {
+        frame: { x: 64, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.posts#15": {
+        frame: { x: 0, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.hay#15": {
+        frame: { x: 16, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.messy-hay#15": {
+        frame: { x: 32, y: 16, w: 16, h: 16 },
+      },
+    },
+  },
+}));
+
 import { BottomToolbar } from "../BottomToolbar";
 
 (
@@ -225,6 +272,86 @@ describe("BottomToolbar", () => {
       groupLabel: "Player",
       previewFrameKey: null,
     });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("opens Layout props as a filtered prop panel without selecting an office tool", () => {
+    const onDragStart = vi.fn();
+    const props = {
+      ...baseProps,
+      entityToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:prop:set-01",
+            label: "Set 01",
+            placeables: [
+              {
+                id: "entity:prop.static.set-01.variant-01",
+                type: "entity" as const,
+                entityId: "prop.static.set-01.variant-01",
+                label: "Variant 01",
+                groupKey: "entity:prop:set-01",
+                groupLabel: "Set 01",
+                previewFrameKey: null,
+              },
+            ],
+          },
+          {
+            key: "entity:npc",
+            label: "Mobs",
+            placeables: [
+              {
+                id: "entity:npc.greeter",
+                type: "entity" as const,
+                entityId: "npc.greeter",
+                label: "Greeter",
+                groupKey: "entity:npc",
+                groupLabel: "Mobs",
+                previewFrameKey: null,
+              },
+            ],
+          },
+        ],
+        onDragStart,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Props tool").click();
+    });
+
+    expect(props.onSelectTool).toHaveBeenCalledWith(null);
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith(null);
+    expect(container.textContent).toContain("Layout");
+    expect(container.textContent).toContain("Props");
+    expect(container.textContent).toContain("Set 01");
+    expect(container.textContent).toContain("Variant 01");
+    expect(container.textContent).not.toContain("Greeter");
+
+    const entry = Array.from(
+      container.querySelectorAll("[draggable='true']"),
+    ).find((element) => element.textContent?.includes("Variant 01"));
+    if (!entry) {
+      throw new Error("Missing draggable prop entry");
+    }
+
+    const dragStartEvent = new Event("dragstart", { bubbles: true });
+    Object.defineProperty(dragStartEvent, "dataTransfer", {
+      value: {
+        setData: vi.fn(),
+        effectAllowed: "none",
+      },
+    });
+
+    act(() => {
+      entry.dispatchEvent(dragStartEvent);
+    });
+
+    expect(onDragStart).toHaveBeenCalledTimes(1);
 
     act(() => {
       root.unmount();
@@ -569,6 +696,37 @@ describe("BottomToolbar", () => {
       materialId: "water",
       brushId: "water",
       terrainSourceId: "public-assets:terrain/farmrpg-grass-summer",
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("static FarmRPG terrain variants stay on the FarmRPG tab and select ground terrain", () => {
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/farmrpg-barn-posts" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain("Barn");
+    expect(getButton(container, "Barn Posts")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+
+    act(() => {
+      getButton(container, "Barn Hay").click();
+    });
+
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-barn-hay",
     });
 
     act(() => {

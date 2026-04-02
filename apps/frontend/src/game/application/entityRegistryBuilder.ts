@@ -1,12 +1,14 @@
 import {
   listMobDescriptors,
   listOfficeCharacterDescriptors,
+  listPropDescriptors,
   type AnimationCatalog,
 } from "../content/asset-catalog/animationCatalog";
 import {
   buildArchetypeRuntimes,
   type NpcArchetypeSeed,
   type PlayerArchetypeSeed,
+  type PropArchetypeSeed,
 } from "../world/entities/archetypes";
 import { RuntimeEntityRegistry } from "../world/entities/entityRegistry";
 import { createEntityVisualRef } from "../world/entities/model";
@@ -70,12 +72,23 @@ function buildNpcSeeds(catalog: AnimationCatalog): NpcArchetypeSeed[] {
   }));
 }
 
+function buildPropSeeds(catalog: AnimationCatalog): PropArchetypeSeed[] {
+  return listPropDescriptors(catalog)
+    .filter(({ animationId }) => animationId.startsWith("props.farmrpg."))
+    .map(({ family, group, propId, visualPath }) => ({
+      family,
+      group,
+      propId,
+      visualRef: createEntityVisualRef(visualPath, propId),
+    }));
+}
 export function buildEntityRegistryFromCatalog(
   catalog: AnimationCatalog,
 ): RuntimeEntityRegistry {
   const runtimes = buildArchetypeRuntimes({
     players: buildPlayerSeeds(catalog),
     npcs: buildNpcSeeds(catalog),
+    props: buildPropSeeds(catalog),
   });
 
   return RuntimeEntityRegistry.fromRuntimes(runtimes);

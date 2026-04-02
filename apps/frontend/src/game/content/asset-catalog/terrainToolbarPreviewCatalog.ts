@@ -9,6 +9,10 @@ import {
   type TerrainContentSourceId,
 } from "./terrainContentRepository";
 import {
+  FARMRPG_STATIC_TERRAIN_SOURCE_SPECS,
+  createFarmrpgAutotileRuleset,
+} from "./farmrpgTerrainSourceCatalog";
+import {
   DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
   type TerrainBrushId,
   type TerrainMaterialId,
@@ -37,7 +41,7 @@ export type TerrainToolbarPreviewFrame = {
 };
 
 export type TerrainToolbarPreviewItem = {
-  terrainSourceId: TerrainContentSourceId;
+  terrainSourceId?: TerrainContentSourceId;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -140,7 +144,7 @@ function resolveTransitionRules(): TerrainRulesetTransitionRule[] {
 }
 
 function createTerrainToolbarPreviewItem(input: {
-  terrainSourceId: TerrainContentSourceId;
+  terrainSourceId?: TerrainContentSourceId;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -165,7 +169,9 @@ function createTerrainToolbarPreviewItem(input: {
     input.atlas,
   );
   return {
-    terrainSourceId: input.terrainSourceId,
+    ...(input.terrainSourceId
+      ? { terrainSourceId: input.terrainSourceId }
+      : {}),
     id: input.id,
     label: input.label,
     materialId: input.materialId,
@@ -202,6 +208,12 @@ const FARMRPG_WATER_TILE_PREVIEW_RULES: TerrainRulesetTransitionRule[] = [
   {
     caseId: 0,
     frame: "tilesets.farmrpg.water.tile#0",
+  },
+];
+const FARMRPG_DELETE_PREVIEW_RULES: TerrainRulesetTransitionRule[] = [
+  {
+    caseId: 0,
+    frame: "tilesets.farmrpg.grass.spring#0",
   },
 ];
 
@@ -317,6 +329,47 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
     } catch {
       // Skip variants not available in the currently generated atlas.
     }
+  }
+
+  for (const spec of FARMRPG_STATIC_TERRAIN_SOURCE_SPECS) {
+    try {
+      previewItems.push(
+        createTerrainToolbarPreviewItem({
+          terrainSourceId: spec.sourceId,
+          id: spec.id,
+          label: spec.label,
+          materialId: "ground",
+          brushId: "ground",
+          representativeCaseId: spec.representativeCaseId,
+          groupKey: spec.groupKey,
+          groupLabel: spec.groupLabel,
+          rules: resolveTransitionRulesFromRuleset(
+            createFarmrpgAutotileRuleset(spec.framePrefix),
+          ),
+          atlas: FARMRPG_ATLAS_SOURCE,
+        }),
+      );
+    } catch {
+      // Skip static terrain variants that are not in the generated atlas yet.
+    }
+  }
+
+  try {
+    previewItems.unshift(
+      createTerrainToolbarPreviewItem({
+        id: "terrain.farmrpg.delete",
+        label: "Clear Terrain",
+        materialId: "ground",
+        brushId: "delete",
+        representativeCaseId: 0,
+        groupKey: "farmrpg-actions",
+        groupLabel: "Actions",
+        rules: FARMRPG_DELETE_PREVIEW_RULES,
+        atlas: FARMRPG_ATLAS_SOURCE,
+      }),
+    );
+  } catch {
+    // The generated FarmRPG atlas may not exist yet.
   }
 
   if (previewItems.length > 0) {

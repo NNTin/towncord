@@ -4,6 +4,11 @@ import { TERRAIN_TEXTURE_KEY } from "../../terrain/contracts";
 import farmrpgTerrainRulesetJson from "public-assets-json:terrain/rulesets/farmrpg-grass.json";
 import terrainRulesetJson from "public-assets-json:terrain/rulesets/phase1.json";
 import terrainSeedJson from "public-assets-json:terrain/seeds/phase1.json";
+import {
+  FARMRPG_STATIC_TERRAIN_SOURCE_SPECS,
+  createFarmrpgAutotileRuleset,
+  type FarmrpgStaticTerrainSourceId,
+} from "./farmrpgTerrainSourceCatalog";
 
 export const PHASE1_TERRAIN_SOURCE_ID = "public-assets:terrain/phase1";
 
@@ -26,7 +31,8 @@ export type FarmrpgTerrainSourceId =
 
 export type TerrainContentSourceId =
   | typeof PHASE1_TERRAIN_SOURCE_ID
-  | FarmrpgTerrainSourceId;
+  | FarmrpgTerrainSourceId
+  | FarmrpgStaticTerrainSourceId;
 
 export type TerrainTextureKey = typeof TERRAIN_TEXTURE_KEY | "debug.tilesets";
 
@@ -106,6 +112,21 @@ const FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID: Record<
   },
 };
 
+const FARMRPG_STATIC_TERRAIN_CONTENT_BY_SOURCE_ID: Record<
+  FarmrpgStaticTerrainSourceId,
+  TerrainContent
+> = Object.fromEntries(
+  FARMRPG_STATIC_TERRAIN_SOURCE_SPECS.map((spec) => [
+    spec.sourceId,
+    {
+      sourceId: spec.sourceId,
+      seed: terrainSeedJson as TerrainSeedDocument,
+      ruleset: createFarmrpgAutotileRuleset(spec.framePrefix),
+      textureKey: TERRAIN_TEXTURE_KEY,
+    },
+  ]),
+) as Record<FarmrpgStaticTerrainSourceId, TerrainContent>;
+
 const DEFAULT_TERRAIN_CONTENT =
   FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID[DEFAULT_TERRAIN_SOURCE_ID];
 
@@ -115,6 +136,7 @@ const TERRAIN_CONTENT_BY_SOURCE_ID: Record<
 > = {
   [PHASE1_TERRAIN_SOURCE_ID]: PHASE1_TERRAIN_CONTENT,
   ...FARMRPG_TERRAIN_CONTENT_BY_SOURCE_ID,
+  ...FARMRPG_STATIC_TERRAIN_CONTENT_BY_SOURCE_ID,
 };
 
 export const ALL_TERRAIN_SOURCE_IDS: readonly TerrainContentSourceId[] = [
@@ -122,6 +144,7 @@ export const ALL_TERRAIN_SOURCE_IDS: readonly TerrainContentSourceId[] = [
   FARMRPG_GRASS_TERRAIN_SOURCE_IDS.summer,
   FARMRPG_GRASS_TERRAIN_SOURCE_IDS.fall,
   FARMRPG_GRASS_TERRAIN_SOURCE_IDS.winter,
+  ...FARMRPG_STATIC_TERRAIN_SOURCE_SPECS.map((spec) => spec.sourceId),
   PHASE1_TERRAIN_SOURCE_ID,
 ];
 

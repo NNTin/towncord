@@ -7,11 +7,11 @@ import { listEntityPlaceables } from "../placeableService";
 
 function createCatalog(): AnimationCatalog {
   return {
-    entityTypes: ["mobs", "player"],
+    entityTypes: ["mobs", "player", "props"],
     playerModels: ["scout"],
     mobFamilies: ["animals"],
     npcFamilies: [],
-    propFamilies: [],
+    propFamilies: ["static"],
     tilesetFamilies: ["animated", "static"],
     officeCharacterPalettes: [],
     officeCharacterIds: [],
@@ -20,6 +20,20 @@ function createCatalog(): AnimationCatalog {
     tracksByPath: new Map([
       ["mobs/animals/chicken", []],
       ["mobs/animals/cow", []],
+      [
+        "props/static/set-01",
+        [
+          {
+            id: "variant-01",
+            label: "variant-01",
+            entityType: "props",
+            directional: false,
+            keyByDirection: {},
+            undirectedKey: "props.farmrpg.static.set-01.variant-01",
+            equipmentCompatible: [],
+          },
+        ],
+      ],
     ]),
   };
 }
@@ -29,6 +43,7 @@ describe("entityRegistryBuilder", () => {
     const registry = buildEntityRegistryFromCatalog(createCatalog());
     const player = registry.getById("player.scout");
     const chicken = registry.getById("npc.animals.chicken");
+    const prop = registry.getById("prop.static.set-01.variant-01");
 
     expect(player).not.toBeNull();
     expect(player).toMatchObject({
@@ -51,6 +66,16 @@ describe("entityRegistryBuilder", () => {
     expect(readEntityVisualRef(chicken!.visualRef)).toBe(
       "mobs/animals/chicken",
     );
+    expect(prop).not.toBeNull();
+    expect(prop).toMatchObject({
+      id: "prop.static.set-01.variant-01",
+      label: "Variant 01",
+      kind: "prop",
+      capabilities: ["idle"],
+      placeable: true,
+    });
+    expect(readEntityVisualRef(prop!.visualRef)).toBe("props/static/set-01");
+    expect(prop!.visualRef.trackId).toBe("variant-01");
 
     const catalog = createCatalog();
     expect(listEntityPlaceables(registry, catalog)).toEqual([
@@ -80,6 +105,15 @@ describe("entityRegistryBuilder", () => {
         groupKey: "entity:npc",
         groupLabel: "Mobs",
         previewFrameKey: null,
+      },
+      {
+        id: "entity:prop.static.set-01.variant-01",
+        type: "entity",
+        entityId: "prop.static.set-01.variant-01",
+        label: "Variant 01",
+        groupKey: "entity:prop:set-01",
+        groupLabel: "Set 01",
+        previewFrameKey: "props.farmrpg.static.set-01.variant-01#0",
       },
     ]);
   });

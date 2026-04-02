@@ -37,6 +37,14 @@ const FARMRPG_TILESETS_ATLAS_FALLBACK_PATH = path.resolve(
   __dirname,
   "./src/assets/farmrpg-tilesets-atlas-fallback.json",
 );
+const FARMRPG_CHARACTERS_ATLAS_FALLBACK_PATH = path.resolve(
+  __dirname,
+  "./src/assets/farmrpg-characters-atlas-fallback.json",
+);
+const FARMRPG_PROPS_ATLAS_FALLBACK_PATH = path.resolve(
+  __dirname,
+  "./src/assets/farmrpg-props-atlas-fallback.json",
+);
 
 const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   [
@@ -50,6 +58,8 @@ const PUBLIC_JSON_FALLBACKS = new Map<string, string>([
   ],
   ["bloomseed/atlas.json", BLOOMSEED_ATLAS_FALLBACK_PATH],
   ["farmrpg/atlas.json", FARMRPG_ATLAS_FALLBACK_PATH],
+  ["farmrpg/atlases/characters.json", FARMRPG_CHARACTERS_ATLAS_FALLBACK_PATH],
+  ["farmrpg/atlases/props.json", FARMRPG_PROPS_ATLAS_FALLBACK_PATH],
   ["farmrpg/atlases/tilesets.json", FARMRPG_TILESETS_ATLAS_FALLBACK_PATH],
 ]);
 

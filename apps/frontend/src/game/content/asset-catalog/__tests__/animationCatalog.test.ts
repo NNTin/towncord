@@ -8,6 +8,7 @@ import {
   getPropGroups,
   getTilesetGroups,
   getTracksForPath,
+  listPropDescriptors,
   listOfficeCharacterDescriptors,
   resolveTrackForDirection,
 } from "../animationCatalog";
@@ -42,14 +43,23 @@ describe("animationCatalog", () => {
       "props.bloomseed.animated.chest.black-chest",
       "props.bloomseed.animated.water.lily-pad",
       "props.bloomseed.static.tables.variant-01",
+      "props.farmrpg.static.set-01.variant-01",
     ]);
 
     expect(catalog.entityTypes).toContain("props");
     expect(catalog.propFamilies).toEqual(["animated", "static"]);
     expect(getPropGroups(catalog, "animated")).toEqual(["chest", "water"]);
+    expect(getPropGroups(catalog, "static")).toEqual(["set-01", "tables"]);
     expect(
       getTracksForPath(catalog, "props/static/tables").map((track) => track.id),
     ).toEqual(["variant-01"]);
+    expect(listPropDescriptors(catalog)).toContainEqual({
+      family: "static",
+      group: "set-01",
+      propId: "variant-01",
+      visualPath: "props/static/set-01",
+      animationId: "props.farmrpg.static.set-01.variant-01",
+    });
   });
 
   test("parses tilesets as a separate entity type", () => {
