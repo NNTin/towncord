@@ -22,6 +22,7 @@ export type OfficeSceneFurnitureCategory =
   | "desks"
   | "electronics"
   | "misc"
+  | "props"
   | "storage"
   | "wall"
   | "unknown";
@@ -29,6 +30,7 @@ export type OfficeSceneFurnitureCategory =
 export type OfficeSceneFurniturePlacement = "floor" | "surface" | "wall";
 
 export type OfficeSceneFurnitureRenderAsset = {
+  textureKey?: string;
   atlasKey: string;
   atlasFrame: { x: number; y: number; w: number; h: number };
 };

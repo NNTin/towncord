@@ -15,6 +15,8 @@ import type {
   PlaceableViewModel,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  TerrainPropSelectionChangedPayload,
+  TerrainSelectedPropPayload,
   TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
@@ -41,6 +43,8 @@ export type {
   PlayerStateChangedPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  TerrainPropSelectionChangedPayload,
+  TerrainSelectedPropPayload,
   TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
@@ -56,6 +60,7 @@ export const RUNTIME_TO_UI_EVENTS = {
   OFFICE_FLOOR_PICKED: "officeFloorPicked",
   OFFICE_LAYOUT_CHANGED: "officeLayoutChanged",
   OFFICE_SELECTION_CHANGED: "officeSelectionChanged",
+  TERRAIN_PROP_SELECTION_CHANGED: "terrainPropSelectionChanged",
   TERRAIN_SEED_CHANGED: "terrainSeedChanged",
 } as const;
 
@@ -73,6 +78,8 @@ export const OFFICE_LAYOUT_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED;
 export const OFFICE_SELECTION_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED;
+export const TERRAIN_PROP_SELECTION_CHANGED_EVENT =
+  RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED;
 export const TERRAIN_SEED_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED;
 
@@ -89,6 +96,7 @@ export type RuntimeToUiEventPayloadByName = {
   [RUNTIME_TO_UI_EVENTS.OFFICE_FLOOR_PICKED]: OfficeFloorPickedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED]: OfficeLayoutChangedPayload;
   [RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED]: OfficeSelectionChangedPayload;
+  [RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED]: TerrainPropSelectionChangedPayload;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]: TerrainSeedChangedPayload;
 };
 
@@ -109,6 +117,7 @@ const OFFICE_SCENE_FURNITURE_CATEGORY_SET = new Set([
   "desks",
   "electronics",
   "misc",
+  "props",
   "storage",
   "wall",
   "unknown",
@@ -119,6 +128,7 @@ const OFFICE_SCENE_FURNITURE_PLACEMENT_SET = new Set([
   "wall",
 ]);
 const OFFICE_SELECTED_PLACEABLE_KIND_SET = new Set(["furniture"]);
+const TERRAIN_SELECTED_PLACEABLE_KIND_SET = new Set(["prop"]);
 const PLAYER_STATE_SET = new Set(["idle", "walk", "run"]);
 const ROTATE_90_SET = new Set([0, 1, 2, 3]);
 
@@ -227,6 +237,9 @@ function isOfficeSceneFurnitureRenderAsset(
 ): value is NonNullable<OfficeSceneFurniture["renderAsset"]> {
   return (
     isRecord(value) &&
+    (!("textureKey" in value) ||
+      value.textureKey == null ||
+      typeof value.textureKey === "string") &&
     typeof value.atlasKey === "string" &&
     isRecord(value.atlasFrame) &&
     isFiniteNumber(value.atlasFrame.x) &&
@@ -506,6 +519,20 @@ function isOfficeSelectedPlaceablePayload(
   );
 }
 
+function isTerrainSelectedPropPayload(
+  value: unknown,
+): value is TerrainSelectedPropPayload {
+  return (
+    isRecord(value) &&
+    typeof value.kind === "string" &&
+    TERRAIN_SELECTED_PLACEABLE_KIND_SET.has(value.kind) &&
+    typeof value.propId === "string" &&
+    typeof value.label === "string" &&
+    isRotate90(value.rotationQuarterTurns) &&
+    typeof value.canRotate === "boolean"
+  );
+}
+
 export function normalizeOfficeSelectionChangedPayload(
   value: unknown,
 ): OfficeSelectionChangedPayload | undefined {
@@ -518,6 +545,28 @@ export function normalizeOfficeSelectionChangedPayload(
   }
 
   if (!isOfficeSelectedPlaceablePayload(value.selection)) {
+    return undefined;
+  }
+
+  return {
+    selection: {
+      ...value.selection,
+    },
+  };
+}
+
+export function normalizeTerrainPropSelectionChangedPayload(
+  value: unknown,
+): TerrainPropSelectionChangedPayload | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  if (value.selection == null) {
+    return { selection: null };
+  }
+
+  if (!isTerrainSelectedPropPayload(value.selection)) {
     return undefined;
   }
 
@@ -572,6 +621,8 @@ const runtimeToUiEventNormalizers = {
     normalizeOfficeLayoutChangedPayload,
   [RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED]:
     normalizeOfficeSelectionChangedPayload,
+  [RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED]:
+    normalizeTerrainPropSelectionChangedPayload,
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]:
     normalizeTerrainSeedChangedPayload,
 } satisfies {

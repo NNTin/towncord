@@ -439,6 +439,7 @@ function doFurnitureBoundsOverlap(
 function buildFurnitureRenderSignature(item: OfficeSceneFurniture): string {
   const renderAssetSignature = item.renderAsset
     ? [
+        item.renderAsset.textureKey ?? DONARG_OFFICE_FURNITURE_ATLAS_KEY,
         item.renderAsset.atlasKey,
         item.renderAsset.atlasFrame.x,
         item.renderAsset.atlasFrame.y,
@@ -471,7 +472,7 @@ function renderFurnitureSprite(
   const sprite = scene.add.image(
     width / 2,
     height / 2,
-    DONARG_OFFICE_FURNITURE_ATLAS_KEY,
+    renderAsset.textureKey ?? DONARG_OFFICE_FURNITURE_ATLAS_KEY,
     atlasKey,
   );
   sprite.setOrigin(0.5, 0.5);

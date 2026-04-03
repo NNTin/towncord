@@ -5,8 +5,128 @@ import type { ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { TerrainToolSelection } from "../../../../game/contracts/runtime";
-import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
+
+vi.mock("public-assets-json:farmrpg/atlases/characters.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:bloomseed/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 64, h: 64 } },
+    frames: {
+      "furniture.electronics.laptop-front-off#0": {
+        frame: { x: 0, y: 0, w: 16, h: 32 },
+      },
+      "furniture.electronics.laptop-right-off#0": {
+        frame: { x: 16, y: 0, w: 32, h: 16 },
+      },
+      "furniture.electronics.monitor-front-off#0": {
+        frame: { x: 48, y: 0, w: 16, h: 16 },
+      },
+    },
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/furniture-catalog.json", () => ({
+  default: {
+    assets: [
+      {
+        id: "ASSET_107",
+        label: "Laptop - Front - Off",
+        category: "electronics",
+        file: "furniture/electronics/LAPTOP_FRONT_OFF.png",
+        width: 16,
+        height: 32,
+        footprintW: 1,
+        footprintH: 2,
+        canPlaceOnSurfaces: true,
+        groupId: "LAPTOP",
+        orientation: "front",
+        state: "off",
+      },
+      {
+        id: "ASSET_78",
+        label: "Monitor - Front - Off",
+        category: "electronics",
+        file: "furniture/electronics/MONITOR_FRONT_OFF.png",
+        width: 16,
+        height: 16,
+        footprintW: 1,
+        footprintH: 1,
+        canPlaceOnSurfaces: true,
+        groupId: "MONITOR",
+        orientation: "front",
+        state: "off",
+      },
+      {
+        id: "ASSET_109",
+        label: "Laptop - Right - Off",
+        category: "electronics",
+        file: "furniture/electronics/LAPTOP_RIGHT_OFF.png",
+        width: 32,
+        height: 16,
+        footprintW: 2,
+        footprintH: 1,
+        canPlaceOnSurfaces: true,
+        groupId: "LAPTOP",
+        orientation: "right",
+        state: "off",
+      },
+    ],
+  },
+}));
+
+vi.mock("public-assets-json:farmrpg/atlases/props.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
+  default: {
+    meta: { size: { w: 256, h: 256 } },
+    frames: {
+      "tilesets.farmrpg.water.tile#0": {
+        frame: { x: 0, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.spring#0": {
+        frame: { x: 16, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.summer#0": {
+        frame: { x: 32, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.fall#0": {
+        frame: { x: 48, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.grass.winter#0": {
+        frame: { x: 64, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.posts#15": {
+        frame: { x: 0, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.hay#15": {
+        frame: { x: 16, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.barn.messy-hay#15": {
+        frame: { x: 32, y: 16, w: 16, h: 16 },
+      },
+    },
+  },
+}));
+
 import { BottomToolbar } from "../BottomToolbar";
+import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
 
 (
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -18,7 +138,8 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   isJsonEditorOpen: false,
   onToggleJsonEditor: vi.fn(),
   entityToolbarViewModel: null,
-  activeTool: null as "floor" | "wall" | "erase" | "furniture" | null,
+  propToolbarViewModel: null,
+  activeTool: null as "floor" | "wall" | "erase" | "furniture" | "prop" | null,
   onSelectTool: vi.fn(),
   activeFloorMode: "paint" as const,
   onSelectFloorMode: vi.fn(),
@@ -33,7 +154,11 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFurnitureId: null,
   activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
+  activePropId: null,
+  activePropRotationQuarterTurns: 0,
+  onSelectPropId: vi.fn(),
   onRotateFurnitureClockwise: vi.fn(),
+  onRotatePropClockwise: vi.fn(),
   activeTerrainTool: null as TerrainToolSelection,
   onSelectTerrainTool: vi.fn(),
   selectedOfficePlaceable: null,
@@ -225,6 +350,113 @@ describe("BottomToolbar", () => {
       groupLabel: "Player",
       previewFrameKey: null,
     });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("opens Layout props as a real layout tool and selects props by click", () => {
+    const props = {
+      ...baseProps,
+      entityToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:npc",
+            label: "Mobs",
+            placeables: [
+              {
+                id: "entity:npc.greeter",
+                type: "entity" as const,
+                entityId: "npc.greeter",
+                label: "Greeter",
+                groupKey: "entity:npc",
+                groupLabel: "Mobs",
+                previewFrameKey: null,
+              },
+            ],
+          },
+        ],
+        onDragStart: vi.fn(),
+      },
+      propToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:prop:set-01",
+            label: "Set 01",
+            placeables: [
+              {
+                id: "entity:prop.static.set-01.variant-01",
+                type: "entity" as const,
+                entityId: "prop.static.set-01.variant-01",
+                label: "Variant 01",
+                groupKey: "entity:prop:set-01",
+                groupLabel: "Set 01",
+                previewFrameKey: null,
+              },
+            ],
+          },
+        ],
+      },
+    };
+    const { container, root, rerender } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Props tool").click();
+    });
+
+    expect(props.onSelectTool).toHaveBeenCalledWith("prop");
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith(null);
+
+    rerender({
+      ...props,
+      activeTool: "prop",
+    });
+
+    expect(container.textContent).toContain("Layout");
+    expect(container.textContent).toContain("Props");
+    expect(container.textContent).toContain("Set 01");
+    expect(container.textContent).toContain("Variant 01");
+    expect(container.textContent).not.toContain("Greeter");
+
+    const entry = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.getAttribute("title") === "Select Variant 01",
+    );
+    if (!(entry instanceof HTMLButtonElement)) {
+      throw new Error("Missing selectable prop entry");
+    }
+
+    expect(entry.getAttribute("draggable")).toBeNull();
+
+    act(() => {
+      entry.click();
+    });
+
+    expect(props.onSelectPropId).toHaveBeenCalledWith(
+      "prop.static.set-01.variant-01",
+    );
+
+    rerender({
+      ...props,
+      activeTool: "prop",
+      activePropId: "prop.static.set-01.variant-01",
+      activePropRotationQuarterTurns: 2,
+    });
+
+    expect(container.textContent).toContain("Selected: Variant 01");
+    expect(container.textContent).toContain("Rotation: 180°");
+
+    const rotateButton = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.textContent === "Rotate",
+    );
+    if (!(rotateButton instanceof HTMLButtonElement)) {
+      throw new Error("Missing rotate prop button");
+    }
+    act(() => {
+      rotateButton.click();
+    });
+
+    expect(props.onRotatePropClockwise).toHaveBeenCalledOnce();
 
     act(() => {
       root.unmount();
@@ -569,6 +801,37 @@ describe("BottomToolbar", () => {
       materialId: "water",
       brushId: "water",
       terrainSourceId: "public-assets:terrain/farmrpg-grass-summer",
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("static FarmRPG terrain variants stay on the FarmRPG tab and select ground terrain", () => {
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/farmrpg-barn-posts" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain("Barn");
+    expect(getButton(container, "Barn Posts")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+
+    act(() => {
+      getButton(container, "Barn Hay").click();
+    });
+
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-barn-hay",
     });
 
     act(() => {

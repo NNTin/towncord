@@ -4,6 +4,8 @@ import { WorldRuntimeInputRouter } from "../input/worldRuntimeInputRouter";
 function makeContext() {
   return {
     beginPan: vi.fn(),
+    hasActiveTerrainPropTool: vi.fn(() => false),
+    tryHandleTerrainPropPointerDown: vi.fn(() => false),
     tryHandleOfficePointerDown: vi.fn(() => false),
     tryHandleOfficeSecondaryPointerDown: vi.fn(() => false),
     hasActiveTerrainTool: vi.fn(() => false),
@@ -53,6 +55,17 @@ describe("WorldRuntimeInputRouter", () => {
       ctx.tryHandleOfficePointerDown.mockReturnValue(true);
       router.onPointerDown(makePointer(0));
       expect(ctx.beginTerrainPaint).toHaveBeenCalledOnce();
+      expect(ctx.tryHandleOfficePointerDown).not.toHaveBeenCalled();
+      expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
+    });
+
+    test("left-click with active terrain prop tool routes to prop placement before terrain or office", () => {
+      ctx.hasActiveTerrainPropTool.mockReturnValue(true);
+      ctx.hasActiveTerrainTool.mockReturnValue(true);
+      ctx.tryHandleOfficePointerDown.mockReturnValue(true);
+      router.onPointerDown(makePointer(0));
+      expect(ctx.tryHandleTerrainPropPointerDown).toHaveBeenCalledOnce();
+      expect(ctx.beginTerrainPaint).not.toHaveBeenCalled();
       expect(ctx.tryHandleOfficePointerDown).not.toHaveBeenCalled();
       expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
     });

@@ -5,6 +5,31 @@ vi.mock("../../../../engine", () => ({
   TERRAIN_CELL_WORLD_SIZE: 64,
   TERRAIN_RENDER_GRID_WORLD_OFFSET: 32,
   TERRAIN_TEXTURE_KEY: "debug.tilesets",
+  worldToAnchoredGridCell: (
+    worldX: number,
+    worldY: number,
+    region: {
+      anchorX16: number;
+      anchorY16: number;
+      layout: { cols: number; rows: number; cellSize: number };
+    },
+  ) => {
+    const localX = worldX - region.anchorX16 * 16;
+    const localY = worldY - region.anchorY16 * 16;
+    const col = Math.floor(localX / region.layout.cellSize);
+    const row = Math.floor(localY / region.layout.cellSize);
+
+    if (
+      col < 0 ||
+      row < 0 ||
+      col >= region.layout.cols ||
+      row >= region.layout.rows
+    ) {
+      return null;
+    }
+
+    return { col, row };
+  },
 }));
 
 type WorldPoint = {
@@ -16,6 +41,30 @@ const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
 
 function createHarness(input?: {
   entityPositions?: WorldPoint[];
+  entities?: Array<{
+    position: WorldPoint;
+    definition?: {
+      kind: "prop" | "npc" | "player";
+    };
+    terrainPropPlacement?: {
+      anchorCell: { cellX: number; cellY: number };
+      footprintW: number;
+      footprintH: number;
+      rotationQuarterTurns: 0 | 1 | 2 | 3;
+    };
+  }>;
+  officeRegion?: {
+    anchorX16: number;
+    anchorY16: number;
+    layout: {
+      cols: number;
+      rows: number;
+      cellSize: number;
+      tiles: [];
+      furniture: [];
+      characters: [];
+    };
+  } | null;
   runtimeTextureKey?: string;
   worldPoint?: WorldPoint;
   worldToCellResult?: { cellX: number; cellY: number } | null;
@@ -31,6 +80,8 @@ function createHarness(input?: {
 }) {
   const queueDrop = vi.fn();
   const previewPaintAtWorld = vi.fn(() => input?.previewTiles ?? []);
+  const detailQueueDrop = vi.fn();
+  const detailPreviewPaintAtWorld = vi.fn(() => input?.previewTiles ?? []);
   const setTerrainContentSource = vi.fn();
   const runtimeTextureKey = input?.runtimeTextureKey ?? "debug.tilesets";
   const worldPoint = input?.worldPoint ?? { x: 96, y: 96 };
@@ -92,10 +143,33 @@ function createHarness(input?: {
         previewPaintAtWorld,
         queueDrop,
       }) as never,
+    getTerrainDetailRuntime: () =>
+      ({
+        getGameplayGrid: () => ({
+          worldToCell,
+        }),
+        getTextureKey: () => "farmrpg.tilesets",
+        previewPaintAtWorld: detailPreviewPaintAtWorld,
+        queueDrop: detailQueueDrop,
+      }) as never,
+    getOfficeDetailRuntime: () =>
+      ({
+        getGameplayGrid: () => ({
+          worldToCell,
+        }),
+        getTextureKey: () => "farmrpg.tilesets",
+        previewPaintAtWorld: detailPreviewPaintAtWorld,
+        queueDrop: detailQueueDrop,
+      }) as never,
+    getOfficeRegion: () => input?.officeRegion ?? null,
     getEntities: () =>
-      entityPositions.map((position) => ({
-        position,
-      })) as never,
+      (input?.entities ??
+        entityPositions.map((position) => ({
+          position,
+          definition: {
+            kind: "npc" as const,
+          },
+        }))) as never,
     setTerrainContentSource,
   });
 
@@ -107,6 +181,8 @@ function createHarness(input?: {
 
   return {
     controller,
+    detailPreviewPaintAtWorld,
+    detailQueueDrop,
     entityPositions,
     previewImage,
     previewPaintAtWorld,
@@ -170,6 +246,32 @@ describe("WorldSceneTerrainController", () => {
     expect(queueDrop).not.toHaveBeenCalled();
   });
 
+  test("terrain prop footprints block terrain painting", () => {
+    const { controller, queueDrop } = createHarness({
+      entities: [
+        {
+          position: { x: 96, y: 96 },
+          definition: {
+            kind: "prop",
+          },
+          terrainPropPlacement: {
+            anchorCell: { cellX: 1, cellY: 1 },
+            footprintW: 2,
+            footprintH: 1,
+            rotationQuarterTurns: 0,
+          },
+        },
+      ],
+    });
+
+    controller.beginPainting({
+      x: 96,
+      y: 96,
+    } as never);
+
+    expect(queueDrop).not.toHaveBeenCalled();
+  });
+
   test("snaps the brush preview to the gameplay placement grid anchor", () => {
     const { controller, terrainBrushPreview, worldToCell } = createHarness({
       worldPoint: { x: 100, y: 110 },
@@ -216,7 +318,10 @@ describe("WorldSceneTerrainController", () => {
       96,
       96,
     );
-    expect(syncRenderPreviewTiles).toHaveBeenCalledWith(previewTiles);
+    expect(syncRenderPreviewTiles).toHaveBeenCalledWith(
+      previewTiles,
+      "debug.tilesets",
+    );
   });
 
   test("positions resolved render-tile preview images on the shifted render grid", () => {
@@ -272,6 +377,123 @@ describe("WorldSceneTerrainController", () => {
     expect(setTerrainContentSource).toHaveBeenCalledWith(
       "public-assets:terrain/farmrpg-grass",
     );
+  });
+
+  test("does not switch the global terrain content source for local static detail tools", () => {
+    const { controller, setTerrainContentSource } = createHarness();
+
+    controller.handleSelectTerrainTool({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-barn-posts",
+    });
+
+    expect(setTerrainContentSource).not.toHaveBeenCalled();
+  });
+
+  test("routes terrain detail tools into the terrain detail runtime", () => {
+    const { controller, detailQueueDrop, queueDrop } = createHarness();
+
+    controller.handleSelectTerrainTool({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-barn-posts",
+    });
+    controller.beginPainting({
+      x: 12,
+      y: 34,
+    } as never);
+
+    expect(detailQueueDrop).toHaveBeenCalledWith(
+      {
+        type: "terrain",
+        materialId: "public-assets:terrain/farmrpg-barn-posts",
+        brushId: "public-assets:terrain/farmrpg-barn-posts",
+        screenX: 12,
+        screenY: 34,
+      },
+      96,
+      96,
+    );
+    expect(queueDrop).not.toHaveBeenCalled();
+  });
+
+  test("blocks terrain detail tools inside the office footprint", () => {
+    const { controller, detailQueueDrop, terrainBrushPreview } = createHarness({
+      officeRegion: {
+        anchorX16: 0,
+        anchorY16: 0,
+        layout: {
+          cols: 8,
+          rows: 8,
+          cellSize: 16,
+          tiles: [],
+          furniture: [],
+          characters: [],
+        },
+      },
+      worldPoint: { x: 32, y: 32 },
+    });
+
+    controller.handleSelectTerrainTool({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-barn-posts",
+    });
+    controller.syncPreviewAtScreen(12, 34);
+    controller.beginPainting({
+      x: 12,
+      y: 34,
+    } as never);
+
+    expect(terrainBrushPreview.setFillStyle).toHaveBeenCalledWith(
+      0xef4444,
+      0.18,
+    );
+    expect(detailQueueDrop).not.toHaveBeenCalled();
+  });
+
+  test("routes carpet tools into the office detail runtime inside the office footprint", () => {
+    const { controller, detailQueueDrop, detailPreviewPaintAtWorld } =
+      createHarness({
+        officeRegion: {
+          anchorX16: 0,
+          anchorY16: 0,
+          layout: {
+            cols: 8,
+            rows: 8,
+            cellSize: 16,
+            tiles: [],
+            furniture: [],
+            characters: [],
+          },
+        },
+        worldPoint: { x: 32, y: 32 },
+      });
+
+    controller.handleSelectTerrainTool({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-carpet-01",
+    });
+    controller.syncPreviewAtScreen(12, 34);
+    controller.beginPainting({
+      x: 12,
+      y: 34,
+    } as never);
+
+    expect(detailPreviewPaintAtWorld).toHaveBeenCalledWith(
+      {
+        type: "terrain",
+        materialId: "public-assets:terrain/farmrpg-carpet-01",
+        brushId: "public-assets:terrain/farmrpg-carpet-01",
+        screenX: 12,
+        screenY: 34,
+      },
+      32,
+      32,
+    );
+    expect(detailQueueDrop).toHaveBeenCalled();
   });
 
   test("hides the brush preview when the hovered placement cell is out of bounds", () => {

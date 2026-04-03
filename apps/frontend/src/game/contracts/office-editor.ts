@@ -9,7 +9,12 @@ import type {
   OfficeTileColor,
 } from "./content";
 
-export type OfficeEditorToolId = "floor" | "wall" | "erase" | "furniture";
+export type OfficeEditorToolId =
+  | "floor"
+  | "wall"
+  | "erase"
+  | "furniture"
+  | "prop";
 export type OfficeFloorMode = "paint" | "pick";
 
 export type OfficeSetEditorToolNonePayload = {
@@ -31,6 +36,12 @@ export type OfficeSetEditorToolFurniturePayload = {
   rotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
+export type OfficeSetEditorToolPropPayload = {
+  tool: "prop";
+  propId: string | null;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
+};
+
 export type OfficeSetEditorToolFloorPayload = {
   tool: "floor";
   floorMode: OfficeFloorMode;
@@ -44,6 +55,7 @@ export type OfficeSetEditorToolPayload =
   | OfficeSetEditorToolWallPayload
   | OfficeSetEditorToolErasePayload
   | OfficeSetEditorToolFurniturePayload
+  | OfficeSetEditorToolPropPayload
   | OfficeSetEditorToolFloorPayload;
 
 export type OfficeFloorPickedPayload = {

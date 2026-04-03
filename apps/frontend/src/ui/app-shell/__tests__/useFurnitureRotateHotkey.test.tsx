@@ -5,8 +5,9 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { useFurnitureRotateHotkey } from "../useFurnitureRotateHotkey";
 
-(globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT =
-  true;
+(
+  globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+).IS_REACT_ACT_ENVIRONMENT = true;
 
 vi.mock("../../../game/contracts/content", () => ({
   canRotateFurniturePaletteItem: (id: string | null | undefined) =>
@@ -17,12 +18,16 @@ type HarnessProps = {
   activeTool: string | null;
   activeFurnitureId: string | null;
   onRotateFurnitureClockwise: () => void;
+  activePropId: string | null;
+  onRotatePropClockwise: () => void;
   selectedOfficePlaceable: { canRotate: boolean } | null;
   onRotateSelectedOfficePlaceable: () => void;
 };
 
 function Harness(props: HarnessProps): null {
-  useFurnitureRotateHotkey(props as Parameters<typeof useFurnitureRotateHotkey>[0]);
+  useFurnitureRotateHotkey(
+    props as Parameters<typeof useFurnitureRotateHotkey>[0],
+  );
   return null;
 }
 
@@ -67,6 +72,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -85,6 +92,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "non-rotatable-desk",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -103,6 +112,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: null,
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -121,6 +132,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "floor",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -141,6 +154,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: null,
         activeFurnitureId: null,
         onRotateFurnitureClockwise: vi.fn(),
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: { canRotate: true },
         onRotateSelectedOfficePlaceable,
       });
@@ -159,6 +174,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: null,
         activeFurnitureId: null,
         onRotateFurnitureClockwise: vi.fn(),
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: { canRotate: false },
         onRotateSelectedOfficePlaceable,
       });
@@ -178,6 +195,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: { canRotate: true },
         onRotateSelectedOfficePlaceable,
       });
@@ -199,6 +218,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -220,6 +241,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -243,13 +266,19 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
 
       await act(async () => {
         window.dispatchEvent(
-          new KeyboardEvent("keydown", { key: "r", bubbles: true, repeat: true }),
+          new KeyboardEvent("keydown", {
+            key: "r",
+            bubbles: true,
+            repeat: true,
+          }),
         );
       });
 
@@ -263,6 +292,8 @@ describe("useFurnitureRotateHotkey", () => {
         activeTool: "furniture",
         activeFurnitureId: "rotatable-chair",
         onRotateFurnitureClockwise,
+        activePropId: null,
+        onRotatePropClockwise: vi.fn(),
         selectedOfficePlaceable: null,
         onRotateSelectedOfficePlaceable: vi.fn(),
       });
@@ -274,6 +305,26 @@ describe("useFurnitureRotateHotkey", () => {
       });
 
       expect(onRotateFurnitureClockwise).not.toHaveBeenCalled();
+    });
+
+    test("calls onRotatePropClockwise when R is pressed with a prop selected", async () => {
+      const onRotatePropClockwise = vi.fn();
+      const harness = await renderHarness({
+        activeTool: "prop",
+        activeFurnitureId: null,
+        onRotateFurnitureClockwise: vi.fn(),
+        activePropId: "prop.static.set-01.variant-01",
+        onRotatePropClockwise,
+        selectedOfficePlaceable: null,
+        onRotateSelectedOfficePlaceable: vi.fn(),
+      });
+
+      await act(async () => {
+        pressKey("r");
+      });
+
+      expect(onRotatePropClockwise).toHaveBeenCalledOnce();
+      await harness.unmount();
     });
   });
 });

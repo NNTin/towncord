@@ -57,6 +57,12 @@ function cloneOfficeEditorToolPayload(
         furnitureId: payload.furnitureId,
         rotationQuarterTurns: payload.rotationQuarterTurns,
       };
+    case "prop":
+      return {
+        tool: "prop",
+        propId: payload.propId,
+        rotationQuarterTurns: payload.rotationQuarterTurns,
+      };
     case "erase":
       return { tool: payload.tool };
     default:
@@ -107,7 +113,9 @@ function isPointerWithinGame(pointer: Phaser.Input.Pointer | null): boolean {
 
   return (
     !("withinGame" in pointer) ||
-    Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame)
+    Boolean(
+      (pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame,
+    )
   );
 }
 
@@ -164,7 +172,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    const changed = this.officeEditorSystem.rotateFurniture(region.layout, furnitureId);
+    const changed = this.officeEditorSystem.rotateFurniture(
+      region.layout,
+      furnitureId,
+    );
     if (changed) {
       this.officeDirty = true;
     }
@@ -178,7 +189,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    return this.officeEditorSystem.canRotateFurniture(region.layout, furnitureId);
+    return this.officeEditorSystem.canRotateFurniture(
+      region.layout,
+      furnitureId,
+    );
   }
 
   public deleteSelectedFurniture(): boolean {
@@ -188,7 +202,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    const changed = this.officeEditorSystem.removeFurniture(region.layout, furnitureId);
+    const changed = this.officeEditorSystem.removeFurniture(
+      region.layout,
+      furnitureId,
+    );
     if (changed) {
       this.officeDirty = true;
       this.selectedFurnitureId = null;
@@ -217,7 +234,7 @@ export class WorldSceneOfficeEditorController {
       return;
     }
 
-    if (tool === "furniture") {
+    if (tool === "furniture" || tool === "prop") {
       highlight.setVisible(false);
       return;
     }
@@ -356,7 +373,9 @@ export class WorldSceneOfficeEditorController {
       this.officeDirty = true;
     }
 
-    return changed;
+    // Return true whenever the command was dispatched (wall tool active +
+    // inside the office region), even if the cell had no wall to remove.
+    return true;
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
@@ -392,7 +411,11 @@ export class WorldSceneOfficeEditorController {
   }
 
   private tryCommitDrag(): void {
-    if (!this.isDraggingFurniture || !this.dragFurnitureId || !this.dragLastCell) {
+    if (
+      !this.isDraggingFurniture ||
+      !this.dragFurnitureId ||
+      !this.dragLastCell
+    ) {
       this.isDraggingFurniture = false;
       this.dragFurnitureId = null;
       this.dragLastCell = null;
@@ -411,7 +434,11 @@ export class WorldSceneOfficeEditorController {
       return;
     }
 
-    const moved = this.officeEditorSystem.moveFurniture(region.layout, furnitureId, targetCell);
+    const moved = this.officeEditorSystem.moveFurniture(
+      region.layout,
+      furnitureId,
+      targetCell,
+    );
     if (moved) {
       this.officeDirty = true;
     }
@@ -433,7 +460,9 @@ export class WorldSceneOfficeEditorController {
     }
 
     const targets = [...this.host.getOfficeFurnitureTargets()].reverse();
-    const hit = targets.find((target) => target.bounds.contains(worldPoint.x, worldPoint.y));
+    const hit = targets.find((target) =>
+      target.bounds.contains(worldPoint.x, worldPoint.y),
+    );
     if (!hit) {
       this.selectedFurnitureId = null;
       this.isDraggingFurniture = false;
@@ -501,7 +530,8 @@ export class WorldSceneOfficeEditorController {
     worldY: number,
   ): boolean {
     const tool = getOfficeEditorTool(this.officeEditorToolPayload);
-    if (!tool) {
+    // "prop" placement is handled by the terrain prop controller, not here.
+    if (!tool || tool === "prop") {
       return false;
     }
 
@@ -533,6 +563,9 @@ export class WorldSceneOfficeEditorController {
       this.officeDirty = true;
     }
 
+    // Return true whenever the command was dispatched (tool active + inside
+    // the office region), even if the edit was a no-op. This prevents the
+    // click from falling through to selection/inspect handlers while painting.
     return true;
   }
 }

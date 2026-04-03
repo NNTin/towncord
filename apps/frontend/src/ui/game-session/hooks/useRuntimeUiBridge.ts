@@ -5,11 +5,15 @@ import type { OfficeSelectedPlaceablePayload } from "../../../game/contracts/off
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import { buildOfficeEditorToolPayload } from "../../../game";
-import type { OfficeEditorBridgeState, TerrainSeedDocument } from "../../../game";
+import type {
+  OfficeEditorBridgeState,
+  TerrainSeedDocument,
+} from "../../../game";
 import type {
   EntityToolbarViewModel,
   RuntimeRootBindings,
   SidebarViewModel,
+  TerrainPropToolbarViewModel,
   ZoomControlsViewModel,
 } from "../contracts";
 import {
@@ -18,6 +22,7 @@ import {
   useRuntimeSyncAdapter,
 } from "./runtimeUiBridgeHooks";
 import { createPlaceablesSidebarBridge } from "../view-models/placeablesSidebarBridge";
+import { createTerrainPropPaletteBridge } from "../view-models/toolbarPropPaletteBridge";
 import { createToolbarEntityPaletteBridge } from "../view-models/toolbarEntityPaletteBridge";
 
 type RuntimeUiBridge = {
@@ -25,6 +30,7 @@ type RuntimeUiBridge = {
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
   entityToolbarViewModel: EntityToolbarViewModel | null;
+  propToolbarViewModel: TerrainPropToolbarViewModel | null;
   selectedOfficePlaceable: OfficeSelectedPlaceablePayload | null;
   onRotateSelectedOfficePlaceable: () => void;
   onDeleteSelectedOfficePlaceable: () => void;
@@ -102,6 +108,8 @@ export function useRuntimeUiBridge(options: {
     options.officeToolState.activeWallColor,
     options.officeToolState.activeFurnitureId,
     options.officeToolState.activeFurnitureRotationQuarterTurns,
+    options.officeToolState.activePropId,
+    options.officeToolState.activePropRotationQuarterTurns,
   ]);
 
   const sidebarViewModel = useMemo<SidebarViewModel | null>(() => {
@@ -141,11 +149,24 @@ export function useRuntimeUiBridge(options: {
     });
   }, [runtimeSync.runtimeSidebarProjection]);
 
+  const propToolbarViewModel =
+    useMemo<TerrainPropToolbarViewModel | null>(() => {
+      const projection = runtimeSync.runtimeSidebarProjection;
+      if (!projection) {
+        return null;
+      }
+
+      return createTerrainPropPaletteBridge({
+        placeables: projection.placeables,
+      });
+    }, [runtimeSync.runtimeSidebarProjection]);
+
   return {
     runtimeRootRef,
     runtimeRootBindings,
     sidebarViewModel,
     entityToolbarViewModel,
+    propToolbarViewModel,
     selectedOfficePlaceable,
     onRotateSelectedOfficePlaceable,
     onDeleteSelectedOfficePlaceable,

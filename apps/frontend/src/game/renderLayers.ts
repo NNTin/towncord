@@ -10,7 +10,11 @@
  *
  *   TERRAIN_STATIC   -1000   ← terrain chunk render-textures (static tiles)
  *   TERRAIN_ANIMATED  -999   ← terrain chunk render-textures (animated tiles, drawn on top of static within same chunk)
+ *   TERRAIN_DETAIL_STATIC  -750  ← terrain detail overlays such as barn/soil, above the seasonal base
+ *   TERRAIN_DETAIL_ANIMATED -749 ← animated terrain detail overlays
  *   OFFICE_FLOOR      -500   ← office tile graphics layer (floor tiles only; walls/furniture/characters use y-sorted depth)
+ *   OFFICE_DETAIL_STATIC -450 ← office-only terrain details such as carpet, above office floors and below entities
+ *   OFFICE_DETAIL_ANIMATED -449 ← animated office detail overlays
  *   ENTITIES           y-sorted (entity.position.y, roughly 0..map-height in world pixels)
  *   OFFICE_CELL_HIGHLIGHT  8000   ← hover-highlight overlay for office editor
  *   TERRAIN_BRUSH_PREVIEW  9000   ← terrain-paint brush hover rectangle
@@ -31,6 +35,17 @@ export const RENDER_LAYERS = {
   TERRAIN_ANIMATED: -999,
 
   /**
+   * Depth for static terrain-detail overlays.
+   * Sits above the seasonal terrain base and below office floors.
+   */
+  TERRAIN_DETAIL_STATIC: -750,
+
+  /**
+   * Depth for animated terrain-detail overlays.
+   */
+  TERRAIN_DETAIL_ANIMATED: -749,
+
+  /**
    * Depth for the office floor tile graphics layer.
    * Sits above terrain and below world entities.
    * Wall tiles, furniture, and characters are rendered as scene-level objects
@@ -38,6 +53,16 @@ export const RENDER_LAYERS = {
    * correctly.
    */
   OFFICE_FLOOR: -500,
+
+  /**
+   * Depth for static office detail overlays such as carpet.
+   */
+  OFFICE_DETAIL_STATIC: -450,
+
+  /**
+   * Depth for animated office detail overlays.
+   */
+  OFFICE_DETAIL_ANIMATED: -449,
 
   /**
    * Depth for the office-cell hover highlight shown while the office editor

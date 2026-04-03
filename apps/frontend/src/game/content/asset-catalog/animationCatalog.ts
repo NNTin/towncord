@@ -36,6 +36,20 @@ type MobCatalogDescriptor = {
   visualPath: string;
 };
 
+type PropCatalogPathDescriptor = {
+  family: string;
+  group: string;
+  visualPath: string;
+};
+
+type PropCatalogDescriptor = {
+  family: string;
+  group: string;
+  propId: string;
+  visualPath: string;
+  animationId: string;
+};
+
 type OfficeCharacterDescriptor = {
   palette: string;
   characterId: string;
@@ -243,9 +257,13 @@ function parsePropKeys(
   keys: string[],
   pathTracks: Map<string, Map<string, AnimationTrack>>,
 ): void {
-  const PREFIX = "props.bloomseed.";
   for (const key of keys) {
-    if (!key.startsWith(PREFIX)) continue;
+    if (
+      !key.startsWith("props.bloomseed.") &&
+      !key.startsWith("props.farmrpg.")
+    ) {
+      continue;
+    }
     const parts = key.split(".");
     if (parts.length < 4) continue;
     const family = parts[2];
@@ -315,6 +333,12 @@ function parseTilesetKeys(
     });
     track.undirectedKey = key;
   }
+}
+
+function parsePropVisualPath(path: string): PropCatalogPathDescriptor | null {
+  const [ns, family, group, extra] = path.split("/");
+  if (ns !== "props" || !family || !group || extra) return null;
+  return { family, group, visualPath: path };
 }
 
 function parseOfficeEnvironmentKeys(
@@ -513,6 +537,39 @@ export function listMobDescriptors(
   for (const path of catalog.tracksByPath.keys()) {
     const descriptor = parseMobVisualPath(path);
     if (descriptor) descriptors.push(descriptor);
+  }
+
+  return descriptors;
+}
+
+export function listPropDescriptors(
+  catalog: AnimationCatalog,
+): PropCatalogDescriptor[] {
+  const descriptors: PropCatalogDescriptor[] = [];
+
+  for (const [path, tracks] of catalog.tracksByPath.entries()) {
+    const baseDescriptor = parsePropVisualPath(path);
+    if (!baseDescriptor) continue;
+
+    for (const track of tracks) {
+      const animationId =
+        track.undirectedKey ??
+        track.keyByDirection.down ??
+        track.keyByDirection.side ??
+        track.keyByDirection.right ??
+        track.keyByDirection.up;
+      if (!animationId) {
+        continue;
+      }
+
+      descriptors.push({
+        family: baseDescriptor.family,
+        group: baseDescriptor.group,
+        propId: track.id,
+        visualPath: path,
+        animationId,
+      });
+    }
   }
 
   return descriptors;

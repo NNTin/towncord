@@ -61,11 +61,10 @@ export {
   BLOOMSEED_ATLAS_W,
   getBloomseedAtlasFrame,
 } from "../content/asset-catalog/bloomseedAtlas";
-export {
-  FARMRPG_ATLAS_H,
-  FARMRPG_ATLAS_IMAGE_URL,
-  FARMRPG_ATLAS_W,
-  getFarmrpgAtlasFrame,
+export { resolveFarmrpgAtlasFrameSource } from "../content/asset-catalog/farmrpgAtlas";
+export type {
+  FarmrpgAtlasFrame,
+  FarmrpgAtlasFrameSource,
 } from "../content/asset-catalog/farmrpgAtlas";
 export {
   DONARG_OFFICE_ATLAS_H,

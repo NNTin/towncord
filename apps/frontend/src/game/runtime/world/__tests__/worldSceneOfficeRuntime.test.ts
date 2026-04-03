@@ -4,6 +4,7 @@ import {
   FURNITURE_ALL_ITEMS,
   resolveFurnitureRotationVariant,
 } from "../../../content/structures/furniturePalette";
+import { resolvePropPaletteItem } from "../../../content/structures/propPalette";
 import { RUNTIME_TO_UI_EVENTS } from "../../transport/runtimeEvents";
 import { WorldSceneOfficeRuntime } from "../worldSceneOfficeRuntime";
 import { WorldSceneProjectionEmitter } from "../worldSceneProjections";
@@ -35,6 +36,9 @@ const rotatingChair = (() => {
   return item;
 })();
 
+const farmrpgProp = (() =>
+  resolvePropPaletteItem("prop.static.set-01.variant-01"))();
+
 const officeRenderMocks = vi.hoisted(() => ({
   renderOfficeLayout: vi.fn(() => ({
     destroy: vi.fn(),
@@ -62,7 +66,15 @@ const officeRenderMocks = vi.hoisted(() => ({
 vi.mock("../../../../engine", () => ({
   renderOfficeLayout: officeRenderMocks.renderOfficeLayout,
   WORLD_REGION_BASE_PX: 16,
-  anchoredGridCellToWorldPixel: (col: number, row: number, region: { anchorX16: number; anchorY16: number; layout: { cellSize: number } }) => ({
+  anchoredGridCellToWorldPixel: (
+    col: number,
+    row: number,
+    region: {
+      anchorX16: number;
+      anchorY16: number;
+      layout: { cellSize: number };
+    },
+  ) => ({
     worldX: region.anchorX16 * 16 + col * region.layout.cellSize,
     worldY: region.anchorY16 * 16 + row * region.layout.cellSize,
   }),
@@ -164,7 +176,8 @@ function createHarness() {
   };
   const scene = {
     add: {
-      rectangle: vi.fn()
+      rectangle: vi
+        .fn()
         .mockImplementationOnce(() => cellHighlight)
         .mockImplementationOnce(() => selectionHighlight)
         .mockImplementation(() => previewCell),
@@ -181,7 +194,7 @@ function createHarness() {
         withinGame: true,
         x: 20,
         y: 20,
-      },
+      } as { withinGame: boolean; x: number; y: number } | null,
     },
   };
   const runtime = new WorldSceneOfficeRuntime(
@@ -192,6 +205,10 @@ function createHarness() {
         x: screenX,
         y: screenY,
       }),
+      getTerrainRuntime: () => null,
+      getEntityRegistry: () => null,
+      getEntitySystem: () => null,
+      selectEntity: vi.fn(),
     },
     new WorldSceneProjectionEmitter({
       getRuntimeHost: () => ({
@@ -218,7 +235,8 @@ function createHarness() {
 
 describe("WorldSceneOfficeRuntime", () => {
   test("bootstraps the office renderable and highlight overlay", () => {
-    const { cellHighlight, runtime, scene, selectionHighlight } = createHarness();
+    const { cellHighlight, runtime, scene, selectionHighlight } =
+      createHarness();
     const bootstrap = createBootstrap();
 
     runtime.bootstrap(bootstrap);
@@ -253,9 +271,7 @@ describe("WorldSceneOfficeRuntime", () => {
       } as never),
     ).toBe(true);
     expect(runtime.getSelectedFurnitureId()).toBe("desk-laptop");
-    expect(
-      runtime.rotateSelectedFurniture(),
-    ).toBe(true);
+    expect(runtime.rotateSelectedFurniture()).toBe(true);
     expect(bootstrap.layout.furniture[0]?.assetId).not.toBe(laptop.id);
 
     expect(runtime.deleteSelectedFurniture()).toBe(true);
@@ -297,7 +313,8 @@ describe("WorldSceneOfficeRuntime", () => {
   });
 
   test("renders the hovered furniture preview inside the office scene", () => {
-    const { previewCell, previewGhost, previewLabel, runtime, scene } = createHarness();
+    const { previewCell, previewGhost, previewLabel, runtime, scene } =
+      createHarness();
     const bootstrap = createBootstrap();
     const rotatedChair = resolveFurnitureRotationVariant(rotatingChair.id, 1);
     if (!rotatedChair) {
@@ -324,7 +341,9 @@ describe("WorldSceneOfficeRuntime", () => {
     expect(previewGhost.setPosition).toHaveBeenCalledWith(32, 48);
     expect(previewGhost.setDisplaySize).toHaveBeenCalledWith(16, 16);
     expect(previewCell.setPosition).toHaveBeenCalledWith(32, 48);
-    expect(previewLabel.setText).toHaveBeenCalledWith("Replace Laptop - Front - Off");
+    expect(previewLabel.setText).toHaveBeenCalledWith(
+      "Replace Laptop - Front - Off",
+    );
   });
 
   test("shows drag move preview ghost when dragging selected furniture and hides it on endPainting", () => {
@@ -379,6 +398,28 @@ describe("WorldSceneOfficeRuntime", () => {
     expect(previewGhost.setVisible).toHaveBeenCalledWith(false);
   });
 
+  test("keeps office placement previews hidden for prop tools", () => {
+    const { previewGhost, runtime, scene } = createHarness();
+    const bootstrap = createBootstrap({
+      furniture: [],
+    });
+    if (!farmrpgProp) {
+      throw new Error("Missing FarmRPG prop test asset");
+    }
+
+    scene.input.activePointer = null;
+
+    runtime.bootstrap(bootstrap);
+    runtime.handleSetEditorTool({
+      tool: "prop",
+      propId: farmrpgProp.id,
+      rotationQuarterTurns: 0,
+    });
+
+    expect(scene.add.image).not.toHaveBeenCalled();
+    expect(previewGhost.setTexture).not.toHaveBeenCalled();
+  });
+
   test("rerenders and emits layout projections after office edits", () => {
     const { emit, runtime } = createHarness();
     const bootstrap = createBootstrap();
@@ -401,8 +442,7 @@ describe("WorldSceneOfficeRuntime", () => {
     runtime.update();
 
     const renderResults = officeRenderMocks.renderOfficeLayout.mock.results;
-    const renderable =
-      renderResults[renderResults.length - 1]?.value;
+    const renderable = renderResults[renderResults.length - 1]?.value;
     expect(renderable?.partialUpdate).toHaveBeenCalledOnce();
     expect(emit).toHaveBeenCalledWith(
       RUNTIME_TO_UI_EVENTS.OFFICE_LAYOUT_CHANGED,

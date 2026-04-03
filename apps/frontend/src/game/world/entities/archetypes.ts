@@ -17,9 +17,17 @@ export type NpcArchetypeSeed = {
   visualRef: EntityVisualRef;
 };
 
+export type PropArchetypeSeed = {
+  family: string;
+  group: string;
+  propId: string;
+  visualRef: EntityVisualRef;
+};
+
 type BuildArchetypeRuntimesInput = {
   players: readonly PlayerArchetypeSeed[];
   npcs: readonly NpcArchetypeSeed[];
+  props: readonly PropArchetypeSeed[];
 };
 
 type ArchetypeRuntime = {
@@ -30,7 +38,7 @@ type ArchetypeRuntime = {
 type BuildRuntimeInput = {
   id: string;
   label: string;
-  kind: "player" | "npc";
+  kind: "player" | "npc" | "prop";
   visualRef: EntityVisualRef;
   createBehavior: () => EntityBehavior;
 };
@@ -96,20 +104,55 @@ function buildNpcRuntime(seed: NpcArchetypeSeed): ArchetypeRuntime {
   });
 }
 
+function createPropBehavior(): EntityBehavior {
+  return {
+    idle(_ctx: ActionContext): EntityAction {
+      return "idle";
+    },
+  };
+}
+
+function formatLabel(value: string): string {
+  return value
+    .split(/[-_.\s]+/)
+    .filter(Boolean)
+    .map((segment) => segment[0]!.toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function buildPropRuntime(seed: PropArchetypeSeed): ArchetypeRuntime {
+  return buildRuntime({
+    id: `prop.${seed.family}.${seed.group}.${seed.propId}`,
+    label: formatLabel(seed.propId),
+    kind: "prop",
+    visualRef: seed.visualRef,
+    createBehavior: createPropBehavior,
+  });
+}
 export function buildArchetypeRuntimes(
   input: BuildArchetypeRuntimesInput,
 ): ArchetypeRuntime[] {
   const runtimes: ArchetypeRuntime[] = [];
-  const seenNpcEntityIds = new Set<string>();
+  const seenEntityIds = new Set<string>();
 
   for (const player of input.players) {
-    runtimes.push(buildPlayerRuntime(player));
+    const runtime = buildPlayerRuntime(player);
+    if (seenEntityIds.has(runtime.definition.id)) continue;
+    seenEntityIds.add(runtime.definition.id);
+    runtimes.push(runtime);
   }
 
   for (const npc of input.npcs) {
     const runtime = buildNpcRuntime(npc);
-    if (seenNpcEntityIds.has(runtime.definition.id)) continue;
-    seenNpcEntityIds.add(runtime.definition.id);
+    if (seenEntityIds.has(runtime.definition.id)) continue;
+    seenEntityIds.add(runtime.definition.id);
+    runtimes.push(runtime);
+  }
+
+  for (const prop of input.props) {
+    const runtime = buildPropRuntime(prop);
+    if (seenEntityIds.has(runtime.definition.id)) continue;
+    seenEntityIds.add(runtime.definition.id);
     runtimes.push(runtime);
   }
 

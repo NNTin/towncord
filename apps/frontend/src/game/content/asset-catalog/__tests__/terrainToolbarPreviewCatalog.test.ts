@@ -76,6 +76,9 @@ describe("terrain toolbar preview catalog", () => {
     const winterWater = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
       (item) => item.id === "terrain.farmrpg.winter.water.tile",
     );
+    const barnPosts = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.find(
+      (item) => item.id === "terrain.farmrpg.barn.posts",
+    );
 
     expect(springWater?.label).toBe("FarmRPG Spring Water Tile Brush");
     expect(springWater?.groupLabel).toBe("Spring");
@@ -101,5 +104,17 @@ describe("terrain toolbar preview catalog", () => {
     expect(winterWater?.animationFrames[0]?.frameKey).toBe(
       "tilesets.farmrpg.water.tile#0@0",
     );
+
+    expect(barnPosts?.label).toBe("Barn Posts");
+    expect(barnPosts?.groupLabel).toBe("Barn");
+    expect(barnPosts?.materialId).toBe("ground");
+    expect(barnPosts?.brushId).toBe("ground");
+    expect(barnPosts?.terrainSourceId).toBe(
+      "public-assets:terrain/farmrpg-barn-posts",
+    );
+    expect(barnPosts?.representativeFrame.frameKey).toBe(
+      "tilesets.farmrpg.barn.posts#15",
+    );
+    expect(barnPosts?.animationFrames).toHaveLength(1);
   });
 });

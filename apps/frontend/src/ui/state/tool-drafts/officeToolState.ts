@@ -25,6 +25,8 @@ export type OfficeToolStateData = {
   activeWallColor: OfficeColorAdjust;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
+  activePropId: string | null;
+  activePropRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export type OfficeToolStateAction =
@@ -36,7 +38,9 @@ export type OfficeToolStateAction =
   | { type: "selectFloorPattern"; id: string }
   | { type: "selectWallColor"; color: OfficeColorAdjust }
   | { type: "selectFurnitureId"; id: string }
+  | { type: "selectPropId"; id: string }
   | { type: "rotateFurnitureClockwise" }
+  | { type: "rotatePropClockwise" }
   | { type: "officeFloorPicked"; payload: OfficeFloorPickedPayload };
 
 const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
@@ -52,13 +56,14 @@ export function createOfficeToolStateData(): OfficeToolStateData {
     activeWallColor: cloneOfficeColorAdjust(DEFAULT_WALL_COLOR_ADJUST),
     activeFurnitureId: null,
     activeFurnitureRotationQuarterTurns: 0,
+    activePropId: null,
+    activePropRotationQuarterTurns: 0,
   };
 }
 
-function applyFloorColor(color: OfficeColorAdjust): Pick<
-  OfficeToolStateData,
-  "activeFloorColor" | "activeTileColor"
-> {
+function applyFloorColor(
+  color: OfficeColorAdjust,
+): Pick<OfficeToolStateData, "activeFloorColor" | "activeTileColor"> {
   const cloned = cloneOfficeColorAdjust(color);
   return {
     activeFloorColor: cloned,
@@ -66,17 +71,15 @@ function applyFloorColor(color: OfficeColorAdjust): Pick<
   };
 }
 
-function applyPresetFloorColor(color: OfficeTileColor): Pick<
-  OfficeToolStateData,
-  "activeFloorColor" | "activeTileColor"
-> {
+function applyPresetFloorColor(
+  color: OfficeTileColor,
+): Pick<OfficeToolStateData, "activeFloorColor" | "activeTileColor"> {
   return applyFloorColor(resolveOfficeTileColorAdjustPreset(color));
 }
 
-function applyWallColor(color: OfficeColorAdjust): Pick<
-  OfficeToolStateData,
-  "activeWallColor"
-> {
+function applyWallColor(
+  color: OfficeColorAdjust,
+): Pick<OfficeToolStateData, "activeWallColor"> {
   return {
     activeWallColor: cloneOfficeColorAdjust(color),
   };
@@ -165,6 +168,16 @@ export function reduceOfficeToolState(
             : 0,
       };
 
+    case "selectPropId":
+      return {
+        ...state,
+        activePropId: action.id,
+        activePropRotationQuarterTurns:
+          state.activePropId === action.id
+            ? state.activePropRotationQuarterTurns
+            : 0,
+      };
+
     case "rotateFurnitureClockwise":
       return {
         ...state,
@@ -173,13 +186,23 @@ export function reduceOfficeToolState(
             4) as FurnitureRotationQuarterTurns,
       };
 
+    case "rotatePropClockwise":
+      return {
+        ...state,
+        activePropRotationQuarterTurns: ((state.activePropRotationQuarterTurns +
+          1) %
+          4) as FurnitureRotationQuarterTurns,
+      };
+
     case "officeFloorPicked":
       return {
         ...state,
         activeTool: "floor",
         activeFloorMode: "paint",
         activeFloorPattern: action.payload.floorPattern,
-        ...applyFloorColor(action.payload.floorColor ?? DEFAULT_FLOOR_COLOR_ADJUST),
+        ...applyFloorColor(
+          action.payload.floorColor ?? DEFAULT_FLOOR_COLOR_ADJUST,
+        ),
       };
   }
 }

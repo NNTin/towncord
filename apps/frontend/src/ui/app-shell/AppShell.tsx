@@ -23,6 +23,7 @@ function App(): JSX.Element {
     officeEditor,
     activeTerrainTool,
     entityToolbarViewModel,
+    propToolbarViewModel,
     selectedOfficePlaceable,
     onRotateSelectedOfficePlaceable,
     onDeleteSelectedOfficePlaceable,
@@ -39,6 +40,8 @@ function App(): JSX.Element {
     activeTool: officeToolState.activeTool,
     activeFurnitureId: officeToolState.activeFurnitureId,
     onRotateFurnitureClockwise: officeToolState.onRotateFurnitureClockwise,
+    activePropId: officeToolState.activePropId,
+    onRotatePropClockwise: officeToolState.onRotatePropClockwise,
     selectedOfficePlaceable,
     onRotateSelectedOfficePlaceable,
   });
@@ -52,7 +55,11 @@ function App(): JSX.Element {
       ) : null}
       {officeEditor.isOpen ? (
         <OfficeEditorDrawer
-          canReload={officeEditor.isAvailable && !officeEditor.isLoading && !layoutSaveState.isSaving}
+          canReload={
+            officeEditor.isAvailable &&
+            !officeEditor.isLoading &&
+            !layoutSaveState.isSaving
+          }
           canReset={officeEditor.canReset}
           error={layoutSaveState.error}
           parseError={officeEditor.parseError}
@@ -90,9 +97,16 @@ function App(): JSX.Element {
           officeToolState.activeFurnitureRotationQuarterTurns
         }
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
+        activePropId={officeToolState.activePropId}
+        activePropRotationQuarterTurns={
+          officeToolState.activePropRotationQuarterTurns
+        }
+        onSelectPropId={officeToolState.onSelectPropId}
+        onRotatePropClockwise={officeToolState.onRotatePropClockwise}
         onRotateFurnitureClockwise={officeToolState.onRotateFurnitureClockwise}
         activeTerrainTool={activeTerrainTool}
         entityToolbarViewModel={entityToolbarViewModel}
+        propToolbarViewModel={propToolbarViewModel}
         selectedOfficePlaceable={selectedOfficePlaceable}
         onRotateSelectedOfficePlaceable={onRotateSelectedOfficePlaceable}
         onDeleteSelectedOfficePlaceable={onDeleteSelectedOfficePlaceable}

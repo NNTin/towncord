@@ -13,6 +13,8 @@ import type {
   PlaceEntityDropPayload,
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
+  SelectedTerrainPropToolPayload,
+  TerrainPropSelectionActionPayload,
 } from "../../contracts/runtime";
 import {
   ALL_TERRAIN_SOURCE_IDS,
@@ -37,11 +39,17 @@ export type {
 } from "../../contracts/office-editor";
 
 export type { SelectedTerrainToolPayload } from "../../contracts/runtime";
+export type {
+  SelectedTerrainPropToolPayload,
+  TerrainPropSelectionActionPayload,
+} from "../../contracts/runtime";
 
 export const UI_TO_RUNTIME_COMMANDS = {
   PLACE_ENTITY_DROP: "placeEntityDrop",
   PLACE_TERRAIN_DROP: "placeTerrainDrop",
   SELECT_TERRAIN_TOOL: "selectTerrainTool",
+  SET_TERRAIN_PROP_TOOL: "setTerrainPropTool",
+  TERRAIN_PROP_SELECTION_ACTION: "terrainPropSelectionAction",
   SET_ZOOM: "setZoom",
   OFFICE_SET_EDITOR_TOOL: "officeSetEditorTool",
   OFFICE_SELECTION_ACTION: "officeSelectionAction",
@@ -52,6 +60,10 @@ export const PLACE_TERRAIN_DROP_EVENT =
   UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP;
 export const SELECT_TERRAIN_TOOL_EVENT =
   UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL;
+export const SET_TERRAIN_PROP_TOOL_EVENT =
+  UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL;
+export const TERRAIN_PROP_SELECTION_ACTION_EVENT =
+  UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION;
 export const SET_ZOOM_EVENT = UI_TO_RUNTIME_COMMANDS.SET_ZOOM;
 export const OFFICE_SET_EDITOR_TOOL_EVENT =
   UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL;
@@ -69,6 +81,8 @@ export type UiToRuntimeCommandPayloadByName = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: PlaceEntityDropPayload;
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: PlaceTerrainDropPayload;
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: SelectedTerrainToolPayload;
+  [UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL]: SelectedTerrainPropToolPayload;
+  [UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION]: TerrainPropSelectionActionPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: SetZoomPayload;
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]: OfficeSetEditorToolPayload;
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]: OfficeSelectionActionPayload;
@@ -203,6 +217,31 @@ export function normalizeSetZoomPayload(
   return { zoom: value.zoom };
 }
 
+export function normalizeSelectedTerrainPropToolPayload(
+  value: unknown,
+): SelectedTerrainPropToolPayload | undefined {
+  if (value == null) {
+    return null;
+  }
+
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const propId = normalizeNullableString(value.propId);
+  const rotationQuarterTurns = normalizeFurnitureRotationQuarterTurns(
+    value.rotationQuarterTurns,
+  );
+  if (propId == null || rotationQuarterTurns === undefined) {
+    return undefined;
+  }
+
+  return {
+    propId,
+    rotationQuarterTurns,
+  };
+}
+
 export function normalizeOfficeSetEditorToolPayload(
   value: unknown,
 ): OfficeSetEditorToolPayload | undefined {
@@ -238,6 +277,21 @@ export function normalizeOfficeSetEditorToolPayload(
       return {
         tool: "furniture",
         furnitureId,
+        rotationQuarterTurns,
+      };
+    }
+    case "prop": {
+      const propId = normalizeNullableString(value.propId);
+      const rotationQuarterTurns = normalizeFurnitureRotationQuarterTurns(
+        value.rotationQuarterTurns,
+      );
+      if (propId === undefined || rotationQuarterTurns === undefined) {
+        return undefined;
+      }
+
+      return {
+        tool: "prop",
+        propId,
         rotationQuarterTurns,
       };
     }
@@ -282,11 +336,30 @@ export function normalizeOfficeSelectionActionPayload(
   };
 }
 
+export function normalizeTerrainPropSelectionActionPayload(
+  value: unknown,
+): TerrainPropSelectionActionPayload | undefined {
+  if (
+    !isRecord(value) ||
+    (value.action !== "rotate" && value.action !== "delete")
+  ) {
+    return undefined;
+  }
+
+  return {
+    action: value.action,
+  };
+}
+
 const uiToRuntimeCommandNormalizers = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]:
     normalizeSelectedTerrainToolPayload,
+  [UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL]:
+    normalizeSelectedTerrainPropToolPayload,
+  [UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION]:
+    normalizeTerrainPropSelectionActionPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: normalizeSetZoomPayload,
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]:
     normalizeOfficeSetEditorToolPayload,

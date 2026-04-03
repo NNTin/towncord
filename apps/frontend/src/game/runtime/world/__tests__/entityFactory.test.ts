@@ -22,6 +22,7 @@ describe("createWorldEntity", () => {
       setFlipX: vi.fn(),
       setInteractive: vi.fn(),
       setOrigin: vi.fn(),
+      setRotation: vi.fn(),
       setScale: vi.fn(),
       play: vi.fn(),
     };

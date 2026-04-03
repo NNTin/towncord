@@ -18,5 +18,7 @@ export {
 } from "./terrainSeedPersistence";
 export {
   isTerrainSeedDocument,
+  type TerrainSeedDetailLayerDocument,
   type TerrainSeedDocument,
+  type TerrainSeedPropDocument,
 } from "./terrainSeedDocument";

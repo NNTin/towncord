@@ -123,6 +123,29 @@ describe("runtime sidebar projection owners", () => {
     });
   });
 
+  test("switches from terrain paint to terrain prop placement when the prop tool is selected", () => {
+    const state = reduceRuntimeBridgeState(createRuntimeBridgeState(), {
+      type: "terrainToolSelected",
+      tool: {
+        materialId: "water",
+        brushId: "paint",
+      },
+    });
+    const nextState = reduceRuntimeBridgeState(state, {
+      type: "terrainPropToolSelected",
+      tool: {
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 1,
+      },
+    });
+
+    expect(nextState.activeTerrainTool).toBeNull();
+    expect(nextState.activeTerrainPropTool).toEqual({
+      propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 1,
+    });
+  });
+
   test("preserves the active terrain source when source-agnostic terrain tools are selected", () => {
     const withFarmrpgTool = reduceRuntimeBridgeState(
       createRuntimeBridgeState(),

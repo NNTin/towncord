@@ -32,7 +32,11 @@ export type OfficeToolState = OfficeToolStateData & {
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectFurnitureId: (id: string) => void;
+  activePropId: string | null;
+  activePropRotationQuarterTurns: FurnitureRotationQuarterTurns;
+  onSelectPropId: (id: string) => void;
   onRotateFurnitureClockwise: () => void;
+  onRotatePropClockwise: () => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
 };
 
@@ -70,8 +74,14 @@ export function useOfficeToolState(): OfficeToolState {
     onSelectFurnitureId(id) {
       dispatch({ type: "selectFurnitureId", id });
     },
+    onSelectPropId(id) {
+      dispatch({ type: "selectPropId", id });
+    },
     onRotateFurnitureClockwise() {
       dispatch({ type: "rotateFurnitureClockwise" });
+    },
+    onRotatePropClockwise() {
+      dispatch({ type: "rotatePropClockwise" });
     },
     onOfficeFloorPicked(payload) {
       dispatch({ type: "officeFloorPicked", payload });

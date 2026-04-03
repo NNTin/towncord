@@ -3,6 +3,8 @@ import type {
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
   RuntimeZoomState,
+  TerrainPropSelectionChangedPayload,
+  TerrainPropToolSelection,
   TerrainTileInspectedPayload,
   TerrainToolSelection,
 } from "../../contracts/runtime";
@@ -11,9 +13,11 @@ export type RuntimeBridgeState = {
   bootstrap: RuntimeBootstrapPayload | null;
   inspectedTile: TerrainTileInspectedPayload | null;
   activeTerrainTool: TerrainToolSelection;
+  activeTerrainPropTool: TerrainPropToolSelection;
   runtimeDiagnostics: RuntimePerfPayload | null;
   zoomState: RuntimeZoomState | null;
   officeSelection: OfficeSelectionChangedPayload | null;
+  terrainPropSelection: TerrainPropSelectionChangedPayload | null;
 };
 
 export type RuntimeBridgeAction =
@@ -22,7 +26,12 @@ export type RuntimeBridgeAction =
   | { type: "runtimeDiagnosticsUpdated"; payload: RuntimePerfPayload }
   | { type: "zoomChanged"; payload: RuntimeZoomState }
   | { type: "terrainToolSelected"; tool: TerrainToolSelection }
+  | { type: "terrainPropToolSelected"; tool: TerrainPropToolSelection }
   | { type: "officeSelectionChanged"; payload: OfficeSelectionChangedPayload }
+  | {
+      type: "terrainPropSelectionChanged";
+      payload: TerrainPropSelectionChangedPayload;
+    }
   | { type: "inspectedTileCleared" };
 
 export function createRuntimeBridgeState(): RuntimeBridgeState {
@@ -30,9 +39,11 @@ export function createRuntimeBridgeState(): RuntimeBridgeState {
     bootstrap: null,
     inspectedTile: null,
     activeTerrainTool: null,
+    activeTerrainPropTool: null,
     runtimeDiagnostics: null,
     zoomState: null,
     officeSelection: null,
+    terrainPropSelection: null,
   };
 }
 
@@ -73,12 +84,25 @@ export function reduceRuntimeBridgeState(
                 terrainSourceId: state.activeTerrainTool.terrainSourceId,
               }
             : action.tool,
+        activeTerrainPropTool: null,
+        inspectedTile: action.tool ? null : state.inspectedTile,
+      };
+    case "terrainPropToolSelected":
+      return {
+        ...state,
+        activeTerrainTool: null,
+        activeTerrainPropTool: action.tool,
         inspectedTile: action.tool ? null : state.inspectedTile,
       };
     case "officeSelectionChanged":
       return {
         ...state,
         officeSelection: action.payload,
+      };
+    case "terrainPropSelectionChanged":
+      return {
+        ...state,
+        terrainPropSelection: action.payload,
       };
     case "inspectedTileCleared":
       return {

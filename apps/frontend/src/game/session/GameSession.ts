@@ -8,10 +8,12 @@ import type {
   PlaceDragPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
+  SelectedTerrainPropToolPayload,
+  SelectedTerrainToolPayload,
+  TerrainPropSelectionChangedPayload,
   TerrainSeedChangedPayload,
   TerrainTileInspectedPayload,
   ZoomChangedPayload,
-  SelectedTerrainToolPayload,
 } from "../contracts/runtime";
 
 type ScreenPoint = {
@@ -34,9 +36,7 @@ export type RuntimeTerrainProjectionPort = {
 };
 
 export type RuntimeTerrainDocumentProjectionPort = {
-  onTerrainSeedChanged?: (
-    payload: TerrainSeedChangedPayload["seed"],
-  ) => void;
+  onTerrainSeedChanged?: (payload: TerrainSeedChangedPayload["seed"]) => void;
 };
 
 export type RuntimeDiagnosticsProjectionPort = {
@@ -50,13 +50,18 @@ export type RuntimeCameraProjectionPort = {
 export type RuntimeOfficeProjectionPort = {
   onOfficeLayoutChanged?: (layout: OfficeSceneLayout) => void;
   onOfficeFloorPicked?: (payload: OfficeFloorPickedPayload) => void;
-  onOfficeSelectionChanged?: (
-    payload: OfficeSelectionChangedPayload,
+  onOfficeSelectionChanged?: (payload: OfficeSelectionChangedPayload) => void;
+};
+
+export type RuntimeTerrainPropProjectionPort = {
+  onTerrainPropSelectionChanged?: (
+    payload: TerrainPropSelectionChangedPayload,
   ) => void;
 };
 
 export type GameSessionNotifications = RuntimeLifecycleProjectionPort &
   RuntimeTerrainProjectionPort &
+  RuntimeTerrainPropProjectionPort &
   RuntimeTerrainDocumentProjectionPort &
   RuntimeDiagnosticsProjectionPort &
   RuntimeCameraProjectionPort &
@@ -68,6 +73,9 @@ export type RuntimePlacementCommandPort = {
 
 export type RuntimeTerrainCommandPort = {
   selectTerrainTool: (tool: RuntimeTerrainToolSelection) => void;
+  setTerrainPropTool: (tool: SelectedTerrainPropToolPayload) => void;
+  rotateSelectedTerrainProp: () => void;
+  deleteSelectedTerrainProp: () => void;
 };
 
 export type RuntimeCameraCommandPort = {

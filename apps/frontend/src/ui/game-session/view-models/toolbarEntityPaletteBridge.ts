@@ -5,6 +5,7 @@ import {
   isEntityPlaceable,
   startPlaceableDrag,
 } from "./placeablesBridge";
+import { isPropEntityPlaceable } from "./toolbarPropPaletteBridge";
 
 type CreateToolbarEntityPaletteBridgeParams = {
   placeables: PlaceableViewModel[];
@@ -13,7 +14,10 @@ type CreateToolbarEntityPaletteBridgeParams = {
 export function createToolbarEntityPaletteBridge({
   placeables,
 }: CreateToolbarEntityPaletteBridgeParams): EntityToolbarViewModel | null {
-  const entityPlaceables = placeables.filter(isEntityPlaceable);
+  const entityPlaceables = placeables.filter(
+    (placeable) =>
+      isEntityPlaceable(placeable) && !isPropEntityPlaceable(placeable),
+  );
   if (entityPlaceables.length === 0) {
     return null;
   }

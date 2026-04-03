@@ -1,9 +1,32 @@
 import { describe, expect, test, vi } from "vitest";
+
+vi.mock("public-assets-json:donarg-office/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/furniture-catalog.json", () => ({
+  default: {
+    assets: [],
+  },
+}));
+
+vi.mock("public-assets-json:bloomseed/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
 import {
   bindUiToRuntimeCommand,
   emitPlaceDropCommand,
   normalizeOfficeSetEditorToolPayload,
   normalizeOfficeSelectionActionPayload,
+  normalizeSelectedTerrainPropToolPayload,
+  normalizeTerrainPropSelectionActionPayload,
   normalizeUiToRuntimeCommandPayload,
   UI_TO_RUNTIME_COMMANDS,
 } from "../uiCommands";
@@ -112,6 +135,17 @@ describe("uiCommands transport", () => {
     ).not.toBe(wallColor);
     expect(
       normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 2,
+      }),
+    ).toEqual({
+      tool: "prop",
+      propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 2,
+    });
+    expect(
+      normalizeOfficeSetEditorToolPayload({
         tool: "floor",
         floorMode: "pick",
         tileColor: "teal",
@@ -130,6 +164,20 @@ describe("uiCommands transport", () => {
       normalizeOfficeSetEditorToolPayload({
         tool: "wall",
         wallColor: { h: "214", s: 25, b: -54, c: 17 },
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: 42,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 5,
       }),
     ).toBeUndefined();
   });
@@ -265,5 +313,40 @@ describe("uiCommands transport", () => {
         screenY: 24,
       },
     );
+  });
+
+  test("normalizes terrain prop tool payloads at the command boundary", () => {
+    expect(
+      normalizeSelectedTerrainPropToolPayload({
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 3,
+      }),
+    ).toEqual({
+      propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 3,
+    });
+    expect(
+      normalizeSelectedTerrainPropToolPayload({
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 4,
+      }),
+    ).toBeUndefined();
+    expect(normalizeSelectedTerrainPropToolPayload(null)).toBeNull();
+  });
+
+  test("normalizes terrain prop selection actions at the command boundary", () => {
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "rotate" }),
+    ).toEqual({
+      action: "rotate",
+    });
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "delete" }),
+    ).toEqual({
+      action: "delete",
+    });
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "flip" }),
+    ).toBeUndefined();
   });
 });

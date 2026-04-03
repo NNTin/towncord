@@ -1,5 +1,6 @@
 import {
   FURNITURE_ALL_ITEMS,
+  FURNITURE_ATLAS_TEXTURE_KEY,
   fallbackFootprintFromPixels,
 } from "../../../content/structures/furniturePalette";
 import {
@@ -86,32 +87,45 @@ function buildOfficeSceneBootstrap(
   sourceLayout: DonargOfficeLayoutSource,
   sourceCatalog: DonargFurnitureCatalogSource,
 ): OfficeSceneBootstrap {
-  const catalog = new Map(sourceCatalog.assets.map((asset) => [asset.id, asset]));
+  const catalog = new Map(
+    sourceCatalog.assets.map((asset) => [asset.id, asset]),
+  );
   const anchor = resolveOfficeSceneAnchor(sourceLayout.anchor);
   const tiles: OfficeSceneTile[] = sourceLayout.tiles.map((tile, index) =>
     normalizeOfficeSceneTile(tile, index, sourceLayout),
   );
 
-  const furnitureRaw = (sourceLayout.furniture as unknown[]);
-  const furniture: MappedFurnitureEntry[] = furnitureRaw.length > 0 && isFurnitureRecord(furnitureRaw[0])
-    ? furnitureRaw.filter(isFurnitureRecord).map((f, i) => ({ ...f, sourceOrder: i }))
-    : (sourceLayout.furniture as DonargLayoutPlacement[]).map((entry, index) =>
-        mapFurnitureEntry(entry, catalog.get(entry.type), index),
-      );
+  const furnitureRaw = sourceLayout.furniture as unknown[];
+  const furniture: MappedFurnitureEntry[] =
+    furnitureRaw.length > 0 && isFurnitureRecord(furnitureRaw[0])
+      ? furnitureRaw
+          .filter(isFurnitureRecord)
+          .map((f, i) => ({ ...f, sourceOrder: i }))
+      : (sourceLayout.furniture as DonargLayoutPlacement[]).map(
+          (entry, index) =>
+            mapFurnitureEntry(entry, catalog.get(entry.type), index),
+        );
 
-  const sourceWithChars = sourceLayout as DonargOfficeLayoutSource & { characters?: unknown[] };
+  const sourceWithChars = sourceLayout as DonargOfficeLayoutSource & {
+    characters?: unknown[];
+  };
   const charactersRaw = sourceWithChars.characters ?? [];
   const normalizedLayoutForCharacters =
-    Array.isArray(sourceLayout.tiles) && (sourceLayout.tiles as unknown[]).length > 0 && typeof (sourceLayout.tiles as unknown[])[0] === "number"
+    Array.isArray(sourceLayout.tiles) &&
+    (sourceLayout.tiles as unknown[]).length > 0 &&
+    typeof (sourceLayout.tiles as unknown[])[0] === "number"
       ? sourceLayout
       : ({
           ...sourceLayout,
           // Ensure tiles is always a number[] for character derivation.
-          tiles: tiles.map((t: any) => (typeof t.tileId === "number" ? t.tileId : 0)),
+          tiles: tiles.map((t: any) =>
+            typeof t.tileId === "number" ? t.tileId : 0,
+          ),
         } as DonargOfficeLayoutSource);
-  const characters: OfficeSceneCharacter[] = charactersRaw.length > 0 && isCharacterRecord(charactersRaw[0])
-    ? charactersRaw.filter(isCharacterRecord)
-    : createDerivedCharacters(normalizedLayoutForCharacters, furniture);
+  const characters: OfficeSceneCharacter[] =
+    charactersRaw.length > 0 && isCharacterRecord(charactersRaw[0])
+      ? charactersRaw.filter(isCharacterRecord)
+      : createDerivedCharacters(normalizedLayoutForCharacters, furniture);
 
   return {
     anchor,
@@ -189,7 +203,9 @@ function mapFurnitureEntry(
     accentColor: colors.accentColor,
     ...(renderAsset ? { renderAsset } : {}),
     sourceOrder,
-    ...(sourceAsset?.orientation ? { orientation: sourceAsset.orientation } : {}),
+    ...(sourceAsset?.orientation
+      ? { orientation: sourceAsset.orientation }
+      : {}),
     ...(sourceAsset?.groupId ? { groupId: sourceAsset.groupId } : {}),
   };
 }
@@ -201,6 +217,7 @@ function toFurnitureRenderAsset(assetId: string) {
   }
 
   return {
+    textureKey: paletteItem.textureKey ?? FURNITURE_ATLAS_TEXTURE_KEY,
     atlasKey: paletteItem.atlasKey,
     atlasFrame: { ...paletteItem.atlasFrame },
   };
@@ -215,6 +232,7 @@ function normalizeFurnitureCategory(
     case "desks":
     case "electronics":
     case "misc":
+    case "props":
     case "storage":
     case "wall":
       return category;
@@ -340,7 +358,11 @@ function createDerivedCharacters(
   const characters: OfficeSceneCharacter[] = [];
 
   for (const station of workstationCandidates) {
-    const seat = findClosestAvailableSeat(station, seatCandidates, occupiedSeats);
+    const seat = findClosestAvailableSeat(
+      station,
+      seatCandidates,
+      occupiedSeats,
+    );
     if (!seat) {
       continue;
     }
@@ -405,9 +427,14 @@ function findClosestAvailableSeat(
     .map((seat) => ({
       seat,
       distance:
-        Math.abs(seat.col - anchorPoint.col) + Math.abs(seat.row - anchorPoint.row),
+        Math.abs(seat.col - anchorPoint.col) +
+        Math.abs(seat.row - anchorPoint.row),
     }))
-    .sort((left, right) => left.distance - right.distance || compareFurnitureBySourceOrder(left.seat, right.seat));
+    .sort(
+      (left, right) =>
+        left.distance - right.distance ||
+        compareFurnitureBySourceOrder(left.seat, right.seat),
+    );
 
   return availableSeats[0]?.seat ?? null;
 }
@@ -519,14 +546,17 @@ function isTileRecord(value: unknown): value is OfficeSceneTile {
     typeof value === "object" &&
     value !== null &&
     "kind" in value &&
-    (value.kind === "void" || value.kind === "floor" || value.kind === "wall") &&
+    (value.kind === "void" ||
+      value.kind === "floor" ||
+      value.kind === "wall") &&
     "tileId" in value &&
     Number.isFinite((value as OfficeSceneTile).tileId) &&
     (!("tint" in value) || Number.isFinite((value as OfficeSceneTile).tint)) &&
     (!("colorAdjust" in value) ||
       (value as OfficeSceneTile).colorAdjust == null ||
       isOfficeColorAdjust((value as OfficeSceneTile).colorAdjust)) &&
-    (!("pattern" in value) || typeof (value as OfficeSceneTile).pattern === "string")
+    (!("pattern" in value) ||
+      typeof (value as OfficeSceneTile).pattern === "string")
   );
 }
 
@@ -538,7 +568,9 @@ function normalizeOfficeSceneTile(
   if (typeof tile === "number") {
     const kind = toTileKind(tile);
     const sourceColor = sourceLayout.tileColors?.[index];
-    const colorAdjust = isOfficeColorAdjust(sourceColor) ? cloneOfficeColorAdjust(sourceColor) : null;
+    const colorAdjust = isOfficeColorAdjust(sourceColor)
+      ? cloneOfficeColorAdjust(sourceColor)
+      : null;
     const tint = resolveOfficeTileTint(colorAdjust, fallbackTileTint(tile));
 
     const normalized: OfficeSceneTile = {
@@ -565,7 +597,9 @@ function normalizeOfficeSceneTile(
     normalized.pattern = tile.pattern;
   }
 
-  const colorAdjust = isOfficeColorAdjust(tile.colorAdjust) ? cloneOfficeColorAdjust(tile.colorAdjust) : null;
+  const colorAdjust = isOfficeColorAdjust(tile.colorAdjust)
+    ? cloneOfficeColorAdjust(tile.colorAdjust)
+    : null;
   const tint = resolveOfficeTileTint(
     colorAdjust,
     typeof tile.tint === "number" ? tile.tint : fallbackTileTint(tile.tileId),
@@ -609,6 +643,9 @@ function isFurnitureRenderAssetRecord(value: unknown): boolean {
 
   const candidate = value as NonNullable<OfficeSceneFurniture["renderAsset"]>;
   return (
+    (!("textureKey" in candidate) ||
+      candidate.textureKey == null ||
+      typeof candidate.textureKey === "string") &&
     typeof candidate.atlasKey === "string" &&
     typeof candidate.atlasFrame === "object" &&
     candidate.atlasFrame !== null &&
@@ -633,12 +670,15 @@ function isCharacterRecord(value: unknown): value is OfficeSceneCharacter {
   );
 }
 
-export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | null {
+export function getOfficeSceneBootstrap(
+  value: unknown,
+): OfficeSceneBootstrap | null {
   if (typeof value !== "object" || value === null || !("layout" in value)) {
     return null;
   }
 
-  const anchor = "anchor" in value ? (value as { anchor?: unknown }).anchor : undefined;
+  const anchor =
+    "anchor" in value ? (value as { anchor?: unknown }).anchor : undefined;
   const layout = value.layout;
   if (typeof layout !== "object" || layout === null) {
     return null;
@@ -699,6 +739,9 @@ export function getOfficeSceneBootstrap(value: unknown): OfficeSceneBootstrap | 
         ...(item.renderAsset
           ? {
               renderAsset: {
+                ...(item.renderAsset.textureKey
+                  ? { textureKey: item.renderAsset.textureKey }
+                  : {}),
                 atlasKey: item.renderAsset.atlasKey,
                 atlasFrame: { ...item.renderAsset.atlasFrame },
               },

@@ -1,5 +1,30 @@
 import { describe, expect, test } from "vitest";
-import { createOfficeToolStateData, reduceOfficeToolState } from "../officeToolState";
+import { vi } from "vitest";
+
+vi.mock("public-assets-json:donarg-office/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/furniture-catalog.json", () => ({
+  default: {
+    assets: [],
+  },
+}));
+
+vi.mock("public-assets-json:bloomseed/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+import {
+  createOfficeToolStateData,
+  reduceOfficeToolState,
+} from "../officeToolState";
 
 describe("office tool state reducer", () => {
   test("turning layout mode off clears the active tool and resets floor mode", () => {
@@ -46,7 +71,9 @@ describe("office tool state reducer", () => {
     expect(next.activeFloorMode).toBe("paint");
     expect(next.activeFloorPattern).toBe("environment.floors.pattern-03");
     expect(next.activeFloorColor).toEqual({ h: 214, s: 30, b: -100, c: -55 });
-    expect(next.activeFloorColor).not.toBe(createOfficeToolStateData().activeFloorColor);
+    expect(next.activeFloorColor).not.toBe(
+      createOfficeToolStateData().activeFloorColor,
+    );
     expect(next.activeTileColor).toBeNull();
   });
 
@@ -89,5 +116,37 @@ describe("office tool state reducer", () => {
 
     expect(once.activeFurnitureRotationQuarterTurns).toBe(1);
     expect(wrapped.activeFurnitureRotationQuarterTurns).toBe(0);
+  });
+
+  test("stores the selected prop id without disturbing the active tool", () => {
+    const next = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        isLayoutPaintMode: true,
+        activeTool: "prop",
+        activePropRotationQuarterTurns: 3,
+      },
+      { type: "selectPropId", id: "prop.static.set-01.variant-01" },
+    );
+
+    expect(next.activeTool).toBe("prop");
+    expect(next.activePropId).toBe("prop.static.set-01.variant-01");
+    expect(next.activePropRotationQuarterTurns).toBe(0);
+  });
+
+  test("rotates the pending prop preview clockwise in quarter turns", () => {
+    const once = reduceOfficeToolState(createOfficeToolStateData(), {
+      type: "rotatePropClockwise",
+    });
+    const wrapped = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        activePropRotationQuarterTurns: 3,
+      },
+      { type: "rotatePropClockwise" },
+    );
+
+    expect(once.activePropRotationQuarterTurns).toBe(1);
+    expect(wrapped.activePropRotationQuarterTurns).toBe(0);
   });
 });

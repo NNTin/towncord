@@ -16,9 +16,6 @@ import {
   ENVIRONMENT_ATLAS_W,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
   FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
-  FARMRPG_ATLAS_H,
-  FARMRPG_ATLAS_IMAGE_URL,
-  FARMRPG_ATLAS_W,
   FLOOR_PATTERN_ITEMS,
   PHASE1_TERRAIN_SOURCE_ID,
   resolveTerrainPingPongFrameIndex,
@@ -33,7 +30,7 @@ import {
   DONARG_OFFICE_ATLAS_W,
   getBloomseedAtlasFrame,
   getDonargOfficeAtlasFrame,
-  getFarmrpgAtlasFrame,
+  resolveFarmrpgAtlasFrameSource,
   resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
   resolveOfficeWallAppearance,
@@ -51,9 +48,15 @@ import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type {
   EntityToolbarViewModel,
   SelectedOfficePlaceableViewModel,
+  TerrainPropToolbarViewModel,
 } from "../../game-session/contracts";
 
-export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
+export type OfficeLayoutTool =
+  | "floor"
+  | "wall"
+  | "erase"
+  | "furniture"
+  | "prop";
 
 type LayoutModeProps = {
   isLayoutMode: boolean;
@@ -64,6 +67,7 @@ type ToolSelectionProps = {
   isJsonEditorOpen?: boolean;
   onToggleJsonEditor?: () => void;
   entityToolbarViewModel?: EntityToolbarViewModel | null;
+  propToolbarViewModel?: TerrainPropToolbarViewModel | null;
   activeTool?: OfficeLayoutTool | null;
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeFloorMode?: OfficeFloorMode | null;
@@ -79,6 +83,10 @@ type ToolSelectionProps = {
   activeFurnitureId?: string | null;
   activeFurnitureRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectFurnitureId?: (id: string) => void;
+  activePropId?: string | null;
+  activePropRotationQuarterTurns?: FurnitureRotationQuarterTurns;
+  onSelectPropId?: (id: string) => void;
+  onRotatePropClockwise?: () => void;
   onRotateFurnitureClockwise?: () => void;
   activeTerrainTool?: TerrainToolSelection;
   onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
@@ -251,15 +259,15 @@ function EntityPreviewSprite({
     );
   }
 
-  const farmrpgFrame = getFarmrpgAtlasFrame(frameKey);
-  if (farmrpgFrame) {
+  const farmrpgFrameSource = resolveFarmrpgAtlasFrameSource(frameKey);
+  if (farmrpgFrameSource) {
     return (
       <AtlasSprite
-        atlasUrl={FARMRPG_ATLAS_IMAGE_URL}
-        atlasW={FARMRPG_ATLAS_W}
-        atlasH={FARMRPG_ATLAS_H}
-        frame={farmrpgFrame}
-        scale={resolveEntityPreviewScale(farmrpgFrame)}
+        atlasUrl={farmrpgFrameSource.atlasImageUrl}
+        atlasW={farmrpgFrameSource.atlasW}
+        atlasH={farmrpgFrameSource.atlasH}
+        frame={farmrpgFrameSource.frame}
+        scale={resolveEntityPreviewScale(farmrpgFrameSource.frame)}
       />
     );
   }
@@ -419,6 +427,18 @@ function formatRotationLabel(
 
 function resolveEntityBreadcrumbs(groupLabel: string, label: string): string[] {
   const breadcrumbs = ["Entity", groupLabel];
+  if (label !== groupLabel) {
+    breadcrumbs.push(label);
+  }
+  return breadcrumbs;
+}
+
+function resolveLayoutEntityBreadcrumbs(
+  sectionLabel: string,
+  groupLabel: string,
+  label: string,
+): string[] {
+  const breadcrumbs = ["Layout", sectionLabel, groupLabel];
   if (label !== groupLabel) {
     breadcrumbs.push(label);
   }
@@ -970,7 +990,7 @@ function TerrainSubPanel({
 
     if (
       terrainSourceId === FARMRPG_GRASS_TERRAIN_SOURCE_ID ||
-      terrainSourceId?.startsWith("public-assets:terrain/farmrpg-grass")
+      terrainSourceId?.startsWith("public-assets:terrain/farmrpg")
     ) {
       return "farmrpg";
     }
@@ -1108,7 +1128,8 @@ function TerrainSubPanel({
                 const isSelected =
                   activeTerrainTool?.brushId === item.brushId &&
                   activeTerrainTool?.materialId === item.materialId &&
-                  activeTerrainSourceId === item.terrainSourceId;
+                  (item.isSourceAgnostic ||
+                    activeTerrainSourceId === item.terrainSourceId);
                 return (
                   <button
                     key={item.id}
@@ -1123,7 +1144,9 @@ function TerrainSubPanel({
                       onSelectTerrainTool?.({
                         materialId: item.materialId,
                         brushId: item.brushId,
-                        terrainSourceId: item.terrainSourceId,
+                        ...(item.terrainSourceId
+                          ? { terrainSourceId: item.terrainSourceId }
+                          : {}),
                       });
                     }}
                     style={{
@@ -1339,7 +1362,7 @@ function LayoutOverviewSubPanel({
       <div style={subPanel}>
         <PreviewCard
           breadcrumbs={["Layout"]}
-          description="Choose Floor, Terrain, Wall, Erase, or Furniture to make a layout change."
+          description="Choose Floor, Terrain, Props, Wall, Erase, or Furniture to make a layout change."
           title="Layout editing"
         />
       </div>
@@ -1492,6 +1515,171 @@ function EntitiesSubPanel({
   );
 }
 
+function PropsSubPanel({
+  viewModel,
+  activePropId,
+  activePropRotationQuarterTurns,
+  onSelectPropId,
+  onRotatePropClockwise,
+}: {
+  viewModel: TerrainPropToolbarViewModel | null;
+  activePropId: string | null | undefined;
+  activePropRotationQuarterTurns:
+    | FurnitureRotationQuarterTurns
+    | null
+    | undefined;
+  onSelectPropId: ((id: string) => void) | undefined;
+  onRotatePropClockwise: (() => void) | undefined;
+}): JSX.Element {
+  if (!viewModel) {
+    return (
+      <div style={{ ...subPanel, maxWidth: 420 }}>
+        <PreviewCard
+          breadcrumbs={["Layout", "Props"]}
+          description="FarmRPG props will appear here after the asset export completes."
+          title="Props"
+        />
+      </div>
+    );
+  }
+
+  const firstGroup = viewModel.groups[0] ?? null;
+  const firstPlaceable = firstGroup?.placeables[0] ?? null;
+  const [hoveredPlaceableId, setHoveredPlaceableId] = useState<string | null>(
+    null,
+  );
+  const selectedPlaceable =
+    viewModel.groups
+      .flatMap((group) => group.placeables)
+      .find((placeable) => placeable.entityId === activePropId) ?? null;
+  const previewPlaceable =
+    viewModel.groups
+      .flatMap((group) => group.placeables)
+      .find((placeable) => placeable.id === hoveredPlaceableId) ??
+    selectedPlaceable ??
+    firstPlaceable;
+  const canRotatePreview = Boolean(activePropId);
+
+  return (
+    <div style={{ ...subPanel, maxWidth: 420 }}>
+      <PreviewCard
+        breadcrumbs={
+          previewPlaceable
+            ? resolveLayoutEntityBreadcrumbs(
+                "Props",
+                previewPlaceable.groupLabel,
+                previewPlaceable.label,
+              )
+            : ["Layout", "Props"]
+        }
+        description={
+          previewPlaceable
+            ? "Select a prop and click the terrain to place it. Props only apply outside the office footprint."
+            : "Choose a prop, rotate it if needed, then click the terrain to place it."
+        }
+        title={previewPlaceable?.label ?? "Prop preview"}
+      />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 6,
+          fontFamily: "monospace",
+          fontSize: 11,
+          color: "var(--pixel-text)",
+          opacity: 0.82,
+        }}
+      >
+        <div>Selected: {selectedPlaceable?.label ?? "Choose a prop"}</div>
+        <div>
+          Rotation: {formatRotationLabel(activePropRotationQuarterTurns ?? 0)}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          disabled={!canRotatePreview}
+          onClick={() => onRotatePropClockwise?.()}
+          style={{
+            ...btnBase,
+            opacity: canRotatePreview ? 1 : 0.5,
+            cursor: canRotatePreview ? "pointer" : "default",
+          }}
+          title={
+            canRotatePreview
+              ? "Rotate the pending prop preview"
+              : "Select a prop to rotate the pending placement"
+          }
+        >
+          Rotate
+        </button>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          maxHeight: 220,
+          overflowY: "auto",
+          paddingRight: 2,
+        }}
+      >
+        {viewModel.groups.map((group) => (
+          <div
+            key={group.key}
+            style={{ display: "flex", flexDirection: "column", gap: 4 }}
+          >
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: 11,
+                color: "var(--pixel-text)",
+                opacity: 0.7,
+              }}
+            >
+              {group.label}
+            </div>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              {group.placeables.map((placeable) => (
+                <button
+                  key={placeable.id}
+                  type="button"
+                  title={`Select ${placeable.label}`}
+                  onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
+                  onMouseLeave={() => setHoveredPlaceableId(null)}
+                  onFocus={() => setHoveredPlaceableId(placeable.id)}
+                  onBlur={() => setHoveredPlaceableId(null)}
+                  onClick={() => onSelectPropId?.(placeable.entityId)}
+                  style={{
+                    background: "var(--pixel-btn-bg)",
+                    border:
+                      activePropId === placeable.entityId
+                        ? "2px solid var(--pixel-accent)"
+                        : "2px solid transparent",
+                    color: "var(--pixel-text)",
+                    cursor: "pointer",
+                    fontFamily: "monospace",
+                    fontSize: 12,
+                    padding: placeable.previewFrameKey ? "4px" : "5px 8px",
+                    userSelect: "none",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {placeable.previewFrameKey ? (
+                    <EntityPreviewSprite frameKey={placeable.previewFrameKey} />
+                  ) : (
+                    `⟡ ${placeable.label}`
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 const DEFAULT_TERRAIN_PREVIEW =
@@ -1509,6 +1697,7 @@ export function BottomToolbar({
   isJsonEditorOpen = false,
   onToggleJsonEditor,
   entityToolbarViewModel = null,
+  propToolbarViewModel = null,
   activeTool = null,
   onSelectTool,
   activeFloorMode = "paint",
@@ -1524,6 +1713,10 @@ export function BottomToolbar({
   activeFurnitureId,
   activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
+  activePropId,
+  activePropRotationQuarterTurns = 0,
+  onSelectPropId,
+  onRotatePropClockwise,
   onRotateFurnitureClockwise,
   activeTerrainTool = null,
   onSelectTerrainTool,
@@ -1551,6 +1744,7 @@ export function BottomToolbar({
   useEffect(() => {
     if (isLayoutMode) {
       setIsEntitiesPanelOpen(false);
+      return;
     }
   }, [isLayoutMode]);
 
@@ -1591,8 +1785,15 @@ export function BottomToolbar({
     onSelectTerrainTool?.({
       materialId: DEFAULT_TERRAIN_PREVIEW.materialId,
       brushId: DEFAULT_TERRAIN_PREVIEW.brushId,
-      terrainSourceId: DEFAULT_TERRAIN_PREVIEW.terrainSourceId,
+      ...(DEFAULT_TERRAIN_PREVIEW.terrainSourceId
+        ? { terrainSourceId: DEFAULT_TERRAIN_PREVIEW.terrainSourceId }
+        : {}),
     });
+  }
+
+  function handlePropsButtonClick(): void {
+    onSelectTerrainTool?.(null);
+    onSelectTool?.(activeTool === "prop" ? null : "prop");
   }
 
   function closeLayoutPanel(): void {
@@ -1638,7 +1839,17 @@ export function BottomToolbar({
       {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
         <EntitiesSubPanel viewModel={entityToolbarViewModel} />
       ) : null}
+      {isLayoutMode && activeTool === "prop" ? (
+        <PropsSubPanel
+          viewModel={propToolbarViewModel}
+          activePropId={activePropId}
+          activePropRotationQuarterTurns={activePropRotationQuarterTurns}
+          onSelectPropId={onSelectPropId}
+          onRotatePropClockwise={onRotatePropClockwise}
+        />
+      ) : null}
       {isLayoutMode &&
+      activeTool !== "prop" &&
       (selectedOfficePlaceable || (!activeTool && !activeTerrainTool)) ? (
         <LayoutOverviewSubPanel
           selectedOfficePlaceable={selectedOfficePlaceable}
@@ -1707,6 +1918,18 @@ export function BottomToolbar({
               title="Terrain tool"
             >
               Terrain
+            </button>
+            <button
+              type="button"
+              onClick={handlePropsButtonClick}
+              onMouseEnter={() => setHovered("props")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("props", {
+                active: activeTool === "prop",
+              })}
+              title="Props tool"
+            >
+              Props
             </button>
             <button
               type="button"

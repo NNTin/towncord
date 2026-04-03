@@ -9,6 +9,7 @@ import {
   FURNITURE_ALL_ITEMS,
   resolveFurnitureRotationVariant,
 } from "../../../content/structures/furniturePalette";
+import { resolvePropPaletteItem } from "../../../content/structures/propPalette";
 
 const laptop = FURNITURE_ALL_ITEMS.find(
   (item) =>
@@ -32,19 +33,18 @@ const floorDecorMat = FURNITURE_ALL_ITEMS.find(
 const floorDesk = FURNITURE_ALL_ITEMS.find(
   (item) => item.category === "desks" && item.placement === "floor",
 );
+const farmrpgProp = resolvePropPaletteItem("prop.static.set-01.variant-01");
 
 function findRotatableLargeAsset() {
-  return FURNITURE_ALL_ITEMS.find(
-    (item) => {
-      const rotated = resolveFurnitureRotationVariant(item.id, 1);
-      return (
-        item.groupId &&
-        item.orientation === "front" &&
-        item.footprintW > 1 &&
-        Boolean(rotated && rotated.id !== item.id && rotated.footprintH > 1)
-      );
-    },
-  );
+  return FURNITURE_ALL_ITEMS.find((item) => {
+    const rotated = resolveFurnitureRotationVariant(item.id, 1);
+    return (
+      item.groupId &&
+      item.orientation === "front" &&
+      item.footprintW > 1 &&
+      Boolean(rotated && rotated.id !== item.id && rotated.footprintH > 1)
+    );
+  });
 }
 
 function createFurnitureItem(
@@ -125,7 +125,9 @@ describe("OfficeEditorSystem floor editing", () => {
           tileId: 0,
           pattern: "environment.floors.pattern-01",
           colorAdjust: { h: 35, s: 30, b: 15, c: 0 },
-          tint: resolveOfficeTileTint({ h: 35, s: 30, b: 15, c: 0 }, 0x475569) ?? 0x475569,
+          tint:
+            resolveOfficeTileTint({ h: 35, s: 30, b: 15, c: 0 }, 0x475569) ??
+            0x475569,
         },
       ],
       furniture: [],
@@ -364,7 +366,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 3,
       rows: 2,
       cellSize: 16,
-      tiles: Array.from({ length: 6 }, () => ({ kind: "void" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({
+        kind: "void" as const,
+        tileId: 0,
+      })),
       furniture: [
         createFurnitureItem({
           id: "same-decor",
@@ -462,7 +467,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 3,
       rows: 2,
       cellSize: 16,
-      tiles: Array.from({ length: 6 }, () => ({ kind: "void" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({
+        kind: "void" as const,
+        tileId: 0,
+      })),
       furniture: [
         createFurnitureItem({
           id: "same-decor",
@@ -554,6 +562,40 @@ describe("OfficeEditorSystem floor editing", () => {
     expect(layout.furniture[0]?.category).toBe("desks");
   });
 
+  test("rejects FarmRPG props in the office layout", () => {
+    if (!farmrpgProp) {
+      throw new Error("Missing FarmRPG prop test asset");
+    }
+
+    const system = new OfficeEditorSystem();
+    const layout: OfficeSceneLayout = {
+      cols: 2,
+      rows: 2,
+      cellSize: 16,
+      tiles: Array.from({ length: 4 }, () => ({
+        kind: "void" as const,
+        tileId: 0,
+      })),
+      furniture: [],
+      characters: [],
+    };
+
+    expect(
+      system.applyCommand(layout, {
+        tool: "prop",
+        cell: { col: 0, row: 0 },
+        tileColor: null,
+        floorColor: null,
+        wallColor: null,
+        floorPattern: null,
+        furnitureId: null,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBe(false);
+
+    expect(layout.furniture).toHaveLength(0);
+  });
+
   test("removes a selected furniture item by id without touching tiles", () => {
     const system = new OfficeEditorSystem();
     const layout: OfficeSceneLayout = {
@@ -599,7 +641,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 3,
       rows: 3,
       cellSize: 16,
-      tiles: Array.from({ length: 9 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 9 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         {
           id: "desk-laptop",
@@ -613,14 +658,23 @@ describe("OfficeEditorSystem floor editing", () => {
           height: 1,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         },
       ],
       characters: [],
     };
 
-    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 2 })).toBe(true);
-    expect(layout.furniture[0]).toMatchObject({ id: "desk-laptop", col: 2, row: 2 });
+    expect(
+      system.moveFurniture(layout, "desk-laptop", { col: 2, row: 2 }),
+    ).toBe(true);
+    expect(layout.furniture[0]).toMatchObject({
+      id: "desk-laptop",
+      col: 2,
+      row: 2,
+    });
   });
 
   test("moveFurniture allows coexist with different categories and blocks same-category overlaps", () => {
@@ -633,7 +687,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 6,
       rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 6 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         createFurnitureItem({
           id: "moving-decor",
@@ -673,7 +730,10 @@ describe("OfficeEditorSystem floor editing", () => {
           height: laptop.footprintH,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         }),
         createFurnitureItem({
           id: "moving-desk",
@@ -692,13 +752,27 @@ describe("OfficeEditorSystem floor editing", () => {
       characters: [],
     };
 
-    expect(system.moveFurniture(layout, "moving-decor", { col: 2, row: 0 })).toBe(true);
-    expect(layout.furniture[0]).toMatchObject({ id: "moving-decor", col: 2, row: 0 });
+    expect(
+      system.moveFurniture(layout, "moving-decor", { col: 2, row: 0 }),
+    ).toBe(true);
+    expect(layout.furniture[0]).toMatchObject({
+      id: "moving-decor",
+      col: 2,
+      row: 0,
+    });
 
-    expect(system.moveFurniture(layout, "moving-decor", { col: 1, row: 0 })).toBe(false);
-    expect(layout.furniture[0]).toMatchObject({ id: "moving-decor", col: 2, row: 0 });
+    expect(
+      system.moveFurniture(layout, "moving-decor", { col: 1, row: 0 }),
+    ).toBe(false);
+    expect(layout.furniture[0]).toMatchObject({
+      id: "moving-decor",
+      col: 2,
+      row: 0,
+    });
 
-    expect(system.moveFurniture(layout, "moving-desk", { col: 2, row: 0 })).toBe(false);
+    expect(
+      system.moveFurniture(layout, "moving-desk", { col: 2, row: 0 }),
+    ).toBe(false);
   });
 
   test("moveFurniture returns false when target is out of bounds", () => {
@@ -711,7 +785,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 2,
       rows: 2,
       cellSize: 16,
-      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 4 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         {
           id: "desk-laptop",
@@ -725,14 +802,21 @@ describe("OfficeEditorSystem floor editing", () => {
           height: 1,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         },
       ],
       characters: [],
     };
 
-    expect(system.moveFurniture(layout, "desk-laptop", { col: 2, row: 0 })).toBe(false);
-    expect(system.moveFurniture(layout, "desk-laptop", { col: -1, row: 0 })).toBe(false);
+    expect(
+      system.moveFurniture(layout, "desk-laptop", { col: 2, row: 0 }),
+    ).toBe(false);
+    expect(
+      system.moveFurniture(layout, "desk-laptop", { col: -1, row: 0 }),
+    ).toBe(false);
   });
 
   test("previewFurnitureMove returns a place preview for a valid free target cell", () => {
@@ -745,7 +829,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 4,
       rows: 4,
       cellSize: 16,
-      tiles: Array.from({ length: 16 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 16 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         {
           id: "desk-laptop",
@@ -759,13 +846,19 @@ describe("OfficeEditorSystem floor editing", () => {
           height: 1,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         },
       ],
       characters: [],
     };
 
-    const preview = system.previewFurnitureMove(layout, "desk-laptop", { col: 2, row: 2 });
+    const preview = system.previewFurnitureMove(layout, "desk-laptop", {
+      col: 2,
+      row: 2,
+    });
     expect(preview).toMatchObject({
       kind: "place",
       anchorCell: { col: 2, row: 2 },
@@ -784,7 +877,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 6,
       rows: 1,
       cellSize: 16,
-      tiles: Array.from({ length: 6 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 6 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         createFurnitureItem({
           id: "moving-decor",
@@ -832,7 +928,10 @@ describe("OfficeEditorSystem floor editing", () => {
           height: laptop.footprintH,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         }),
       ],
       characters: [],
@@ -865,7 +964,10 @@ describe("OfficeEditorSystem floor editing", () => {
       cols: 2,
       rows: 2,
       cellSize: 16,
-      tiles: Array.from({ length: 4 }, () => ({ kind: "floor" as const, tileId: 0 })),
+      tiles: Array.from({ length: 4 }, () => ({
+        kind: "floor" as const,
+        tileId: 0,
+      })),
       furniture: [
         {
           id: "desk-laptop",
@@ -879,7 +981,10 @@ describe("OfficeEditorSystem floor editing", () => {
           height: 1,
           color: laptop.color,
           accentColor: laptop.accentColor,
-          renderAsset: { atlasKey: laptop.atlasKey, atlasFrame: { ...laptop.atlasFrame } },
+          renderAsset: {
+            atlasKey: laptop.atlasKey,
+            atlasFrame: { ...laptop.atlasFrame },
+          },
         },
       ],
       characters: [],

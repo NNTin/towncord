@@ -33,7 +33,11 @@ export class WorldScenePlacementController {
 
     const spawnRequest = mapDropPayloadToSpawnRequest(payload);
     const runtime = entityRegistry.getRuntimeById(spawnRequest.entityId);
-    if (!runtime || !runtime.definition.placeable) {
+    if (
+      !runtime ||
+      !runtime.definition.placeable ||
+      runtime.definition.kind === "prop"
+    ) {
       return;
     }
 
@@ -52,7 +56,11 @@ export class WorldScenePlacementController {
       return;
     }
 
-    const entity = entitySystem.addEntity(runtime, clamped.worldX, clamped.worldY);
+    const entity = entitySystem.addEntity(
+      runtime,
+      clamped.worldX,
+      clamped.worldY,
+    );
     if (!entity) {
       return;
     }

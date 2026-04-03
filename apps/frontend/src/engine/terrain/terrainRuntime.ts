@@ -103,6 +103,8 @@ export type TerrainRuntimeOptions = {
   textureKey?: string;
   animationPhaseDurationsById?: Readonly<Record<string, readonly number[]>>;
   fallbackPhaseDurationMs?: number;
+  staticDepth?: number;
+  animatedDepth?: number;
 };
 
 export class TerrainRuntime {
@@ -120,6 +122,8 @@ export class TerrainRuntime {
       this.textureKey,
       options.animationPhaseDurationsById ?? {},
       options.fallbackPhaseDurationMs ?? DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+      options.staticDepth,
+      options.animatedDepth,
     );
   }
 

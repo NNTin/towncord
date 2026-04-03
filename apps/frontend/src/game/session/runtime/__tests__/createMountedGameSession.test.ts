@@ -78,6 +78,18 @@ function createSelectionPayload() {
   };
 }
 
+function createTerrainPropSelectionPayload() {
+  return {
+    selection: {
+      kind: "prop" as const,
+      propId: "prop.static.set-01.variant-01",
+      label: "Variant 01",
+      rotationQuarterTurns: 1 as const,
+      canRotate: true,
+    },
+  };
+}
+
 describe("createMountedGameSession", () => {
   test("owns runtime lifecycle and tears the runtime down idempotently", () => {
     const runtimeHost = createRuntimeHost();
@@ -257,6 +269,53 @@ describe("createMountedGameSession", () => {
     );
   });
 
+  test("replays terrain prop selection to late subscribers and routes rotate/delete actions", () => {
+    const runtimeHost = createRuntimeHost();
+    const session = createMountedGameSession(runtimeHost as never);
+    const selection = createTerrainPropSelectionPayload();
+    const firstSubscriber = {
+      onTerrainPropSelectionChanged: vi.fn(),
+    };
+
+    session.subscribe(firstSubscriber);
+    runtimeHost.events.emit(
+      RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED,
+      selection,
+    );
+
+    const lateSubscriber = {
+      onTerrainPropSelectionChanged: vi.fn(),
+    };
+    session.subscribe(lateSubscriber);
+
+    expect(firstSubscriber.onTerrainPropSelectionChanged).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(firstSubscriber.onTerrainPropSelectionChanged).toHaveBeenCalledWith(
+      selection,
+    );
+    expect(lateSubscriber.onTerrainPropSelectionChanged).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(lateSubscriber.onTerrainPropSelectionChanged).toHaveBeenCalledWith(
+      selection,
+    );
+
+    session.rotateSelectedTerrainProp();
+    session.deleteSelectedTerrainProp();
+
+    expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
+      2,
+      UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION,
+      { action: "rotate" },
+    );
+    expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
+      3,
+      UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION,
+      { action: "delete" },
+    );
+  });
+
   test("supports unsubscribe and dispatches runtime commands through transport", () => {
     const runtimeHost = createRuntimeHost();
     const session = createMountedGameSession(runtimeHost as never);
@@ -281,6 +340,10 @@ describe("createMountedGameSession", () => {
     session.selectTerrainTool({
       materialId: "grass",
       brushId: "paint",
+    });
+    session.setTerrainPropTool({
+      propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 2,
     });
     session.setOfficeEditorTool({ tool: null });
     session.setZoom(1.5);
@@ -307,16 +370,24 @@ describe("createMountedGameSession", () => {
     );
     expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
       3,
+      UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL,
+      {
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 2,
+      },
+    );
+    expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
+      4,
       UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL,
       { tool: null },
     );
     expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
-      4,
+      5,
       UI_TO_RUNTIME_COMMANDS.SET_ZOOM,
       { zoom: 1.5 },
     );
     expect(runtimeHost.events.emit).toHaveBeenNthCalledWith(
-      5,
+      6,
       UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP,
       {
         type: "terrain",

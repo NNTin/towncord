@@ -1,6 +1,7 @@
 import type { EntityId } from "../world/entities/model";
 import type { TerrainBrushId, TerrainMaterialId } from "../terrain/contracts";
 import type { AnimationCatalog } from "./content";
+import type { FurnitureRotationQuarterTurns } from "./content";
 import type { TerrainSeedDocument } from "../../data";
 import type { TerrainContentSourceId } from "../content/asset-catalog/terrainContentRepository";
 
@@ -30,6 +31,29 @@ export type PlayerStateChangedPayload = {
 };
 
 export type SelectedTerrainToolPayload = TerrainToolSelection;
+
+export type TerrainPropToolSelection = {
+  propId: EntityId;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
+} | null;
+
+export type SelectedTerrainPropToolPayload = TerrainPropToolSelection;
+
+export type TerrainSelectedPropPayload = {
+  kind: "prop";
+  propId: EntityId;
+  label: string;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
+  canRotate: boolean;
+};
+
+export type TerrainPropSelectionChangedPayload = {
+  selection: TerrainSelectedPropPayload | null;
+};
+
+export type TerrainPropSelectionActionPayload = {
+  action: "rotate" | "delete";
+};
 
 export type PlaceEntityDragPayload = {
   type: "entity";
