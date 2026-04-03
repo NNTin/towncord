@@ -1,14 +1,7 @@
-import propsAtlasJson from "public-assets-json:farmrpg/atlases/props.json";
+import { resolveFarmrpgAtlasFrameSource } from "../asset-catalog/farmrpgAtlas";
 
 const FARMRPG_PROP_TEXTURE_KEY = "farmrpg.props";
 const TILE_SIZE = 16;
-
-type FarmrpgPropsAtlasData = {
-  frames: Record<
-    string,
-    { frame: { x: number; y: number; w: number; h: number } }
-  >;
-};
 
 export type PropPaletteItem = {
   id: string;
@@ -24,8 +17,6 @@ export type PropPaletteItem = {
   accentColor: number;
   groupLabel: string;
 };
-
-const propsAtlasData = propsAtlasJson as FarmrpgPropsAtlasData;
 
 function titleCase(value: string): string {
   return value
@@ -58,7 +49,7 @@ export function resolvePropPaletteItem(
   }
 
   const atlasKey = resolveFrameKey(propId);
-  const atlasFrame = propsAtlasData.frames[atlasKey]?.frame;
+  const atlasFrame = resolveFarmrpgAtlasFrameSource(atlasKey)?.frame;
   if (!atlasFrame) {
     return null;
   }
