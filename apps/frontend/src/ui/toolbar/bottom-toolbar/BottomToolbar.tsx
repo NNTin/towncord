@@ -28,7 +28,11 @@ import {
   FURNITURE_PALETTE_ITEMS,
   OFFICE_TILE_COLORS,
   cloneOfficeColorAdjust,
+  DONARG_OFFICE_ATLAS_H,
+  DONARG_OFFICE_ATLAS_IMAGE_URL,
+  DONARG_OFFICE_ATLAS_W,
   getBloomseedAtlasFrame,
+  getDonargOfficeAtlasFrame,
   getFarmrpgAtlasFrame,
   resolveFurnitureRotationVariant,
   resolveOfficeFloorAppearance,
@@ -223,8 +227,11 @@ function FurnitureSprite({
   );
 }
 
-// Entity sprites are 64×64 px; scale to 0.5 so they display at 32×32 px like furniture thumbnails.
-const ENTITY_PREVIEW_SCALE = 0.5;
+const ENTITY_PREVIEW_TARGET_HEIGHT = 32;
+
+function resolveEntityPreviewScale(frame: AtlasFrame): number {
+  return ENTITY_PREVIEW_TARGET_HEIGHT / frame.h;
+}
 
 function EntityPreviewSprite({
   frameKey,
@@ -239,7 +246,7 @@ function EntityPreviewSprite({
         atlasW={BLOOMSEED_ATLAS_W}
         atlasH={BLOOMSEED_ATLAS_H}
         frame={bloomseedFrame}
-        scale={ENTITY_PREVIEW_SCALE}
+        scale={resolveEntityPreviewScale(bloomseedFrame)}
       />
     );
   }
@@ -252,7 +259,20 @@ function EntityPreviewSprite({
         atlasW={FARMRPG_ATLAS_W}
         atlasH={FARMRPG_ATLAS_H}
         frame={farmrpgFrame}
-        scale={ENTITY_PREVIEW_SCALE}
+        scale={resolveEntityPreviewScale(farmrpgFrame)}
+      />
+    );
+  }
+
+  const donargOfficeFrame = getDonargOfficeAtlasFrame(frameKey);
+  if (donargOfficeFrame) {
+    return (
+      <AtlasSprite
+        atlasUrl={DONARG_OFFICE_ATLAS_IMAGE_URL}
+        atlasW={DONARG_OFFICE_ATLAS_W}
+        atlasH={DONARG_OFFICE_ATLAS_H}
+        frame={donargOfficeFrame}
+        scale={resolveEntityPreviewScale(donargOfficeFrame)}
       />
     );
   }

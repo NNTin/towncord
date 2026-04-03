@@ -68,6 +68,12 @@ export {
   getFarmrpgAtlasFrame,
 } from "../content/asset-catalog/farmrpgAtlas";
 export {
+  DONARG_OFFICE_ATLAS_H,
+  DONARG_OFFICE_ATLAS_IMAGE_URL,
+  DONARG_OFFICE_ATLAS_W,
+  getDonargOfficeAtlasFrame,
+} from "../content/asset-catalog/donargOfficeAtlas";
+export {
   DEBUG_TERRAIN_ATLAS_H,
   DEBUG_TERRAIN_ATLAS_IMAGE_URL,
   DEBUG_TERRAIN_ATLAS_W,

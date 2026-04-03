@@ -1,8 +1,13 @@
-import { deriveCapabilitiesFromBehavior, type ActionContext, type EntityBehavior } from "./capabilities";
+import {
+  deriveCapabilitiesFromBehavior,
+  type ActionContext,
+  type EntityBehavior,
+} from "./capabilities";
 import type { EntityAction, EntityDefinition, EntityVisualRef } from "./model";
 
 export type PlayerArchetypeSeed = {
   model: string;
+  label?: string;
   visualRef: EntityVisualRef;
 };
 
@@ -74,7 +79,7 @@ function createNpcBehavior(): EntityBehavior {
 function buildPlayerRuntime(seed: PlayerArchetypeSeed): ArchetypeRuntime {
   return buildRuntime({
     id: `player.${seed.model}`,
-    label: seed.model,
+    label: seed.label ?? seed.model,
     kind: "player",
     visualRef: seed.visualRef,
     createBehavior: createPlayerBehavior,
@@ -91,7 +96,9 @@ function buildNpcRuntime(seed: NpcArchetypeSeed): ArchetypeRuntime {
   });
 }
 
-export function buildArchetypeRuntimes(input: BuildArchetypeRuntimesInput): ArchetypeRuntime[] {
+export function buildArchetypeRuntimes(
+  input: BuildArchetypeRuntimesInput,
+): ArchetypeRuntime[] {
   const runtimes: ArchetypeRuntime[] = [];
   const seenNpcEntityIds = new Set<string>();
 
