@@ -418,6 +418,39 @@ describe("renderOfficeLayout", () => {
     expect(scene.add.container.mock.calls[3]).toEqual([48, 48]);
   });
 
+  test("renders furniture sprites from the explicit texture key when provided", () => {
+    const scene = createScene();
+    const layout: OfficeSceneLayout = {
+      cols: 1,
+      rows: 1,
+      cellSize: 16,
+      tiles: [{ kind: "floor", tileId: 0 }],
+      furniture: [
+        createFurnitureItem({
+          id: "farmrpg-prop",
+          assetId: "prop.static.set-01.variant-01",
+          label: "Variant 01",
+          category: "props" as never,
+          renderAsset: {
+            textureKey: "farmrpg.props",
+            atlasKey: "props.farmrpg.static.set-01.variant-01#0",
+            atlasFrame: { x: 0, y: 0, w: 16, h: 16 },
+          },
+        }),
+      ],
+      characters: [],
+    };
+
+    renderOfficeLayout(scene as unknown as Phaser.Scene, layout);
+
+    expect(scene.add.image).toHaveBeenCalledWith(
+      8,
+      8,
+      "farmrpg.props",
+      "props.farmrpg.static.set-01.variant-01#0",
+    );
+  });
+
   test("keeps wall-mounted furniture in front of rebuilt wall sprites during partial updates", () => {
     const scene = createScene();
     const wallFurniture = createFurnitureItem({

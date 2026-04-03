@@ -18,6 +18,7 @@ export type OfficeEditorBridgeState = {
   activeWallColor: OfficeColorAdjust;
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
+  activePropId: string | null;
 };
 
 export function buildOfficeEditorToolPayload(
@@ -42,6 +43,11 @@ export function buildOfficeEditorToolPayload(
         tool: "furniture",
         furnitureId: state.activeFurnitureId,
         rotationQuarterTurns: state.activeFurnitureRotationQuarterTurns,
+      };
+    case "prop":
+      return {
+        tool: "prop",
+        propId: state.activePropId,
       };
     case "erase":
       return { tool: state.activeTool };

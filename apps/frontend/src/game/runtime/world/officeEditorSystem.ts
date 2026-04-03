@@ -1,9 +1,5 @@
-import {
-  type AnchoredGridCellCoord as OfficeCellCoord,
-} from "../../../engine/world-runtime/regions";
-import {
-  shouldTreatFurnitureOverlapAsExclusive,
-} from "../../../engine/world-runtime/spatial";
+import { type AnchoredGridCellCoord as OfficeCellCoord } from "../../../engine/world-runtime/regions";
+import { shouldTreatFurnitureOverlapAsExclusive } from "../../../engine/world-runtime/spatial";
 import {
   officeColorAdjustEquals,
   resolveOfficeFloorAppearance,
@@ -12,14 +8,20 @@ import {
 } from "../../content/structures/colors";
 import {
   FURNITURE_ALL_ITEMS,
+  FURNITURE_ATLAS_TEXTURE_KEY,
   canRotateFurniturePaletteItem,
   resolveFurnitureRotationVariant,
   type FurniturePaletteItem,
   type FurnitureRotationQuarterTurns,
 } from "../../content/structures/furniturePalette";
+import {
+  resolvePropPaletteItem,
+  type PropPaletteItem,
+} from "../../content/structures/propPalette";
 import type {
   OfficeSceneFurniture,
   OfficeSceneFurnitureCategory,
+  OfficeSceneFurnitureRenderAsset,
   OfficeSceneLayout,
 } from "../../officeLayoutContract";
 import type { OfficeTileColor } from "../../world/structures/model";
@@ -43,14 +45,35 @@ type OfficeEditorCommand = {
   floorPattern: string | null;
   /** Active furniture asset ID (only used by the "furniture" tool). */
   furnitureId: string | null;
+  /** Active prop asset ID (only used by the "prop" tool). */
+  propId?: string | null;
   /** Pending clockwise quarter-turns from the selected furniture tool. */
   rotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
+type OfficePlaceablePaletteItem = Pick<
+  FurniturePaletteItem,
+  | "id"
+  | "label"
+  | "category"
+  | "placement"
+  | "textureKey"
+  | "atlasKey"
+  | "atlasFrame"
+  | "footprintW"
+  | "footprintH"
+  | "color"
+  | "accentColor"
+  | "groupId"
+  | "orientation"
+  | "state"
+> &
+  Partial<Pick<PropPaletteItem, "groupLabel">>;
+
 export type OfficeFurniturePlacementPreview = {
   kind: "place" | "replace" | "blocked";
   anchorCell: OfficeCellCoord;
-  asset: FurniturePaletteItem;
+  asset: OfficePlaceablePaletteItem;
   footprintW: number;
   footprintH: number;
   affectedFurniture: OfficeSceneFurniture[];
@@ -104,13 +127,21 @@ export class OfficeEditorSystem {
           command.furnitureId,
           command.rotationQuarterTurns,
         );
+
+      case "prop":
+        return this.applyProp(layout, cell, command.propId ?? null);
     }
 
     return false;
   }
 
-  public removeFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
-    const nextFurniture = layout.furniture.filter((furniture) => furniture.id !== furnitureId);
+  public removeFurniture(
+    layout: OfficeSceneLayout,
+    furnitureId: string,
+  ): boolean {
+    const nextFurniture = layout.furniture.filter(
+      (furniture) => furniture.id !== furnitureId,
+    );
     if (nextFurniture.length === layout.furniture.length) {
       return false;
     }
@@ -137,13 +168,12 @@ export class OfficeEditorSystem {
   public previewFurniturePlacement(
     layout: OfficeSceneLayout,
     cell: OfficeCellCoord,
-    furnitureId: string | null,
+    assetId: string | null,
     rotationQuarterTurns: FurnitureRotationQuarterTurns,
   ): OfficeFurniturePlacementPreview | null {
-    const asset = this.resolvePlacementFurnitureAsset(
-      furnitureId,
-      rotationQuarterTurns,
-    );
+    const asset =
+      this.resolvePlacementFurnitureAsset(assetId, rotationQuarterTurns) ??
+      this.resolvePlacementPropAsset(assetId);
     if (!asset) {
       return null;
     }
@@ -180,13 +210,20 @@ export class OfficeEditorSystem {
     };
   }
 
-  public canRotateFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
-    const current = layout.furniture.find((furniture) => furniture.id === furnitureId);
+  public canRotateFurniture(
+    layout: OfficeSceneLayout,
+    furnitureId: string,
+  ): boolean {
+    const current = layout.furniture.find(
+      (furniture) => furniture.id === furnitureId,
+    );
     if (!current) {
       return false;
     }
 
-    const currentAsset = FURNITURE_ALL_ITEMS.find((item) => item.id === current.assetId);
+    const currentAsset = FURNITURE_ALL_ITEMS.find(
+      (item) => item.id === current.assetId,
+    );
     const nextAsset = this.resolveRotatedFurnitureAsset(currentAsset);
     if (!nextAsset || !currentAsset || nextAsset.id === currentAsset.id) {
       return false;
@@ -206,6 +243,7 @@ export class OfficeEditorSystem {
       ...(nextAsset.orientation ? { orientation: nextAsset.orientation } : {}),
       ...(nextAsset.state ? { state: nextAsset.state } : {}),
       renderAsset: {
+        textureKey: nextAsset.textureKey,
         atlasKey: nextAsset.atlasKey,
         atlasFrame: { ...nextAsset.atlasFrame },
       },
@@ -230,8 +268,13 @@ export class OfficeEditorSystem {
     return canRotateFurniturePaletteItem(furnitureId);
   }
 
-  public rotateFurniture(layout: OfficeSceneLayout, furnitureId: string): boolean {
-    const index = layout.furniture.findIndex((furniture) => furniture.id === furnitureId);
+  public rotateFurniture(
+    layout: OfficeSceneLayout,
+    furnitureId: string,
+  ): boolean {
+    const index = layout.furniture.findIndex(
+      (furniture) => furniture.id === furnitureId,
+    );
     if (index < 0) {
       return false;
     }
@@ -241,7 +284,9 @@ export class OfficeEditorSystem {
       return false;
     }
 
-    const currentAsset = FURNITURE_ALL_ITEMS.find((item) => item.id === current.assetId);
+    const currentAsset = FURNITURE_ALL_ITEMS.find(
+      (item) => item.id === current.assetId,
+    );
     const nextAsset = this.resolveRotatedFurnitureAsset(currentAsset);
     if (!currentAsset || !nextAsset || nextAsset.id === currentAsset.id) {
       return false;
@@ -261,6 +306,7 @@ export class OfficeEditorSystem {
       ...(nextAsset.orientation ? { orientation: nextAsset.orientation } : {}),
       ...(nextAsset.state ? { state: nextAsset.state } : {}),
       renderAsset: {
+        textureKey: nextAsset.textureKey,
         atlasKey: nextAsset.atlasKey,
         atlasFrame: { ...nextAsset.atlasFrame },
       },
@@ -389,51 +435,20 @@ export class OfficeEditorSystem {
       rotationQuarterTurns,
     );
     if (!paletteItem) return false;
+    return this.placePaletteItem(layout, cell, paletteItem);
+  }
 
-    if (
-      cell.col + paletteItem.footprintW > layout.cols ||
-      cell.row + paletteItem.footprintH > layout.rows
-    ) {
+  private applyProp(
+    layout: OfficeSceneLayout,
+    cell: OfficeCellCoord,
+    propId: string | null,
+  ): boolean {
+    const paletteItem = this.resolvePlacementPropAsset(propId);
+    if (!paletteItem) {
       return false;
     }
 
-    const overlappingFurniture = this.findExclusiveOverlappingFurniture(layout, {
-      category: paletteItem.category,
-      col: cell.col,
-      row: cell.row,
-      width: paletteItem.footprintW,
-      height: paletteItem.footprintH,
-    });
-    if (overlappingFurniture.length > 0) {
-      const removeIds = new Set(overlappingFurniture.map((furniture) => furniture.id));
-      layout.furniture = layout.furniture.filter(
-        (furniture) => !removeIds.has(furniture.id),
-      );
-    }
-
-    const newFurniture: OfficeSceneFurniture = {
-      id: `placed-${paletteItem.id}-${nextFurniturePlacementId++}`,
-      assetId: paletteItem.id,
-      label: paletteItem.label,
-      category: paletteItem.category as OfficeSceneFurnitureCategory,
-      placement: paletteItem.placement,
-      col: cell.col,
-      row: cell.row,
-      width: paletteItem.footprintW,
-      height: paletteItem.footprintH,
-      color: paletteItem.color,
-      accentColor: paletteItem.accentColor,
-      ...(paletteItem.groupId ? { groupId: paletteItem.groupId } : {}),
-      ...(paletteItem.orientation ? { orientation: paletteItem.orientation } : {}),
-      ...(paletteItem.state ? { state: paletteItem.state } : {}),
-      renderAsset: {
-        atlasKey: paletteItem.atlasKey,
-        atlasFrame: { ...paletteItem.atlasFrame },
-      },
-    };
-
-    layout.furniture.push(newFurniture);
-    return true;
+    return this.placePaletteItem(layout, cell, paletteItem);
   }
 
   private resolvePlacementFurnitureAsset(
@@ -447,6 +462,12 @@ export class OfficeEditorSystem {
     return resolveFurnitureRotationVariant(furnitureId, rotationQuarterTurns);
   }
 
+  private resolvePlacementPropAsset(
+    propId: string | null,
+  ): OfficePlaceablePaletteItem | null {
+    return resolvePropPaletteItem(propId);
+  }
+
   public previewFurnitureMove(
     layout: OfficeSceneLayout,
     furnitureId: string,
@@ -457,7 +478,9 @@ export class OfficeEditorSystem {
       return null;
     }
 
-    const asset = FURNITURE_ALL_ITEMS.find((item) => item.id === furniture.assetId);
+    const asset =
+      this.resolvePlacedFurniturePreviewAsset(furniture) ??
+      FURNITURE_ALL_ITEMS.find((item) => item.id === furniture.assetId);
     if (!asset) {
       return null;
     }
@@ -499,6 +522,88 @@ export class OfficeEditorSystem {
       footprintH: furniture.height,
       affectedFurniture,
       blockedReason: moveBlockedReason,
+    };
+  }
+
+  private placePaletteItem(
+    layout: OfficeSceneLayout,
+    cell: OfficeCellCoord,
+    paletteItem: OfficePlaceablePaletteItem,
+  ): boolean {
+    if (
+      cell.col + paletteItem.footprintW > layout.cols ||
+      cell.row + paletteItem.footprintH > layout.rows
+    ) {
+      return false;
+    }
+
+    const overlappingFurniture = this.findExclusiveOverlappingFurniture(
+      layout,
+      {
+        category: paletteItem.category,
+        col: cell.col,
+        row: cell.row,
+        width: paletteItem.footprintW,
+        height: paletteItem.footprintH,
+      },
+    );
+    if (overlappingFurniture.length > 0) {
+      const removeIds = new Set(
+        overlappingFurniture.map((furniture) => furniture.id),
+      );
+      layout.furniture = layout.furniture.filter(
+        (furniture) => !removeIds.has(furniture.id),
+      );
+    }
+
+    const newFurniture: OfficeSceneFurniture = {
+      id: `placed-${paletteItem.id}-${nextFurniturePlacementId++}`,
+      assetId: paletteItem.id,
+      label: paletteItem.label,
+      category: paletteItem.category as OfficeSceneFurnitureCategory,
+      placement: paletteItem.placement,
+      col: cell.col,
+      row: cell.row,
+      width: paletteItem.footprintW,
+      height: paletteItem.footprintH,
+      color: paletteItem.color,
+      accentColor: paletteItem.accentColor,
+      ...(paletteItem.groupId ? { groupId: paletteItem.groupId } : {}),
+      ...(paletteItem.orientation
+        ? { orientation: paletteItem.orientation }
+        : {}),
+      ...(paletteItem.state ? { state: paletteItem.state } : {}),
+      renderAsset: {
+        textureKey: paletteItem.textureKey,
+        atlasKey: paletteItem.atlasKey,
+        atlasFrame: { ...paletteItem.atlasFrame },
+      },
+    };
+
+    layout.furniture.push(newFurniture);
+    return true;
+  }
+
+  private resolvePlacedFurniturePreviewAsset(
+    furniture: OfficeSceneFurniture,
+  ): OfficePlaceablePaletteItem | null {
+    const renderAsset = furniture.renderAsset;
+    if (!renderAsset) {
+      return null;
+    }
+
+    return {
+      id: furniture.assetId,
+      label: furniture.label,
+      category: furniture.category,
+      placement: furniture.placement,
+      textureKey: renderAsset.textureKey ?? FURNITURE_ATLAS_TEXTURE_KEY,
+      atlasKey: renderAsset.atlasKey,
+      atlasFrame: { ...renderAsset.atlasFrame },
+      footprintW: furniture.width,
+      footprintH: furniture.height,
+      color: furniture.color,
+      accentColor: furniture.accentColor,
     };
   }
 
@@ -571,21 +676,41 @@ export class OfficeEditorSystem {
 
   private findExclusiveOverlappingFurniture(
     layout: OfficeSceneLayout,
-    bounds: { category: string; col: number; row: number; width: number; height: number },
+    bounds: {
+      category: string;
+      col: number;
+      row: number;
+      width: number;
+      height: number;
+    },
   ): OfficeSceneFurniture[] {
     return this.findOverlappingFurniture(layout, bounds).filter((furniture) =>
-      shouldTreatFurnitureOverlapAsExclusive(bounds.category, furniture.category),
+      shouldTreatFurnitureOverlapAsExclusive(
+        bounds.category,
+        furniture.category,
+      ),
     );
   }
 
   private findBlockingOverlappingFurniture(
     layout: OfficeSceneLayout,
-    bounds: { category: string; col: number; row: number; width: number; height: number },
+    bounds: {
+      category: string;
+      col: number;
+      row: number;
+      width: number;
+      height: number;
+    },
     ignoreFurnitureId?: string,
   ): OfficeSceneFurniture[] {
     return this.findOverlappingFurniture(layout, bounds)
       .filter((furniture) => furniture.id !== ignoreFurnitureId)
-      .filter((furniture) => shouldTreatFurnitureOverlapAsExclusive(bounds.category, furniture.category));
+      .filter((furniture) =>
+        shouldTreatFurnitureOverlapAsExclusive(
+          bounds.category,
+          furniture.category,
+        ),
+      );
   }
 
   private resolveRotatedFurnitureAsset(
@@ -603,20 +728,22 @@ export class OfficeEditorSystem {
     }
 
     const currentState = currentAsset.state ?? null;
-    const currentIndex = ROTATION_ORDER.indexOf(currentAsset.orientation as (typeof ROTATION_ORDER)[number]);
+    const currentIndex = ROTATION_ORDER.indexOf(
+      currentAsset.orientation as (typeof ROTATION_ORDER)[number],
+    );
     if (currentIndex < 0) {
       return null;
     }
 
     for (let offset = 1; offset <= ROTATION_ORDER.length; offset += 1) {
-      const nextOrientation = ROTATION_ORDER[(currentIndex + offset) % ROTATION_ORDER.length];
+      const nextOrientation =
+        ROTATION_ORDER[(currentIndex + offset) % ROTATION_ORDER.length];
       const nextAsset =
         candidates.find(
           (item) =>
             item.orientation === nextOrientation &&
             (item.state ?? null) === currentState,
-        ) ??
-        candidates.find((item) => item.orientation === nextOrientation);
+        ) ?? candidates.find((item) => item.orientation === nextOrientation);
 
       if (nextAsset) {
         return nextAsset;

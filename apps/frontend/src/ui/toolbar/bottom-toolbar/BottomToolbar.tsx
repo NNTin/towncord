@@ -47,10 +47,16 @@ import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type {
   EntityToolbarViewModel,
+  PropToolbarViewModel,
   SelectedOfficePlaceableViewModel,
 } from "../../game-session/contracts";
 
-export type OfficeLayoutTool = "floor" | "wall" | "erase" | "furniture";
+export type OfficeLayoutTool =
+  | "floor"
+  | "wall"
+  | "erase"
+  | "furniture"
+  | "prop";
 
 type LayoutModeProps = {
   isLayoutMode: boolean;
@@ -61,6 +67,7 @@ type ToolSelectionProps = {
   isJsonEditorOpen?: boolean;
   onToggleJsonEditor?: () => void;
   entityToolbarViewModel?: EntityToolbarViewModel | null;
+  propToolbarViewModel?: PropToolbarViewModel | null;
   activeTool?: OfficeLayoutTool | null;
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeFloorMode?: OfficeFloorMode | null;
@@ -76,6 +83,8 @@ type ToolSelectionProps = {
   activeFurnitureId?: string | null;
   activeFurnitureRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectFurnitureId?: (id: string) => void;
+  activePropId?: string | null;
+  onSelectPropId?: (id: string) => void;
   onRotateFurnitureClockwise?: () => void;
   activeTerrainTool?: TerrainToolSelection;
   onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
@@ -432,10 +441,6 @@ function resolveLayoutEntityBreadcrumbs(
     breadcrumbs.push(label);
   }
   return breadcrumbs;
-}
-
-function isPropGroupKey(groupKey: string): boolean {
-  return groupKey.startsWith("entity:prop:");
 }
 
 function PreviewCard({
@@ -1407,21 +1412,6 @@ function LayoutOverviewSubPanel({
   );
 }
 
-function filterEntityToolbarViewModel(
-  viewModel: EntityToolbarViewModel,
-  predicate: (group: EntityToolbarViewModel["groups"][number]) => boolean,
-): EntityToolbarViewModel | null {
-  const groups = viewModel.groups.filter(predicate);
-  if (groups.length === 0) {
-    return null;
-  }
-
-  return {
-    groups,
-    onDragStart: viewModel.onDragStart,
-  };
-}
-
 function EntitiesSubPanel({
   viewModel,
 }: {
@@ -1524,8 +1514,12 @@ function EntitiesSubPanel({
 
 function PropsSubPanel({
   viewModel,
+  activePropId,
+  onSelectPropId,
 }: {
-  viewModel: EntityToolbarViewModel | null;
+  viewModel: PropToolbarViewModel | null;
+  activePropId: string | null | undefined;
+  onSelectPropId: ((id: string) => void) | undefined;
 }): JSX.Element {
   if (!viewModel) {
     return (
@@ -1564,8 +1558,8 @@ function PropsSubPanel({
         }
         description={
           previewPlaceable
-            ? "Drag a prop into the world to place a static FarmRPG decoration."
-            : "Hover a prop to preview it."
+            ? "Click a prop to arm it for layout placement, then click in the office to place it."
+            : "Hover a prop to preview it, then click to select it."
         }
         title={previewPlaceable?.label ?? "Prop preview"}
       />
@@ -1596,23 +1590,23 @@ function PropsSubPanel({
             </div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {group.placeables.map((placeable) => (
-                <div
+                <button
                   key={placeable.id}
-                  draggable
-                  tabIndex={0}
+                  type="button"
                   title={`Place ${placeable.label}`}
                   onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
                   onMouseLeave={() => setHoveredPlaceableId(null)}
                   onFocus={() => setHoveredPlaceableId(placeable.id)}
                   onBlur={() => setHoveredPlaceableId(null)}
-                  onDragStart={(event) =>
-                    viewModel.onDragStart(event, placeable)
-                  }
+                  onClick={() => onSelectPropId?.(placeable.entityId)}
                   style={{
                     background: "var(--pixel-btn-bg)",
-                    border: "2px solid transparent",
+                    border:
+                      activePropId === placeable.entityId
+                        ? "2px solid var(--pixel-accent)"
+                        : "2px solid transparent",
                     color: "var(--pixel-text)",
-                    cursor: "grab",
+                    cursor: "pointer",
                     fontFamily: "monospace",
                     fontSize: 12,
                     padding: placeable.previewFrameKey ? "4px" : "5px 8px",
@@ -1625,7 +1619,7 @@ function PropsSubPanel({
                   ) : (
                     `⊕ ${placeable.label}`
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -1652,6 +1646,7 @@ export function BottomToolbar({
   isJsonEditorOpen = false,
   onToggleJsonEditor,
   entityToolbarViewModel = null,
+  propToolbarViewModel = null,
   activeTool = null,
   onSelectTool,
   activeFloorMode = "paint",
@@ -1667,6 +1662,8 @@ export function BottomToolbar({
   activeFurnitureId,
   activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
+  activePropId,
+  onSelectPropId,
   onRotateFurnitureClockwise,
   activeTerrainTool = null,
   onSelectTerrainTool,
@@ -1684,12 +1681,6 @@ export function BottomToolbar({
 }: BottomToolbarProps): JSX.Element {
   const [hovered, setHovered] = useState<string | null>(null);
   const [isEntitiesPanelOpen, setIsEntitiesPanelOpen] = useState(false);
-  const [isPropsPanelOpen, setIsPropsPanelOpen] = useState(false);
-  const layoutPropsViewModel = entityToolbarViewModel
-    ? filterEntityToolbarViewModel(entityToolbarViewModel, (group) =>
-        isPropGroupKey(group.key),
-      )
-    : null;
 
   useEffect(() => {
     if (!entityToolbarViewModel) {
@@ -1698,18 +1689,10 @@ export function BottomToolbar({
   }, [entityToolbarViewModel]);
 
   useEffect(() => {
-    if (!layoutPropsViewModel) {
-      setIsPropsPanelOpen(false);
-    }
-  }, [layoutPropsViewModel]);
-
-  useEffect(() => {
     if (isLayoutMode) {
       setIsEntitiesPanelOpen(false);
       return;
     }
-
-    setIsPropsPanelOpen(false);
   }, [isLayoutMode]);
 
   function resolveButtonStyle(
@@ -1732,13 +1715,11 @@ export function BottomToolbar({
   }
 
   function handleToolClick(tool: OfficeLayoutTool): void {
-    setIsPropsPanelOpen(false);
     onSelectTerrainTool?.(null);
     onSelectTool?.(activeTool === tool ? null : tool);
   }
 
   function handleTerrainButtonClick(): void {
-    setIsPropsPanelOpen(false);
     if (activeTerrainTool) {
       onSelectTerrainTool?.(null);
       return;
@@ -1758,18 +1739,8 @@ export function BottomToolbar({
   }
 
   function handlePropsButtonClick(): void {
-    if (!layoutPropsViewModel) {
-      return;
-    }
-
-    if (isPropsPanelOpen) {
-      setIsPropsPanelOpen(false);
-      return;
-    }
-
-    onSelectTool?.(null);
     onSelectTerrainTool?.(null);
-    setIsPropsPanelOpen(true);
+    onSelectTool?.(activeTool === "prop" ? null : "prop");
   }
 
   function closeLayoutPanel(): void {
@@ -1777,7 +1748,6 @@ export function BottomToolbar({
       return;
     }
 
-    setIsPropsPanelOpen(false);
     onSelectTool?.(null);
     onSelectTerrainTool?.(null);
     onToggleLayoutMode();
@@ -1816,11 +1786,15 @@ export function BottomToolbar({
       {!isLayoutMode && isEntitiesPanelOpen && entityToolbarViewModel ? (
         <EntitiesSubPanel viewModel={entityToolbarViewModel} />
       ) : null}
-      {isLayoutMode && isPropsPanelOpen ? (
-        <PropsSubPanel viewModel={layoutPropsViewModel} />
+      {isLayoutMode && activeTool === "prop" ? (
+        <PropsSubPanel
+          viewModel={propToolbarViewModel}
+          activePropId={activePropId}
+          onSelectPropId={onSelectPropId}
+        />
       ) : null}
       {isLayoutMode &&
-      !isPropsPanelOpen &&
+      activeTool !== "prop" &&
       (selectedOfficePlaceable || (!activeTool && !activeTerrainTool)) ? (
         <LayoutOverviewSubPanel
           selectedOfficePlaceable={selectedOfficePlaceable}
@@ -1896,7 +1870,7 @@ export function BottomToolbar({
               onMouseEnter={() => setHovered("props")}
               onMouseLeave={() => setHovered(null)}
               style={resolveButtonStyle("props", {
-                active: isPropsPanelOpen,
+                active: activeTool === "prop",
               })}
               title="Props tool"
             >

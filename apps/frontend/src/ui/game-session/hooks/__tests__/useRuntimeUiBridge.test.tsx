@@ -38,6 +38,7 @@ function renderHarness() {
         activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
+        activePropId: null,
       },
       onClearOfficeTool: clearOfficeTool,
     });
@@ -85,6 +86,15 @@ function renderHarness() {
           label: "Player Spawn",
           groupKey: "entity:player",
           groupLabel: "Player",
+          previewFrameKey: null,
+        },
+        {
+          id: "entity:prop.static.set-01.variant-01",
+          type: "entity" as const,
+          entityId: "prop.static.set-01.variant-01",
+          label: "Variant 01",
+          groupKey: "entity:prop:set-01",
+          groupLabel: "Set 01",
           previewFrameKey: null,
         },
         {
@@ -229,6 +239,25 @@ describe("useRuntimeUiBridge", () => {
         },
       ],
       onDragStart: expect.any(Function),
+    });
+    expect(bridge.propToolbarViewModel).toEqual({
+      groups: [
+        {
+          key: "entity:prop:set-01",
+          label: "Set 01",
+          placeables: [
+            {
+              id: "entity:prop.static.set-01.variant-01",
+              type: "entity",
+              entityId: "prop.static.set-01.variant-01",
+              label: "Variant 01",
+              groupKey: "entity:prop:set-01",
+              groupLabel: "Set 01",
+              previewFrameKey: null,
+            },
+          ],
+        },
+      ],
     });
 
     await harness.unmount();

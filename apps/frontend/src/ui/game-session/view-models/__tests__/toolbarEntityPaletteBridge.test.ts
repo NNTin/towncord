@@ -25,6 +25,15 @@ describe("createToolbarEntityPaletteBridge", () => {
           previewFrameKey: null,
         },
         {
+          id: "entity:prop.static.set-01.variant-01",
+          type: "entity",
+          entityId: "prop.static.set-01.variant-01",
+          label: "Variant 01",
+          groupKey: "entity:prop:set-01",
+          groupLabel: "Set 01",
+          previewFrameKey: null,
+        },
+        {
           id: "terrain.ground.tile",
           type: "terrain",
           materialId: "ground",

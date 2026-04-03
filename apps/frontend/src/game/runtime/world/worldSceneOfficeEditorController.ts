@@ -57,6 +57,11 @@ function cloneOfficeEditorToolPayload(
         furnitureId: payload.furnitureId,
         rotationQuarterTurns: payload.rotationQuarterTurns,
       };
+    case "prop":
+      return {
+        tool: "prop",
+        propId: payload.propId,
+      };
     case "erase":
       return { tool: payload.tool };
     default:
@@ -94,6 +99,10 @@ function getOfficeFurnitureId(
   return payload.tool === "furniture" ? payload.furnitureId : null;
 }
 
+function getOfficePropId(payload: OfficeSetEditorToolPayload): string | null {
+  return payload.tool === "prop" ? payload.propId : null;
+}
+
 function getOfficeFurnitureRotationQuarterTurns(
   payload: OfficeSetEditorToolPayload,
 ): 0 | 1 | 2 | 3 {
@@ -107,7 +116,9 @@ function isPointerWithinGame(pointer: Phaser.Input.Pointer | null): boolean {
 
   return (
     !("withinGame" in pointer) ||
-    Boolean((pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame)
+    Boolean(
+      (pointer as Phaser.Input.Pointer & { withinGame?: boolean }).withinGame,
+    )
   );
 }
 
@@ -164,7 +175,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    const changed = this.officeEditorSystem.rotateFurniture(region.layout, furnitureId);
+    const changed = this.officeEditorSystem.rotateFurniture(
+      region.layout,
+      furnitureId,
+    );
     if (changed) {
       this.officeDirty = true;
     }
@@ -178,7 +192,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    return this.officeEditorSystem.canRotateFurniture(region.layout, furnitureId);
+    return this.officeEditorSystem.canRotateFurniture(
+      region.layout,
+      furnitureId,
+    );
   }
 
   public deleteSelectedFurniture(): boolean {
@@ -188,7 +205,10 @@ export class WorldSceneOfficeEditorController {
       return false;
     }
 
-    const changed = this.officeEditorSystem.removeFurniture(region.layout, furnitureId);
+    const changed = this.officeEditorSystem.removeFurniture(
+      region.layout,
+      furnitureId,
+    );
     if (changed) {
       this.officeDirty = true;
       this.selectedFurnitureId = null;
@@ -217,7 +237,7 @@ export class WorldSceneOfficeEditorController {
       return;
     }
 
-    if (tool === "furniture") {
+    if (tool === "furniture" || tool === "prop") {
       highlight.setVisible(false);
       return;
     }
@@ -289,7 +309,8 @@ export class WorldSceneOfficeEditorController {
       !pointer ||
       !isPointerWithinGame(pointer) ||
       !region ||
-      getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture"
+      (getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture" &&
+        getOfficeEditorTool(this.officeEditorToolPayload) !== "prop")
     ) {
       return null;
     }
@@ -298,6 +319,16 @@ export class WorldSceneOfficeEditorController {
     const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
     if (!cell) {
       return null;
+    }
+
+    const tool = getOfficeEditorTool(this.officeEditorToolPayload);
+    if (tool === "prop") {
+      return this.officeEditorSystem.previewFurniturePlacement(
+        region.layout,
+        cell,
+        getOfficePropId(this.officeEditorToolPayload),
+        0,
+      );
     }
 
     return this.officeEditorSystem.previewFurniturePlacement(
@@ -392,7 +423,11 @@ export class WorldSceneOfficeEditorController {
   }
 
   private tryCommitDrag(): void {
-    if (!this.isDraggingFurniture || !this.dragFurnitureId || !this.dragLastCell) {
+    if (
+      !this.isDraggingFurniture ||
+      !this.dragFurnitureId ||
+      !this.dragLastCell
+    ) {
       this.isDraggingFurniture = false;
       this.dragFurnitureId = null;
       this.dragLastCell = null;
@@ -411,7 +446,11 @@ export class WorldSceneOfficeEditorController {
       return;
     }
 
-    const moved = this.officeEditorSystem.moveFurniture(region.layout, furnitureId, targetCell);
+    const moved = this.officeEditorSystem.moveFurniture(
+      region.layout,
+      furnitureId,
+      targetCell,
+    );
     if (moved) {
       this.officeDirty = true;
     }
@@ -433,7 +472,9 @@ export class WorldSceneOfficeEditorController {
     }
 
     const targets = [...this.host.getOfficeFurnitureTargets()].reverse();
-    const hit = targets.find((target) => target.bounds.contains(worldPoint.x, worldPoint.y));
+    const hit = targets.find((target) =>
+      target.bounds.contains(worldPoint.x, worldPoint.y),
+    );
     if (!hit) {
       this.selectedFurnitureId = null;
       this.isDraggingFurniture = false;
@@ -524,6 +565,7 @@ export class WorldSceneOfficeEditorController {
       wallColor: getOfficeWallColor(this.officeEditorToolPayload),
       floorPattern: getOfficeFloorPattern(this.officeEditorToolPayload),
       furnitureId: getOfficeFurnitureId(this.officeEditorToolPayload),
+      propId: getOfficePropId(this.officeEditorToolPayload),
       rotationQuarterTurns: getOfficeFurnitureRotationQuarterTurns(
         this.officeEditorToolPayload,
       ),

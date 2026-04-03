@@ -1,4 +1,25 @@
 import { describe, expect, test, vi } from "vitest";
+
+vi.mock("public-assets-json:donarg-office/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/furniture-catalog.json", () => ({
+  default: {
+    assets: [],
+  },
+}));
+
+vi.mock("public-assets-json:bloomseed/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
 import {
   bindUiToRuntimeCommand,
   emitPlaceDropCommand,
@@ -112,6 +133,15 @@ describe("uiCommands transport", () => {
     ).not.toBe(wallColor);
     expect(
       normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: "prop.static.set-01.variant-01",
+      }),
+    ).toEqual({
+      tool: "prop",
+      propId: "prop.static.set-01.variant-01",
+    });
+    expect(
+      normalizeOfficeSetEditorToolPayload({
         tool: "floor",
         floorMode: "pick",
         tileColor: "teal",
@@ -130,6 +160,12 @@ describe("uiCommands transport", () => {
       normalizeOfficeSetEditorToolPayload({
         tool: "wall",
         wallColor: { h: "214", s: 25, b: -54, c: 17 },
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: 42,
       }),
     ).toBeUndefined();
   });

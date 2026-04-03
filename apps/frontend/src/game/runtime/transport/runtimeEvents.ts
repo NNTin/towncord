@@ -109,6 +109,7 @@ const OFFICE_SCENE_FURNITURE_CATEGORY_SET = new Set([
   "desks",
   "electronics",
   "misc",
+  "props",
   "storage",
   "wall",
   "unknown",
@@ -227,6 +228,9 @@ function isOfficeSceneFurnitureRenderAsset(
 ): value is NonNullable<OfficeSceneFurniture["renderAsset"]> {
   return (
     isRecord(value) &&
+    (!("textureKey" in value) ||
+      value.textureKey == null ||
+      typeof value.textureKey === "string") &&
     typeof value.atlasKey === "string" &&
     isRecord(value.atlasFrame) &&
     isFiniteNumber(value.atlasFrame.x) &&

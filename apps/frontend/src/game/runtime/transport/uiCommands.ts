@@ -241,6 +241,17 @@ export function normalizeOfficeSetEditorToolPayload(
         rotationQuarterTurns,
       };
     }
+    case "prop": {
+      const propId = normalizeNullableString(value.propId);
+      if (propId === undefined) {
+        return undefined;
+      }
+
+      return {
+        tool: "prop",
+        propId,
+      };
+    }
     case "floor": {
       const tileColor = normalizeNullableOfficeTileColor(value.tileColor);
       const floorColor = normalizeNullableOfficeColorAdjust(value.floorColor);

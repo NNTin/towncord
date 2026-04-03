@@ -13,6 +13,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
+        activePropId: null,
       }),
     ).toEqual({
       tool: "floor",
@@ -34,6 +35,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: "desk-01",
         activeFurnitureRotationQuarterTurns: 2,
+        activePropId: null,
       }),
     ).toEqual({
       tool: "furniture",
@@ -53,10 +55,30 @@ describe("buildOfficeEditorToolPayload", () => {
         activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
+        activePropId: null,
       }),
     ).toEqual({
       tool: "wall",
       wallColor: { h: 214, s: 25, b: -54, c: 17 },
+    });
+  });
+
+  test("maps prop state into the editor payload", () => {
+    expect(
+      buildOfficeEditorToolPayload({
+        activeTool: "prop",
+        activeFloorMode: "paint",
+        activeTileColor: null,
+        activeFloorColor: { h: 35, s: 30, b: 15, c: 0 },
+        activeFloorPattern: null,
+        activeWallColor: { h: 214, s: 25, b: -54, c: 17 },
+        activeFurnitureId: null,
+        activeFurnitureRotationQuarterTurns: 0,
+        activePropId: "prop.static.set-01.variant-01",
+      }),
+    ).toEqual({
+      tool: "prop",
+      propId: "prop.static.set-01.variant-01",
     });
   });
 });

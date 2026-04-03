@@ -1,10 +1,16 @@
 import { describe, expect, test, vi } from "vitest";
-import type { OfficeSceneLayout, OfficeSceneTile } from "../../office/bootstrap";
+import type {
+  OfficeSceneLayout,
+  OfficeSceneTile,
+} from "../../office/bootstrap";
 import type { AnchoredGridRegion } from "../../../../engine/world-runtime/regions/anchoredGridRegion";
 import { FURNITURE_ALL_ITEMS } from "../../../content/structures/furniturePalette";
+import { resolvePropPaletteItem } from "../../../content/structures/propPalette";
 import { WorldSceneOfficeEditorController } from "../worldSceneOfficeEditorController";
 
-function createControllerHarness(options: { cols?: number; rows?: number } = {}) {
+function createControllerHarness(
+  options: { cols?: number; rows?: number } = {},
+) {
   const cols = options.cols ?? 1;
   const rows = options.rows ?? 1;
   const highlight = {
@@ -240,6 +246,50 @@ describe("WorldSceneOfficeEditorController", () => {
     });
   });
 
+  test("projects and places FarmRPG props through the office editor tool", () => {
+    const { controller, region } = createControllerHarness({
+      cols: 3,
+      rows: 3,
+    });
+    const prop = resolvePropPaletteItem("prop.static.set-01.variant-01");
+    if (!prop) {
+      throw new Error("Missing FarmRPG prop test asset");
+    }
+
+    controller.setOfficeEditorTool({
+      tool: "prop",
+      propId: prop.id,
+    });
+
+    expect(
+      controller.getFurniturePlacementPreview({
+        isDown: false,
+        withinGame: true,
+        x: 20,
+        y: 20,
+      } as never),
+    ).toMatchObject({
+      anchorCell: { col: 1, row: 1 },
+      asset: expect.objectContaining({
+        id: prop.id,
+        textureKey: "farmrpg.props",
+      }),
+    });
+
+    expect(
+      controller.tryHandlePointerDown({
+        button: 0,
+        isDown: true,
+        x: 20,
+        y: 20,
+      } as never),
+    ).toBe(true);
+
+    expect(
+      region.layout.furniture.some((item) => item.assetId === prop.id),
+    ).toBe(true);
+  });
+
   test("starts a furniture drag on second click of the selected item and hides same-cell move previews", () => {
     const { controller, region } = createControllerHarness();
 
@@ -267,9 +317,9 @@ describe("WorldSceneOfficeEditorController", () => {
     expect(controller.isFurnitureDragging()).toBe(true);
 
     // shouldContinuePainting returns true while dragging with pointer down
-    expect(
-      controller.shouldContinuePainting({ isDown: true } as never),
-    ).toBe(true);
+    expect(controller.shouldContinuePainting({ isDown: true } as never)).toBe(
+      true,
+    );
 
     // Same-cell drags should not show a preview because moveFurniture would be a no-op.
     const preview = controller.getDragMovePreview({
@@ -289,7 +339,10 @@ describe("WorldSceneOfficeEditorController", () => {
   });
 
   test("cancels a furniture drag when the pointer leaves the playable office area", () => {
-    const { controller, region } = createControllerHarness({ cols: 3, rows: 2 });
+    const { controller, region } = createControllerHarness({
+      cols: 3,
+      rows: 2,
+    });
 
     expect(
       controller.tryHandlePointerDown({

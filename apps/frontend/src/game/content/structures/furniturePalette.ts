@@ -9,6 +9,7 @@ import {
 
 const atlasData = donargOfficeAtlasData;
 const furnitureCatalogData = donargFurnitureCatalogData;
+export const FURNITURE_ATLAS_TEXTURE_KEY = "donarg.office.furniture";
 
 export type FurniturePalettePlacement = "floor" | "wall" | "surface";
 export type FurnitureRotationQuarterTurns = 0 | 1 | 2 | 3;
@@ -20,6 +21,7 @@ export type FurniturePaletteItem = {
   groupId?: string;
   orientation?: string;
   state?: string;
+  textureKey: string;
   atlasKey: string;
   atlasFrame: { x: number; y: number; w: number; h: number };
   footprintW: number;
@@ -55,17 +57,24 @@ export function fallbackFootprintFromPixels(pixels?: number): number {
 
 function resolvePlacement(asset: RawAsset): FurniturePalettePlacement {
   if ("canPlaceOnWalls" in asset && asset.canPlaceOnWalls) return "wall";
-  if ("canPlaceOnSurfaces" in asset && asset.canPlaceOnSurfaces) return "surface";
+  if ("canPlaceOnSurfaces" in asset && asset.canPlaceOnSurfaces)
+    return "surface";
   return "floor";
 }
 
-function resolveColors(asset: RawAsset): { color: number; accentColor: number } {
+function resolveColors(asset: RawAsset): {
+  color: number;
+  accentColor: number;
+} {
   const label = asset.label?.toLowerCase() ?? "";
   const category = asset.category?.toLowerCase() ?? "";
 
-  if (label.includes("plant")) return { color: 0x166534, accentColor: 0x86efac };
-  if (label.includes("fridge")) return { color: 0xe5e7eb, accentColor: 0x94a3b8 };
-  if (label.includes("vending")) return { color: 0x4338ca, accentColor: 0xc4b5fd };
+  if (label.includes("plant"))
+    return { color: 0x166534, accentColor: 0x86efac };
+  if (label.includes("fridge"))
+    return { color: 0xe5e7eb, accentColor: 0x94a3b8 };
+  if (label.includes("vending"))
+    return { color: 0x4338ca, accentColor: 0xc4b5fd };
   if (
     label.includes("computer") ||
     label.includes("laptop") ||
@@ -101,7 +110,10 @@ function resolveColors(asset: RawAsset): { color: number; accentColor: number } 
 type RawAsset = DonargFurnitureCatalogAsset;
 
 function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
-  const frames = atlasData.frames as Record<string, { frame: { x: number; y: number; w: number; h: number } }>;
+  const frames = atlasData.frames as Record<
+    string,
+    { frame: { x: number; y: number; w: number; h: number } }
+  >;
   const result: FurniturePaletteItem[] = [];
 
   for (const asset of assets) {
@@ -111,21 +123,30 @@ function buildItemsFromAssets(assets: RawAsset[]): FurniturePaletteItem[] {
 
     const footprintW = Math.max(
       1,
-      ("footprintW" in asset && typeof asset.footprintW === "number"
+      "footprintW" in asset && typeof asset.footprintW === "number"
         ? asset.footprintW
-        : fallbackFootprintFromPixels("width" in asset && typeof asset.width === "number" ? asset.width : undefined)),
+        : fallbackFootprintFromPixels(
+            "width" in asset && typeof asset.width === "number"
+              ? asset.width
+              : undefined,
+          ),
     );
     const footprintH = Math.max(
       1,
-      ("footprintH" in asset && typeof asset.footprintH === "number"
+      "footprintH" in asset && typeof asset.footprintH === "number"
         ? asset.footprintH
-        : fallbackFootprintFromPixels("height" in asset && typeof asset.height === "number" ? asset.height : undefined)),
+        : fallbackFootprintFromPixels(
+            "height" in asset && typeof asset.height === "number"
+              ? asset.height
+              : undefined,
+          ),
     );
 
     result.push({
       id: asset.id,
       label: asset.label,
       category: asset.category,
+      textureKey: FURNITURE_ATLAS_TEXTURE_KEY,
       atlasKey,
       atlasFrame: frameData.frame,
       footprintW,
@@ -152,9 +173,11 @@ function buildVisibleItems(): FurniturePaletteItem[] {
   // Only use "off" state (or no state) variants to determine the primary orientation
   const orientationGroups = new Map<string, Map<string, string>>();
   for (const asset of assets) {
-    if (!asset.groupId || !("orientation" in asset) || !asset.orientation) continue;
+    if (!asset.groupId || !("orientation" in asset) || !asset.orientation)
+      continue;
     if ("state" in asset && asset.state && asset.state !== "off") continue;
-    const map = orientationGroups.get(asset.groupId) ?? new Map<string, string>();
+    const map =
+      orientationGroups.get(asset.groupId) ?? new Map<string, string>();
     map.set(asset.orientation, asset.id);
     orientationGroups.set(asset.groupId, map);
   }
@@ -164,7 +187,9 @@ function buildVisibleItems(): FurniturePaletteItem[] {
   // Hide non-primary orientations in rotation groups
   for (const orientMap of orientationGroups.values()) {
     if (orientMap.size < 2) continue;
-    const primary = ORIENTATION_ORDER.find((o) => orientMap.has(o)) ?? [...orientMap.keys()][0]!;
+    const primary =
+      ORIENTATION_ORDER.find((o) => orientMap.has(o)) ??
+      [...orientMap.keys()][0]!;
     for (const [orientation, id] of orientMap) {
       if (orientation !== primary) hidden.add(id);
     }
@@ -178,7 +203,9 @@ function buildVisibleItems(): FurniturePaletteItem[] {
   return buildItemsFromAssets(assets.filter((asset) => !hidden.has(asset.id)));
 }
 
-function resolveFurnitureItemById(id: string | null | undefined): FurniturePaletteItem | null {
+function resolveFurnitureItemById(
+  id: string | null | undefined,
+): FurniturePaletteItem | null {
   if (!id) {
     return null;
   }
@@ -226,7 +253,9 @@ function resolveNextRotatedFurnitureVariant(
   return currentItem;
 }
 
-export function canRotateFurniturePaletteItem(id: string | null | undefined): boolean {
+export function canRotateFurniturePaletteItem(
+  id: string | null | undefined,
+): boolean {
   const currentItem = resolveFurnitureItemById(id);
   if (!currentItem) {
     return false;
@@ -258,7 +287,8 @@ export function resolveFurnitureRotationVariant(
 
 /** All furniture items with atlas frames, including non-primary orientations. Used for rendering placed furniture. */
 export const FURNITURE_ALL_ITEMS: FurniturePaletteItem[] = buildAllItems();
-export const FURNITURE_PALETTE_ITEMS: FurniturePaletteItem[] = buildVisibleItems();
+export const FURNITURE_PALETTE_ITEMS: FurniturePaletteItem[] =
+  buildVisibleItems();
 export const FURNITURE_PALETTE_CATEGORIES: string[] = [
   ...new Set(FURNITURE_PALETTE_ITEMS.map((i) => i.category)),
 ].sort();

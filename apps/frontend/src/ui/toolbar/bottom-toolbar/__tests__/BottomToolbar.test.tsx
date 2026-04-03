@@ -5,12 +5,84 @@ import type { ComponentProps } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { TerrainToolSelection } from "../../../../game/contracts/runtime";
-import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
 
 vi.mock("public-assets-json:farmrpg/atlases/characters.json", () => ({
   default: {
     meta: { size: { w: 1, h: 1 } },
     frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:bloomseed/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 1, h: 1 } },
+    frames: {},
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 64, h: 64 } },
+    frames: {
+      "furniture.electronics.laptop-front-off#0": {
+        frame: { x: 0, y: 0, w: 16, h: 32 },
+      },
+      "furniture.electronics.laptop-right-off#0": {
+        frame: { x: 16, y: 0, w: 32, h: 16 },
+      },
+      "furniture.electronics.monitor-front-off#0": {
+        frame: { x: 48, y: 0, w: 16, h: 16 },
+      },
+    },
+  },
+}));
+
+vi.mock("public-assets-json:donarg-office/furniture-catalog.json", () => ({
+  default: {
+    assets: [
+      {
+        id: "ASSET_107",
+        label: "Laptop - Front - Off",
+        category: "electronics",
+        file: "furniture/electronics/LAPTOP_FRONT_OFF.png",
+        width: 16,
+        height: 32,
+        footprintW: 1,
+        footprintH: 2,
+        canPlaceOnSurfaces: true,
+        groupId: "LAPTOP",
+        orientation: "front",
+        state: "off",
+      },
+      {
+        id: "ASSET_78",
+        label: "Monitor - Front - Off",
+        category: "electronics",
+        file: "furniture/electronics/MONITOR_FRONT_OFF.png",
+        width: 16,
+        height: 16,
+        footprintW: 1,
+        footprintH: 1,
+        canPlaceOnSurfaces: true,
+        groupId: "MONITOR",
+        orientation: "front",
+        state: "off",
+      },
+      {
+        id: "ASSET_109",
+        label: "Laptop - Right - Off",
+        category: "electronics",
+        file: "furniture/electronics/LAPTOP_RIGHT_OFF.png",
+        width: 32,
+        height: 16,
+        footprintW: 2,
+        footprintH: 1,
+        canPlaceOnSurfaces: true,
+        groupId: "LAPTOP",
+        orientation: "right",
+        state: "off",
+      },
+    ],
   },
 }));
 
@@ -54,6 +126,7 @@ vi.mock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
 }));
 
 import { BottomToolbar } from "../BottomToolbar";
+import { FURNITURE_PALETTE_ITEMS } from "../../../../game/content/structures/furniturePalette";
 
 (
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -65,7 +138,8 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   isJsonEditorOpen: false,
   onToggleJsonEditor: vi.fn(),
   entityToolbarViewModel: null,
-  activeTool: null as "floor" | "wall" | "erase" | "furniture" | null,
+  propToolbarViewModel: null,
+  activeTool: null as "floor" | "wall" | "erase" | "furniture" | "prop" | null,
   onSelectTool: vi.fn(),
   activeFloorMode: "paint" as const,
   onSelectFloorMode: vi.fn(),
@@ -80,6 +154,8 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFurnitureId: null,
   activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
+  activePropId: null,
+  onSelectPropId: vi.fn(),
   onRotateFurnitureClockwise: vi.fn(),
   activeTerrainTool: null as TerrainToolSelection,
   onSelectTerrainTool: vi.fn(),
@@ -278,27 +354,11 @@ describe("BottomToolbar", () => {
     });
   });
 
-  test("opens Layout props as a filtered prop panel without selecting an office tool", () => {
-    const onDragStart = vi.fn();
+  test("opens Layout props as a real layout tool and selects props by click", () => {
     const props = {
       ...baseProps,
       entityToolbarViewModel: {
         groups: [
-          {
-            key: "entity:prop:set-01",
-            label: "Set 01",
-            placeables: [
-              {
-                id: "entity:prop.static.set-01.variant-01",
-                type: "entity" as const,
-                entityId: "prop.static.set-01.variant-01",
-                label: "Variant 01",
-                groupKey: "entity:prop:set-01",
-                groupLabel: "Set 01",
-                previewFrameKey: null,
-              },
-            ],
-          },
           {
             key: "entity:npc",
             label: "Mobs",
@@ -315,43 +375,63 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
-        onDragStart,
+        onDragStart: vi.fn(),
+      },
+      propToolbarViewModel: {
+        groups: [
+          {
+            key: "entity:prop:set-01",
+            label: "Set 01",
+            placeables: [
+              {
+                id: "entity:prop.static.set-01.variant-01",
+                type: "entity" as const,
+                entityId: "prop.static.set-01.variant-01",
+                label: "Variant 01",
+                groupKey: "entity:prop:set-01",
+                groupLabel: "Set 01",
+                previewFrameKey: null,
+              },
+            ],
+          },
+        ],
       },
     };
-    const { container, root } = renderToolbar(props);
+    const { container, root, rerender } = renderToolbar(props);
 
     act(() => {
       getButton(container, "Props tool").click();
     });
 
-    expect(props.onSelectTool).toHaveBeenCalledWith(null);
+    expect(props.onSelectTool).toHaveBeenCalledWith("prop");
     expect(props.onSelectTerrainTool).toHaveBeenCalledWith(null);
+
+    rerender({
+      ...props,
+      activeTool: "prop",
+    });
+
     expect(container.textContent).toContain("Layout");
     expect(container.textContent).toContain("Props");
     expect(container.textContent).toContain("Set 01");
     expect(container.textContent).toContain("Variant 01");
     expect(container.textContent).not.toContain("Greeter");
 
-    const entry = Array.from(
-      container.querySelectorAll("[draggable='true']"),
-    ).find((element) => element.textContent?.includes("Variant 01"));
-    if (!entry) {
-      throw new Error("Missing draggable prop entry");
+    const entry = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.getAttribute("title") === "Place Variant 01",
+    );
+    if (!(entry instanceof HTMLButtonElement)) {
+      throw new Error("Missing clickable prop entry");
     }
 
-    const dragStartEvent = new Event("dragstart", { bubbles: true });
-    Object.defineProperty(dragStartEvent, "dataTransfer", {
-      value: {
-        setData: vi.fn(),
-        effectAllowed: "none",
-      },
-    });
-
     act(() => {
-      entry.dispatchEvent(dragStartEvent);
+      entry.click();
     });
 
-    expect(onDragStart).toHaveBeenCalledTimes(1);
+    expect(props.onSelectPropId).toHaveBeenCalledWith(
+      "prop.static.set-01.variant-01",
+    );
+    expect(container.querySelector("[draggable='true']")).toBeNull();
 
     act(() => {
       root.unmount();

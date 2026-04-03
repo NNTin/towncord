@@ -372,7 +372,7 @@ export class WorldSceneOfficeRuntime {
     const colors = this.resolvePlacementPreviewColors(preview);
 
     const ghost = this.ensurePlacementPreviewGhost();
-    ghost.setTexture(OFFICE_PREVIEW_TEXTURE_KEY, preview.asset.atlasKey);
+    ghost.setTexture(preview.asset.textureKey, preview.asset.atlasKey);
     ghost.setOrigin(0, 0);
     ghost.setDepth(OFFICE_PREVIEW_GHOST_DEPTH);
     ghost.setAlpha(OFFICE_PREVIEW_GHOST_ALPHA);
@@ -401,12 +401,21 @@ export class WorldSceneOfficeRuntime {
       for (let colOffset = 0; colOffset < preview.footprintW; colOffset += 1) {
         const col = preview.anchorCell.col + colOffset;
         const row = preview.anchorCell.row + rowOffset;
-        if (col < 0 || row < 0 || col >= region.layout.cols || row >= region.layout.rows) {
+        if (
+          col < 0 ||
+          row < 0 ||
+          col >= region.layout.cols ||
+          row >= region.layout.rows
+        ) {
           continue;
         }
 
         const cell = this.getPlacementPreviewCell(visibleCellCount);
-        const { worldX, worldY } = anchoredGridCellToWorldPixel(col, row, region);
+        const { worldX, worldY } = anchoredGridCellToWorldPixel(
+          col,
+          row,
+          region,
+        );
         cell.setPosition(worldX, worldY);
         cell.setSize(cellSize, cellSize);
         cell.setFillStyle(colors.fill, OFFICE_PREVIEW_FOOTPRINT_ALPHA);
@@ -463,7 +472,14 @@ export class WorldSceneOfficeRuntime {
       return existing;
     }
 
-    const cell = this.host.scene.add.rectangle(0, 0, 0, 0, OFFICE_PREVIEW_PLACE_FILL, 0);
+    const cell = this.host.scene.add.rectangle(
+      0,
+      0,
+      0,
+      0,
+      OFFICE_PREVIEW_PLACE_FILL,
+      0,
+    );
     cell.setOrigin(0, 0);
     cell.setDepth(OFFICE_PREVIEW_FOOTPRINT_DEPTH);
     cell.setVisible(false);
