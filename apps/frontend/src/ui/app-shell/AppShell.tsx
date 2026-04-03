@@ -40,6 +40,8 @@ function App(): JSX.Element {
     activeTool: officeToolState.activeTool,
     activeFurnitureId: officeToolState.activeFurnitureId,
     onRotateFurnitureClockwise: officeToolState.onRotateFurnitureClockwise,
+    activePropId: officeToolState.activePropId,
+    onRotatePropClockwise: officeToolState.onRotatePropClockwise,
     selectedOfficePlaceable,
     onRotateSelectedOfficePlaceable,
   });
@@ -96,7 +98,11 @@ function App(): JSX.Element {
         }
         onSelectFurnitureId={officeToolState.onSelectFurnitureId}
         activePropId={officeToolState.activePropId}
+        activePropRotationQuarterTurns={
+          officeToolState.activePropRotationQuarterTurns
+        }
         onSelectPropId={officeToolState.onSelectPropId}
+        onRotatePropClockwise={officeToolState.onRotatePropClockwise}
         onRotateFurnitureClockwise={officeToolState.onRotateFurnitureClockwise}
         activeTerrainTool={activeTerrainTool}
         entityToolbarViewModel={entityToolbarViewModel}

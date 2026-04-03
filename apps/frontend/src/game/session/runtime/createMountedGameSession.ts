@@ -29,6 +29,12 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       >[0]
     | null = null;
   let hasOfficeSelectionSnapshot = false;
+  let terrainPropSelectionSnapshot:
+    | Parameters<
+        NonNullable<GameSessionNotifications["onTerrainPropSelectionChanged"]>
+      >[0]
+    | null = null;
+  let hasTerrainPropSelectionSnapshot = false;
   let destroyed = false;
 
   const forEachSubscriber = (
@@ -149,6 +155,18 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       );
     },
   );
+  const unbindTerrainPropSelectionChanged = bindRuntimeToUiEvent(
+    runtime,
+    RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED,
+    (payload) => {
+      hydrateBootstrapSnapshotFromRegistry();
+      terrainPropSelectionSnapshot = payload;
+      hasTerrainPropSelectionSnapshot = true;
+      forEachSubscriber((subscriber) =>
+        subscriber.onTerrainPropSelectionChanged?.(payload),
+      );
+    },
+  );
 
   hydrateBootstrapSnapshotFromRegistry();
 
@@ -167,6 +185,7 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     unbindTerrainSeedChanged();
     unbindOfficeFloorPicked();
     unbindOfficeSelectionChanged();
+    unbindTerrainPropSelectionChanged();
     runtime.destroy(true);
   };
 
@@ -187,6 +206,11 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       if (hasOfficeSelectionSnapshot) {
         notifications.onOfficeSelectionChanged?.(
           officeSelectionSnapshot ?? { selection: null },
+        );
+      }
+      if (hasTerrainPropSelectionSnapshot) {
+        notifications.onTerrainPropSelectionChanged?.(
+          terrainPropSelectionSnapshot ?? { selection: null },
         );
       }
 
@@ -213,6 +237,39 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         runtime,
         UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL,
         tool,
+      );
+    },
+    setTerrainPropTool(tool) {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(
+        runtime,
+        UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL,
+        tool,
+      );
+    },
+    rotateSelectedTerrainProp() {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(
+        runtime,
+        UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION,
+        { action: "rotate" },
+      );
+    },
+    deleteSelectedTerrainProp() {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(
+        runtime,
+        UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION,
+        { action: "delete" },
       );
     },
     setZoom(zoom) {

@@ -1,6 +1,7 @@
 import type {
   TerrainSeedDetailLayerDocument,
   TerrainSeedDocument,
+  TerrainSeedPropDocument,
 } from "../../../data";
 import type { TerrainMapStore } from "../../terrain";
 import { TERRAIN_DETAIL_EMPTY_SOURCE_ID } from "../../terrain/runtime";
@@ -92,6 +93,7 @@ export function syncFromRuntimeTerrain(
   options: {
     terrainDetailsStore?: TerrainMapStore | null;
     officeDetailsStore?: TerrainMapStore | null;
+    terrainProps?: TerrainSeedPropDocument[] | null;
   } = {},
 ): TerrainSeedDocument {
   if (
@@ -126,6 +128,9 @@ export function syncFromRuntimeTerrain(
 
   const terrainDetails = serializeDetailLayer(options.terrainDetailsStore);
   const officeDetails = serializeDetailLayer(options.officeDetailsStore);
+  const terrainProps =
+    options.terrainProps?.map((prop) => ({ ...prop })) ??
+    seed.terrainProps?.map((prop) => ({ ...prop }));
 
   const nextSeed: TerrainSeedDocument = {
     width: seed.width,
@@ -143,6 +148,10 @@ export function syncFromRuntimeTerrain(
 
   if (officeDetails) {
     nextSeed.officeDetails = officeDetails;
+  }
+
+  if (terrainProps && terrainProps.length > 0) {
+    nextSeed.terrainProps = terrainProps;
   }
 
   return nextSeed;

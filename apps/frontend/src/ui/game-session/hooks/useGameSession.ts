@@ -22,6 +22,7 @@ type OfficeToolStateBridge = {
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   activePropId: string | null;
+  activePropRotationQuarterTurns: FurnitureRotationQuarterTurns;
   onSelectTool: (tool: OfficeEditorToolId | null) => void;
   onOfficeFloorPicked: (payload: OfficeFloorPickedPayload) => void;
 };
@@ -44,6 +45,8 @@ export function useGameSession({ officeToolState }: UseGameSessionOptions) {
       activeFurnitureRotationQuarterTurns:
         officeToolState.activeFurnitureRotationQuarterTurns,
       activePropId: officeToolState.activePropId,
+      activePropRotationQuarterTurns:
+        officeToolState.activePropRotationQuarterTurns,
     },
     onOfficeLayoutChanged: officeEditor.syncFromRuntime,
     onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,

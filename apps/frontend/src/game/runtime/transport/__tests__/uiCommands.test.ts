@@ -25,6 +25,8 @@ import {
   emitPlaceDropCommand,
   normalizeOfficeSetEditorToolPayload,
   normalizeOfficeSelectionActionPayload,
+  normalizeSelectedTerrainPropToolPayload,
+  normalizeTerrainPropSelectionActionPayload,
   normalizeUiToRuntimeCommandPayload,
   UI_TO_RUNTIME_COMMANDS,
 } from "../uiCommands";
@@ -135,10 +137,12 @@ describe("uiCommands transport", () => {
       normalizeOfficeSetEditorToolPayload({
         tool: "prop",
         propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 2,
       }),
     ).toEqual({
       tool: "prop",
       propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 2,
     });
     expect(
       normalizeOfficeSetEditorToolPayload({
@@ -166,6 +170,14 @@ describe("uiCommands transport", () => {
       normalizeOfficeSetEditorToolPayload({
         tool: "prop",
         propId: 42,
+        rotationQuarterTurns: 0,
+      }),
+    ).toBeUndefined();
+    expect(
+      normalizeOfficeSetEditorToolPayload({
+        tool: "prop",
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 5,
       }),
     ).toBeUndefined();
   });
@@ -301,5 +313,40 @@ describe("uiCommands transport", () => {
         screenY: 24,
       },
     );
+  });
+
+  test("normalizes terrain prop tool payloads at the command boundary", () => {
+    expect(
+      normalizeSelectedTerrainPropToolPayload({
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 3,
+      }),
+    ).toEqual({
+      propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 3,
+    });
+    expect(
+      normalizeSelectedTerrainPropToolPayload({
+        propId: "prop.static.set-01.variant-01",
+        rotationQuarterTurns: 4,
+      }),
+    ).toBeUndefined();
+    expect(normalizeSelectedTerrainPropToolPayload(null)).toBeNull();
+  });
+
+  test("normalizes terrain prop selection actions at the command boundary", () => {
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "rotate" }),
+    ).toEqual({
+      action: "rotate",
+    });
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "delete" }),
+    ).toEqual({
+      action: "delete",
+    });
+    expect(
+      normalizeTerrainPropSelectionActionPayload({ action: "flip" }),
+    ).toBeUndefined();
   });
 });

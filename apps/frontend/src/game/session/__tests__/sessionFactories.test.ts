@@ -20,7 +20,8 @@ vi.mock("../runtime/createMountedGameSession", () => ({
 }));
 
 vi.mock("../../runtime/assembly/createPreviewRuntimeHostAssembly", () => ({
-  createPreviewRuntimeHostAssembly: factoryMocks.createPreviewRuntimeHostAssembly,
+  createPreviewRuntimeHostAssembly:
+    factoryMocks.createPreviewRuntimeHostAssembly,
 }));
 
 vi.mock("../preview/createMountedPreviewSession", () => ({
@@ -38,6 +39,9 @@ describe("game session factories", () => {
       subscribe: vi.fn(),
       placeDragDrop: vi.fn(),
       selectTerrainTool: vi.fn(),
+      setTerrainPropTool: vi.fn(),
+      rotateSelectedTerrainProp: vi.fn(),
+      deleteSelectedTerrainProp: vi.fn(),
       setZoom: vi.fn(),
       setOfficeEditorTool: vi.fn(),
       rotateSelectedOfficePlaceable: vi.fn(),
@@ -52,8 +56,12 @@ describe("game session factories", () => {
     const mountedSession = factory.mount({} as HTMLElement);
 
     expect(mountedSession).toBe(session);
-    expect(factoryMocks.createWorldRuntimeHostAssembly).toHaveBeenCalledTimes(1);
-    expect(factoryMocks.createMountedGameSession).toHaveBeenCalledWith(runtimeHost);
+    expect(factoryMocks.createWorldRuntimeHostAssembly).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(factoryMocks.createMountedGameSession).toHaveBeenCalledWith(
+      runtimeHost,
+    );
   });
 
   test("PreviewSessionFactory mounts through the runtime assembly seam and preview owner", () => {
@@ -72,7 +80,11 @@ describe("game session factories", () => {
     const mountedSession = factory.mount({} as HTMLElement);
 
     expect(mountedSession).toBe(session);
-    expect(factoryMocks.createPreviewRuntimeHostAssembly).toHaveBeenCalledTimes(1);
-    expect(factoryMocks.createMountedPreviewSession).toHaveBeenCalledWith(runtimeHost);
+    expect(factoryMocks.createPreviewRuntimeHostAssembly).toHaveBeenCalledTimes(
+      1,
+    );
+    expect(factoryMocks.createMountedPreviewSession).toHaveBeenCalledWith(
+      runtimeHost,
+    );
   });
 });

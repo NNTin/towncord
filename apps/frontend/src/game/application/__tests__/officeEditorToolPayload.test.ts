@@ -14,6 +14,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
         activePropId: null,
+        activePropRotationQuarterTurns: 0,
       }),
     ).toEqual({
       tool: "floor",
@@ -36,6 +37,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFurnitureId: "desk-01",
         activeFurnitureRotationQuarterTurns: 2,
         activePropId: null,
+        activePropRotationQuarterTurns: 0,
       }),
     ).toEqual({
       tool: "furniture",
@@ -56,6 +58,7 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
         activePropId: null,
+        activePropRotationQuarterTurns: 0,
       }),
     ).toEqual({
       tool: "wall",
@@ -75,10 +78,12 @@ describe("buildOfficeEditorToolPayload", () => {
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
         activePropId: "prop.static.set-01.variant-01",
+        activePropRotationQuarterTurns: 2,
       }),
     ).toEqual({
       tool: "prop",
       propId: "prop.static.set-01.variant-01",
+      rotationQuarterTurns: 2,
     });
   });
 });

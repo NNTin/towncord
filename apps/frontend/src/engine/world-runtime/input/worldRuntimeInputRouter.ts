@@ -4,6 +4,8 @@ type Pointer = Phaser.Input.Pointer;
 
 type WorldRuntimeInputRouterContext = {
   beginPan: (pointer: Pointer) => void;
+  hasActiveTerrainPropTool: () => boolean;
+  tryHandleTerrainPropPointerDown: (pointer: Pointer) => boolean;
   tryHandleOfficePointerDown: (pointer: Pointer) => boolean;
   tryHandleOfficeSecondaryPointerDown: (pointer: Pointer) => boolean;
   hasActiveTerrainTool: () => boolean;
@@ -35,6 +37,11 @@ export class WorldRuntimeInputRouter {
     }
 
     if (pointer.button !== 0) {
+      return;
+    }
+
+    if (this.context.hasActiveTerrainPropTool()) {
+      this.context.tryHandleTerrainPropPointerDown(pointer);
       return;
     }
 

@@ -112,6 +112,14 @@ describe("document export terrain seed translation", () => {
       syncFromRuntimeTerrain(seed, store, {
         terrainDetailsStore,
         officeDetailsStore,
+        terrainProps: [
+          {
+            propId: "prop.static.set-01.variant-01",
+            cellX: 1,
+            cellY: 0,
+            rotationQuarterTurns: 3,
+          },
+        ],
       }),
     ).toEqual({
       width: seed.width,
@@ -135,6 +143,14 @@ describe("document export terrain seed translation", () => {
         },
         rows: ["..", ".a"],
       },
+      terrainProps: [
+        {
+          propId: "prop.static.set-01.variant-01",
+          cellX: 1,
+          cellY: 0,
+          rotationQuarterTurns: 3,
+        },
+      ],
     });
   });
 });

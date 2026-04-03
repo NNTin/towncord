@@ -59,6 +59,17 @@ describe("WorldRuntimeInputRouter", () => {
       expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
     });
 
+    test("left-click with active terrain prop tool routes to prop placement before terrain or office", () => {
+      ctx.hasActiveTerrainPropTool.mockReturnValue(true);
+      ctx.hasActiveTerrainTool.mockReturnValue(true);
+      ctx.tryHandleOfficePointerDown.mockReturnValue(true);
+      router.onPointerDown(makePointer(0));
+      expect(ctx.tryHandleTerrainPropPointerDown).toHaveBeenCalledOnce();
+      expect(ctx.beginTerrainPaint).not.toHaveBeenCalled();
+      expect(ctx.tryHandleOfficePointerDown).not.toHaveBeenCalled();
+      expect(ctx.handleSelectionAndInspect).not.toHaveBeenCalled();
+    });
+
     test("left-click lets office handle when no terrain tool is active", () => {
       ctx.tryHandleOfficePointerDown.mockReturnValue(true);
       router.onPointerDown(makePointer(0));

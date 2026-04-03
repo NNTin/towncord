@@ -19,6 +19,7 @@ export type OfficeEditorBridgeState = {
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   activePropId: string | null;
+  activePropRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export function buildOfficeEditorToolPayload(
@@ -48,6 +49,7 @@ export function buildOfficeEditorToolPayload(
       return {
         tool: "prop",
         propId: state.activePropId,
+        rotationQuarterTurns: state.activePropRotationQuarterTurns,
       };
     case "erase":
       return { tool: state.activeTool };

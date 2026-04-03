@@ -6,6 +6,7 @@ import {
   type OfficeLayoutChangedPayload,
   type OfficeSelectionChangedPayload,
   type RuntimeBootstrapPayload,
+  type TerrainPropSelectionChangedPayload,
   type TerrainSeedChangedPayload,
 } from "../runtimeEvents";
 
@@ -180,6 +181,18 @@ function createSelectionPayload(): OfficeSelectionChangedPayload {
   };
 }
 
+function createTerrainPropSelectionPayload(): TerrainPropSelectionChangedPayload {
+  return {
+    selection: {
+      kind: "prop",
+      propId: "prop.static.set-01.variant-01",
+      label: "Variant 01",
+      rotationQuarterTurns: 2,
+      canRotate: true,
+    },
+  };
+}
+
 describe("runtimeEvents transport", () => {
   test("bindRuntimeToUiEvent normalizes zoom payloads before delivery", () => {
     const { host } = createHost();
@@ -290,5 +303,30 @@ describe("runtimeEvents transport", () => {
 
     payload.selection!.label = "Changed label";
     expect(received?.selection?.label).toBe("Laptop - Front - Off");
+  });
+
+  test("emits terrain prop selection snapshots as cloned payloads", () => {
+    const { host } = createHost();
+    const handler = vi.fn();
+    const payload = createTerrainPropSelectionPayload();
+
+    bindRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED,
+      handler,
+    );
+    emitRuntimeToUiEvent(
+      host,
+      RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED,
+      payload,
+    );
+
+    const received = handler.mock.calls[0]?.[0];
+    expect(received).toEqual(payload);
+    expect(received).not.toBe(payload);
+    expect(received?.selection).not.toBe(payload.selection);
+
+    payload.selection!.label = "Changed terrain prop";
+    expect(received?.selection?.label).toBe("Variant 01");
   });
 });

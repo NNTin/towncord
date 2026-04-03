@@ -137,6 +137,14 @@ describe("terrain seed persistence adapter", () => {
                 },
                 rows: ["a."],
               },
+              terrainProps: [
+                {
+                  propId: "prop.static.set-01.variant-01",
+                  cellX: 1,
+                  cellY: 0,
+                  rotationQuarterTurns: 2,
+                },
+              ],
             },
           }),
           {
@@ -155,6 +163,14 @@ describe("terrain seed persistence adapter", () => {
         terrainDetails: {
           rows: ["a."],
         },
+        terrainProps: [
+          {
+            propId: "prop.static.set-01.variant-01",
+            cellX: 1,
+            cellY: 0,
+            rotationQuarterTurns: 2,
+          },
+        ],
       },
     });
   });

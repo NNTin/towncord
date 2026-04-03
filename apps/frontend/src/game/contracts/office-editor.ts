@@ -39,6 +39,7 @@ export type OfficeSetEditorToolFurniturePayload = {
 export type OfficeSetEditorToolPropPayload = {
   tool: "prop";
   propId: string | null;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export type OfficeSetEditorToolFloorPayload = {
