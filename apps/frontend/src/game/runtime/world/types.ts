@@ -1,5 +1,6 @@
 import type Phaser from "phaser";
 import type { InputDirection } from "../../content/asset-catalog/animationCatalog";
+import type { FurnitureRotationQuarterTurns } from "../../contracts/content";
 import type { EntityBehavior } from "../../world/entities/capabilities";
 import type {
   EntityAction,
@@ -10,6 +11,16 @@ import type {
 export type WorldPoint = {
   x: number;
   y: number;
+};
+
+export type WorldTerrainPropPlacement = {
+  anchorCell: {
+    cellX: number;
+    cellY: number;
+  };
+  footprintW: number;
+  footprintH: number;
+  rotationQuarterTurns: 0 | 1 | 2 | 3;
 };
 
 export type EntityAutonomyState = {
@@ -31,10 +42,12 @@ export type WorldActor = {
   behavior: EntityBehavior;
   position: WorldPoint;
   velocity: WorldPoint;
+  rotationQuarterTurns: FurnitureRotationQuarterTurns;
   facing: InputDirection;
   state: EntityAction;
   animationAction: string;
   autonomy: EntityAutonomyState;
+  terrainPropPlacement?: WorldTerrainPropPlacement;
 };
 
 export interface WorldAnimationSprite {

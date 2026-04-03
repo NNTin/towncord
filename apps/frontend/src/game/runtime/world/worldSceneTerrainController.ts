@@ -48,6 +48,32 @@ type Destroyable = {
   destroy?: () => unknown;
 };
 
+function getEntityOccupiedCells(
+  entity: WorldEntity,
+  grid: ReturnType<TerrainRuntime["getGameplayGrid"]>,
+): Array<{ cellX: number; cellY: number }> {
+  const placement = entity.terrainPropPlacement;
+  if (entity.definition.kind === "prop" && placement) {
+    const cells: Array<{ cellX: number; cellY: number }> = [];
+    for (let rowOffset = 0; rowOffset < placement.footprintH; rowOffset += 1) {
+      for (
+        let colOffset = 0;
+        colOffset < placement.footprintW;
+        colOffset += 1
+      ) {
+        cells.push({
+          cellX: placement.anchorCell.cellX + colOffset,
+          cellY: placement.anchorCell.cellY + rowOffset,
+        });
+      }
+    }
+    return cells;
+  }
+
+  const worldCell = grid.worldToCell(entity.position.x, entity.position.y);
+  return worldCell ? [{ cellX: worldCell.cellX, cellY: worldCell.cellY }] : [];
+}
+
 function destroyGameObject(object: Destroyable | null | undefined): void {
   object?.destroy?.();
 }
@@ -579,9 +605,9 @@ export class WorldSceneTerrainController {
 
     const grid = terrainRuntime.getGameplayGrid();
     return this.host.getEntities().some((entity) => {
-      const entityCell = grid.worldToCell(entity.position.x, entity.position.y);
-      return (
-        entityCell?.cellX === cell.cellX && entityCell?.cellY === cell.cellY
+      return getEntityOccupiedCells(entity, grid).some(
+        (entityCell) =>
+          entityCell.cellX === cell.cellX && entityCell.cellY === cell.cellY,
       );
     });
   }

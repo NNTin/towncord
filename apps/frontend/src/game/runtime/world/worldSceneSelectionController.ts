@@ -25,8 +25,7 @@ export class WorldSceneSelectionController {
   ) {}
 
   public createSelectionBadge(): void {
-    const firstFrame = this.host.scene.anims
-      .get(SELECTED_BADGE_ANIMATION_KEY)
+    const firstFrame = this.host.scene.anims.get(SELECTED_BADGE_ANIMATION_KEY)
       ?.frames[0];
     if (!firstFrame) {
       return;
@@ -51,11 +50,13 @@ export class WorldSceneSelectionController {
 
   public selectEntity(entity: WorldEntity | null): void {
     const entitySystem = this.host.getEntitySystem();
-    if (!entitySystem || entitySystem.getSelected() === entity) {
+    if (!entitySystem) {
       return;
     }
 
-    entitySystem.select(entity);
+    if (entitySystem.getSelected() !== entity) {
+      entitySystem.select(entity);
+    }
     this.setSelectionBadgeVisible(Boolean(entity));
     if (entity) {
       this.syncSelectionBadgePosition(entity);
@@ -85,7 +86,10 @@ export class WorldSceneSelectionController {
       return;
     }
 
-    const worldPoint = this.host.scene.cameras.main.getWorldPoint(pointer.x, pointer.y);
+    const worldPoint = this.host.scene.cameras.main.getWorldPoint(
+      pointer.x,
+      pointer.y,
+    );
     const inspected = terrainRuntime.inspectAtWorld(worldPoint.x, worldPoint.y);
     if (inspected) {
       const payload: TerrainTileInspectedPayload = inspected;

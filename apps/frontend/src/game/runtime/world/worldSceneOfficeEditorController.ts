@@ -61,6 +61,7 @@ function cloneOfficeEditorToolPayload(
       return {
         tool: "prop",
         propId: payload.propId,
+        rotationQuarterTurns: payload.rotationQuarterTurns,
       };
     case "erase":
       return { tool: payload.tool };
@@ -97,10 +98,6 @@ function getOfficeFurnitureId(
   payload: OfficeSetEditorToolPayload,
 ): string | null {
   return payload.tool === "furniture" ? payload.furnitureId : null;
-}
-
-function getOfficePropId(payload: OfficeSetEditorToolPayload): string | null {
-  return payload.tool === "prop" ? payload.propId : null;
 }
 
 function getOfficeFurnitureRotationQuarterTurns(
@@ -309,8 +306,7 @@ export class WorldSceneOfficeEditorController {
       !pointer ||
       !isPointerWithinGame(pointer) ||
       !region ||
-      (getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture" &&
-        getOfficeEditorTool(this.officeEditorToolPayload) !== "prop")
+      getOfficeEditorTool(this.officeEditorToolPayload) !== "furniture"
     ) {
       return null;
     }
@@ -319,16 +315,6 @@ export class WorldSceneOfficeEditorController {
     const cell = worldToAnchoredGridCell(worldPoint.x, worldPoint.y, region);
     if (!cell) {
       return null;
-    }
-
-    const tool = getOfficeEditorTool(this.officeEditorToolPayload);
-    if (tool === "prop") {
-      return this.officeEditorSystem.previewFurniturePlacement(
-        region.layout,
-        cell,
-        getOfficePropId(this.officeEditorToolPayload),
-        0,
-      );
     }
 
     return this.officeEditorSystem.previewFurniturePlacement(
@@ -565,7 +551,6 @@ export class WorldSceneOfficeEditorController {
       wallColor: getOfficeWallColor(this.officeEditorToolPayload),
       floorPattern: getOfficeFloorPattern(this.officeEditorToolPayload),
       furnitureId: getOfficeFurnitureId(this.officeEditorToolPayload),
-      propId: getOfficePropId(this.officeEditorToolPayload),
       rotationQuarterTurns: getOfficeFurnitureRotationQuarterTurns(
         this.officeEditorToolPayload,
       ),
@@ -575,6 +560,6 @@ export class WorldSceneOfficeEditorController {
       this.officeDirty = true;
     }
 
-    return true;
+    return changed;
   }
 }

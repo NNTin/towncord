@@ -1,4 +1,5 @@
 import type { AnimationCatalog } from "../../content/asset-catalog/animationCatalog";
+import type { FurnitureRotationQuarterTurns } from "../../contracts/content";
 import type { RegisteredEntity } from "../../world/entities/entityRegistry";
 import { type PlayerStateChangedPayload } from "../../contracts/runtime";
 import { playEntityAnimation } from "./animationSystem";
@@ -14,7 +15,12 @@ import {
 import type { MovementInput } from "./movementSystem";
 import { updateEntityMovement } from "./movementSystem";
 import type { WorldNavigationService } from "../../../engine/world-runtime/spatial";
-import type { WorldEntity, WorldPoint, WorldSelectableActor } from "./types";
+import type {
+  WorldEntity,
+  WorldPoint,
+  WorldSelectableActor,
+  WorldTerrainPropPlacement,
+} from "./types";
 import type Phaser from "phaser";
 
 const SPRITE_SCALE = 1;
@@ -62,6 +68,10 @@ export class EntitySystem {
     runtime: RegisteredEntity,
     worldX: number,
     worldY: number,
+    options: {
+      rotationQuarterTurns?: FurnitureRotationQuarterTurns;
+      terrainPropPlacement?: WorldTerrainPropPlacement;
+    } = {},
   ): WorldEntity | null {
     const { scene, catalog } = this.context;
     const entity = createWorldEntity({
@@ -72,12 +82,32 @@ export class EntitySystem {
       worldX,
       worldY,
       spriteScale: SPRITE_SCALE,
+      ...(options.rotationQuarterTurns !== undefined
+        ? { rotationQuarterTurns: options.rotationQuarterTurns }
+        : {}),
+      ...(options.terrainPropPlacement
+        ? { terrainPropPlacement: options.terrainPropPlacement }
+        : {}),
     });
     if (!entity) return null;
 
     this.nextId += 1;
     this.entities.push(entity);
     return entity;
+  }
+
+  removeEntity(entity: WorldEntity): boolean {
+    const index = this.entities.indexOf(entity);
+    if (index < 0) {
+      return false;
+    }
+
+    this.entities.splice(index, 1);
+    if (this.selectedEntity === entity) {
+      this.selectedEntity = null;
+    }
+    entity.sprite.destroy();
+    return true;
   }
 
   // -------------------------------------------------------------------------
@@ -98,6 +128,14 @@ export class EntitySystem {
 
   getAll(): readonly WorldEntity[] {
     return this.entities;
+  }
+
+  getTerrainProps(): readonly WorldEntity[] {
+    return this.entities.filter(
+      (entity): entity is WorldEntity =>
+        entity.definition.kind === "prop" &&
+        Boolean(entity.terrainPropPlacement),
+    );
   }
 
   // -------------------------------------------------------------------------

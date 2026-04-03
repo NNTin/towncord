@@ -26,6 +26,7 @@ function createEntity(overrides?: Partial<WorldEntity>): WorldEntity {
     },
     position: { x: 100, y: 200 },
     velocity: { x: 0, y: 0 },
+    rotationQuarterTurns: 0,
     facing: "down",
     state: "idle",
     animationAction: "idle",

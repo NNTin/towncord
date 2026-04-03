@@ -41,6 +41,18 @@ const OCCUPIED_ENTITY_POSITIONS: WorldPoint[] = [{ x: 96, y: 96 }];
 
 function createHarness(input?: {
   entityPositions?: WorldPoint[];
+  entities?: Array<{
+    position: WorldPoint;
+    definition?: {
+      kind: "prop" | "npc" | "player";
+    };
+    terrainPropPlacement?: {
+      anchorCell: { cellX: number; cellY: number };
+      footprintW: number;
+      footprintH: number;
+      rotationQuarterTurns: 0 | 1 | 2 | 3;
+    };
+  }>;
   officeRegion?: {
     anchorX16: number;
     anchorY16: number;
@@ -151,9 +163,13 @@ function createHarness(input?: {
       }) as never,
     getOfficeRegion: () => input?.officeRegion ?? null,
     getEntities: () =>
-      entityPositions.map((position) => ({
-        position,
-      })) as never,
+      (input?.entities ??
+        entityPositions.map((position) => ({
+          position,
+          definition: {
+            kind: "npc" as const,
+          },
+        }))) as never,
     setTerrainContentSource,
   });
 
@@ -226,6 +242,32 @@ describe("WorldSceneTerrainController", () => {
       screenX: 12,
       screenY: 34,
     });
+
+    expect(queueDrop).not.toHaveBeenCalled();
+  });
+
+  test("terrain prop footprints block terrain painting", () => {
+    const { controller, queueDrop } = createHarness({
+      entities: [
+        {
+          position: { x: 96, y: 96 },
+          definition: {
+            kind: "prop",
+          },
+          terrainPropPlacement: {
+            anchorCell: { cellX: 1, cellY: 1 },
+            footprintW: 2,
+            footprintH: 1,
+            rotationQuarterTurns: 0,
+          },
+        },
+      ],
+    });
+
+    controller.beginPainting({
+      x: 96,
+      y: 96,
+    } as never);
 
     expect(queueDrop).not.toHaveBeenCalled();
   });

@@ -70,4 +70,58 @@ describe("WorldScenePlacementController", () => {
       worldY: 160,
     });
   });
+
+  test("ignores prop drops in world placement", () => {
+    const addEntity = vi.fn();
+    const controller = new WorldScenePlacementController(
+      {
+        getEntityRegistry: () =>
+          ({
+            getRuntimeById: () => ({
+              definition: {
+                kind: "prop",
+                placeable: true,
+              },
+            }),
+          }) as never,
+        getTerrainRuntime: () =>
+          ({
+            getGameplayGrid: () => ({
+              clampWorldPoint: () => ({
+                worldX: 96,
+                worldY: 160,
+              }),
+              isWorldWalkable: () => true,
+            }),
+          }) as never,
+        getEntitySystem: () =>
+          ({
+            addEntity,
+          }) as never,
+        getWorldPoint: () => ({
+          x: 100,
+          y: 160,
+        }),
+        selectEntity: vi.fn(),
+      },
+      new WorldSceneProjectionEmitter({
+        getRuntimeHost: () => ({
+          events: {
+            emit: vi.fn(),
+            on: vi.fn(),
+            off: vi.fn(),
+          },
+        }),
+      }),
+    );
+
+    controller.handlePlaceEntityDrop({
+      type: "entity",
+      entityId: "prop.static.set-01.variant-01",
+      screenX: 12,
+      screenY: 34,
+    });
+
+    expect(addEntity).not.toHaveBeenCalled();
+  });
 });

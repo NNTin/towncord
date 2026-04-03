@@ -246,7 +246,7 @@ describe("WorldSceneOfficeEditorController", () => {
     });
   });
 
-  test("projects and places FarmRPG props through the office editor tool", () => {
+  test("does not project or place props through the office editor tool", () => {
     const { controller, region } = createControllerHarness({
       cols: 3,
       rows: 3,
@@ -259,6 +259,7 @@ describe("WorldSceneOfficeEditorController", () => {
     controller.setOfficeEditorTool({
       tool: "prop",
       propId: prop.id,
+      rotationQuarterTurns: 0,
     });
 
     expect(
@@ -268,13 +269,7 @@ describe("WorldSceneOfficeEditorController", () => {
         x: 20,
         y: 20,
       } as never),
-    ).toMatchObject({
-      anchorCell: { col: 1, row: 1 },
-      asset: expect.objectContaining({
-        id: prop.id,
-        textureKey: "farmrpg.props",
-      }),
-    });
+    ).toBeNull();
 
     expect(
       controller.tryHandlePointerDown({
@@ -283,11 +278,11 @@ describe("WorldSceneOfficeEditorController", () => {
         x: 20,
         y: 20,
       } as never),
-    ).toBe(true);
+    ).toBe(false);
 
     expect(
       region.layout.furniture.some((item) => item.assetId === prop.id),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   test("starts a furniture drag on second click of the selected item and hides same-cell move previews", () => {

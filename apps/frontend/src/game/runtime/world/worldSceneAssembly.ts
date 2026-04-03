@@ -114,6 +114,10 @@ export class WorldSceneAssembly {
         getActivePointer: () => scene.input.activePointer,
         getWorldPoint: (screenX, screenY) =>
           scene.cameras.main.getWorldPoint(screenX, screenY),
+        getTerrainRuntime: () => this.terrainRuntime,
+        getEntityRegistry: () => this.entityRegistry,
+        getEntitySystem: () => this.entitySystem,
+        selectEntity: (entity) => this.selectionController.selectEntity(entity),
       },
       this.projections,
     );
@@ -196,6 +200,10 @@ export class WorldSceneAssembly {
         this.cameraController.beginPan(pointer);
         this.terrainController.syncPreviewFromPointer(pointer);
       },
+      hasActiveTerrainPropTool: () =>
+        this.officeRuntime.hasActiveTerrainPropTool(),
+      tryHandleTerrainPropPointerDown: (pointer) =>
+        this.officeRuntime.tryHandleTerrainPropPointerDown(pointer),
       tryHandleOfficePointerDown: (pointer) =>
         this.officeRuntime.tryHandlePointerDown(pointer),
       tryHandleOfficeSecondaryPointerDown: (pointer) =>

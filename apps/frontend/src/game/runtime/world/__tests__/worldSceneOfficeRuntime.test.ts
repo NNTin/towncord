@@ -194,7 +194,7 @@ function createHarness() {
         withinGame: true,
         x: 20,
         y: 20,
-      },
+      } as { withinGame: boolean; x: number; y: number } | null,
     },
   };
   const runtime = new WorldSceneOfficeRuntime(
@@ -205,6 +205,10 @@ function createHarness() {
         x: screenX,
         y: screenY,
       }),
+      getTerrainRuntime: () => null,
+      getEntityRegistry: () => null,
+      getEntitySystem: () => null,
+      selectEntity: vi.fn(),
     },
     new WorldSceneProjectionEmitter({
       getRuntimeHost: () => ({
@@ -394,7 +398,7 @@ describe("WorldSceneOfficeRuntime", () => {
     expect(previewGhost.setVisible).toHaveBeenCalledWith(false);
   });
 
-  test("uses the FarmRPG props texture for prop placement previews", () => {
+  test("keeps office placement previews hidden for prop tools", () => {
     const { previewGhost, runtime, scene } = createHarness();
     const bootstrap = createBootstrap({
       furniture: [],
@@ -403,22 +407,17 @@ describe("WorldSceneOfficeRuntime", () => {
       throw new Error("Missing FarmRPG prop test asset");
     }
 
-    scene.input.activePointer = {
-      withinGame: true,
-      x: 36,
-      y: 52,
-    };
+    scene.input.activePointer = null;
 
     runtime.bootstrap(bootstrap);
     runtime.handleSetEditorTool({
       tool: "prop",
       propId: farmrpgProp.id,
+      rotationQuarterTurns: 0,
     });
 
-    expect(previewGhost.setTexture).toHaveBeenCalledWith(
-      "farmrpg.props",
-      farmrpgProp.atlasKey,
-    );
+    expect(scene.add.image).not.toHaveBeenCalled();
+    expect(previewGhost.setTexture).not.toHaveBeenCalled();
   });
 
   test("rerenders and emits layout projections after office edits", () => {

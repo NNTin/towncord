@@ -562,7 +562,7 @@ describe("OfficeEditorSystem floor editing", () => {
     expect(layout.furniture[0]?.category).toBe("desks");
   });
 
-  test("places FarmRPG props into the office layout with a props category and texture key", () => {
+  test("rejects FarmRPG props in the office layout", () => {
     if (!farmrpgProp) {
       throw new Error("Missing FarmRPG prop test asset");
     }
@@ -589,20 +589,11 @@ describe("OfficeEditorSystem floor editing", () => {
         wallColor: null,
         floorPattern: null,
         furnitureId: null,
-        propId: farmrpgProp.id,
         rotationQuarterTurns: 0,
       }),
-    ).toBe(true);
+    ).toBe(false);
 
-    expect(layout.furniture[0]).toMatchObject({
-      assetId: farmrpgProp.id,
-      category: "props",
-      placement: "floor",
-      renderAsset: {
-        textureKey: "farmrpg.props",
-        atlasKey: farmrpgProp.atlasKey,
-      },
-    });
+    expect(layout.furniture).toHaveLength(0);
   });
 
   test("removes a selected furniture item by id without touching tiles", () => {

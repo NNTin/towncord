@@ -4,6 +4,8 @@ import { WorldRuntimeInputRouter } from "../input/worldRuntimeInputRouter";
 function makeContext() {
   return {
     beginPan: vi.fn(),
+    hasActiveTerrainPropTool: vi.fn(() => false),
+    tryHandleTerrainPropPointerDown: vi.fn(() => false),
     tryHandleOfficePointerDown: vi.fn(() => false),
     tryHandleOfficeSecondaryPointerDown: vi.fn(() => false),
     hasActiveTerrainTool: vi.fn(() => false),

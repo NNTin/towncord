@@ -17,6 +17,11 @@ import type {
 import { WorldSceneOfficeEditorController } from "./worldSceneOfficeEditorController";
 import type { WorldSceneProjectionEmitter } from "./worldSceneProjections";
 import type { OfficeFurniturePlacementPreview } from "./officeEditorSystem";
+import type { EntityRegistry } from "../../world/entities/entityRegistry";
+import type { EntitySystem } from "./entitySystem";
+import type { WorldEntity } from "./types";
+import { WorldSceneTerrainPropController } from "./worldSceneTerrainPropController";
+import type { TerrainRuntime } from "../../../engine";
 
 const OFFICE_CELL_HIGHLIGHT_FILL = 0x38bdf8;
 const OFFICE_CELL_HIGHLIGHT_ALPHA = 0.22;
@@ -51,10 +56,15 @@ type WorldSceneOfficeRuntimeHost = {
   scene: Phaser.Scene;
   getActivePointer: () => Phaser.Input.Pointer | null;
   getWorldPoint: (screenX: number, screenY: number) => { x: number; y: number };
+  getTerrainRuntime: () => TerrainRuntime | null;
+  getEntityRegistry: () => EntityRegistry | null;
+  getEntitySystem: () => EntitySystem | null;
+  selectEntity: (entity: WorldEntity | null) => void;
 };
 
 export class WorldSceneOfficeRuntime {
   private readonly controller: WorldSceneOfficeEditorController;
+  private readonly terrainPropController: WorldSceneTerrainPropController;
   private officeRenderable: OfficeLayoutRenderable | null = null;
   private officeRegion: OfficeRegion | null = null;
   private officeCellHighlight: Phaser.GameObjects.Rectangle | null = null;
@@ -76,6 +86,15 @@ export class WorldSceneOfficeRuntime {
       getWorldPoint: this.host.getWorldPoint,
       emitOfficeFloorPicked: (payload) =>
         this.projections.emitOfficeFloorPicked(payload),
+    });
+    this.terrainPropController = new WorldSceneTerrainPropController({
+      scene: this.host.scene,
+      getTerrainRuntime: this.host.getTerrainRuntime,
+      getOfficeRegion: () => this.officeRegion,
+      getEntityRegistry: this.host.getEntityRegistry,
+      getEntitySystem: this.host.getEntitySystem,
+      selectEntity: this.host.selectEntity,
+      getWorldPoint: this.host.getWorldPoint,
     });
   }
 
@@ -118,12 +137,32 @@ export class WorldSceneOfficeRuntime {
 
   public handleSetEditorTool(payload: OfficeSetEditorToolPayload): void {
     this.controller.setOfficeEditorTool(payload);
+    this.terrainPropController.setTerrainPropTool(payload);
     this.syncSelectionHighlight();
     this.syncHighlight(this.host.getActivePointer());
     this.emitSelectionChanged();
   }
 
+  public hasActiveTerrainPropTool(): boolean {
+    return this.terrainPropController.hasActiveTool();
+  }
+
+  public tryHandleTerrainPropPointerDown(
+    pointer: Phaser.Input.Pointer,
+  ): boolean {
+    return this.terrainPropController.tryHandlePointerDown(pointer);
+  }
+
   public tryHandlePointerDown(pointer: Phaser.Input.Pointer): boolean {
+    if (this.terrainPropController.hasActiveTool()) {
+      if (this.terrainPropController.tryHandlePointerDown(pointer)) {
+        this.syncSelectionHighlight();
+        this.syncHighlight(this.host.getActivePointer());
+        this.emitSelectionChanged();
+        return true;
+      }
+    }
+
     const handled = this.controller.tryHandlePointerDown(pointer);
     if (handled) {
       this.syncSelectionHighlight();
@@ -142,10 +181,18 @@ export class WorldSceneOfficeRuntime {
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
+    if (this.terrainPropController.hasActiveTool()) {
+      return false;
+    }
+
     return this.controller.shouldContinuePainting(pointer);
   }
 
   public continuePainting(pointer: Phaser.Input.Pointer): void {
+    if (this.terrainPropController.hasActiveTool()) {
+      return;
+    }
+
     this.controller.continuePainting(pointer);
   }
 
@@ -155,6 +202,13 @@ export class WorldSceneOfficeRuntime {
   }
 
   public rotateSelectedFurniture(): boolean {
+    if (this.terrainPropController.rotateSelectedProp()) {
+      this.syncSelectionHighlight();
+      this.syncHighlight(this.host.getActivePointer());
+      this.emitSelectionChanged();
+      return true;
+    }
+
     const changed = this.controller.rotateSelectedFurniture();
     if (changed) {
       this.rerenderOffice();
@@ -173,6 +227,13 @@ export class WorldSceneOfficeRuntime {
   }
 
   public deleteSelectedFurniture(): boolean {
+    if (this.terrainPropController.deleteSelectedProp()) {
+      this.syncSelectionHighlight();
+      this.syncHighlight(this.host.getActivePointer());
+      this.emitSelectionChanged();
+      return true;
+    }
+
     const changed = this.controller.deleteSelectedFurniture();
     if (changed) {
       this.rerenderOffice();
@@ -205,6 +266,12 @@ export class WorldSceneOfficeRuntime {
 
   public syncHighlight(pointer: Phaser.Input.Pointer | null): void {
     this.controller.syncOfficeCellHighlight(pointer);
+    this.terrainPropController.syncPreview(pointer);
+    if (this.terrainPropController.hasActiveTool()) {
+      this.hidePlacementPreview();
+      return;
+    }
+
     this.syncPlacementPreview(pointer);
   }
 
@@ -226,6 +293,8 @@ export class WorldSceneOfficeRuntime {
 
   public dispose(): void {
     this.controller.reset();
+    this.terrainPropController.reset();
+    this.terrainPropController.dispose();
     this.officeRenderable?.destroy();
     this.officeRenderable = null;
     this.officeCellHighlight?.destroy();

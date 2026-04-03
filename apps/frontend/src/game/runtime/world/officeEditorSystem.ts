@@ -14,10 +14,7 @@ import {
   type FurniturePaletteItem,
   type FurnitureRotationQuarterTurns,
 } from "../../content/structures/furniturePalette";
-import {
-  resolvePropPaletteItem,
-  type PropPaletteItem,
-} from "../../content/structures/propPalette";
+import { type PropPaletteItem } from "../../content/structures/propPalette";
 import type {
   OfficeSceneFurniture,
   OfficeSceneFurnitureCategory,
@@ -45,8 +42,6 @@ type OfficeEditorCommand = {
   floorPattern: string | null;
   /** Active furniture asset ID (only used by the "furniture" tool). */
   furnitureId: string | null;
-  /** Active prop asset ID (only used by the "prop" tool). */
-  propId?: string | null;
   /** Pending clockwise quarter-turns from the selected furniture tool. */
   rotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
@@ -129,7 +124,7 @@ export class OfficeEditorSystem {
         );
 
       case "prop":
-        return this.applyProp(layout, cell, command.propId ?? null);
+        return false;
     }
 
     return false;
@@ -171,9 +166,10 @@ export class OfficeEditorSystem {
     assetId: string | null,
     rotationQuarterTurns: FurnitureRotationQuarterTurns,
   ): OfficeFurniturePlacementPreview | null {
-    const asset =
-      this.resolvePlacementFurnitureAsset(assetId, rotationQuarterTurns) ??
-      this.resolvePlacementPropAsset(assetId);
+    const asset = this.resolvePlacementFurnitureAsset(
+      assetId,
+      rotationQuarterTurns,
+    );
     if (!asset) {
       return null;
     }
@@ -438,19 +434,6 @@ export class OfficeEditorSystem {
     return this.placePaletteItem(layout, cell, paletteItem);
   }
 
-  private applyProp(
-    layout: OfficeSceneLayout,
-    cell: OfficeCellCoord,
-    propId: string | null,
-  ): boolean {
-    const paletteItem = this.resolvePlacementPropAsset(propId);
-    if (!paletteItem) {
-      return false;
-    }
-
-    return this.placePaletteItem(layout, cell, paletteItem);
-  }
-
   private resolvePlacementFurnitureAsset(
     furnitureId: string | null,
     rotationQuarterTurns: FurnitureRotationQuarterTurns,
@@ -460,12 +443,6 @@ export class OfficeEditorSystem {
     }
 
     return resolveFurnitureRotationVariant(furnitureId, rotationQuarterTurns);
-  }
-
-  private resolvePlacementPropAsset(
-    propId: string | null,
-  ): OfficePlaceablePaletteItem | null {
-    return resolvePropPaletteItem(propId);
   }
 
   public previewFurnitureMove(
