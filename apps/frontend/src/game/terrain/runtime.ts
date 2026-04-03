@@ -40,6 +40,7 @@ import type {
 } from "../../data";
 import {
   getFarmrpgStaticTerrainSourceSpecsForDomain,
+  resolveFarmrpgStaticTerrainFrameCaseId,
   resolveFarmrpgStaticTerrainSourceSpec,
   type FarmrpgStaticTerrainPlacementDomain,
 } from "../content/asset-catalog/farmrpgTerrainSourceCatalog";
@@ -189,22 +190,51 @@ class TerrainDetailTileResolver {
     cellX: number,
     cellY: number,
   ): TerrainRenderTile | null {
-    const sourceId = materialAt(cellX, cellY);
-    if (sourceId === TERRAIN_DETAIL_EMPTY_SOURCE_ID) {
+    // In dual-grid marching squares, junction (cellX, cellY) covers 4 cells:
+    //   NW=(cellX, cellY), NE=(cellX+1, cellY),
+    //   SE=(cellX+1, cellY+1), SW=(cellX, cellY+1).
+    // A junction tile must render if ANY corner has a detail material, not just NW.
+    // We pick the dominant material (NW > NE > SW > SE) and compute the case based
+    // on which corners match that material.
+    const nwMaterial = materialAt(cellX, cellY);
+    const neMaterial = materialAt(cellX + 1, cellY);
+    const swMaterial = materialAt(cellX, cellY + 1);
+    const seMaterial = materialAt(cellX + 1, cellY + 1);
+
+    const dominantMaterial =
+      nwMaterial !== TERRAIN_DETAIL_EMPTY_SOURCE_ID
+        ? nwMaterial
+        : neMaterial !== TERRAIN_DETAIL_EMPTY_SOURCE_ID
+          ? neMaterial
+          : swMaterial !== TERRAIN_DETAIL_EMPTY_SOURCE_ID
+            ? swMaterial
+            : seMaterial !== TERRAIN_DETAIL_EMPTY_SOURCE_ID
+              ? seMaterial
+              : null;
+
+    if (!dominantMaterial) {
       return null;
     }
 
-    const sourceSpec = resolveFarmrpgStaticTerrainSourceSpec(sourceId);
+    const sourceSpec = resolveFarmrpgStaticTerrainSourceSpec(dominantMaterial);
     if (!sourceSpec) {
       return null;
     }
 
-    const caseId = this.kernel.deriveCaseId(materialAt, cellX, cellY, sourceId);
+    const caseId = this.kernel.deriveCaseId(
+      materialAt,
+      cellX,
+      cellY,
+      dominantMaterial,
+    );
     return {
       cellX,
       cellY,
       caseId,
-      frame: `${sourceSpec.framePrefix}${caseId}`,
+      frame: `${sourceSpec.framePrefix}${resolveFarmrpgStaticTerrainFrameCaseId(
+        sourceSpec,
+        caseId,
+      )}`,
       rotate90: 0,
       flipX: false,
       flipY: false,

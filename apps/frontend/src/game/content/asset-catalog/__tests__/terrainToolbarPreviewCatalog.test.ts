@@ -113,7 +113,7 @@ describe("terrain toolbar preview catalog", () => {
       "public-assets:terrain/farmrpg-barn-posts",
     );
     expect(barnPosts?.representativeFrame.frameKey).toBe(
-      "tilesets.farmrpg.barn.posts#15",
+      "tilesets.farmrpg.barn.posts#0",
     );
     expect(barnPosts?.animationFrames).toHaveLength(1);
   });

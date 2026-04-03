@@ -112,13 +112,13 @@ vi.mock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
       "tilesets.farmrpg.grass.winter#0": {
         frame: { x: 64, y: 0, w: 16, h: 16 },
       },
-      "tilesets.farmrpg.barn.posts#15": {
+      "tilesets.farmrpg.barn.posts#0": {
         frame: { x: 0, y: 16, w: 16, h: 16 },
       },
-      "tilesets.farmrpg.barn.hay#15": {
+      "tilesets.farmrpg.barn.hay#0": {
         frame: { x: 16, y: 16, w: 16, h: 16 },
       },
-      "tilesets.farmrpg.barn.messy-hay#15": {
+      "tilesets.farmrpg.barn.messy-hay#0": {
         frame: { x: 32, y: 16, w: 16, h: 16 },
       },
     },

@@ -348,7 +348,10 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
           groupKey: spec.groupKey,
           groupLabel: spec.groupLabel,
           rules: resolveTransitionRulesFromRuleset(
-            createFarmrpgAutotileRuleset(spec.framePrefix),
+            createFarmrpgAutotileRuleset(
+              spec.framePrefix,
+              spec.reverseMarchingSquaresCaseIds,
+            ),
           ),
           atlas: FARMRPG_ATLAS_SOURCE,
         }),

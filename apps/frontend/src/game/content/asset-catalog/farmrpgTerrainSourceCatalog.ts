@@ -9,6 +9,7 @@ export type FarmrpgStaticTerrainSourceSpec = {
   placementDomain: "terrain" | "office";
   framePrefix: `tilesets.farmrpg.${string}#`;
   representativeCaseId: number;
+  reverseMarchingSquaresCaseIds: boolean;
 };
 
 export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
@@ -21,6 +22,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.barn.posts#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-barn-hay",
@@ -31,6 +33,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.barn.hay#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-barn-messy-hay",
@@ -41,6 +44,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.barn.messy-hay#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-carpet-01",
@@ -51,6 +55,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "office",
     framePrefix: "tilesets.farmrpg.carpet.variant-01#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-carpet-02",
@@ -61,6 +66,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "office",
     framePrefix: "tilesets.farmrpg.carpet.variant-02#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-carpet-03",
@@ -71,6 +77,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "office",
     framePrefix: "tilesets.farmrpg.carpet.variant-03#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-soil-tilled-01",
@@ -81,6 +88,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.soil.tilled.variant-01#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-soil-wet-01",
@@ -91,6 +99,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.soil.wet.variant-01#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-soil-tilled-02",
@@ -101,6 +110,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.soil.tilled.variant-02#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
   {
     sourceId: "public-assets:terrain/farmrpg-soil-wet-02",
@@ -111,6 +121,7 @@ export const FARMRPG_STATIC_TERRAIN_SOURCE_SPECS = [
     placementDomain: "terrain",
     framePrefix: "tilesets.farmrpg.soil.wet.variant-02#",
     representativeCaseId: 15,
+    reverseMarchingSquaresCaseIds: true,
   },
 ] as const satisfies readonly FarmrpgStaticTerrainSourceSpec[];
 
@@ -156,6 +167,7 @@ export function getFarmrpgStaticTerrainSourceSpecsForDomain(
 
 export function createFarmrpgAutotileRuleset(
   framePrefix: `tilesets.farmrpg.${string}#`,
+  reverseMarchingSquaresCaseIds = false,
 ): TerrainRulesetFile {
   return {
     transitions: [
@@ -165,9 +177,18 @@ export function createFarmrpgAutotileRuleset(
         outsideMaterial: "ground",
         rules: Array.from({ length: 16 }, (_, caseId) => ({
           caseId,
-          frame: `${framePrefix}${caseId}`,
+          frame: `${framePrefix}${
+            reverseMarchingSquaresCaseIds ? 15 - caseId : caseId
+          }`,
         })),
       },
     ],
   };
+}
+
+export function resolveFarmrpgStaticTerrainFrameCaseId(
+  sourceSpec: FarmrpgStaticTerrainSourceSpec,
+  caseId: number,
+): number {
+  return sourceSpec.reverseMarchingSquaresCaseIds ? 15 - caseId : caseId;
 }

@@ -69,10 +69,10 @@ describe("terrain content repository", () => {
     });
     expect(content.ruleset.transitions[0]?.rules).toHaveLength(16);
     expect(content.ruleset.transitions[0]?.rules[0]?.frame).toBe(
-      "tilesets.farmrpg.barn.posts#0",
+      "tilesets.farmrpg.barn.posts#15",
     );
     expect(content.ruleset.transitions[0]?.rules[15]?.frame).toBe(
-      "tilesets.farmrpg.barn.posts#15",
+      "tilesets.farmrpg.barn.posts#0",
     );
   });
 });
