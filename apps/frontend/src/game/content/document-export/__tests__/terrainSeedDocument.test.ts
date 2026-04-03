@@ -57,8 +57,84 @@ describe("document export terrain seed translation", () => {
     store.setCellMaterial(1, 0, "water");
 
     expect(syncFromRuntimeTerrain(seed, store)).toEqual({
-      ...seed,
+      width: seed.width,
+      height: seed.height,
+      chunkSize: seed.chunkSize,
+      defaultMaterial: seed.defaultMaterial,
+      materials: [...seed.materials],
+      legend: { ...seed.legend },
       rows: [".~", ".."],
+    });
+  });
+
+  test("exports optional terrain and office detail layers", () => {
+    const seed: TerrainSeedDocument = {
+      width: 2,
+      height: 2,
+      chunkSize: TERRAIN_CHUNK_SIZE,
+      defaultMaterial: "grass",
+      materials: ["grass", "water"],
+      legend: {
+        ".": "grass",
+        "~": "water",
+      },
+      rows: ["..", ".."],
+    };
+    const store = new TerrainMapStore(createGridSpec());
+    const terrainDetailsStore = new TerrainMapStore({
+      width: 2,
+      height: 2,
+      chunkSize: TERRAIN_CHUNK_SIZE,
+      defaultMaterial: "__empty__",
+      materials: ["__empty__", "public-assets:terrain/farmrpg-barn-posts"],
+      cells: [
+        "public-assets:terrain/farmrpg-barn-posts",
+        "__empty__",
+        "__empty__",
+        "__empty__",
+      ],
+    });
+    const officeDetailsStore = new TerrainMapStore({
+      width: 2,
+      height: 2,
+      chunkSize: TERRAIN_CHUNK_SIZE,
+      defaultMaterial: "__empty__",
+      materials: ["__empty__", "public-assets:terrain/farmrpg-carpet-01"],
+      cells: [
+        "__empty__",
+        "__empty__",
+        "__empty__",
+        "public-assets:terrain/farmrpg-carpet-01",
+      ],
+    });
+
+    expect(
+      syncFromRuntimeTerrain(seed, store, {
+        terrainDetailsStore,
+        officeDetailsStore,
+      }),
+    ).toEqual({
+      width: seed.width,
+      height: seed.height,
+      chunkSize: seed.chunkSize,
+      defaultMaterial: seed.defaultMaterial,
+      materials: [...seed.materials],
+      legend: { ...seed.legend },
+      rows: [".~", ".."],
+      terrainDetails: {
+        legend: {
+          ".": null,
+          a: "public-assets:terrain/farmrpg-barn-posts",
+        },
+        rows: ["a.", ".."],
+      },
+      officeDetails: {
+        legend: {
+          ".": null,
+          a: "public-assets:terrain/farmrpg-carpet-01",
+        },
+        rows: ["..", ".a"],
+      },
     });
   });
 });

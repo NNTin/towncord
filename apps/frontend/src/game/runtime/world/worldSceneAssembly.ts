@@ -12,12 +12,16 @@ import {
   doesFurnitureBlockMovement,
   type WorldNavigationService,
 } from "../../../engine";
-import { createTerrainRuntimeContext } from "../../terrain/runtime";
+import {
+  createTerrainDetailRuntimeContext,
+  createTerrainRuntimeContext,
+} from "../../terrain/runtime";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import {
   readTerrainContent,
   type TerrainContentSourceId,
 } from "../../content/asset-catalog/terrainContentRepository";
+import { RENDER_LAYERS } from "../../renderLayers";
 import { EntitySystem } from "./entitySystem";
 import type { MovementInput } from "./movementSystem";
 import { WorldSceneCommandBindings } from "./worldSceneCommandBindings";
@@ -59,9 +63,17 @@ export class WorldSceneAssembly {
   public readonly inputRouter: WorldRuntimeInputRouter;
 
   private terrainRuntime: TerrainRuntime | null = null;
+  private terrainDetailRuntime: TerrainRuntime | null = null;
+  private officeDetailRuntime: TerrainRuntime | null = null;
   private readonly officeLayoutChangedEvents: Phaser.Events.EventEmitter;
   private terrainRuntimeContext: ReturnType<
     typeof createTerrainRuntimeContext
+  > | null = null;
+  private terrainDetailRuntimeContext: ReturnType<
+    typeof createTerrainDetailRuntimeContext
+  > | null = null;
+  private officeDetailRuntimeContext: ReturnType<
+    typeof createTerrainDetailRuntimeContext
   > | null = null;
   private officeRegion: OfficeSceneBootstrap["layout"] | null = null;
   private entitySystem: EntitySystem | null = null;
@@ -107,6 +119,23 @@ export class WorldSceneAssembly {
     );
 
     this.terrainRuntimeContext = createTerrainRuntimeContext(scene);
+    this.terrainDetailRuntimeContext = createTerrainDetailRuntimeContext(
+      scene,
+      {
+        seedDocument: this.terrainRuntimeContext.seedDocument,
+        gameplayGrid: this.terrainRuntimeContext.gameplayGrid,
+        placementDomain: "terrain",
+        staticDepth: RENDER_LAYERS.TERRAIN_DETAIL_STATIC,
+        animatedDepth: RENDER_LAYERS.TERRAIN_DETAIL_ANIMATED,
+      },
+    );
+    this.officeDetailRuntimeContext = createTerrainDetailRuntimeContext(scene, {
+      seedDocument: this.terrainRuntimeContext.seedDocument,
+      gameplayGrid: this.terrainRuntimeContext.gameplayGrid,
+      placementDomain: "office",
+      staticDepth: RENDER_LAYERS.OFFICE_DETAIL_STATIC,
+      animatedDepth: RENDER_LAYERS.OFFICE_DETAIL_ANIMATED,
+    });
     scene.game.events.on(
       OFFICE_LAYOUT_CHANGED_EVENT,
       this.handleOfficeLayoutChanged,
@@ -124,6 +153,9 @@ export class WorldSceneAssembly {
     this.terrainController = new WorldSceneTerrainController({
       scene,
       getTerrainRuntime: () => this.terrainRuntime,
+      getTerrainDetailRuntime: () => this.terrainDetailRuntime,
+      getOfficeDetailRuntime: () => this.officeDetailRuntime,
+      getOfficeRegion: () => this.officeRuntime.getRegion(),
       getEntities: () => this.entitySystem?.getAll() ?? [],
       setTerrainContentSource: (sourceId) =>
         this.setTerrainContentSource(sourceId),
@@ -209,7 +241,13 @@ export class WorldSceneAssembly {
   public boot(scene: Phaser.Scene, options: WorldSceneBootOptions): void {
     const { worldBootstrap, officeBootstrap } = options;
     const terrainRuntimeContext = this.terrainRuntimeContext;
-    if (!terrainRuntimeContext) {
+    const terrainDetailRuntimeContext = this.terrainDetailRuntimeContext;
+    const officeDetailRuntimeContext = this.officeDetailRuntimeContext;
+    if (
+      !terrainRuntimeContext ||
+      !terrainDetailRuntimeContext ||
+      !officeDetailRuntimeContext
+    ) {
       throw new Error("Terrain runtime context was not initialized.");
     }
 
@@ -225,6 +263,18 @@ export class WorldSceneAssembly {
 
     this.terrainRuntime = new TerrainRuntime(scene, {
       ...terrainRuntimeContext.runtimeOptions,
+      onTerrainChanged: () => {
+        this.hasPendingTerrainSnapshotChange = true;
+      },
+    });
+    this.terrainDetailRuntime = new TerrainRuntime(scene, {
+      ...terrainDetailRuntimeContext.runtimeOptions,
+      onTerrainChanged: () => {
+        this.hasPendingTerrainSnapshotChange = true;
+      },
+    });
+    this.officeDetailRuntime = new TerrainRuntime(scene, {
+      ...officeDetailRuntimeContext.runtimeOptions,
       onTerrainChanged: () => {
         this.hasPendingTerrainSnapshotChange = true;
       },
@@ -282,6 +332,8 @@ export class WorldSceneAssembly {
 
     const terrainStart = performance.now();
     this.terrainRuntime?.update();
+    this.terrainDetailRuntime?.update();
+    this.officeDetailRuntime?.update();
     const terrainMs = performance.now() - terrainStart;
 
     if (this.wasd && this.shiftKey && this.entitySystem) {
@@ -313,6 +365,10 @@ export class WorldSceneAssembly {
     this.entitySystem = null;
     this.terrainRuntime?.destroy();
     this.terrainRuntime = null;
+    this.terrainDetailRuntime?.destroy();
+    this.terrainDetailRuntime = null;
+    this.officeDetailRuntime?.destroy();
+    this.officeDetailRuntime = null;
     this.officeRuntime.dispose();
     this.selectionController.dispose();
     this.terrainController.dispose();
@@ -325,6 +381,8 @@ export class WorldSceneAssembly {
     this.rKey = null;
     this.rKeyWasDown = false;
     this.terrainRuntimeContext = null;
+    this.terrainDetailRuntimeContext = null;
+    this.officeDetailRuntimeContext = null;
     this.hasEmittedTerrainSeedSnapshot = false;
     this.hasPendingTerrainSnapshotChange = false;
     this.officeFurnitureBlockingCells.clear();
@@ -377,16 +435,13 @@ export class WorldSceneAssembly {
   }
 
   private emitTerrainSeedSnapshot(): void {
-    const terrainRuntimeContext = this.terrainRuntimeContext;
-    if (!terrainRuntimeContext) {
+    const nextSeed = this.buildTerrainSeedSnapshot();
+    if (!nextSeed) {
       return;
     }
 
     this.projections.emitTerrainSeedChanged({
-      seed: syncFromRuntimeTerrain(
-        terrainRuntimeContext.seedDocument,
-        terrainRuntimeContext.runtimeOptions.store,
-      ),
+      seed: nextSeed,
     });
   }
 
@@ -396,10 +451,10 @@ export class WorldSceneAssembly {
       return;
     }
 
-    const nextSeed = syncFromRuntimeTerrain(
-      terrainRuntimeContext.seedDocument,
-      terrainRuntimeContext.runtimeOptions.store,
-    );
+    const nextSeed = this.buildTerrainSeedSnapshot();
+    if (!nextSeed) {
+      return;
+    }
     const nextContent = readTerrainContent(sourceId);
     const nextRuntimeContext = createTerrainRuntimeContext(this.scene, {
       terrainContent: {
@@ -422,6 +477,24 @@ export class WorldSceneAssembly {
       },
     });
     this.terrainRuntime.update();
+  }
+
+  private buildTerrainSeedSnapshot() {
+    const terrainRuntimeContext = this.terrainRuntimeContext;
+    if (!terrainRuntimeContext) {
+      return null;
+    }
+
+    return syncFromRuntimeTerrain(
+      terrainRuntimeContext.seedDocument,
+      terrainRuntimeContext.runtimeOptions.store,
+      {
+        terrainDetailsStore:
+          this.terrainDetailRuntimeContext?.runtimeOptions.store ?? null,
+        officeDetailsStore:
+          this.officeDetailRuntimeContext?.runtimeOptions.store ?? null,
+      },
+    );
   }
 
   private resolveMovementInput(

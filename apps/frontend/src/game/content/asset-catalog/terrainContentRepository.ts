@@ -29,6 +29,17 @@ export const DEFAULT_TERRAIN_SOURCE_ID = FARMRPG_GRASS_TERRAIN_SOURCE_ID;
 export type FarmrpgTerrainSourceId =
   (typeof FARMRPG_GRASS_TERRAIN_SOURCE_IDS)[FarmrpgTerrainSeason];
 
+export function isFarmrpgTerrainSourceId(
+  value: string | null | undefined,
+): value is FarmrpgTerrainSourceId {
+  return (
+    typeof value === "string" &&
+    (Object.values(FARMRPG_GRASS_TERRAIN_SOURCE_IDS) as string[]).includes(
+      value,
+    )
+  );
+}
+
 export type TerrainContentSourceId =
   | typeof PHASE1_TERRAIN_SOURCE_ID
   | FarmrpgTerrainSourceId

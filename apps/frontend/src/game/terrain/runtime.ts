@@ -20,6 +20,12 @@ import {
 } from "./gameplayGrid";
 import { MarchingSquaresKernel } from "./marchingSquaresKernel";
 import { TerrainQueries } from "./queries";
+import {
+  TERRAIN_TEXTURE_KEY,
+  type TerrainChunkState,
+  type TerrainGridSpec,
+  type TerrainRenderTile,
+} from "./contracts";
 import type { TerrainRenderSurface } from "./renderSurface";
 import { TerrainMapStore } from "./store";
 import { TerrainTileResolver } from "./tileResolver";
@@ -28,7 +34,15 @@ import {
   TerrainRuntime,
   type TerrainRuntimeOptions,
 } from "../../engine/terrain";
-import type { TerrainSeedDocument } from "../../data";
+import type {
+  TerrainSeedDetailLayerDocument,
+  TerrainSeedDocument,
+} from "../../data";
+import {
+  getFarmrpgStaticTerrainSourceSpecsForDomain,
+  resolveFarmrpgStaticTerrainSourceSpec,
+  type FarmrpgStaticTerrainPlacementDomain,
+} from "../content/asset-catalog/farmrpgTerrainSourceCatalog";
 import {
   readTerrainContent,
   type TerrainContent,
@@ -54,16 +68,245 @@ type CreateTerrainRuntimeContextOptions = {
   sharedState?: TerrainRuntimeSharedState;
 };
 
+export const TERRAIN_DETAIL_EMPTY_SOURCE_ID = "__empty__";
+
+export type TerrainDetailRuntimeContext = {
+  placementDomain: FarmrpgStaticTerrainPlacementDomain;
+  runtimeOptions: Omit<TerrainRuntimeOptions, "store"> & {
+    store: TerrainMapStore;
+  };
+};
+
+type CreateTerrainDetailRuntimeContextOptions = {
+  seedDocument: TerrainSeedDocument;
+  gameplayGrid: TerrainGameplayGrid;
+  placementDomain: FarmrpgStaticTerrainPlacementDomain;
+  staticDepth: number;
+  animatedDepth: number;
+};
+
 const ANIMATION_MANIFEST_KEY_BY_TERRAIN_TEXTURE: Record<string, string> = {
   "debug.tilesets": DEBUG_ANIMATIONS_JSON_KEY,
   "farmrpg.tilesets": FARMRPG_ANIMATIONS_JSON_KEY,
 };
+
+const PREVIEW_RENDER_NEIGHBOR_OFFSETS = [
+  { x: -1, y: -1 },
+  { x: 0, y: -1 },
+  { x: -1, y: 0 },
+  { x: 0, y: 0 },
+] as const;
 
 function resolveTerrainAnimationManifestKey(textureKey: string): string {
   return (
     ANIMATION_MANIFEST_KEY_BY_TERRAIN_TEXTURE[textureKey] ??
     DEBUG_ANIMATIONS_JSON_KEY
   );
+}
+
+function resolveDetailLayerDocument(
+  seedDocument: TerrainSeedDocument,
+  placementDomain: FarmrpgStaticTerrainPlacementDomain,
+): TerrainSeedDetailLayerDocument | undefined {
+  return placementDomain === "terrain"
+    ? seedDocument.terrainDetails
+    : seedDocument.officeDetails;
+}
+
+function createEmptyDetailRows(seedDocument: TerrainSeedDocument): string[] {
+  return Array.from({ length: seedDocument.height }, () =>
+    ".".repeat(seedDocument.width),
+  );
+}
+
+function createTerrainDetailGridSpec(options: {
+  seedDocument: TerrainSeedDocument;
+  placementDomain: FarmrpgStaticTerrainPlacementDomain;
+}): TerrainGridSpec {
+  const detailLayer = resolveDetailLayerDocument(
+    options.seedDocument,
+    options.placementDomain,
+  );
+  const sourceSpecs = getFarmrpgStaticTerrainSourceSpecsForDomain(
+    options.placementDomain,
+  );
+  const allowedSourceIds = new Set<string>(
+    sourceSpecs.map((spec) => spec.sourceId),
+  );
+  const materials = [
+    TERRAIN_DETAIL_EMPTY_SOURCE_ID,
+    ...sourceSpecs.map((spec) => spec.sourceId),
+  ];
+  const rows = detailLayer?.rows ?? createEmptyDetailRows(options.seedDocument);
+  const legend = detailLayer?.legend ?? { ".": null };
+  const cells: string[] = [];
+
+  for (const [rowIndex, row] of rows.entries()) {
+    if (row.length !== options.seedDocument.width) {
+      throw new Error(
+        `Terrain detail row ${rowIndex} width mismatch: expected ${options.seedDocument.width}, received ${row.length}.`,
+      );
+    }
+
+    for (const glyph of row) {
+      if (!(glyph in legend)) {
+        throw new Error(
+          `Terrain detail row ${rowIndex} references unknown glyph "${glyph}".`,
+        );
+      }
+
+      const sourceId = legend[glyph];
+      if (sourceId === null) {
+        cells.push(TERRAIN_DETAIL_EMPTY_SOURCE_ID);
+        continue;
+      }
+
+      if (typeof sourceId !== "string" || !allowedSourceIds.has(sourceId)) {
+        throw new Error(
+          `Terrain detail glyph "${glyph}" maps to unsupported source "${String(sourceId)}" for domain "${options.placementDomain}".`,
+        );
+      }
+
+      cells.push(sourceId);
+    }
+  }
+
+  return {
+    width: options.seedDocument.width,
+    height: options.seedDocument.height,
+    chunkSize: options.seedDocument.chunkSize as TerrainGridSpec["chunkSize"],
+    defaultMaterial: TERRAIN_DETAIL_EMPTY_SOURCE_ID,
+    materials,
+    cells,
+  };
+}
+
+class TerrainDetailTileResolver {
+  constructor(private readonly kernel: MarchingSquaresKernel) {}
+
+  public resolveRenderTile(
+    materialAt: (cellX: number, cellY: number) => string,
+    cellX: number,
+    cellY: number,
+  ): TerrainRenderTile | null {
+    const sourceId = materialAt(cellX, cellY);
+    if (sourceId === TERRAIN_DETAIL_EMPTY_SOURCE_ID) {
+      return null;
+    }
+
+    const sourceSpec = resolveFarmrpgStaticTerrainSourceSpec(sourceId);
+    if (!sourceSpec) {
+      return null;
+    }
+
+    const caseId = this.kernel.deriveCaseId(materialAt, cellX, cellY, sourceId);
+    return {
+      cellX,
+      cellY,
+      caseId,
+      frame: `${sourceSpec.framePrefix}${caseId}`,
+      rotate90: 0,
+      flipX: false,
+      flipY: false,
+    };
+  }
+}
+
+class TerrainDetailChunkBuilder {
+  constructor(
+    private readonly store: TerrainMapStore,
+    private readonly tileResolver: TerrainDetailTileResolver,
+  ) {}
+
+  public buildChunkPayload(chunk: TerrainChunkState) {
+    const tiles: TerrainRenderTile[] = [];
+    const bounds = this.store.getChunkCellBounds(chunk.chunkX, chunk.chunkY);
+    const materialAt = (cellX: number, cellY: number) =>
+      this.store.getCellMaterial(cellX, cellY);
+
+    for (let cellY = bounds.startY; cellY < bounds.endY; cellY += 1) {
+      for (let cellX = bounds.startX; cellX < bounds.endX; cellX += 1) {
+        const tile = this.tileResolver.resolveRenderTile(
+          materialAt,
+          cellX,
+          cellY,
+        );
+        if (tile) {
+          tiles.push(tile);
+        }
+      }
+    }
+
+    return {
+      id: chunk.id,
+      chunkX: chunk.chunkX,
+      chunkY: chunk.chunkY,
+      revision: chunk.revision,
+      tiles,
+    };
+  }
+}
+
+class TerrainDetailQueries {
+  constructor(
+    private readonly store: TerrainMapStore,
+    private readonly gameplayGrid: TerrainGameplayGrid,
+    private readonly tileResolver: TerrainDetailTileResolver,
+  ) {}
+
+  public getGameplayGrid(): TerrainGameplayGrid {
+    return this.gameplayGrid;
+  }
+
+  public previewPaintAtWorld(
+    payload: {
+      materialId: string;
+      brushId: string;
+      screenX: number;
+      screenY: number;
+      type: "terrain";
+    },
+    worldX: number,
+    worldY: number,
+  ): TerrainRenderTile[] | null {
+    const center = this.gameplayGrid.worldToCell(worldX, worldY);
+    if (!center) {
+      return null;
+    }
+
+    const previewMaterialId =
+      payload.brushId === "delete" || payload.brushId === "eraser"
+        ? TERRAIN_DETAIL_EMPTY_SOURCE_ID
+        : payload.materialId;
+    const materialAt = (cellX: number, cellY: number) =>
+      cellX === center.cellX && cellY === center.cellY
+        ? previewMaterialId
+        : this.store.getCellMaterial(cellX, cellY);
+    const tiles: TerrainRenderTile[] = [];
+
+    for (const offset of PREVIEW_RENDER_NEIGHBOR_OFFSETS) {
+      const cellX = center.cellX + offset.x;
+      const cellY = center.cellY + offset.y;
+      if (!this.gameplayGrid.isCellInBounds(cellX, cellY)) {
+        continue;
+      }
+
+      const tile = this.tileResolver.resolveRenderTile(
+        materialAt,
+        cellX,
+        cellY,
+      );
+      if (tile) {
+        tiles.push(tile);
+      }
+    }
+
+    return tiles;
+  }
+
+  public inspectAtWorld(): null {
+    return null;
+  }
 }
 
 export function createTerrainRuntimeContext(
@@ -147,6 +390,57 @@ export function createTerrainRuntimeOptions(
   scene: TerrainRenderSurface,
 ): TerrainRuntimeOptions {
   return createTerrainRuntimeContext(scene).runtimeOptions;
+}
+
+export function createTerrainDetailRuntimeContext(
+  scene: TerrainRenderSurface,
+  options: CreateTerrainDetailRuntimeContextOptions,
+): TerrainDetailRuntimeContext {
+  const animationManifest = readOptionalAnimationManifest(
+    scene as unknown as Record<string, unknown>,
+    resolveTerrainAnimationManifestKey(TERRAIN_TEXTURE_KEY),
+  );
+  const phaseDurationsByAnimationId =
+    collectPhaseDurationsByAnimationId(animationManifest);
+  const gridSpec = createTerrainDetailGridSpec({
+    seedDocument: options.seedDocument,
+    placementDomain: options.placementDomain,
+  });
+  const store = new TerrainMapStore(gridSpec);
+  const kernel = new MarchingSquaresKernel();
+  const tileResolver = new TerrainDetailTileResolver(kernel);
+  const chunkBuilder = new TerrainDetailChunkBuilder(store, tileResolver);
+  const commands = new TerrainCommands(
+    new TerrainEditRouter(),
+    store,
+    options.gameplayGrid,
+  );
+  const queries = new TerrainDetailQueries(
+    store,
+    options.gameplayGrid,
+    tileResolver,
+  );
+  const visibleChunks = new TerrainVisibleChunkResolver(
+    store.chunkSize,
+    store.chunkCountX,
+    store.chunkCountY,
+  );
+
+  return {
+    placementDomain: options.placementDomain,
+    runtimeOptions: {
+      gridSpec,
+      store,
+      chunkBuilder,
+      commands,
+      queries,
+      visibleChunks,
+      textureKey: TERRAIN_TEXTURE_KEY,
+      animationPhaseDurationsById: phaseDurationsByAnimationId,
+      staticDepth: options.staticDepth,
+      animatedDepth: options.animatedDepth,
+    },
+  };
 }
 
 export function createTerrainRuntime(

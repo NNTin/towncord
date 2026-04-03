@@ -1,3 +1,8 @@
+export type TerrainSeedDetailLayerDocument = {
+  legend: Record<string, string | null>;
+  rows: string[];
+};
+
 export type TerrainSeedDocument = {
   width: number;
   height: number;
@@ -6,6 +11,8 @@ export type TerrainSeedDocument = {
   materials: string[];
   legend: Record<string, string>;
   rows: string[];
+  terrainDetails?: TerrainSeedDetailLayerDocument;
+  officeDetails?: TerrainSeedDetailLayerDocument;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -13,10 +20,63 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isStringArray(value: unknown): value is string[] {
-  return Array.isArray(value) && value.every((entry) => typeof entry === "string");
+  return (
+    Array.isArray(value) && value.every((entry) => typeof entry === "string")
+  );
 }
 
-export function isTerrainSeedDocument(value: unknown): value is TerrainSeedDocument {
+function isDetailLayerDocument(
+  value: unknown,
+  width: number,
+  height: number,
+): value is TerrainSeedDetailLayerDocument {
+  if (
+    !isRecord(value) ||
+    !isRecord(value.legend) ||
+    !isStringArray(value.rows)
+  ) {
+    return false;
+  }
+
+  if (value.rows.length !== height) {
+    return false;
+  }
+
+  if (!("." in value.legend) || value.legend["."] !== null) {
+    return false;
+  }
+
+  const glyphs = new Set<string>();
+  for (const [glyph, sourceId] of Object.entries(value.legend)) {
+    if (
+      glyph.length !== 1 ||
+      glyphs.has(glyph) ||
+      !(typeof sourceId === "string" || sourceId === null)
+    ) {
+      return false;
+    }
+
+    glyphs.add(glyph);
+  }
+
+  for (const row of value.rows) {
+    if (row.length !== width) {
+      return false;
+    }
+
+    for (const glyph of row) {
+      if (!glyphs.has(glyph)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+export function isTerrainSeedDocument(
+  value: unknown,
+): value is TerrainSeedDocument {
   if (!isRecord(value)) {
     return false;
   }
@@ -63,6 +123,20 @@ export function isTerrainSeedDocument(value: unknown): value is TerrainSeedDocum
         return false;
       }
     }
+  }
+
+  if (
+    value.terrainDetails !== undefined &&
+    !isDetailLayerDocument(value.terrainDetails, value.width, value.height)
+  ) {
+    return false;
+  }
+
+  if (
+    value.officeDetails !== undefined &&
+    !isDetailLayerDocument(value.officeDetails, value.width, value.height)
+  ) {
+    return false;
   }
 
   return true;

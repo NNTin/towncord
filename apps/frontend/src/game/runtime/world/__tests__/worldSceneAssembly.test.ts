@@ -218,6 +218,7 @@ vi.mock("../../../terrain/runtime", () => ({
         hasDirtyChunks: vi.fn(() => false),
         consumeDirtyChunks: vi.fn(() => []),
         getCellMaterial: vi.fn(() => "ground"),
+        markAllChunksDirty: vi.fn(),
       },
       chunkBuilder: {
         buildChunkPayload: vi.fn(),
@@ -237,6 +238,42 @@ vi.mock("../../../terrain/runtime", () => ({
       },
     },
   })),
+  createTerrainDetailRuntimeContext: vi.fn(() => ({
+    placementDomain: "terrain",
+    runtimeOptions: {
+      gridSpec: {
+        width: 1,
+        height: 1,
+        chunkSize: 1,
+        defaultMaterial: "__empty__",
+        materials: ["__empty__"],
+        cells: ["__empty__"],
+      },
+      store: {
+        hasDirtyChunks: vi.fn(() => false),
+        consumeDirtyChunks: vi.fn(() => []),
+        getCellMaterial: vi.fn(() => "__empty__"),
+        markAllChunksDirty: vi.fn(),
+      },
+      chunkBuilder: {
+        buildChunkPayload: vi.fn(),
+      },
+      commands: {
+        queueDrop: vi.fn(),
+        flushPendingDrops: vi.fn(() => []),
+        clearPendingDrops: vi.fn(),
+      },
+      queries: {
+        getGameplayGrid: vi.fn(() => assemblyMocks.terrainGrid),
+        previewPaintAtWorld: vi.fn(() => []),
+        inspectAtWorld: vi.fn(() => null),
+      },
+      visibleChunks: {
+        resolveVisibleChunkIds: vi.fn(() => []),
+      },
+    },
+  })),
+  TERRAIN_DETAIL_EMPTY_SOURCE_ID: "__empty__",
 }));
 
 vi.mock("../../../content/document-export", () => ({
@@ -255,6 +292,10 @@ vi.mock("../../../../engine", () => ({
 
     public getGameplayGrid() {
       return assemblyMocks.terrainGrid;
+    }
+
+    public getTextureKey() {
+      return "farmrpg.tilesets";
     }
   },
   UnifiedCollisionMap: class {
@@ -465,7 +506,7 @@ describe("WorldScene assembly", () => {
 
     lifecycle.update(16);
 
-    expect(assemblyMocks.terrainRuntimeUpdate).toHaveBeenCalledOnce();
+    expect(assemblyMocks.terrainRuntimeUpdate).toHaveBeenCalledTimes(3);
     expect(assemblyMocks.entitySystemUpdate).toHaveBeenCalledOnce();
     expect(assemblyMocks.diagnosticsRecordFrame).toHaveBeenCalledOnce();
     expect(assemblyMocks.officeUpdate).toHaveBeenCalledOnce();
@@ -489,7 +530,7 @@ describe("WorldScene assembly", () => {
 
     expect(assemblyMocks.commandUnbind).toHaveBeenCalledOnce();
     expect(assemblyMocks.entitySystemDispose).toHaveBeenCalledOnce();
-    expect(assemblyMocks.terrainRuntimeDestroy).toHaveBeenCalledOnce();
+    expect(assemblyMocks.terrainRuntimeDestroy).toHaveBeenCalledTimes(3);
     expect(assemblyMocks.officeDispose).toHaveBeenCalledOnce();
     expect(assemblyMocks.selectionDispose).toHaveBeenCalledOnce();
     expect(assemblyMocks.terrainControllerDispose).toHaveBeenCalledOnce();

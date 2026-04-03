@@ -128,6 +128,8 @@ export class TerrainRenderer {
       Record<string, readonly number[]>
     > = {},
     fallbackPhaseDurationMs: number = DEFAULT_TERRAIN_ANIMATION_FRAME_MS,
+    private readonly staticDepth: number = TERRAIN_STATIC_DEPTH,
+    private readonly animatedDepth: number = TERRAIN_ANIMATED_DEPTH,
   ) {
     this.animationClock = new TerrainAnimationClock(
       animationPhaseDurationsById,
@@ -323,7 +325,7 @@ export class TerrainRenderer {
       staticRT: this.createRenderTexture(
         chunkStartX,
         chunkStartY,
-        TERRAIN_STATIC_DEPTH,
+        this.staticDepth,
       ),
       animatedRT: null,
       staticTiles: [],
@@ -394,7 +396,7 @@ export class TerrainRenderer {
         state.animatedRT = this.createRenderTexture(
           state.chunkStartX,
           state.chunkStartY,
-          TERRAIN_ANIMATED_DEPTH,
+          this.animatedDepth,
         );
       }
     } else if (state.animatedRT) {

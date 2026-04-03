@@ -3,10 +3,17 @@ import {
   TERRAIN_CELL_WORLD_SIZE,
   TERRAIN_RENDER_GRID_WORLD_OFFSET,
   TERRAIN_TEXTURE_KEY,
+  worldToAnchoredGridCell,
+  type AnchoredGridRegion,
   type TerrainCellCoord,
   type TerrainRenderTile,
   type TerrainRuntime,
 } from "../../../engine";
+import type { OfficeSceneLayout } from "../../contracts/office-scene";
+import {
+  resolveFarmrpgStaticTerrainSourceSpec,
+  type FarmrpgStaticTerrainSourceSpec,
+} from "../../content/asset-catalog/farmrpgTerrainSourceCatalog";
 import type { TerrainContentSourceId } from "../../content/asset-catalog/terrainContentRepository";
 import type {
   PlaceTerrainDropPayload,
@@ -15,6 +22,7 @@ import type {
 import type { WorldEntity } from "./types";
 import { TerrainPaintSession } from "./terrainPaintSession";
 import { RENDER_LAYERS } from "../../renderLayers";
+import { TERRAIN_DETAIL_EMPTY_SOURCE_ID } from "../../terrain/runtime";
 
 const TERRAIN_BRUSH_PREVIEW_ALPHA = 0.18;
 const TERRAIN_BRUSH_PREVIEW_STROKE_WIDTH = 2;
@@ -24,9 +32,14 @@ const TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL = 0xef4444;
 const TERRAIN_BRUSH_PREVIEW_BLOCKED_STROKE = 0xfecaca;
 const TERRAIN_BRUSH_RENDER_PREVIEW_ALPHA = 0.72;
 
+type OfficeRegion = AnchoredGridRegion<OfficeSceneLayout>;
+
 type WorldSceneTerrainControllerHost = {
   scene: Pick<Phaser.Scene, "add" | "cameras" | "input">;
   getTerrainRuntime: () => TerrainRuntime | null;
+  getTerrainDetailRuntime: () => TerrainRuntime | null;
+  getOfficeDetailRuntime: () => TerrainRuntime | null;
+  getOfficeRegion: () => OfficeRegion | null;
   getEntities: () => readonly WorldEntity[];
   setTerrainContentSource: (sourceId: TerrainContentSourceId) => void;
 };
@@ -109,11 +122,36 @@ export class WorldSceneTerrainController {
       payload.screenX,
       payload.screenY,
     );
+    if (this.isDeleteTerrainTool()) {
+      this.queueDeleteDropAtWorld(
+        payload.screenX,
+        payload.screenY,
+        worldPoint.x,
+        worldPoint.y,
+      );
+      return;
+    }
+
+    const staticSourceSpec = this.resolveActiveStaticTerrainSourceSpec();
+    if (staticSourceSpec) {
+      this.queueStaticTerrainDropAtWorld(
+        staticSourceSpec,
+        payload.screenX,
+        payload.screenY,
+        worldPoint.x,
+        worldPoint.y,
+      );
+      return;
+    }
+
     this.queueTerrainDropAtWorld(payload, worldPoint.x, worldPoint.y);
   }
 
   public handleSelectTerrainTool(payload: SelectedTerrainToolPayload): void {
-    if (payload?.terrainSourceId) {
+    if (
+      payload?.terrainSourceId &&
+      !resolveFarmrpgStaticTerrainSourceSpec(payload.terrainSourceId)
+    ) {
       this.host.setTerrainContentSource(payload.terrainSourceId);
     }
 
@@ -172,7 +210,16 @@ export class WorldSceneTerrainController {
       return;
     }
 
-    const isBlocked = this.isTerrainCellOccupied(cell);
+    const staticSourceSpec = this.resolveActiveStaticTerrainSourceSpec();
+    const isBlocked =
+      this.isTerrainCellOccupied(cell) ||
+      (staticSourceSpec
+        ? this.isStaticTerrainSourceBlockedAtWorld(
+            staticSourceSpec,
+            worldPoint.x,
+            worldPoint.y,
+          )
+        : false);
     this.terrainBrushPreview.setFillStyle(
       isBlocked
         ? TERRAIN_BRUSH_PREVIEW_BLOCKED_FILL
@@ -197,28 +244,50 @@ export class WorldSceneTerrainController {
       return;
     }
 
-    const previewTiles = terrainRuntime.previewPaintAtWorld(
-      {
-        type: "terrain",
-        materialId: this.activeTerrainTool.materialId,
-        brushId: this.activeTerrainTool.brushId,
-        screenX,
-        screenY,
-      },
-      worldPoint.x,
-      worldPoint.y,
-    );
+    const previewRuntime =
+      staticSourceSpec?.placementDomain === "office"
+        ? this.host.getOfficeDetailRuntime()
+        : staticSourceSpec
+          ? this.host.getTerrainDetailRuntime()
+          : terrainRuntime;
+    const previewPayload = staticSourceSpec
+      ? this.buildStaticTerrainDropPayload(
+          staticSourceSpec.sourceId,
+          screenX,
+          screenY,
+        )
+      : this.isDeleteTerrainTool() &&
+          this.isInsideOfficeRegion(worldPoint.x, worldPoint.y)
+        ? null
+        : {
+            type: "terrain" as const,
+            materialId: this.activeTerrainTool.materialId,
+            brushId: this.activeTerrainTool.brushId,
+            screenX,
+            screenY,
+          };
+    const previewTiles =
+      previewRuntime && previewPayload
+        ? previewRuntime.previewPaintAtWorld(
+            previewPayload,
+            worldPoint.x,
+            worldPoint.y,
+          )
+        : null;
     if (!previewTiles || previewTiles.length === 0) {
       this.hideTerrainBrushRenderPreview();
       return;
     }
 
-    this.syncRenderPreviewTiles(previewTiles);
+    this.syncRenderPreviewTiles(previewTiles, previewRuntime?.getTextureKey());
   }
 
-  public syncRenderPreviewTiles(tiles: readonly TerrainRenderTile[]): void {
-    const terrainRuntime = this.host.getTerrainRuntime();
-    const textureKey = terrainRuntime?.getTextureKey();
+  public syncRenderPreviewTiles(
+    tiles: readonly TerrainRenderTile[],
+    textureKey: string | undefined = this.host
+      .getTerrainRuntime()
+      ?.getTextureKey(),
+  ): void {
     if (!textureKey) {
       this.hideTerrainBrushRenderPreview();
       return;
@@ -293,6 +362,23 @@ export class WorldSceneTerrainController {
       return;
     }
 
+    if (this.isDeleteTerrainTool()) {
+      this.queueDeleteDropAtWorld(screenX, screenY, worldPoint.x, worldPoint.y);
+      return;
+    }
+
+    const staticSourceSpec = this.resolveActiveStaticTerrainSourceSpec();
+    if (staticSourceSpec) {
+      this.queueStaticTerrainDropAtWorld(
+        staticSourceSpec,
+        screenX,
+        screenY,
+        worldPoint.x,
+        worldPoint.y,
+      );
+      return;
+    }
+
     this.queueTerrainDropAtWorld(
       {
         type: "terrain",
@@ -361,6 +447,128 @@ export class WorldSceneTerrainController {
     }
 
     terrainRuntime.queueDrop(payload, worldX, worldY);
+  }
+
+  private queueStaticTerrainDropAtWorld(
+    sourceSpec: FarmrpgStaticTerrainSourceSpec,
+    screenX: number,
+    screenY: number,
+    worldX: number,
+    worldY: number,
+  ): void {
+    if (this.isStaticTerrainSourceBlockedAtWorld(sourceSpec, worldX, worldY)) {
+      return;
+    }
+
+    const targetRuntime =
+      sourceSpec.placementDomain === "office"
+        ? this.host.getOfficeDetailRuntime()
+        : this.host.getTerrainDetailRuntime();
+    if (!targetRuntime) {
+      return;
+    }
+
+    const cell = targetRuntime.getGameplayGrid().worldToCell(worldX, worldY);
+    if (!cell || this.isTerrainCellOccupied(cell)) {
+      return;
+    }
+
+    targetRuntime.queueDrop(
+      this.buildStaticTerrainDropPayload(sourceSpec.sourceId, screenX, screenY),
+      worldX,
+      worldY,
+    );
+  }
+
+  private queueDeleteDropAtWorld(
+    screenX: number,
+    screenY: number,
+    worldX: number,
+    worldY: number,
+  ): void {
+    const terrainRuntime = this.host.getTerrainRuntime();
+    if (!terrainRuntime) {
+      return;
+    }
+
+    const cell = terrainRuntime.getGameplayGrid().worldToCell(worldX, worldY);
+    if (!cell || this.isTerrainCellOccupied(cell)) {
+      return;
+    }
+
+    const insideOffice = this.isInsideOfficeRegion(worldX, worldY);
+    const detailRuntime = insideOffice
+      ? this.host.getOfficeDetailRuntime()
+      : this.host.getTerrainDetailRuntime();
+    detailRuntime?.queueDrop(
+      this.buildStaticTerrainDropPayload(
+        TERRAIN_DETAIL_EMPTY_SOURCE_ID,
+        screenX,
+        screenY,
+        "delete",
+      ),
+      worldX,
+      worldY,
+    );
+
+    if (!insideOffice) {
+      terrainRuntime.queueDrop(
+        {
+          type: "terrain",
+          materialId: this.activeTerrainTool?.materialId ?? "ground",
+          brushId: "delete",
+          screenX,
+          screenY,
+        },
+        worldX,
+        worldY,
+      );
+    }
+  }
+
+  private buildStaticTerrainDropPayload(
+    sourceId: string,
+    screenX: number,
+    screenY: number,
+    brushId: string = sourceId,
+  ): PlaceTerrainDropPayload {
+    return {
+      type: "terrain",
+      materialId: sourceId,
+      brushId,
+      screenX,
+      screenY,
+    };
+  }
+
+  private resolveActiveStaticTerrainSourceSpec(): FarmrpgStaticTerrainSourceSpec | null {
+    return resolveFarmrpgStaticTerrainSourceSpec(
+      this.activeTerrainTool?.terrainSourceId,
+    );
+  }
+
+  private isDeleteTerrainTool(): boolean {
+    return this.activeTerrainTool?.brushId === "delete";
+  }
+
+  private isInsideOfficeRegion(worldX: number, worldY: number): boolean {
+    const officeRegion = this.host.getOfficeRegion();
+    if (!officeRegion) {
+      return false;
+    }
+
+    return Boolean(worldToAnchoredGridCell(worldX, worldY, officeRegion));
+  }
+
+  private isStaticTerrainSourceBlockedAtWorld(
+    sourceSpec: FarmrpgStaticTerrainSourceSpec,
+    worldX: number,
+    worldY: number,
+  ): boolean {
+    const insideOffice = this.isInsideOfficeRegion(worldX, worldY);
+    return sourceSpec.placementDomain === "office"
+      ? !insideOffice
+      : insideOffice;
   }
 
   private isTerrainCellOccupied(cell: TerrainCellCoord): boolean {
