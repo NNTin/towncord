@@ -793,6 +793,7 @@ describe("runtime ownership boundary", () => {
       path.join(RUNTIME_ROOT, "world", "worldSceneOfficeRuntime.ts"),
       path.join(RUNTIME_ROOT, "world", "worldSceneSelectionController.ts"),
       path.join(RUNTIME_ROOT, "world", "worldSceneTerrainController.ts"),
+      path.join(RUNTIME_ROOT, "world", "worldSceneTerrainPropController.ts"),
     ]);
     const violations: string[] = [];
 
@@ -925,9 +926,7 @@ describe("runtime ownership boundary", () => {
   test("stage end introduces concrete ui theme and shared panel-state owners", () => {
     expect(fs.existsSync(path.join(UI_ROOT, "theme", "theme.css"))).toBe(true);
     expect(
-      fs.existsSync(
-        path.join(UI_ROOT, "state", "panel-state", "index.ts"),
-      ),
+      fs.existsSync(path.join(UI_ROOT, "state", "panel-state", "index.ts")),
     ).toBe(true);
     expect(
       fs.existsSync(
@@ -936,7 +935,7 @@ describe("runtime ownership boundary", () => {
     ).toBe(true);
 
     const mainSource = fs.readFileSync(path.join(SRC_ROOT, "main.tsx"), "utf8");
-    expect(mainSource).toContain('./ui/theme/theme.css');
+    expect(mainSource).toContain("./ui/theme/theme.css");
   });
 
   test("production source does not depend on compatibility public barrels", () => {
@@ -963,7 +962,9 @@ describe("runtime ownership boundary", () => {
         );
 
         if (retiredPublicBarrels.has(resolvedPath)) {
-          violations.push(`${path.relative(SRC_ROOT, filePath)} -> ${specifier}`);
+          violations.push(
+            `${path.relative(SRC_ROOT, filePath)} -> ${specifier}`,
+          );
         }
       }
     }
@@ -992,7 +993,9 @@ describe("runtime ownership boundary", () => {
             resolvedPath.startsWith(`${engineRoot}${path.sep}`)) &&
           ["factory", "factories"].includes(path.basename(resolvedPath))
         ) {
-          violations.push(`${path.relative(SRC_ROOT, filePath)} -> ${specifier}`);
+          violations.push(
+            `${path.relative(SRC_ROOT, filePath)} -> ${specifier}`,
+          );
         }
       }
     }
