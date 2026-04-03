@@ -47,8 +47,8 @@ import type { OfficeFloorMode } from "../../../game/contracts/office-editor";
 import type { TerrainToolSelection } from "../../../game/contracts/runtime";
 import type {
   EntityToolbarViewModel,
-  PropToolbarViewModel,
   SelectedOfficePlaceableViewModel,
+  TerrainPropToolbarViewModel,
 } from "../../game-session/contracts";
 
 export type OfficeLayoutTool =
@@ -67,7 +67,7 @@ type ToolSelectionProps = {
   isJsonEditorOpen?: boolean;
   onToggleJsonEditor?: () => void;
   entityToolbarViewModel?: EntityToolbarViewModel | null;
-  propToolbarViewModel?: PropToolbarViewModel | null;
+  propToolbarViewModel?: TerrainPropToolbarViewModel | null;
   activeTool?: OfficeLayoutTool | null;
   onSelectTool?: (tool: OfficeLayoutTool | null) => void;
   activeFloorMode?: OfficeFloorMode | null;
@@ -84,7 +84,9 @@ type ToolSelectionProps = {
   activeFurnitureRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectFurnitureId?: (id: string) => void;
   activePropId?: string | null;
+  activePropRotationQuarterTurns?: FurnitureRotationQuarterTurns;
   onSelectPropId?: (id: string) => void;
+  onRotatePropClockwise?: () => void;
   onRotateFurnitureClockwise?: () => void;
   activeTerrainTool?: TerrainToolSelection;
   onSelectTerrainTool?: (tool: TerrainToolSelection) => void;
@@ -1515,9 +1517,18 @@ function EntitiesSubPanel({
 function PropsSubPanel({
   viewModel,
   activePropId,
+  activePropRotationQuarterTurns,
+  onSelectPropId,
+  onRotatePropClockwise,
 }: {
-  viewModel: PropToolbarViewModel | null;
+  viewModel: TerrainPropToolbarViewModel | null;
   activePropId: string | null | undefined;
+  activePropRotationQuarterTurns:
+    | FurnitureRotationQuarterTurns
+    | null
+    | undefined;
+  onSelectPropId: ((id: string) => void) | undefined;
+  onRotatePropClockwise: (() => void) | undefined;
 }): JSX.Element {
   if (!viewModel) {
     return (
@@ -1536,11 +1547,17 @@ function PropsSubPanel({
   const [hoveredPlaceableId, setHoveredPlaceableId] = useState<string | null>(
     null,
   );
+  const selectedPlaceable =
+    viewModel.groups
+      .flatMap((group) => group.placeables)
+      .find((placeable) => placeable.entityId === activePropId) ?? null;
   const previewPlaceable =
     viewModel.groups
       .flatMap((group) => group.placeables)
       .find((placeable) => placeable.id === hoveredPlaceableId) ??
+    selectedPlaceable ??
     firstPlaceable;
+  const canRotatePreview = Boolean(activePropId);
 
   return (
     <div style={{ ...subPanel, maxWidth: 420 }}>
@@ -1556,11 +1573,46 @@ function PropsSubPanel({
         }
         description={
           previewPlaceable
-            ? "Drag a prop into the world to place it on the terrain."
-            : "Hover a prop to preview it, then drag to place it."
+            ? "Select a prop and click the terrain to place it. Props only apply outside the office footprint."
+            : "Choose a prop, rotate it if needed, then click the terrain to place it."
         }
         title={previewPlaceable?.label ?? "Prop preview"}
       />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: 6,
+          fontFamily: "monospace",
+          fontSize: 11,
+          color: "var(--pixel-text)",
+          opacity: 0.82,
+        }}
+      >
+        <div>Selected: {selectedPlaceable?.label ?? "Choose a prop"}</div>
+        <div>
+          Rotation: {formatRotationLabel(activePropRotationQuarterTurns ?? 0)}
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          disabled={!canRotatePreview}
+          onClick={() => onRotatePropClockwise?.()}
+          style={{
+            ...btnBase,
+            opacity: canRotatePreview ? 1 : 0.5,
+            cursor: canRotatePreview ? "pointer" : "default",
+          }}
+          title={
+            canRotatePreview
+              ? "Rotate the pending prop preview"
+              : "Select a prop to rotate the pending placement"
+          }
+        >
+          Rotate
+        </button>
+      </div>
       <div
         style={{
           display: "flex",
@@ -1591,15 +1643,12 @@ function PropsSubPanel({
                 <button
                   key={placeable.id}
                   type="button"
-                  title={`Place ${placeable.label}`}
+                  title={`Select ${placeable.label}`}
                   onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
                   onMouseLeave={() => setHoveredPlaceableId(null)}
                   onFocus={() => setHoveredPlaceableId(placeable.id)}
                   onBlur={() => setHoveredPlaceableId(null)}
-                  draggable
-                  onDragStart={(event) =>
-                    viewModel.onDragStart(event, placeable)
-                  }
+                  onClick={() => onSelectPropId?.(placeable.entityId)}
                   style={{
                     background: "var(--pixel-btn-bg)",
                     border:
@@ -1664,6 +1713,9 @@ export function BottomToolbar({
   activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
   activePropId,
+  activePropRotationQuarterTurns = 0,
+  onSelectPropId,
+  onRotatePropClockwise,
   onRotateFurnitureClockwise,
   activeTerrainTool = null,
   onSelectTerrainTool,
@@ -1790,6 +1842,9 @@ export function BottomToolbar({
         <PropsSubPanel
           viewModel={propToolbarViewModel}
           activePropId={activePropId}
+          activePropRotationQuarterTurns={activePropRotationQuarterTurns}
+          onSelectPropId={onSelectPropId}
+          onRotatePropClockwise={onRotatePropClockwise}
         />
       ) : null}
       {isLayoutMode &&

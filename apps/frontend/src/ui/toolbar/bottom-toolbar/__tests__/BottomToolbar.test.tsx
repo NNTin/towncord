@@ -155,8 +155,10 @@ const baseProps: ComponentProps<typeof BottomToolbar> = {
   activeFurnitureRotationQuarterTurns: 0,
   onSelectFurnitureId: vi.fn(),
   activePropId: null,
+  activePropRotationQuarterTurns: 0,
   onSelectPropId: vi.fn(),
   onRotateFurnitureClockwise: vi.fn(),
+  onRotatePropClockwise: vi.fn(),
   activeTerrainTool: null as TerrainToolSelection,
   onSelectTerrainTool: vi.fn(),
   selectedOfficePlaceable: null,
@@ -395,7 +397,6 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
-        onDragStart: vi.fn(),
       },
     };
     const { container, root, rerender } = renderToolbar(props);
@@ -419,45 +420,43 @@ describe("BottomToolbar", () => {
     expect(container.textContent).not.toContain("Greeter");
 
     const entry = Array.from(container.querySelectorAll("button")).find(
-      (element) => element.getAttribute("title") === "Place Variant 01",
+      (element) => element.getAttribute("title") === "Select Variant 01",
     );
     if (!(entry instanceof HTMLButtonElement)) {
-      throw new Error("Missing draggable prop entry");
+      throw new Error("Missing selectable prop entry");
     }
 
-    expect(entry.getAttribute("draggable")).toBe("true");
-
-    const dragStartEvent = new Event("dragstart", { bubbles: true });
-    Object.defineProperty(dragStartEvent, "dataTransfer", {
-      value: {
-        setData: vi.fn(),
-        effectAllowed: "none",
-      },
-    });
+    expect(entry.getAttribute("draggable")).toBeNull();
 
     act(() => {
-      entry.dispatchEvent(dragStartEvent);
+      entry.click();
     });
 
-    expect(props.propToolbarViewModel?.onDragStart).toHaveBeenCalledOnce();
-    const [eventArg, placeableArg] =
-      props.propToolbarViewModel?.onDragStart.mock.calls[0] ?? [];
-    expect(eventArg).toEqual(
-      expect.objectContaining({
-        type: "dragstart",
-        dataTransfer: expect.objectContaining({
-          setData: expect.any(Function),
-          effectAllowed: "none",
-        }),
-      }),
+    expect(props.onSelectPropId).toHaveBeenCalledWith(
+      "prop.static.set-01.variant-01",
     );
-    expect(placeableArg).toEqual(
-      expect.objectContaining({
-        id: "entity:prop.static.set-01.variant-01",
-        type: "entity",
-        entityId: "prop.static.set-01.variant-01",
-      }),
+
+    rerender({
+      ...props,
+      activeTool: "prop",
+      activePropId: "prop.static.set-01.variant-01",
+      activePropRotationQuarterTurns: 2,
+    });
+
+    expect(container.textContent).toContain("Selected: Variant 01");
+    expect(container.textContent).toContain("Rotation: 180°");
+
+    const rotateButton = Array.from(container.querySelectorAll("button")).find(
+      (element) => element.textContent === "Rotate",
     );
+    if (!(rotateButton instanceof HTMLButtonElement)) {
+      throw new Error("Missing rotate prop button");
+    }
+    act(() => {
+      rotateButton.click();
+    });
+
+    expect(props.onRotatePropClockwise).toHaveBeenCalledOnce();
 
     act(() => {
       root.unmount();

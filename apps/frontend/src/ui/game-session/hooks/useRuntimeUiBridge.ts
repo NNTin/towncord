@@ -11,9 +11,9 @@ import type {
 } from "../../../game";
 import type {
   EntityToolbarViewModel,
-  PropToolbarViewModel,
   RuntimeRootBindings,
   SidebarViewModel,
+  TerrainPropToolbarViewModel,
   ZoomControlsViewModel,
 } from "../contracts";
 import {
@@ -22,7 +22,7 @@ import {
   useRuntimeSyncAdapter,
 } from "./runtimeUiBridgeHooks";
 import { createPlaceablesSidebarBridge } from "../view-models/placeablesSidebarBridge";
-import { createToolbarPropPaletteBridge } from "../view-models/toolbarPropPaletteBridge";
+import { createTerrainPropPaletteBridge } from "../view-models/toolbarPropPaletteBridge";
 import { createToolbarEntityPaletteBridge } from "../view-models/toolbarEntityPaletteBridge";
 
 type RuntimeUiBridge = {
@@ -30,7 +30,7 @@ type RuntimeUiBridge = {
   runtimeRootBindings: RuntimeRootBindings;
   sidebarViewModel: SidebarViewModel | null;
   entityToolbarViewModel: EntityToolbarViewModel | null;
-  propToolbarViewModel: PropToolbarViewModel | null;
+  propToolbarViewModel: TerrainPropToolbarViewModel | null;
   selectedOfficePlaceable: OfficeSelectedPlaceablePayload | null;
   onRotateSelectedOfficePlaceable: () => void;
   onDeleteSelectedOfficePlaceable: () => void;
@@ -109,6 +109,7 @@ export function useRuntimeUiBridge(options: {
     options.officeToolState.activeFurnitureId,
     options.officeToolState.activeFurnitureRotationQuarterTurns,
     options.officeToolState.activePropId,
+    options.officeToolState.activePropRotationQuarterTurns,
   ]);
 
   const sidebarViewModel = useMemo<SidebarViewModel | null>(() => {
@@ -148,16 +149,17 @@ export function useRuntimeUiBridge(options: {
     });
   }, [runtimeSync.runtimeSidebarProjection]);
 
-  const propToolbarViewModel = useMemo<PropToolbarViewModel | null>(() => {
-    const projection = runtimeSync.runtimeSidebarProjection;
-    if (!projection) {
-      return null;
-    }
+  const propToolbarViewModel =
+    useMemo<TerrainPropToolbarViewModel | null>(() => {
+      const projection = runtimeSync.runtimeSidebarProjection;
+      if (!projection) {
+        return null;
+      }
 
-    return createToolbarPropPaletteBridge({
-      placeables: projection.placeables,
-    });
-  }, [runtimeSync.runtimeSidebarProjection]);
+      return createTerrainPropPaletteBridge({
+        placeables: projection.placeables,
+      });
+    }, [runtimeSync.runtimeSidebarProjection]);
 
   return {
     runtimeRootRef,

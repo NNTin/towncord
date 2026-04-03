@@ -39,6 +39,7 @@ function renderHarness() {
         activeFurnitureId: null,
         activeFurnitureRotationQuarterTurns: 0,
         activePropId: null,
+        activePropRotationQuarterTurns: 0,
       },
       onClearOfficeTool: clearOfficeTool,
     });
@@ -258,7 +259,6 @@ describe("useRuntimeUiBridge", () => {
           ],
         },
       ],
-      onDragStart: expect.any(Function),
     });
 
     await harness.unmount();

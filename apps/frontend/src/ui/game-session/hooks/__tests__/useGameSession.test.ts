@@ -34,6 +34,7 @@ describe("useGameSession", () => {
       activeFurnitureId: "desk-01",
       activeFurnitureRotationQuarterTurns: 1 as const,
       activePropId: "prop.static.set-01.variant-01",
+      activePropRotationQuarterTurns: 2 as const,
       onSelectTool: vi.fn(),
       onOfficeFloorPicked: vi.fn(),
     };
@@ -92,7 +93,6 @@ describe("useGameSession", () => {
       },
       propToolbarViewModel: {
         groups: [],
-        onDragStart: vi.fn(),
       },
       selectedOfficePlaceable: null,
       onRotateSelectedOfficePlaceable: vi.fn(),
@@ -145,6 +145,8 @@ describe("useGameSession", () => {
         activeFurnitureRotationQuarterTurns:
           officeToolState.activeFurnitureRotationQuarterTurns,
         activePropId: officeToolState.activePropId,
+        activePropRotationQuarterTurns:
+          officeToolState.activePropRotationQuarterTurns,
       },
       onOfficeLayoutChanged: officeEditor.syncFromRuntime,
       onOfficeFloorPicked: officeToolState.onOfficeFloorPicked,

@@ -1,10 +1,6 @@
 import type { PlaceableViewModel } from "../../../game/contracts/runtime";
-import type { PropToolbarViewModel } from "../contracts";
-import {
-  groupPlaceablesByGroup,
-  isEntityPlaceable,
-  startPlaceableDrag,
-} from "./placeablesBridge";
+import type { TerrainPropToolbarViewModel } from "../contracts";
+import { groupPlaceablesByGroup, isEntityPlaceable } from "./placeablesBridge";
 
 function isPropEntityPlaceable(
   placeable: PlaceableViewModel,
@@ -19,9 +15,9 @@ type CreateToolbarPropPaletteBridgeParams = {
   placeables: PlaceableViewModel[];
 };
 
-export function createToolbarPropPaletteBridge({
+export function createTerrainPropPaletteBridge({
   placeables,
-}: CreateToolbarPropPaletteBridgeParams): PropToolbarViewModel | null {
+}: CreateToolbarPropPaletteBridgeParams): TerrainPropToolbarViewModel | null {
   const propPlaceables = placeables.filter(isPropEntityPlaceable);
   if (propPlaceables.length === 0) {
     return null;
@@ -29,10 +25,8 @@ export function createToolbarPropPaletteBridge({
 
   return {
     groups: groupPlaceablesByGroup(propPlaceables),
-    onDragStart(event, placeable) {
-      startPlaceableDrag(event, placeable);
-    },
   };
 }
 
+export { createTerrainPropPaletteBridge as createToolbarPropPaletteBridge };
 export { isPropEntityPlaceable };

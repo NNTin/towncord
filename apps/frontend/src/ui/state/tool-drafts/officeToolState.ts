@@ -26,6 +26,7 @@ export type OfficeToolStateData = {
   activeFurnitureId: string | null;
   activeFurnitureRotationQuarterTurns: FurnitureRotationQuarterTurns;
   activePropId: string | null;
+  activePropRotationQuarterTurns: FurnitureRotationQuarterTurns;
 };
 
 export type OfficeToolStateAction =
@@ -39,6 +40,7 @@ export type OfficeToolStateAction =
   | { type: "selectFurnitureId"; id: string }
   | { type: "selectPropId"; id: string }
   | { type: "rotateFurnitureClockwise" }
+  | { type: "rotatePropClockwise" }
   | { type: "officeFloorPicked"; payload: OfficeFloorPickedPayload };
 
 const DEFAULT_FLOOR_PATTERN = FLOOR_PATTERN_ITEMS[0]?.id ?? null;
@@ -55,6 +57,7 @@ export function createOfficeToolStateData(): OfficeToolStateData {
     activeFurnitureId: null,
     activeFurnitureRotationQuarterTurns: 0,
     activePropId: null,
+    activePropRotationQuarterTurns: 0,
   };
 }
 
@@ -169,6 +172,10 @@ export function reduceOfficeToolState(
       return {
         ...state,
         activePropId: action.id,
+        activePropRotationQuarterTurns:
+          state.activePropId === action.id
+            ? state.activePropRotationQuarterTurns
+            : 0,
       };
 
     case "rotateFurnitureClockwise":
@@ -177,6 +184,14 @@ export function reduceOfficeToolState(
         activeFurnitureRotationQuarterTurns:
           ((state.activeFurnitureRotationQuarterTurns + 1) %
             4) as FurnitureRotationQuarterTurns,
+      };
+
+    case "rotatePropClockwise":
+      return {
+        ...state,
+        activePropRotationQuarterTurns: ((state.activePropRotationQuarterTurns +
+          1) %
+          4) as FurnitureRotationQuarterTurns,
       };
 
     case "officeFloorPicked":

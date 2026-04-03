@@ -124,11 +124,29 @@ describe("office tool state reducer", () => {
         ...createOfficeToolStateData(),
         isLayoutPaintMode: true,
         activeTool: "prop",
+        activePropRotationQuarterTurns: 3,
       },
       { type: "selectPropId", id: "prop.static.set-01.variant-01" },
     );
 
     expect(next.activeTool).toBe("prop");
     expect(next.activePropId).toBe("prop.static.set-01.variant-01");
+    expect(next.activePropRotationQuarterTurns).toBe(0);
+  });
+
+  test("rotates the pending prop preview clockwise in quarter turns", () => {
+    const once = reduceOfficeToolState(createOfficeToolStateData(), {
+      type: "rotatePropClockwise",
+    });
+    const wrapped = reduceOfficeToolState(
+      {
+        ...createOfficeToolStateData(),
+        activePropRotationQuarterTurns: 3,
+      },
+      { type: "rotatePropClockwise" },
+    );
+
+    expect(once.activePropRotationQuarterTurns).toBe(1);
+    expect(wrapped.activePropRotationQuarterTurns).toBe(0);
   });
 });
