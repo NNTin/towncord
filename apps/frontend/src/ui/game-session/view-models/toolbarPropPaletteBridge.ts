@@ -1,6 +1,10 @@
 import type { PlaceableViewModel } from "../../../game/contracts/runtime";
 import type { PropToolbarViewModel } from "../contracts";
-import { groupPlaceablesByGroup, isEntityPlaceable } from "./placeablesBridge";
+import {
+  groupPlaceablesByGroup,
+  isEntityPlaceable,
+  startPlaceableDrag,
+} from "./placeablesBridge";
 
 function isPropEntityPlaceable(
   placeable: PlaceableViewModel,
@@ -25,6 +29,9 @@ export function createToolbarPropPaletteBridge({
 
   return {
     groups: groupPlaceablesByGroup(propPlaceables),
+    onDragStart(event, placeable) {
+      startPlaceableDrag(event, placeable);
+    },
   };
 }
 

@@ -92,6 +92,7 @@ describe("useGameSession", () => {
       },
       propToolbarViewModel: {
         groups: [],
+        onDragStart: vi.fn(),
       },
       selectedOfficePlaceable: null,
       onRotateSelectedOfficePlaceable: vi.fn(),

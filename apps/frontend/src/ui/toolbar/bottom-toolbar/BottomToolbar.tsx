@@ -1515,11 +1515,9 @@ function EntitiesSubPanel({
 function PropsSubPanel({
   viewModel,
   activePropId,
-  onSelectPropId,
 }: {
   viewModel: PropToolbarViewModel | null;
   activePropId: string | null | undefined;
-  onSelectPropId: ((id: string) => void) | undefined;
 }): JSX.Element {
   if (!viewModel) {
     return (
@@ -1558,8 +1556,8 @@ function PropsSubPanel({
         }
         description={
           previewPlaceable
-            ? "Click a prop to arm it for layout placement, then click in the office to place it."
-            : "Hover a prop to preview it, then click to select it."
+            ? "Drag a prop into the world to place it on the terrain."
+            : "Hover a prop to preview it, then drag to place it."
         }
         title={previewPlaceable?.label ?? "Prop preview"}
       />
@@ -1598,7 +1596,10 @@ function PropsSubPanel({
                   onMouseLeave={() => setHoveredPlaceableId(null)}
                   onFocus={() => setHoveredPlaceableId(placeable.id)}
                   onBlur={() => setHoveredPlaceableId(null)}
-                  onClick={() => onSelectPropId?.(placeable.entityId)}
+                  draggable
+                  onDragStart={(event) =>
+                    viewModel.onDragStart(event, placeable)
+                  }
                   style={{
                     background: "var(--pixel-btn-bg)",
                     border:
@@ -1617,7 +1618,7 @@ function PropsSubPanel({
                   {placeable.previewFrameKey ? (
                     <EntityPreviewSprite frameKey={placeable.previewFrameKey} />
                   ) : (
-                    `⊕ ${placeable.label}`
+                    `⟡ ${placeable.label}`
                   )}
                 </button>
               ))}
@@ -1663,7 +1664,6 @@ export function BottomToolbar({
   activeFurnitureRotationQuarterTurns = 0,
   onSelectFurnitureId,
   activePropId,
-  onSelectPropId,
   onRotateFurnitureClockwise,
   activeTerrainTool = null,
   onSelectTerrainTool,
@@ -1790,7 +1790,6 @@ export function BottomToolbar({
         <PropsSubPanel
           viewModel={propToolbarViewModel}
           activePropId={activePropId}
-          onSelectPropId={onSelectPropId}
         />
       ) : null}
       {isLayoutMode &&

@@ -35,6 +35,7 @@ export type EntityToolbarViewModel = {
 
 export type PropToolbarViewModel = {
   groups: PlaceableGroupViewModel<EntityPlaceableViewModel>[];
+  onDragStart: (event: DragEvent, placeable: EntityPlaceableViewModel) => void;
 };
 
 export type SelectedOfficePlaceableViewModel =

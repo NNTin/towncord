@@ -395,6 +395,7 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
+        onDragStart: vi.fn(),
       },
     };
     const { container, root, rerender } = renderToolbar(props);
@@ -421,17 +422,42 @@ describe("BottomToolbar", () => {
       (element) => element.getAttribute("title") === "Place Variant 01",
     );
     if (!(entry instanceof HTMLButtonElement)) {
-      throw new Error("Missing clickable prop entry");
+      throw new Error("Missing draggable prop entry");
     }
 
-    act(() => {
-      entry.click();
+    expect(entry.getAttribute("draggable")).toBe("true");
+
+    const dragStartEvent = new Event("dragstart", { bubbles: true });
+    Object.defineProperty(dragStartEvent, "dataTransfer", {
+      value: {
+        setData: vi.fn(),
+        effectAllowed: "none",
+      },
     });
 
-    expect(props.onSelectPropId).toHaveBeenCalledWith(
-      "prop.static.set-01.variant-01",
+    act(() => {
+      entry.dispatchEvent(dragStartEvent);
+    });
+
+    expect(props.propToolbarViewModel?.onDragStart).toHaveBeenCalledOnce();
+    const [eventArg, placeableArg] =
+      props.propToolbarViewModel?.onDragStart.mock.calls[0] ?? [];
+    expect(eventArg).toEqual(
+      expect.objectContaining({
+        type: "dragstart",
+        dataTransfer: expect.objectContaining({
+          setData: expect.any(Function),
+          effectAllowed: "none",
+        }),
+      }),
     );
-    expect(container.querySelector("[draggable='true']")).toBeNull();
+    expect(placeableArg).toEqual(
+      expect.objectContaining({
+        id: "entity:prop.static.set-01.variant-01",
+        type: "entity",
+        entityId: "prop.static.set-01.variant-01",
+      }),
+    );
 
     act(() => {
       root.unmount();

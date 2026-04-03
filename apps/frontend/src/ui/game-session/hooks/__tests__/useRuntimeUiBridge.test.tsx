@@ -258,6 +258,7 @@ describe("useRuntimeUiBridge", () => {
           ],
         },
       ],
+      onDragStart: expect.any(Function),
     });
 
     await harness.unmount();
