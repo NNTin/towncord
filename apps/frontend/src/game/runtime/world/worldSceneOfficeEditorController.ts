@@ -373,7 +373,9 @@ export class WorldSceneOfficeEditorController {
       this.officeDirty = true;
     }
 
-    return changed;
+    // Return true whenever the command was dispatched (wall tool active +
+    // inside the office region), even if the cell had no wall to remove.
+    return true;
   }
 
   public shouldContinuePainting(pointer: Phaser.Input.Pointer): boolean {
@@ -528,7 +530,8 @@ export class WorldSceneOfficeEditorController {
     worldY: number,
   ): boolean {
     const tool = getOfficeEditorTool(this.officeEditorToolPayload);
-    if (!tool) {
+    // "prop" placement is handled by the terrain prop controller, not here.
+    if (!tool || tool === "prop") {
       return false;
     }
 
@@ -560,6 +563,9 @@ export class WorldSceneOfficeEditorController {
       this.officeDirty = true;
     }
 
-    return changed;
+    // Return true whenever the command was dispatched (tool active + inside
+    // the office region), even if the edit was a no-op. This prevents the
+    // click from falling through to selection/inspect handlers while painting.
+    return true;
   }
 }

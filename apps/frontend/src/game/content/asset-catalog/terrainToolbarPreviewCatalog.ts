@@ -42,6 +42,8 @@ export type TerrainToolbarPreviewFrame = {
 
 export type TerrainToolbarPreviewItem = {
   terrainSourceId?: TerrainContentSourceId;
+  /** When `true`, this item applies to any active terrain source (e.g. "Clear Terrain"). */
+  isSourceAgnostic?: true;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -145,6 +147,7 @@ function resolveTransitionRules(): TerrainRulesetTransitionRule[] {
 
 function createTerrainToolbarPreviewItem(input: {
   terrainSourceId?: TerrainContentSourceId;
+  isSourceAgnostic?: true;
   id: string;
   label: string;
   materialId: TerrainMaterialId;
@@ -172,6 +175,7 @@ function createTerrainToolbarPreviewItem(input: {
     ...(input.terrainSourceId
       ? { terrainSourceId: input.terrainSourceId }
       : {}),
+    ...(input.isSourceAgnostic && { isSourceAgnostic: true }),
     id: input.id,
     label: input.label,
     materialId: input.materialId,
@@ -359,6 +363,7 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
       createTerrainToolbarPreviewItem({
         id: "terrain.farmrpg.delete",
         label: "Clear Terrain",
+        isSourceAgnostic: true,
         materialId: "ground",
         brushId: "delete",
         representativeCaseId: 0,

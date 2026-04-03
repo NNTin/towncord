@@ -1128,7 +1128,8 @@ function TerrainSubPanel({
                 const isSelected =
                   activeTerrainTool?.brushId === item.brushId &&
                   activeTerrainTool?.materialId === item.materialId &&
-                  activeTerrainSourceId === item.terrainSourceId;
+                  (item.isSourceAgnostic ||
+                    activeTerrainSourceId === item.terrainSourceId);
                 return (
                   <button
                     key={item.id}
