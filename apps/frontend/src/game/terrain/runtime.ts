@@ -40,6 +40,7 @@ import type {
 } from "../../data";
 import {
   getFarmrpgStaticTerrainSourceSpecsForDomain,
+  resolveFarmrpgStaticTerrainFrameCaseId,
   resolveFarmrpgStaticTerrainSourceSpec,
   type FarmrpgStaticTerrainPlacementDomain,
 } from "../content/asset-catalog/farmrpgTerrainSourceCatalog";
@@ -230,7 +231,10 @@ class TerrainDetailTileResolver {
       cellX,
       cellY,
       caseId,
-      frame: `${sourceSpec.framePrefix}${caseId}`,
+      frame: `${sourceSpec.framePrefix}${resolveFarmrpgStaticTerrainFrameCaseId(
+        sourceSpec,
+        caseId,
+      )}`,
       rotate90: 0,
       flipX: false,
       flipY: false,

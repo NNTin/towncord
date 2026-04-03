@@ -12,7 +12,10 @@
 import { describe, expect, test } from "vitest";
 import { MarchingSquaresKernel } from "../marchingSquaresKernel";
 import { TERRAIN_DETAIL_EMPTY_SOURCE_ID } from "../runtime";
-import { resolveFarmrpgStaticTerrainSourceSpec } from "../../content/asset-catalog/farmrpgTerrainSourceCatalog";
+import {
+  resolveFarmrpgStaticTerrainFrameCaseId,
+  resolveFarmrpgStaticTerrainSourceSpec,
+} from "../../content/asset-catalog/farmrpgTerrainSourceCatalog";
 
 const CARPET_SOURCE_ID = "public-assets:terrain/farmrpg-carpet-01";
 const HAY_SOURCE_ID = "public-assets:terrain/farmrpg-barn-hay";
@@ -53,7 +56,10 @@ function resolveDetailTile(
   return {
     dominantMaterial: dominant,
     caseId,
-    frame: `${sourceSpec.framePrefix}${caseId}`,
+    frame: `${sourceSpec.framePrefix}${resolveFarmrpgStaticTerrainFrameCaseId(
+      sourceSpec,
+      caseId,
+    )}`,
   };
 }
 
@@ -171,6 +177,6 @@ describe("terrain detail overlay — dual-grid marching squares", () => {
       { cellX: 0, cellY: 0, material: CARPET_SOURCE_ID },
     ]);
     const tile = resolveDetailTile(kernel, materialAt, 0, 0);
-    expect(tile?.frame).toBe("tilesets.farmrpg.carpet.variant-01#1");
+    expect(tile?.frame).toBe("tilesets.farmrpg.carpet.variant-01#14");
   });
 });

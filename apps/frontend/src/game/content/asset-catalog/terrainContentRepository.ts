@@ -132,7 +132,10 @@ const FARMRPG_STATIC_TERRAIN_CONTENT_BY_SOURCE_ID: Record<
     {
       sourceId: spec.sourceId,
       seed: terrainSeedJson as TerrainSeedDocument,
-      ruleset: createFarmrpgAutotileRuleset(spec.framePrefix),
+      ruleset: createFarmrpgAutotileRuleset(
+        spec.framePrefix,
+        spec.reverseMarchingSquaresCaseIds,
+      ),
       textureKey: TERRAIN_TEXTURE_KEY,
     },
   ]),
