@@ -10,6 +10,7 @@ import {
   FARMRPG_TERRAIN_ATLAS_W,
 } from "../farmrpgTerrainAtlas";
 import {
+  FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS,
   FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   TERRAIN_TOOLBAR_PREVIEW_ITEMS,
 } from "../terrainToolbarPreviewCatalog";
@@ -116,5 +117,36 @@ describe("terrain toolbar preview catalog", () => {
       "tilesets.farmrpg.barn.posts#0",
     );
     expect(barnPosts?.animationFrames).toHaveLength(1);
+  });
+
+  test("carpet variants land in FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS and are excluded from FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS", () => {
+    // When the FarmRPG tileset atlas hasn't been generated yet both lists may
+    // be empty — only run carpet-specific assertions when there are items.
+    if (
+      FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.length === 0 &&
+      FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS.length === 0
+    ) {
+      return;
+    }
+
+    const carpetInTerrain = FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.filter(
+      (item) => item.groupKey === "farmrpg-carpet",
+    );
+    expect(carpetInTerrain).toHaveLength(0);
+
+    const carpetItems = FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS;
+    expect(carpetItems.length).toBeGreaterThan(0);
+    expect(
+      carpetItems.every((item) => item.groupKey === "farmrpg-carpet"),
+    ).toBe(true);
+
+    const carpet01 = carpetItems.find(
+      (item) => item.id === "terrain.farmrpg.carpet.variant-01",
+    );
+    expect(carpet01).toBeDefined();
+    expect(carpet01?.label).toBe("Carpet 01");
+    expect(carpet01?.terrainSourceId).toBe(
+      "public-assets:terrain/farmrpg-carpet-01",
+    );
   });
 });

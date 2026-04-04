@@ -868,6 +868,34 @@ describe("BottomToolbar", () => {
     });
   });
 
+  test("the Terrain panel does not show carpet variants when the terrain tool is active", () => {
+    vi.useFakeTimers();
+
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/farmrpg-grass" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    // Terrain panel is visible
+    expect(container.textContent).toContain("Spring");
+
+    // Carpet variants must not appear in the Terrain panel
+    expect(findButton(container, "Carpet 01")).toBeNull();
+    expect(findButton(container, "Carpet 02")).toBeNull();
+    expect(findButton(container, "Carpet 03")).toBeNull();
+
+    act(() => {
+      root.unmount();
+    });
+
+    vi.useRealTimers();
+  });
+
   test("Carpet button is present in the Layout panel and activates the first carpet variant", () => {
     const { container, root } = renderToolbar(baseProps);
 
@@ -947,5 +975,59 @@ describe("BottomToolbar", () => {
     act(() => {
       root.unmount();
     });
+  });
+
+  test("Carpet button is disabled and does not call onSelectTerrainTool when no carpet atlas frames exist", async () => {
+    // Reset modules so vi.doMock overrides take effect for this test
+    vi.resetModules();
+
+    vi.doMock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
+      default: {
+        // No carpet frames — simulates environment before atlas generation
+        meta: { size: { w: 256, h: 256 } },
+        frames: {
+          "tilesets.farmrpg.water.tile#0": {
+            frame: { x: 0, y: 0, w: 16, h: 16 },
+          },
+          "tilesets.farmrpg.grass.spring#0": {
+            frame: { x: 16, y: 0, w: 16, h: 16 },
+          },
+        },
+      },
+    }));
+
+    const { BottomToolbar: BT } = await import("../BottomToolbar");
+
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const { createRoot } = await import("react-dom/client");
+    const root = createRoot(container);
+
+    const onSelectTerrainTool = vi.fn();
+    act(() => {
+      root.render(
+        // @ts-expect-error — dynamic import typing mismatch in test
+        <BT
+          {...baseProps}
+          isLayoutMode
+          onSelectTerrainTool={onSelectTerrainTool}
+        />,
+      );
+    });
+
+    const carpetBtn = getButton(container, "Carpet tool");
+    expect(carpetBtn.disabled).toBe(true);
+
+    act(() => {
+      carpetBtn.click();
+    });
+
+    expect(onSelectTerrainTool).not.toHaveBeenCalled();
+
+    act(() => {
+      root.unmount();
+    });
+
+    vi.resetModules();
   });
 });
