@@ -417,5 +417,35 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
   }
 }
 
-export const FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] =
-  buildFarmrpgTerrainToolbarPreviewItems();
+const FARMRPG_CARPET_GROUP_KEY = "farmrpg-carpet";
+
+function partitionFarmrpgTerrainToolbarPreviewItems(
+  items: TerrainToolbarPreviewItem[],
+): [
+  terrainItems: TerrainToolbarPreviewItem[],
+  carpetItems: TerrainToolbarPreviewItem[],
+] {
+  return items.reduce<
+    [
+      terrainItems: TerrainToolbarPreviewItem[],
+      carpetItems: TerrainToolbarPreviewItem[],
+    ]
+  >(
+    (result, item) => {
+      if (item.groupKey === FARMRPG_CARPET_GROUP_KEY) {
+        result[1].push(item);
+      } else {
+        result[0].push(item);
+      }
+      return result;
+    },
+    [[], []],
+  );
+}
+
+export const [
+  FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
+  FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS,
+] = partitionFarmrpgTerrainToolbarPreviewItems(
+  buildFarmrpgTerrainToolbarPreviewItems(),
+);
