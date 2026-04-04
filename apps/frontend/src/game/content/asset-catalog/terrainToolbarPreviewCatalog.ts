@@ -417,5 +417,15 @@ function buildFarmrpgTerrainToolbarPreviewItems(): TerrainToolbarPreviewItem[] {
   }
 }
 
-export const FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] =
+const ALL_FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS =
   buildFarmrpgTerrainToolbarPreviewItems();
+
+export const FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] =
+  ALL_FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.filter(
+    (item) => item.groupKey !== "farmrpg-carpet",
+  );
+
+export const FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS: TerrainToolbarPreviewItem[] =
+  ALL_FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS.filter(
+    (item) => item.groupKey === "farmrpg-carpet",
+  );

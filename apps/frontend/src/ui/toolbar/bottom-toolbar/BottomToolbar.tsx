@@ -14,6 +14,7 @@ import {
   ENVIRONMENT_ATLAS_H,
   ENVIRONMENT_ATLAS_IMAGE_URL,
   ENVIRONMENT_ATLAS_W,
+  FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS,
   FARMRPG_GRASS_TERRAIN_SOURCE_ID,
   FARMRPG_TERRAIN_TOOLBAR_PREVIEW_ITEMS,
   FLOOR_PATTERN_ITEMS,
@@ -1172,6 +1173,86 @@ function TerrainSubPanel({
   );
 }
 
+function CarpetSubPanel({
+  activeTerrainTool,
+  onSelectTerrainTool,
+}: {
+  activeTerrainTool: TerrainToolSelection;
+  onSelectTerrainTool: ((tool: TerrainToolSelection) => void) | undefined;
+}): JSX.Element {
+  const [tick, setTick] = useState(0);
+  const items = FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS;
+
+  useEffect(() => {
+    const hasAnimated = items.some((item) => item.animationFrames.length > 1);
+    if (!hasAnimated) {
+      return undefined;
+    }
+
+    const timer = window.setInterval(() => {
+      setTick((t) => t + 1);
+    }, DEFAULT_TERRAIN_ANIMATION_FRAME_MS);
+
+    return () => window.clearInterval(timer);
+  }, [items]);
+
+  return (
+    <div style={subPanel}>
+      <div
+        style={{
+          fontFamily: "monospace",
+          fontSize: 11,
+          color: "var(--pixel-text)",
+          opacity: 0.7,
+        }}
+      >
+        Carpet
+      </div>
+      <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+        {items.map((item) => {
+          const isSelected =
+            activeTerrainTool?.brushId === item.brushId &&
+            activeTerrainTool?.materialId === item.materialId &&
+            activeTerrainTool?.terrainSourceId === item.terrainSourceId;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              title={item.label}
+              onClick={() => {
+                if (isSelected) {
+                  onSelectTerrainTool?.(null);
+                  return;
+                }
+
+                onSelectTerrainTool?.({
+                  materialId: item.materialId,
+                  brushId: item.brushId,
+                  ...(item.terrainSourceId
+                    ? { terrainSourceId: item.terrainSourceId }
+                    : {}),
+                });
+              }}
+              style={{
+                background: isSelected
+                  ? "var(--pixel-active-bg)"
+                  : "var(--pixel-btn-bg)",
+                border: isSelected
+                  ? "2px solid var(--pixel-accent)"
+                  : "2px solid transparent",
+                cursor: "pointer",
+                padding: 2,
+              }}
+            >
+              <TerrainPreviewSprite item={item} tick={tick} />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function FurnitureSubPanel({
   activeFurnitureId,
   activeFurnitureRotationQuarterTurns,
@@ -1691,6 +1772,12 @@ const DEFAULT_TERRAIN_PREVIEW =
   TERRAIN_TOOLBAR_PREVIEW_ITEMS[0] ??
   null;
 
+const DEFAULT_CARPET_PREVIEW = FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS[0] ?? null;
+
+function isCarpetTerrainSourceId(terrainSourceId: string | undefined): boolean {
+  return terrainSourceId?.includes("farmrpg-carpet") ?? false;
+}
+
 export function BottomToolbar({
   isLayoutMode,
   onToggleLayoutMode,
@@ -1735,6 +1822,10 @@ export function BottomToolbar({
   const [hovered, setHovered] = useState<string | null>(null);
   const [isEntitiesPanelOpen, setIsEntitiesPanelOpen] = useState(false);
 
+  const isActiveCarpetTool = isCarpetTerrainSourceId(
+    activeTerrainTool?.terrainSourceId,
+  );
+
   useEffect(() => {
     if (!entityToolbarViewModel) {
       setIsEntitiesPanelOpen(false);
@@ -1773,7 +1864,7 @@ export function BottomToolbar({
   }
 
   function handleTerrainButtonClick(): void {
-    if (activeTerrainTool) {
+    if (activeTerrainTool && !isActiveCarpetTool) {
       onSelectTerrainTool?.(null);
       return;
     }
@@ -1787,6 +1878,25 @@ export function BottomToolbar({
       brushId: DEFAULT_TERRAIN_PREVIEW.brushId,
       ...(DEFAULT_TERRAIN_PREVIEW.terrainSourceId
         ? { terrainSourceId: DEFAULT_TERRAIN_PREVIEW.terrainSourceId }
+        : {}),
+    });
+  }
+
+  function handleCarpetButtonClick(): void {
+    if (isActiveCarpetTool) {
+      onSelectTerrainTool?.(null);
+      return;
+    }
+
+    if (!DEFAULT_CARPET_PREVIEW) {
+      return;
+    }
+
+    onSelectTerrainTool?.({
+      materialId: DEFAULT_CARPET_PREVIEW.materialId,
+      brushId: DEFAULT_CARPET_PREVIEW.brushId,
+      ...(DEFAULT_CARPET_PREVIEW.terrainSourceId
+        ? { terrainSourceId: DEFAULT_CARPET_PREVIEW.terrainSourceId }
         : {}),
     });
   }
@@ -1869,8 +1979,14 @@ export function BottomToolbar({
           onSelectFloorMode={onSelectFloorMode}
         />
       )}
-      {isLayoutMode && activeTerrainTool && (
+      {isLayoutMode && activeTerrainTool && !isActiveCarpetTool && (
         <TerrainSubPanel
+          activeTerrainTool={activeTerrainTool}
+          onSelectTerrainTool={onSelectTerrainTool}
+        />
+      )}
+      {isLayoutMode && activeTerrainTool && isActiveCarpetTool && (
+        <CarpetSubPanel
           activeTerrainTool={activeTerrainTool}
           onSelectTerrainTool={onSelectTerrainTool}
         />
@@ -1913,11 +2029,25 @@ export function BottomToolbar({
               onMouseEnter={() => setHovered("terrain")}
               onMouseLeave={() => setHovered(null)}
               style={resolveButtonStyle("terrain", {
-                active: Boolean(activeTerrainTool),
+                active: Boolean(activeTerrainTool) && !isActiveCarpetTool,
               })}
               title="Terrain tool"
             >
               Terrain
+            </button>
+            <button
+              type="button"
+              disabled={FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS.length === 0}
+              onClick={handleCarpetButtonClick}
+              onMouseEnter={() => setHovered("carpet")}
+              onMouseLeave={() => setHovered(null)}
+              style={resolveButtonStyle("carpet", {
+                active: isActiveCarpetTool,
+                disabled: FARMRPG_CARPET_TOOLBAR_PREVIEW_ITEMS.length === 0,
+              })}
+              title="Carpet tool"
+            >
+              Carpet
             </button>
             <button
               type="button"

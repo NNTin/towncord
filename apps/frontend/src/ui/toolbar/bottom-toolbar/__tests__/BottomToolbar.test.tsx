@@ -6,6 +6,26 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { TerrainToolSelection } from "../../../../game/contracts/runtime";
 
+vi.mock("public-assets-json:debug/atlas.json", () => ({
+  default: {
+    meta: { size: { w: 256, h: 256 } },
+    frames: {
+      "tilesets.debug.environment.autotile-15#0": {
+        frame: { x: 0, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.debug.environment.autotile-15#0@0": {
+        frame: { x: 0, y: 0, w: 16, h: 16 },
+      },
+      "tilesets.debug.environment.autotile-15#15": {
+        frame: { x: 0, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.debug.environment.autotile-15#15@0": {
+        frame: { x: 0, y: 16, w: 16, h: 16 },
+      },
+    },
+  },
+}));
+
 vi.mock("public-assets-json:farmrpg/atlases/characters.json", () => ({
   default: {
     meta: { size: { w: 1, h: 1 } },
@@ -120,6 +140,15 @@ vi.mock("public-assets-json:farmrpg/atlases/tilesets.json", () => ({
       },
       "tilesets.farmrpg.barn.messy-hay#0": {
         frame: { x: 32, y: 16, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.carpet.variant-01#0": {
+        frame: { x: 0, y: 32, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.carpet.variant-02#0": {
+        frame: { x: 16, y: 32, w: 16, h: 16 },
+      },
+      "tilesets.farmrpg.carpet.variant-03#0": {
+        frame: { x: 32, y: 32, w: 16, h: 16 },
       },
     },
   },
@@ -833,6 +862,87 @@ describe("BottomToolbar", () => {
       brushId: "ground",
       terrainSourceId: "public-assets:terrain/farmrpg-barn-hay",
     });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("Carpet button is present in the Layout panel and activates the first carpet variant", () => {
+    const { container, root } = renderToolbar(baseProps);
+
+    expect(getButton(container, "Carpet tool")).toBeInstanceOf(
+      HTMLButtonElement,
+    );
+
+    act(() => {
+      getButton(container, "Carpet tool").click();
+    });
+
+    expect(baseProps.onSelectTerrainTool).toHaveBeenCalledWith({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-carpet-01",
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("carpet tool shows the CarpetSubPanel with carpet variants and not the Terrain panel", () => {
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/farmrpg-carpet-01" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    expect(container.textContent).toContain("Carpet");
+    expect(getButton(container, "Carpet 01")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Carpet 02")).toBeInstanceOf(HTMLButtonElement);
+    expect(getButton(container, "Carpet 03")).toBeInstanceOf(HTMLButtonElement);
+
+    // Terrain panel items should not be visible when carpet is active
+    expect(
+      findButton(container, "FarmRPG Spring Ground Tile Brush"),
+    ).toBeNull();
+
+    act(() => {
+      getButton(container, "Carpet 02").click();
+    });
+
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith({
+      materialId: "ground",
+      brushId: "ground",
+      terrainSourceId: "public-assets:terrain/farmrpg-carpet-02",
+    });
+
+    act(() => {
+      root.unmount();
+    });
+  });
+
+  test("carpet tool is shown as active and clicking it deactivates the carpet selection", () => {
+    const props = {
+      ...baseProps,
+      activeTerrainTool: {
+        materialId: "ground",
+        brushId: "ground",
+        terrainSourceId: "public-assets:terrain/farmrpg-carpet-02" as const,
+      },
+    };
+    const { container, root } = renderToolbar(props);
+
+    act(() => {
+      getButton(container, "Carpet tool").click();
+    });
+
+    // Re-clicking active carpet deactivates it
+    expect(props.onSelectTerrainTool).toHaveBeenCalledWith(null);
 
     act(() => {
       root.unmount();
