@@ -1006,7 +1006,6 @@ describe("BottomToolbar", () => {
     const onSelectTerrainTool = vi.fn();
     act(() => {
       root.render(
-        // @ts-expect-error — dynamic import typing mismatch in test
         <BT
           {...baseProps}
           isLayoutMode
