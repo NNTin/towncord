@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "generatedAt": "2026-04-04T20:01:47.004462+00:00",
+    "generator": "packages/public-assets/pipeline/export_public_assets.py",
+    "namespace": "donarg.office",
+    "seed": "257263088",
+    "format": "phaser-asset-pack"
+  },
+  "donarg-office": {
+    "files": [
+      {
+        "type": "atlas",
+        "key": "donarg.office.characters",
+        "textureURL": "assets/donarg-office/atlas.png",
+        "atlasURL": "assets/donarg-office/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "donarg.office.environment",
+        "textureURL": "assets/donarg-office/atlas.png",
+        "atlasURL": "assets/donarg-office/atlas.json"
+      },
+      {
+        "type": "atlas",
+        "key": "donarg.office.furniture",
+        "textureURL": "assets/donarg-office/atlas.png",
+        "atlasURL": "assets/donarg-office/atlas.json"
+      },
+      {
+        "type": "json",
+        "key": "donarg-office.animations",
+        "url": "assets/donarg-office/animations.json"
+      }
+    ]
+  }
+}

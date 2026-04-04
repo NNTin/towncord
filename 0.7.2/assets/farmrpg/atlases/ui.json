@@ -1,0 +1,515 @@
+{
+  "frames": {
+    "ui.farmrpg.0-2#0": {
+      "frame": {
+        "x": 2,
+        "y": 2,
+        "w": 240,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 240,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 240,
+        "h": 64
+      }
+    },
+    "ui.farmrpg.bars#0": {
+      "frame": {
+        "x": 244,
+        "y": 2,
+        "w": 192,
+        "h": 160
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 160
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 160
+      }
+    },
+    "ui.farmrpg.button#0": {
+      "frame": {
+        "x": 438,
+        "y": 2,
+        "w": 848,
+        "h": 544
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 848,
+        "h": 544
+      },
+      "sourceSize": {
+        "w": 848,
+        "h": 544
+      }
+    },
+    "ui.farmrpg.clock.clock-hand#0": {
+      "frame": {
+        "x": 1288,
+        "y": 2,
+        "w": 256,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 32
+      }
+    },
+    "ui.farmrpg.clock.clock#0": {
+      "frame": {
+        "x": 1546,
+        "y": 2,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "ui.farmrpg.clock.extras#0": {
+      "frame": {
+        "x": 1580,
+        "y": 2,
+        "w": 224,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 128
+      }
+    },
+    "ui.farmrpg.clock.others.clock-2#0": {
+      "frame": {
+        "x": 1806,
+        "y": 2,
+        "w": 160,
+        "h": 144
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 144
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 144
+      }
+    },
+    "ui.farmrpg.clock.others.clock-3#0": {
+      "frame": {
+        "x": 2,
+        "y": 548,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.clock.others.clock-4#0": {
+      "frame": {
+        "x": 100,
+        "y": 548,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.clock.others.clock#0": {
+      "frame": {
+        "x": 198,
+        "y": 548,
+        "w": 192,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.dialogue-box#0": {
+      "frame": {
+        "x": 392,
+        "y": 548,
+        "w": 144,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 144,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.extras#0": {
+      "frame": {
+        "x": 538,
+        "y": 548,
+        "w": 368,
+        "h": 128
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 368,
+        "h": 128
+      },
+      "sourceSize": {
+        "w": 368,
+        "h": 128
+      }
+    },
+    "ui.farmrpg.hud#0": {
+      "frame": {
+        "x": 908,
+        "y": 548,
+        "w": 416,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 416,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 416,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.inventory.banner#0": {
+      "frame": {
+        "x": 1326,
+        "y": 548,
+        "w": 112,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 256
+      }
+    },
+    "ui.farmrpg.inventory.book#0": {
+      "frame": {
+        "x": 1440,
+        "y": 548,
+        "w": 256,
+        "h": 288
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 288
+      },
+      "sourceSize": {
+        "w": 256,
+        "h": 288
+      }
+    },
+    "ui.farmrpg.inventory.decor#0": {
+      "frame": {
+        "x": 1698,
+        "y": 548,
+        "w": 96,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 32
+      }
+    },
+    "ui.farmrpg.inventory.extras#0": {
+      "frame": {
+        "x": 2,
+        "y": 838,
+        "w": 384,
+        "h": 256
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 256
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 256
+      }
+    },
+    "ui.farmrpg.inventory.inventory#0": {
+      "frame": {
+        "x": 388,
+        "y": 838,
+        "w": 112,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 112
+      }
+    },
+    "ui.farmrpg.inventory.slot-armor#0": {
+      "frame": {
+        "x": 502,
+        "y": 838,
+        "w": 384,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 384,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 384,
+        "h": 64
+      }
+    },
+    "ui.farmrpg.inventory.slots#0": {
+      "frame": {
+        "x": 888,
+        "y": 838,
+        "w": 224,
+        "h": 288
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 288
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 288
+      }
+    },
+    "ui.farmrpg.money#0": {
+      "frame": {
+        "x": 1114,
+        "y": 838,
+        "w": 96,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 16
+      }
+    },
+    "ui.farmrpg.social-network-logos#0": {
+      "frame": {
+        "x": 1212,
+        "y": 838,
+        "w": 192,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 32
+      }
+    },
+    "ui.farmrpg.speech-bubble-emojis-reaction#0": {
+      "frame": {
+        "x": 1406,
+        "y": 838,
+        "w": 144,
+        "h": 336
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 144,
+        "h": 336
+      },
+      "sourceSize": {
+        "w": 144,
+        "h": 336
+      }
+    },
+    "ui.farmrpg.ui-music#0": {
+      "frame": {
+        "x": 1552,
+        "y": 838,
+        "w": 96,
+        "h": 96
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 96
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 96
+      }
+    },
+    "ui.farmrpg.weather-icons#0": {
+      "frame": {
+        "x": 1650,
+        "y": 838,
+        "w": 160,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 160,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 160,
+        "h": 48
+      }
+    }
+  },
+  "meta": {
+    "app": "towncord-aseprite-pipeline",
+    "version": "1.0",
+    "image": "ui.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1968,
+      "h": 1176
+    },
+    "scale": "1"
+  }
+}

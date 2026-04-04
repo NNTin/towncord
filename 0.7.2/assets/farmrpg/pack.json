@@ -1,0 +1,43 @@
+{
+  "meta": {
+    "generatedAt": "2026-04-04T20:01:55.758233+00:00",
+    "generator": "packages/farmrpg-assets/pipeline/export_from_aseprite.py",
+    "namespace": "farmrpg",
+    "sourceRoot": "packages/farmrpg-assets/aseprite",
+    "publicRoot": "apps/frontend/public/assets/farmrpg",
+    "format": "phaser-asset-pack"
+  },
+  "farmrpg": {
+    "files": [
+      {
+        "type": "atlas",
+        "key": "farmrpg.characters",
+        "textureURL": "assets/farmrpg/atlases/characters.png",
+        "atlasURL": "assets/farmrpg/atlases/characters.json"
+      },
+      {
+        "type": "atlas",
+        "key": "farmrpg.props",
+        "textureURL": "assets/farmrpg/atlases/props.png",
+        "atlasURL": "assets/farmrpg/atlases/props.json"
+      },
+      {
+        "type": "atlas",
+        "key": "farmrpg.tilesets",
+        "textureURL": "assets/farmrpg/atlases/tilesets.png",
+        "atlasURL": "assets/farmrpg/atlases/tilesets.json"
+      },
+      {
+        "type": "atlas",
+        "key": "farmrpg.ui",
+        "textureURL": "assets/farmrpg/atlases/ui.png",
+        "atlasURL": "assets/farmrpg/atlases/ui.json"
+      },
+      {
+        "type": "json",
+        "key": "farmrpg.animations",
+        "url": "assets/farmrpg/animations.json"
+      }
+    ]
+  }
+}

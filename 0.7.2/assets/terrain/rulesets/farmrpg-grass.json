@@ -1,0 +1,28 @@
+{
+  "transitions": [
+    {
+      "id": "farmrpg-grass-water-over-ground",
+      "insideMaterial": "water",
+      "outsideMaterial": "ground",
+      "insideFillFrame": "tilesets.farmrpg.water.tile#0",
+      "rules": [
+        { "caseId": 0, "frame": "tilesets.farmrpg.grass-water.spring#0" },
+        { "caseId": 1, "frame": "tilesets.farmrpg.grass-water.spring#1" },
+        { "caseId": 2, "frame": "tilesets.farmrpg.grass-water.spring#2" },
+        { "caseId": 3, "frame": "tilesets.farmrpg.grass-water.spring#3" },
+        { "caseId": 4, "frame": "tilesets.farmrpg.grass-water.spring#4" },
+        { "caseId": 5, "frame": "tilesets.farmrpg.grass-water.spring#5" },
+        { "caseId": 6, "frame": "tilesets.farmrpg.grass-water.spring#6" },
+        { "caseId": 7, "frame": "tilesets.farmrpg.grass-water.spring#7" },
+        { "caseId": 8, "frame": "tilesets.farmrpg.grass-water.spring#8" },
+        { "caseId": 9, "frame": "tilesets.farmrpg.grass-water.spring#9" },
+        { "caseId": 10, "frame": "tilesets.farmrpg.grass-water.spring#10" },
+        { "caseId": 11, "frame": "tilesets.farmrpg.grass-water.spring#11" },
+        { "caseId": 12, "frame": "tilesets.farmrpg.grass-water.spring#12" },
+        { "caseId": 13, "frame": "tilesets.farmrpg.grass-water.spring#13" },
+        { "caseId": 14, "frame": "tilesets.farmrpg.grass-water.spring#14" },
+        { "caseId": 15, "frame": "tilesets.farmrpg.grass-water.spring#15" }
+      ]
+    }
+  ]
+}
