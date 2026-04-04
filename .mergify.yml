@@ -195,3 +195,5 @@ merge_protections:
       - "check-success = ci"
       - "-conflict"
       - "-label = has-dependents"
+merge_protections_settings:
+  reporting_method: check-runs
