@@ -2,9 +2,16 @@
   "threshold": 0,
   "gitignore": true,
   "reporters": ["console"],
-  "path": [
-    ".github/scripts",
-    "apps/frontend",
-    "packages/public-animation-contracts"
+  "path": [".github/scripts", "apps/frontend", "packages"],
+  "ignore": [
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.test.js",
+    "**/*.test.mjs",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.spec.js",
+    "**/*.spec.mjs"
   ]
 }
