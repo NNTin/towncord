@@ -8,8 +8,8 @@ import type { OfficeSceneFurniture } from "../../contracts/office-scene";
 import {
   anchoredGridCellToWorldPixel,
   type AnchoredGridRegion,
-  type TerrainRuntime,
-} from "../../../engine";
+} from "../../../engine/world-runtime/regions";
+import type { TerrainRuntime } from "../../../engine/terrain/terrainRuntime";
 import type { EntityRegistry } from "../../world/entities/entityRegistry";
 import type { OfficeSceneBootstrap } from "../../contracts/office-scene";
 import type { WorldEntity } from "./types";
