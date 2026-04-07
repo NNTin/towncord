@@ -38,6 +38,7 @@ describe("game session factories", () => {
     const session = {
       subscribe: vi.fn(),
       placeDragDrop: vi.fn(),
+      spawnMob: vi.fn(),
       selectTerrainTool: vi.fn(),
       setTerrainPropTool: vi.fn(),
       rotateSelectedTerrainProp: vi.fn(),

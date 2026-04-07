@@ -7,5 +7,6 @@ export {
 export {
   createTerrainNavigationService,
   type AutonomyNavigationService,
+  type TerrainNavigationGrid,
   type WorldNavigationService,
 } from "./navigationService";
