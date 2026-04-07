@@ -9,7 +9,7 @@ import {
   anchoredGridCellToWorldPixel,
   type AnchoredGridRegion,
 } from "../../../engine/world-runtime/regions";
-import type { TerrainRuntime } from "../../../engine/terrain/terrainRuntime";
+import type { TerrainRuntime } from "../../../engine/terrain";
 import type { EntityRegistry } from "../../world/entities/entityRegistry";
 import type { OfficeSceneBootstrap } from "../../contracts/office-scene";
 import type { WorldEntity } from "./types";
