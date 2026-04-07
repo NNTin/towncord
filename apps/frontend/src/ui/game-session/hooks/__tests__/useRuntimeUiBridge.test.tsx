@@ -243,6 +243,8 @@ describe("useRuntimeUiBridge", () => {
         },
       ],
       onDragStart: expect.any(Function),
+      onSpawnMob: expect.any(Function),
+      spawnError: null,
     });
     expect(bridge.propToolbarViewModel).toEqual({
       groups: [
