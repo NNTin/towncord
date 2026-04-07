@@ -119,6 +119,15 @@ export class EntitySystem {
     });
   }
 
+  /**
+   * Immediately enables autonomous wandering for all entities by advancing the
+   * idle timer past the threshold. Call this after a click-to-spawn so the new
+   * entity starts wandering without the player having to press WASD first.
+   */
+  enableAutoplay(): void {
+    this.directInputIdleMs = AUTONOMY_IDLE_DELAY_MS;
+  }
+
   removeEntity(entity: WorldEntity): boolean {
     const index = this.entities.indexOf(entity);
     if (index < 0) {

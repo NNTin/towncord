@@ -176,6 +176,7 @@ export class WorldSceneAssembly {
           const cam = scene.cameras.main;
           return cam.getWorldPoint(cam.width / 2, cam.height / 2);
         },
+        getOfficeRegion: () => this.officeRuntime.getRegion(),
         selectEntity: (entity) => this.selectionController.selectEntity(entity),
       },
       this.projections,

@@ -4,11 +4,19 @@ import type {
   PlayerPlacedPayload,
   SpawnEntityPayload,
 } from "../../contracts/runtime";
-import type { TerrainRuntime } from "../../../engine";
+import type { OfficeSceneFurniture } from "../../contracts/office-scene";
+import {
+  anchoredGridCellToWorldPixel,
+  type AnchoredGridRegion,
+  type TerrainRuntime,
+} from "../../../engine";
 import type { EntityRegistry } from "../../world/entities/entityRegistry";
+import type { OfficeSceneBootstrap } from "../../contracts/office-scene";
 import type { WorldEntity } from "./types";
 import { EntitySystem } from "./entitySystem";
 import type { WorldSceneProjectionEmitter } from "./worldSceneProjections";
+
+type OfficeRegion = AnchoredGridRegion<OfficeSceneBootstrap["layout"]>;
 
 type WorldScenePlacementControllerHost = {
   getEntityRegistry: () => EntityRegistry | null;
@@ -16,6 +24,7 @@ type WorldScenePlacementControllerHost = {
   getEntitySystem: () => EntitySystem | null;
   getWorldPoint: (screenX: number, screenY: number) => { x: number; y: number };
   getCameraCenter: () => { x: number; y: number };
+  getOfficeRegion: () => OfficeRegion | null;
   selectEntity: (entity: WorldEntity | null) => void;
 };
 
@@ -80,9 +89,8 @@ export class WorldScenePlacementController {
 
   public handleSpawnEntity(payload: SpawnEntityPayload): void {
     const entityRegistry = this.host.getEntityRegistry();
-    const terrainRuntime = this.host.getTerrainRuntime();
     const entitySystem = this.host.getEntitySystem();
-    if (!entityRegistry || !terrainRuntime || !entitySystem) {
+    if (!entityRegistry || !entitySystem) {
       return;
     }
 
@@ -95,35 +103,49 @@ export class WorldScenePlacementController {
       return;
     }
 
-    const center = this.host.getCameraCenter();
-    const clamped = terrainRuntime
-      .getGameplayGrid()
-      .clampWorldPoint(center.x, center.y);
-    if (
-      !terrainRuntime
-        .getGameplayGrid()
-        .isWorldWalkable(clamped.worldX, clamped.worldY)
-    ) {
+    const spawnPoint = this.pickRandomChairPosition();
+    if (!spawnPoint) {
       return;
     }
 
-    const entity = entitySystem.addEntity(
-      runtime,
-      clamped.worldX,
-      clamped.worldY,
-    );
+    const entity = entitySystem.addEntity(runtime, spawnPoint.x, spawnPoint.y);
     if (!entity) {
       return;
     }
 
+    entitySystem.enableAutoplay();
     this.host.selectEntity(entity);
 
     if (runtime.definition.kind === "player") {
       const placedPayload: PlayerPlacedPayload = {
-        worldX: clamped.worldX,
-        worldY: clamped.worldY,
+        worldX: spawnPoint.x,
+        worldY: spawnPoint.y,
       };
       this.projections.emitPlayerPlaced(placedPayload);
     }
+  }
+
+  private pickRandomChairPosition(): { x: number; y: number } | null {
+    const officeRegion = this.host.getOfficeRegion();
+    if (!officeRegion) {
+      return null;
+    }
+
+    const chairs = officeRegion.layout.furniture.filter(
+      (f): f is OfficeSceneFurniture =>
+        f.category === "chairs" && f.placement === "floor",
+    );
+    if (chairs.length === 0) {
+      return null;
+    }
+
+    const chair = chairs[Math.floor(Math.random() * chairs.length)]!;
+    const { worldX, worldY } = anchoredGridCellToWorldPixel(
+      chair.col,
+      chair.row,
+      officeRegion,
+    );
+    const half = officeRegion.layout.cellSize / 2;
+    return { x: worldX + half, y: worldY + half };
   }
 }
