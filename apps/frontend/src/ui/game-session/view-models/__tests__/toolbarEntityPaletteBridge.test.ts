@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
-import { PLACE_DRAG_MIME, serializePlaceDragPayload } from "../../../../game";
 import { createToolbarEntityPaletteBridge } from "../toolbarEntityPaletteBridge";
 
 describe("createToolbarEntityPaletteBridge", () => {
-  test("groups entity placeables and reuses the existing drag payload flow", () => {
+  test("groups entity placeables and calls onSpawnEntity with the entity id on click", () => {
+    const onSpawnEntity = vi.fn();
     const viewModel = createToolbarEntityPaletteBridge({
       placeables: [
         {
@@ -43,6 +43,7 @@ describe("createToolbarEntityPaletteBridge", () => {
           groupLabel: "Terrain",
         },
       ],
+      onSpawnEntity,
     });
 
     expect(viewModel).toEqual({
@@ -78,26 +79,11 @@ describe("createToolbarEntityPaletteBridge", () => {
           ],
         },
       ],
-      onDragStart: expect.any(Function),
+      onClick: expect.any(Function),
     });
 
-    const dataTransfer = {
-      effectAllowed: "none",
-      setData: vi.fn(),
-    };
+    viewModel?.onClick(viewModel.groups[0]!.placeables[0]!);
 
-    viewModel?.onDragStart(
-      { dataTransfer } as never,
-      viewModel.groups[0]!.placeables[0]!,
-    );
-
-    expect(dataTransfer.setData).toHaveBeenCalledWith(
-      PLACE_DRAG_MIME,
-      serializePlaceDragPayload({
-        type: "entity",
-        entityId: "player",
-      }),
-    );
-    expect(dataTransfer.effectAllowed).toBe("copy");
+    expect(onSpawnEntity).toHaveBeenCalledWith("player");
   });
 });

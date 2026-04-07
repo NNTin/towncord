@@ -8,74 +8,12 @@ vi.mock("../../../../game/session", () => {
   };
 });
 
-import { serializePlaceDragPayload } from "../../../../game";
 import { createRuntimeInteractionAdapter } from "../runtimeUiBridgeHooks";
 
-function createDropEvent(payload: string) {
-  return {
-    clientX: 140,
-    clientY: 260,
-    dataTransfer: {
-      dropEffect: "none",
-      getData: vi.fn(() => payload),
-    },
-    preventDefault: vi.fn(),
-  } as unknown as React.DragEvent<HTMLDivElement>;
-}
-
 describe("createRuntimeInteractionAdapter", () => {
-  test("maps drag-and-drop screen coordinates through the runtime root", () => {
-    const sessionRef = {
-      current: {
-        placeDragDrop: vi.fn(),
-        setZoom: vi.fn(),
-      },
-    };
-    const runtimeRootRef = {
-      current: {
-        getBoundingClientRect: () => ({
-          left: 40,
-          top: 110,
-        }),
-      },
-    } as React.MutableRefObject<HTMLDivElement | null>;
-    const adapter = createRuntimeInteractionAdapter({
-      runtimeRootRef,
-      sessionRef: sessionRef as never,
-      zoomState: {
-        zoom: 1,
-        minZoom: 0.5,
-        maxZoom: 2,
-      },
-    });
-    const event = createDropEvent(
-      serializePlaceDragPayload({
-        type: "terrain",
-        materialId: "grass",
-        brushId: "paint",
-      }),
-    );
-
-    adapter.runtimeRootBindings.onDrop(event);
-
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(sessionRef.current.placeDragDrop).toHaveBeenCalledWith(
-      {
-        type: "terrain",
-        materialId: "grass",
-        brushId: "paint",
-      },
-      {
-        screenX: 100,
-        screenY: 150,
-      },
-    );
-  });
-
   test("builds zoom controls that send commands through the runtime session", () => {
     const sessionRef = {
       current: {
-        placeDragDrop: vi.fn(),
         setZoom: vi.fn(),
       },
     };

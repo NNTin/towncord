@@ -133,8 +133,6 @@ function renderHarness() {
 
   vi.mocked(useRuntimeInteractionAdapter).mockReturnValue({
     runtimeRootBindings: {
-      onDragOver: vi.fn(),
-      onDrop: vi.fn(),
       onContextMenu: vi.fn(),
     },
     zoomViewModel: null,
@@ -239,7 +237,7 @@ describe("useRuntimeUiBridge", () => {
           ],
         },
       ],
-      onDragStart: expect.any(Function),
+      onClick: expect.any(Function),
     });
     expect(bridge.propToolbarViewModel).toEqual({
       groups: [

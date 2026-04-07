@@ -55,6 +55,10 @@ export type TerrainPropSelectionActionPayload = {
   action: "rotate" | "delete";
 };
 
+export type SpawnEntityPayload = {
+  entityId: EntityId;
+};
+
 export type PlaceEntityDragPayload = {
   type: "entity";
   entityId: EntityId;

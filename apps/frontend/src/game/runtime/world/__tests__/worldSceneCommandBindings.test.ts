@@ -40,11 +40,17 @@ function createRuntimeHost() {
 describe("WorldSceneCommandBindings", () => {
   test("routes runtime commands to feature handlers and unbinds cleanly", () => {
     const runtimeHost = createRuntimeHost();
-    const handlePlaceEntityDrop = vi.fn<(payload: PlaceEntityDropPayload) => void>();
-    const handlePlaceTerrainDrop = vi.fn<(payload: PlaceTerrainDropPayload) => void>();
-    const handleSelectTerrainTool = vi.fn<(payload: SelectedTerrainToolPayload) => void>();
-    const handleSetOfficeEditorTool = vi.fn<(payload: OfficeSetEditorToolPayload) => void>();
-    const handleOfficeSelectionAction = vi.fn<(payload: OfficeSelectionActionPayload) => void>();
+    const handlePlaceEntityDrop =
+      vi.fn<(payload: PlaceEntityDropPayload) => void>();
+    const handlePlaceTerrainDrop =
+      vi.fn<(payload: PlaceTerrainDropPayload) => void>();
+    const handleSpawnEntity = vi.fn();
+    const handleSelectTerrainTool =
+      vi.fn<(payload: SelectedTerrainToolPayload) => void>();
+    const handleSetOfficeEditorTool =
+      vi.fn<(payload: OfficeSetEditorToolPayload) => void>();
+    const handleOfficeSelectionAction =
+      vi.fn<(payload: OfficeSelectionActionPayload) => void>();
     const handleSetZoom = vi.fn<(payload: SetZoomPayload) => void>();
     const bindings = new WorldSceneCommandBindings(
       {
@@ -53,6 +59,7 @@ describe("WorldSceneCommandBindings", () => {
       {
         handlePlaceEntityDrop,
         handlePlaceTerrainDrop,
+        handleSpawnEntity,
         handleSelectTerrainTool,
         handleSetOfficeEditorTool,
         handleOfficeSelectionAction,

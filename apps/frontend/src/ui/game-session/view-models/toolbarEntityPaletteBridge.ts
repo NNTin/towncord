@@ -1,18 +1,16 @@
 import type { PlaceableViewModel } from "../../../game/contracts/runtime";
 import type { EntityToolbarViewModel } from "../contracts";
-import {
-  groupPlaceablesByGroup,
-  isEntityPlaceable,
-  startPlaceableDrag,
-} from "./placeablesBridge";
+import { groupPlaceablesByGroup, isEntityPlaceable } from "./placeablesBridge";
 import { isPropEntityPlaceable } from "./toolbarPropPaletteBridge";
 
 type CreateToolbarEntityPaletteBridgeParams = {
   placeables: PlaceableViewModel[];
+  onSpawnEntity: (entityId: string) => void;
 };
 
 export function createToolbarEntityPaletteBridge({
   placeables,
+  onSpawnEntity,
 }: CreateToolbarEntityPaletteBridgeParams): EntityToolbarViewModel | null {
   const entityPlaceables = placeables.filter(
     (placeable) =>
@@ -24,8 +22,8 @@ export function createToolbarEntityPaletteBridge({
 
   return {
     groups: groupPlaceablesByGroup(entityPlaceables),
-    onDragStart(event, placeable) {
-      startPlaceableDrag(event, placeable);
+    onClick(placeable) {
+      onSpawnEntity(placeable.entityId);
     },
   };
 }
