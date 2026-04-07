@@ -124,6 +124,9 @@ function renderHarness() {
     },
     zoomState: null,
     onOfficeSelectionChanged: vi.fn(),
+    mobSpawnError: null,
+    onMobSpawnFailed: vi.fn(),
+    clearMobSpawnError: vi.fn(),
   });
 
   vi.mocked(useRuntimeGatewayLifecycle).mockReturnValue({

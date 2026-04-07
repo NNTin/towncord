@@ -90,6 +90,8 @@ describe("useGameSession", () => {
       entityToolbarViewModel: {
         groups: [],
         onDragStart: vi.fn(),
+        onSpawnMob: vi.fn(),
+        spawnError: null,
       },
       propToolbarViewModel: {
         groups: [],

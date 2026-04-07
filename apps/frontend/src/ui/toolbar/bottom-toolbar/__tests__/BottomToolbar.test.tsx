@@ -336,6 +336,8 @@ describe("BottomToolbar", () => {
           },
         ],
         onDragStart,
+        onSpawnMob: vi.fn(),
+        spawnError: null,
       },
     };
     const { container, root } = renderToolbar(props);
@@ -407,6 +409,8 @@ describe("BottomToolbar", () => {
           },
         ],
         onDragStart: vi.fn(),
+        onSpawnMob: vi.fn(),
+        spawnError: null,
       },
       propToolbarViewModel: {
         groups: [
@@ -515,6 +519,8 @@ describe("BottomToolbar", () => {
           },
         ],
         onDragStart: vi.fn(),
+        onSpawnMob: vi.fn(),
+        spawnError: null,
       },
     };
     const { container, root, rerender } = renderToolbar(props);
