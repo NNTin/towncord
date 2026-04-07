@@ -3,34 +3,6 @@ import { groupPlaceablesByGroup } from "../../game-session/view-models/placeable
 import { useGroupedDisclosureState } from "../../state/panel-state";
 import { AccordionHeader } from "../shared/common";
 
-function DraggableEntry({
-  label,
-  onDragStart,
-}: {
-  label: string;
-  onDragStart: (e: React.DragEvent) => void;
-}): JSX.Element {
-  return (
-    <div
-      draggable
-      onDragStart={onDragStart}
-      style={{
-        background: "var(--ui-surface-muted)",
-        border: "1px solid var(--ui-border-strong)",
-        borderRadius: 4,
-        color: "var(--ui-text-secondary)",
-        cursor: "grab",
-        fontFamily: "var(--ui-font-mono)",
-        fontSize: 12,
-        padding: "5px 8px",
-        userSelect: "none",
-      }}
-    >
-      ⊕ {label}
-    </div>
-  );
-}
-
 function TerrainToolEntry({
   active,
   label,
@@ -98,7 +70,14 @@ export function PlaceablesPanel({
               onToggle={() => groupDisclosure.toggle(group.key)}
             />
             {open && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingLeft: 8 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 3,
+                  paddingLeft: 8,
+                }}
+              >
                 {group.placeables.map((placeable) =>
                   placeable.type === "terrain" ? (
                     <TerrainToolEntry
@@ -107,13 +86,7 @@ export function PlaceablesPanel({
                       label={placeable.label}
                       onClick={() => viewModel.onSelectTerrainTool(placeable)}
                     />
-                  ) : (
-                    <DraggableEntry
-                      key={placeable.id}
-                      label={placeable.label}
-                      onDragStart={(event) => viewModel.onDragStart(event, placeable)}
-                    />
-                  ),
+                  ) : null,
                 )}
               </div>
             )}

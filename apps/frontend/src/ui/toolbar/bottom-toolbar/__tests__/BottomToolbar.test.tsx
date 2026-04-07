@@ -297,8 +297,8 @@ describe("BottomToolbar", () => {
     });
   });
 
-  test("shows the Entities panel outside layout mode and wires drag start through the toolbar view model", () => {
-    const onDragStart = vi.fn();
+  test("shows the Entities panel outside layout mode and fires onClick through the toolbar view model", () => {
+    const onClick = vi.fn();
     const props = {
       ...baseProps,
       isLayoutMode: false,
@@ -335,7 +335,7 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
-        onDragStart,
+        onClick,
       },
     };
     const { container, root } = renderToolbar(props);
@@ -350,27 +350,21 @@ describe("BottomToolbar", () => {
     expect(container.textContent).toContain("Player Spawn");
     expect(container.textContent).toContain("Greeter");
 
-    const entry = Array.from(
-      container.querySelectorAll("[draggable='true']"),
-    ).find((element) => element.textContent?.includes("Player Spawn"));
+    const entry = Array.from(container.querySelectorAll("button")).find(
+      (element) =>
+        element.title === "Spawn Player Spawn" ||
+        element.textContent?.includes("Player Spawn"),
+    );
     if (!entry) {
-      throw new Error("Missing draggable entity entry");
+      throw new Error("Missing clickable entity entry");
     }
 
-    const dragStartEvent = new Event("dragstart", { bubbles: true });
-    Object.defineProperty(dragStartEvent, "dataTransfer", {
-      value: {
-        setData: vi.fn(),
-        effectAllowed: "none",
-      },
-    });
-
     act(() => {
-      entry.dispatchEvent(dragStartEvent);
+      entry.click();
     });
 
-    expect(onDragStart).toHaveBeenCalledTimes(1);
-    expect(onDragStart.mock.calls[0]?.[1]).toEqual({
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onClick.mock.calls[0]?.[0]).toEqual({
       id: "entity:player",
       type: "entity",
       entityId: "player",
@@ -406,7 +400,7 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
-        onDragStart: vi.fn(),
+        onClick: vi.fn(),
       },
       propToolbarViewModel: {
         groups: [
@@ -514,7 +508,7 @@ describe("BottomToolbar", () => {
             ],
           },
         ],
-        onDragStart: vi.fn(),
+        onClick: vi.fn(),
       },
     };
     const { container, root, rerender } = renderToolbar(props);

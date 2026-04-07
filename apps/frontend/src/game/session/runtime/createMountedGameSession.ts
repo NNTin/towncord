@@ -228,6 +228,15 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         toPlaceDropPayload(payload, point.screenX, point.screenY),
       );
     },
+    spawnEntity(entityId) {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(runtime, UI_TO_RUNTIME_COMMANDS.SPAWN_ENTITY, {
+        entityId,
+      });
+    },
     selectTerrainTool(tool) {
       if (destroyed) {
         return;

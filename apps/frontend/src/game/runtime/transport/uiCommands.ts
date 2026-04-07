@@ -14,6 +14,7 @@ import type {
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
   SelectedTerrainPropToolPayload,
+  SpawnEntityPayload,
   TerrainPropSelectionActionPayload,
 } from "../../contracts/runtime";
 import {
@@ -47,6 +48,7 @@ export type {
 export const UI_TO_RUNTIME_COMMANDS = {
   PLACE_ENTITY_DROP: "placeEntityDrop",
   PLACE_TERRAIN_DROP: "placeTerrainDrop",
+  SPAWN_ENTITY: "spawnEntity",
   SELECT_TERRAIN_TOOL: "selectTerrainTool",
   SET_TERRAIN_PROP_TOOL: "setTerrainPropTool",
   TERRAIN_PROP_SELECTION_ACTION: "terrainPropSelectionAction",
@@ -70,6 +72,8 @@ export const OFFICE_SET_EDITOR_TOOL_EVENT =
 export const OFFICE_SELECTION_ACTION_EVENT =
   UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION;
 
+export type { SpawnEntityPayload } from "../../contracts/runtime";
+
 export type SetZoomPayload = {
   zoom: number;
 };
@@ -80,6 +84,7 @@ export type UiToRuntimeCommandName =
 export type UiToRuntimeCommandPayloadByName = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: PlaceEntityDropPayload;
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: PlaceTerrainDropPayload;
+  [UI_TO_RUNTIME_COMMANDS.SPAWN_ENTITY]: SpawnEntityPayload;
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: SelectedTerrainToolPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL]: SelectedTerrainPropToolPayload;
   [UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION]: TerrainPropSelectionActionPayload;
@@ -351,9 +356,20 @@ export function normalizeTerrainPropSelectionActionPayload(
   };
 }
 
+export function normalizeSpawnEntityPayload(
+  value: unknown,
+): SpawnEntityPayload | undefined {
+  if (!isRecord(value) || typeof value.entityId !== "string") {
+    return undefined;
+  }
+
+  return { entityId: value.entityId };
+}
+
 const uiToRuntimeCommandNormalizers = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
+  [UI_TO_RUNTIME_COMMANDS.SPAWN_ENTITY]: normalizeSpawnEntityPayload,
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]:
     normalizeSelectedTerrainToolPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL]:

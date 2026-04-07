@@ -4,8 +4,8 @@ import type {
 } from "../../../game/contracts/runtime";
 import type { PlaceablesPanelViewModel } from "../contracts";
 import {
+  isEntityPlaceable,
   resolveActiveTerrainToolId,
-  startPlaceableDrag,
 } from "./placeablesBridge";
 
 type CreatePlaceablesSidebarBridgeParams = {
@@ -19,15 +19,18 @@ export function createPlaceablesSidebarBridge({
   activeTerrainTool,
   onSelectTerrainTool,
 }: CreatePlaceablesSidebarBridgeParams): PlaceablesPanelViewModel {
+  // Entity placeables are spawned via the bottom toolbar (click-to-spawn);
+  // only terrain placeables remain in the sidebar panel.
+  const terrainPlaceables = placeables.filter(
+    (placeable) => !isEntityPlaceable(placeable),
+  );
+
   return {
-    placeables,
+    placeables: terrainPlaceables,
     activeTerrainToolId: resolveActiveTerrainToolId(
-      placeables,
+      terrainPlaceables,
       activeTerrainTool,
     ),
-    onDragStart(event, placeable) {
-      startPlaceableDrag(event, placeable);
-    },
     onSelectTerrainTool(placeable) {
       if (
         activeTerrainTool &&

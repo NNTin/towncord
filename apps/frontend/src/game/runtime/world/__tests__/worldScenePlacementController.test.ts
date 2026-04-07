@@ -40,6 +40,8 @@ describe("WorldScenePlacementController", () => {
           x: 100,
           y: 160,
         }),
+        getCameraCenter: () => ({ x: 100, y: 160 }),
+        getOfficeRegion: () => null,
         selectEntity,
       },
       new WorldSceneProjectionEmitter({
@@ -102,6 +104,8 @@ describe("WorldScenePlacementController", () => {
           x: 100,
           y: 160,
         }),
+        getCameraCenter: () => ({ x: 100, y: 160 }),
+        getOfficeRegion: () => null,
         selectEntity: vi.fn(),
       },
       new WorldSceneProjectionEmitter({

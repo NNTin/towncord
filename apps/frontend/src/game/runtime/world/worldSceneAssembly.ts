@@ -172,6 +172,11 @@ export class WorldSceneAssembly {
         getEntitySystem: () => this.entitySystem,
         getWorldPoint: (screenX, screenY) =>
           scene.cameras.main.getWorldPoint(screenX, screenY),
+        getCameraCenter: () => {
+          const cam = scene.cameras.main;
+          return cam.getWorldPoint(cam.width / 2, cam.height / 2);
+        },
+        getOfficeRegion: () => this.officeRuntime.getRegion(),
         selectEntity: (entity) => this.selectionController.selectEntity(entity),
       },
       this.projections,
@@ -184,6 +189,8 @@ export class WorldSceneAssembly {
           this.placementController.handlePlaceEntityDrop(payload),
         handlePlaceTerrainDrop: (payload) =>
           this.terrainController.handlePlaceTerrainDrop(payload),
+        handleSpawnEntity: (payload) =>
+          this.placementController.handleSpawnEntity(payload),
         handleSelectTerrainTool: (payload) =>
           this.terrainController.handleSelectTerrainTool(payload),
         handleSetOfficeEditorTool: (payload) =>

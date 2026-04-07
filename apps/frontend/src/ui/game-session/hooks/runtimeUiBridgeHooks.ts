@@ -14,9 +14,7 @@ import type {
   TerrainToolSelection,
 } from "../../../game/contracts/runtime";
 import {
-  PLACE_DRAG_MIME,
   createRuntimeBridgeState,
-  parsePlaceDragMimePayload,
   reduceRuntimeBridgeState,
   selectRuntimeSidebarProjection,
 } from "../../../game";
@@ -40,9 +38,7 @@ type RuntimeGatewayLifecycleOptions = {
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onZoomChanged: (payload: RuntimeZoomState) => void;
-  onOfficeSelectionChanged?: (
-    payload: OfficeSelectionChangedPayload,
-  ) => void;
+  onOfficeSelectionChanged?: (payload: OfficeSelectionChangedPayload) => void;
   onOfficeLayoutChanged?: ((layout: OfficeSceneLayout) => void) | undefined;
   onTerrainSeedChanged?: ((seed: TerrainSeedDocument) => void) | undefined;
   onOfficeFloorPicked?:
@@ -132,42 +128,13 @@ export function useRuntimeGatewayLifecycle({
 }
 
 export function createRuntimeInteractionAdapter({
-  runtimeRootRef,
+  runtimeRootRef: _runtimeRootRef,
   sessionRef,
   zoomState,
 }: RuntimeInteractionOptions): {
   runtimeRootBindings: RuntimeRootBindings;
   zoomViewModel: ZoomControlsViewModel | null;
 } {
-  const onDragOver: RuntimeRootBindings["onDragOver"] = (event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = "copy";
-  };
-
-  const onDrop: RuntimeRootBindings["onDrop"] = (event) => {
-    event.preventDefault();
-
-    const rawPayload = event.dataTransfer.getData(PLACE_DRAG_MIME);
-    if (!rawPayload) {
-      return;
-    }
-
-    const dragPayload = parsePlaceDragMimePayload(rawPayload);
-    if (!dragPayload) {
-      return;
-    }
-
-    const rect = runtimeRootRef.current?.getBoundingClientRect();
-    if (!rect) {
-      return;
-    }
-
-    sessionRef.current?.placeDragDrop(dragPayload, {
-      screenX: event.clientX - rect.left,
-      screenY: event.clientY - rect.top,
-    });
-  };
-
   const onContextMenu: RuntimeRootBindings["onContextMenu"] = (event) => {
     event.preventDefault();
   };
@@ -190,8 +157,6 @@ export function createRuntimeInteractionAdapter({
 
   return {
     runtimeRootBindings: {
-      onDragOver,
-      onDrop,
       onContextMenu,
     },
     zoomViewModel: zoomState
@@ -222,9 +187,7 @@ export function useRuntimeSyncAdapter(): {
   activeTerrainTool: TerrainToolSelection;
   onBootstrap: (payload: RuntimeBootstrapPayload) => void;
   onClearInspectedTile: () => void;
-  onOfficeSelectionChanged: (
-    payload: OfficeSelectionChangedPayload,
-  ) => void;
+  onOfficeSelectionChanged: (payload: OfficeSelectionChangedPayload) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onSelectTerrainTool: (tool: TerrainToolSelection) => void;
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;

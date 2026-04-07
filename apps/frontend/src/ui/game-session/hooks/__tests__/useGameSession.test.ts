@@ -57,15 +57,12 @@ describe("useGameSession", () => {
     const runtimeBridge = {
       runtimeRootRef: { current: null },
       runtimeRootBindings: {
-        onDragOver: vi.fn(),
-        onDrop: vi.fn(),
         onContextMenu: vi.fn(),
       },
       sidebarViewModel: {
         placeablesPanel: {
           placeables: [],
           activeTerrainToolId: null,
-          onDragStart: vi.fn(),
           onSelectTerrainTool: vi.fn(),
         },
         previewPanel: {
@@ -89,7 +86,7 @@ describe("useGameSession", () => {
       },
       entityToolbarViewModel: {
         groups: [],
-        onDragStart: vi.fn(),
+        onClick: vi.fn(),
       },
       propToolbarViewModel: {
         groups: [],

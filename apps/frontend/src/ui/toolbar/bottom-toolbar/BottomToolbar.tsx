@@ -1525,7 +1525,7 @@ function EntitiesSubPanel({
         }
         description={
           previewPlaceable
-            ? "Preview the entity that will be dragged into the world."
+            ? "Click to spawn this entity into the world."
             : "Hover an entity to preview it."
         }
         title={previewPlaceable?.label ?? "Entity preview"}
@@ -1557,23 +1557,21 @@ function EntitiesSubPanel({
             </div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {group.placeables.map((placeable) => (
-                <div
+                <button
                   key={placeable.id}
-                  draggable
+                  type="button"
                   tabIndex={0}
                   title={`Spawn ${placeable.label}`}
                   onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
                   onMouseLeave={() => setHoveredPlaceableId(null)}
                   onFocus={() => setHoveredPlaceableId(placeable.id)}
                   onBlur={() => setHoveredPlaceableId(null)}
-                  onDragStart={(event) =>
-                    viewModel.onDragStart(event, placeable)
-                  }
+                  onClick={() => viewModel.onClick(placeable)}
                   style={{
                     background: "var(--pixel-btn-bg)",
                     border: "2px solid transparent",
                     color: "var(--pixel-text)",
-                    cursor: "grab",
+                    cursor: "pointer",
                     fontFamily: "monospace",
                     fontSize: 12,
                     padding: placeable.previewFrameKey ? "4px" : "5px 8px",
@@ -1586,7 +1584,7 @@ function EntitiesSubPanel({
                   ) : (
                     `⊕ ${placeable.label}`
                   )}
-                </div>
+                </button>
               ))}
             </div>
           </div>

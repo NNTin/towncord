@@ -11,6 +11,7 @@ import {
   UI_TO_RUNTIME_COMMANDS,
   bindUiToRuntimeCommand,
   type SetZoomPayload,
+  type SpawnEntityPayload,
 } from "../transport/uiCommands";
 
 type RuntimeCommandHost = {
@@ -18,8 +19,16 @@ type RuntimeCommandHost = {
     | {
         events: {
           emit: (event: string, payload: unknown) => void;
-          on: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
-          off: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
+          on: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
+          off: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
         };
       }
     | null
@@ -29,6 +38,7 @@ type RuntimeCommandHost = {
 type WorldSceneRuntimeCommandHandlers = {
   handlePlaceEntityDrop: (payload: PlaceEntityDropPayload) => void;
   handlePlaceTerrainDrop: (payload: PlaceTerrainDropPayload) => void;
+  handleSpawnEntity: (payload: SpawnEntityPayload) => void;
   handleSelectTerrainTool: (payload: SelectedTerrainToolPayload) => void;
   handleSetOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
   handleOfficeSelectionAction: (payload: OfficeSelectionActionPayload) => void;
@@ -60,6 +70,11 @@ export class WorldSceneCommandBindings {
         runtimeHost,
         UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP,
         this.handlers.handlePlaceTerrainDrop,
+      ),
+      bindUiToRuntimeCommand(
+        runtimeHost,
+        UI_TO_RUNTIME_COMMANDS.SPAWN_ENTITY,
+        this.handlers.handleSpawnEntity,
       ),
       bindUiToRuntimeCommand(
         runtimeHost,

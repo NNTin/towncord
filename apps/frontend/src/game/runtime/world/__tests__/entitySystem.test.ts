@@ -4,47 +4,51 @@ import { EntitySystem } from "../entitySystem";
 
 const mocks = vi.hoisted(() => {
   const entityDestroy = vi.fn();
-  const createWorldEntity = vi.fn((input: {
-    runtime: {
-      definition: {
-        id: string;
-        label: string;
-        kind: "npc" | "player";
-        visualRef: { value: string };
-        capabilities: string[];
-        placeable: boolean;
+  const createWorldEntity = vi.fn(
+    (input: {
+      runtime: {
+        definition: {
+          id: string;
+          label: string;
+          kind: "npc" | "player";
+          visualRef: { value: string };
+          capabilities: string[];
+          placeable: boolean;
+        };
       };
-    };
-    worldX: number;
-    worldY: number;
-  }) => ({
-    id: 1,
-    entityId: input.runtime.definition.id,
-    definition: input.runtime.definition,
-    behavior: {
-      idle: () => "idle",
-      walk: () => "walk",
-      run: () => "run",
-    },
-    position: { x: input.worldX, y: input.worldY },
-    velocity: { x: 0, y: 0 },
-    facing: "down",
-    state: "idle",
-    animationAction: "idle",
-    autonomy: {
-      currentAmbientAction: null,
-      currentAmbientMs: 0,
-      path: [],
-      pathIndex: 0,
-      pathRevision: null,
-      wanderTarget: null,
-    },
-    sprite: {
-      destroy: entityDestroy,
-      setDepth: vi.fn(),
-      setPosition: vi.fn(),
-    },
-  }));
+      worldX: number;
+      worldY: number;
+    }) => ({
+      id: 1,
+      entityId: input.runtime.definition.id,
+      definition: input.runtime.definition,
+      behavior: {
+        idle: () => "idle",
+        walk: () => "walk",
+        run: () => "run",
+      },
+      position: { x: input.worldX, y: input.worldY },
+      velocity: { x: 0, y: 0 },
+      facing: "down",
+      state: "idle",
+      animationAction: "idle",
+      autonomy: {
+        currentAmbientAction: null,
+        currentAmbientMs: 0,
+        path: [],
+        pathIndex: 0,
+        pathRevision: null,
+        wanderTarget: null,
+      },
+      sprite: {
+        destroy: entityDestroy,
+        setDepth: vi.fn(),
+        setPosition: vi.fn(),
+        setAlpha: vi.fn(),
+        setScale: vi.fn(),
+      },
+    }),
+  );
   const playEntityAnimation = vi.fn();
   const updateEntityAutonomy = vi.fn(() => ({
     moveX: 0,
@@ -88,7 +92,7 @@ describe("EntitySystem", () => {
 
   test("owns entity lifecycle and transient state", () => {
     const system = new EntitySystem({
-      scene: {} as never,
+      scene: { tweens: { add: vi.fn() } } as never,
       catalog: {} as AnimationCatalog,
       navigation: {} as never,
       emitPlayerStateChanged: vi.fn(),
@@ -138,7 +142,7 @@ describe("EntitySystem", () => {
   test("emits selected player state changes through the explicit player projection", () => {
     const emitPlayerStateChanged = vi.fn();
     const system = new EntitySystem({
-      scene: {} as never,
+      scene: { tweens: { add: vi.fn() } } as never,
       catalog: {} as AnimationCatalog,
       navigation: {
         clampToBounds: (point: { x: number; y: number }) => point,

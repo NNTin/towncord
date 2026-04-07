@@ -69,6 +69,7 @@ export type GameSessionNotifications = RuntimeLifecycleProjectionPort &
 
 export type RuntimePlacementCommandPort = {
   placeDragDrop: (payload: PlaceDragPayload, point: ScreenPoint) => void;
+  spawnEntity: (entityId: string) => void;
 };
 
 export type RuntimeTerrainCommandPort = {

@@ -146,8 +146,11 @@ export function useRuntimeUiBridge(options: {
 
     return createToolbarEntityPaletteBridge({
       placeables: projection.placeables,
+      onSpawnEntity: (entityId) => {
+        sessionRef.current?.spawnEntity(entityId);
+      },
     });
-  }, [runtimeSync.runtimeSidebarProjection]);
+  }, [runtimeSync.runtimeSidebarProjection, sessionRef]);
 
   const propToolbarViewModel =
     useMemo<TerrainPropToolbarViewModel | null>(() => {

@@ -25,6 +25,11 @@ import type Phaser from "phaser";
 
 const SPRITE_SCALE = 1;
 
+const SPAWN_ANIM_DURATION_MS = 400;
+const DESPAWN_ANIM_DURATION_MS = 300;
+const SPAWN_ANIM_SCALE_FROM = 0.3;
+const DESPAWN_ANIM_SCALE_TO = 0.3;
+
 type EntitySystemContext = {
   scene: Phaser.Scene;
   catalog: AnimationCatalog;
@@ -48,6 +53,7 @@ export class EntitySystem {
   private selectedEntity: WorldEntity | null = null;
   private nextId = 0;
   private directInputIdleMs = 0;
+  private despawningSprites: Phaser.GameObjects.Sprite[] = [];
 
   private readonly context: EntitySystemContext;
 
@@ -93,7 +99,33 @@ export class EntitySystem {
 
     this.nextId += 1;
     this.entities.push(entity);
+    this.playSpawnAnimation(entity.sprite, SPRITE_SCALE);
     return entity;
+  }
+
+  private playSpawnAnimation(
+    sprite: Phaser.GameObjects.Sprite,
+    targetScale: number,
+  ): void {
+    sprite.setAlpha(0);
+    sprite.setScale(SPAWN_ANIM_SCALE_FROM * targetScale);
+    this.context.scene.tweens.add({
+      targets: sprite,
+      alpha: 1,
+      scaleX: targetScale,
+      scaleY: targetScale,
+      duration: SPAWN_ANIM_DURATION_MS,
+      ease: "Back.Out",
+    });
+  }
+
+  /**
+   * Immediately enables autonomous wandering for all entities by advancing the
+   * idle timer past the threshold. Call this after a click-to-spawn so the new
+   * entity starts wandering without the player having to press WASD first.
+   */
+  enableAutoplay(): void {
+    this.directInputIdleMs = AUTONOMY_IDLE_DELAY_MS;
   }
 
   removeEntity(entity: WorldEntity): boolean {
@@ -106,8 +138,27 @@ export class EntitySystem {
     if (this.selectedEntity === entity) {
       this.selectedEntity = null;
     }
-    entity.sprite.destroy();
+    this.playDespawnAnimation(entity.sprite);
     return true;
+  }
+
+  private playDespawnAnimation(sprite: Phaser.GameObjects.Sprite): void {
+    this.despawningSprites.push(sprite);
+    this.context.scene.tweens.add({
+      targets: sprite,
+      alpha: 0,
+      scaleX: DESPAWN_ANIM_SCALE_TO,
+      scaleY: DESPAWN_ANIM_SCALE_TO,
+      duration: DESPAWN_ANIM_DURATION_MS,
+      ease: "Back.In",
+      onComplete: () => {
+        const idx = this.despawningSprites.indexOf(sprite);
+        if (idx >= 0) {
+          this.despawningSprites.splice(idx, 1);
+        }
+        sprite.destroy();
+      },
+    });
   }
 
   // -------------------------------------------------------------------------
@@ -285,6 +336,10 @@ export class EntitySystem {
       entity.sprite.destroy();
     }
     this.entities = [];
+    for (const sprite of this.despawningSprites) {
+      sprite.destroy();
+    }
+    this.despawningSprites = [];
     this.selectedEntity = null;
     this.nextId = 0;
     this.directInputIdleMs = 0;
