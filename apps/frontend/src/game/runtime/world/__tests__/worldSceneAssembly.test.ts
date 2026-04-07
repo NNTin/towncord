@@ -494,7 +494,10 @@ describe("WorldScene assembly", () => {
       }),
     );
     expect(assemblyMocks.createOfficeSceneBootstrap).not.toHaveBeenCalled();
-    expect(assemblyMocks.createTerrainNavigationService).toHaveBeenCalledOnce();
+    // Called once for the main navigation and once for mob navigation (barn.posts constraint).
+    expect(assemblyMocks.createTerrainNavigationService).toHaveBeenCalledTimes(
+      2,
+    );
     expect(assemblyMocks.entitySystemConstruct).toHaveBeenCalledOnce();
     expect(assemblyMocks.selectionCreateSelectionBadge).toHaveBeenCalledOnce();
     expect(
