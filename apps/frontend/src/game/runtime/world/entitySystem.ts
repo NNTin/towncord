@@ -21,6 +21,7 @@ import type {
   WorldSelectableActor,
   WorldTerrainPropPlacement,
 } from "./types";
+
 import type Phaser from "phaser";
 
 const SPRITE_SCALE = 1;
@@ -71,6 +72,7 @@ export class EntitySystem {
     options: {
       rotationQuarterTurns?: FurnitureRotationQuarterTurns;
       terrainPropPlacement?: WorldTerrainPropPlacement;
+      navigation?: WorldNavigationService;
     } = {},
   ): WorldEntity | null {
     const { scene, catalog } = this.context;
@@ -90,6 +92,10 @@ export class EntitySystem {
         : {}),
     });
     if (!entity) return null;
+
+    if (options.navigation) {
+      entity.navigation = options.navigation;
+    }
 
     this.nextId += 1;
     this.entities.push(entity);
@@ -177,13 +183,17 @@ export class EntitySystem {
       const prevAnimationAction = entity.animationAction;
       const isSelected = entity === selectedEntity;
 
+      // Entities with a navigation override (e.g. mobs constrained to barn.posts)
+      // use their own nav service; others share the scene-wide one.
+      const entityNav = entity.navigation ?? navigation;
+
       // --- 1. Autonomy / input resolution ---
       const movementInput: MovementInput =
         isSelected && hasDirectMovement
           ? directInput
           : updateEntityAutonomy(entity, delta, {
               autoplayEnabled,
-              navigation,
+              navigation: entityNav,
             });
 
       if (isSelected && hasDirectMovement) {
@@ -204,7 +214,7 @@ export class EntitySystem {
       const resolvedPosition = this.resolveEntityPosition(
         entity.position,
         nextPosition,
-        navigation,
+        entityNav,
       );
       entity.position.x = resolvedPosition.x;
       entity.position.y = resolvedPosition.y;

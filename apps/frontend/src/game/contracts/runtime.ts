@@ -68,6 +68,15 @@ export type PlaceTerrainDragPayload = {
 
 export type PlaceDragPayload = PlaceEntityDragPayload | PlaceTerrainDragPayload;
 
+export type SpawnMobPayload = {
+  entityId: EntityId;
+};
+
+export type MobSpawnFailedPayload = {
+  entityId: EntityId;
+  reason: "no-valid-spawn-area";
+};
+
 export type PlaceEntityDropPayload = PlaceEntityDragPayload & {
   screenX: number;
   screenY: number;

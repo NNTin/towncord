@@ -3,7 +3,8 @@ import { PLACE_DRAG_MIME, serializePlaceDragPayload } from "../../../../game";
 import { createToolbarEntityPaletteBridge } from "../toolbarEntityPaletteBridge";
 
 describe("createToolbarEntityPaletteBridge", () => {
-  test("groups entity placeables and reuses the existing drag payload flow", () => {
+  test("groups entity placeables, wires drag for players and spawn for mobs", () => {
+    const spawnMob = vi.fn();
     const viewModel = createToolbarEntityPaletteBridge({
       placeables: [
         {
@@ -43,6 +44,8 @@ describe("createToolbarEntityPaletteBridge", () => {
           groupLabel: "Terrain",
         },
       ],
+      spawnMob,
+      spawnError: null,
     });
 
     expect(viewModel).toEqual({
@@ -79,8 +82,11 @@ describe("createToolbarEntityPaletteBridge", () => {
         },
       ],
       onDragStart: expect.any(Function),
+      onSpawnMob: expect.any(Function),
+      spawnError: null,
     });
 
+    // Player entities still use the drag-and-drop flow.
     const dataTransfer = {
       effectAllowed: "none",
       setData: vi.fn(),
@@ -99,5 +105,29 @@ describe("createToolbarEntityPaletteBridge", () => {
       }),
     );
     expect(dataTransfer.effectAllowed).toBe("copy");
+
+    // Mob entities use click-to-spawn instead.
+    viewModel?.onSpawnMob(viewModel.groups[1]!.placeables[0]!);
+    expect(spawnMob).toHaveBeenCalledWith("npc.greeter");
+  });
+
+  test("forwards spawnError from params", () => {
+    const viewModel = createToolbarEntityPaletteBridge({
+      placeables: [
+        {
+          id: "entity:npc.bat",
+          type: "entity",
+          entityId: "npc.bat",
+          label: "Bat",
+          groupKey: "entity:npc",
+          groupLabel: "Mobs",
+          previewFrameKey: null,
+        },
+      ],
+      spawnMob: vi.fn(),
+      spawnError: "No barn.posts terrain found.",
+    });
+
+    expect(viewModel?.spawnError).toBe("No barn.posts terrain found.");
   });
 });

@@ -6,6 +6,7 @@ import type {
   PlaceEntityDropPayload,
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
+  SpawnMobPayload,
 } from "../../contracts/runtime";
 import {
   UI_TO_RUNTIME_COMMANDS,
@@ -18,8 +19,16 @@ type RuntimeCommandHost = {
     | {
         events: {
           emit: (event: string, payload: unknown) => void;
-          on: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
-          off: (event: string, fn: (payload: unknown) => void, context?: unknown) => void;
+          on: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
+          off: (
+            event: string,
+            fn: (payload: unknown) => void,
+            context?: unknown,
+          ) => void;
         };
       }
     | null
@@ -33,6 +42,7 @@ type WorldSceneRuntimeCommandHandlers = {
   handleSetOfficeEditorTool: (payload: OfficeSetEditorToolPayload) => void;
   handleOfficeSelectionAction: (payload: OfficeSelectionActionPayload) => void;
   handleSetZoom: (payload: SetZoomPayload) => void;
+  handleSpawnMob: (payload: SpawnMobPayload) => void;
 };
 
 export class WorldSceneCommandBindings {
@@ -80,6 +90,11 @@ export class WorldSceneCommandBindings {
         runtimeHost,
         UI_TO_RUNTIME_COMMANDS.SET_ZOOM,
         this.handlers.handleSetZoom,
+      ),
+      bindUiToRuntimeCommand(
+        runtimeHost,
+        UI_TO_RUNTIME_COMMANDS.SPAWN_MOB,
+        this.handlers.handleSpawnMob,
       ),
     ];
   }

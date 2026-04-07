@@ -12,10 +12,13 @@ import {
   doesFurnitureBlockMovement,
   type WorldNavigationService,
 } from "../../../engine";
+import type { TerrainNavigationGrid } from "../../../engine/world-runtime/spatial";
 import {
   createTerrainDetailRuntimeContext,
   createTerrainRuntimeContext,
 } from "../../terrain/runtime";
+import { TerrainMapStore } from "../../terrain/store";
+import { FARMRPG_STATIC_TERRAIN_SOURCE_SPECS } from "../../content/asset-catalog/farmrpgTerrainSourceCatalog";
 import { syncFromRuntimeTerrain } from "../../content/document-export";
 import {
   readTerrainContent,
@@ -37,6 +40,10 @@ type WorldSceneMovementKeys = Record<
 >;
 
 const OFFICE_LAYOUT_CHANGED_EVENT = "officeLayoutChanged";
+
+const BARN_POSTS_SOURCE_ID = FARMRPG_STATIC_TERRAIN_SOURCE_SPECS.find(
+  (spec) => spec.id === "terrain.farmrpg.barn.posts",
+)!.sourceId;
 
 export type WorldSceneBootOptions = {
   worldBootstrap: WorldBootstrap | null;
@@ -65,6 +72,8 @@ export class WorldSceneAssembly {
   private terrainRuntime: TerrainRuntime | null = null;
   private terrainDetailRuntime: TerrainRuntime | null = null;
   private officeDetailRuntime: TerrainRuntime | null = null;
+  private terrainDetailStore: TerrainMapStore | null = null;
+  private mobNavigation: WorldNavigationService | null = null;
   private readonly officeLayoutChangedEvents: Phaser.Events.EventEmitter;
   private terrainRuntimeContext: ReturnType<
     typeof createTerrainRuntimeContext
@@ -173,6 +182,17 @@ export class WorldSceneAssembly {
         getWorldPoint: (screenX, screenY) =>
           scene.cameras.main.getWorldPoint(screenX, screenY),
         selectEntity: (entity) => this.selectionController.selectEntity(entity),
+        getBarnPostsCellQuery: () => {
+          const store = this.terrainDetailStore;
+          if (!store) return null;
+          return {
+            isBarnPostsCell: (cellX, cellY) =>
+              store.getCellMaterial(cellX, cellY) === BARN_POSTS_SOURCE_ID,
+            width: store.width,
+            height: store.height,
+          };
+        },
+        createMobNavigation: () => this.mobNavigation,
       },
       this.projections,
     );
@@ -192,6 +212,8 @@ export class WorldSceneAssembly {
           this.officeRuntime.handleSelectionAction(payload),
         handleSetZoom: (payload) =>
           this.cameraController.handleSetZoom(payload),
+        handleSpawnMob: (payload) =>
+          this.placementController.handleSpawnMob(payload),
       },
     );
 
@@ -275,6 +297,7 @@ export class WorldSceneAssembly {
         this.hasPendingTerrainSnapshotChange = true;
       },
     });
+    this.terrainDetailStore = terrainDetailRuntimeContext.runtimeOptions.store;
     this.terrainDetailRuntime = new TerrainRuntime(scene, {
       ...terrainDetailRuntimeContext.runtimeOptions,
       onTerrainChanged: () => {
@@ -305,6 +328,28 @@ export class WorldSceneAssembly {
       this.terrainRuntime.getGameplayGrid(),
       collisionGrid,
     );
+
+    // Mob navigation is constrained to cells that have barn.posts detail terrain.
+    const detailStore = this.terrainDetailStore;
+    if (detailStore) {
+      const barnPostsOverride = {
+        isWorldWalkable: (worldX: number, worldY: number): boolean => {
+          const cell = this.terrainRuntime!.getGameplayGrid().worldToCell(
+            worldX,
+            worldY,
+          );
+          if (!cell) return false;
+          return (
+            detailStore.getCellMaterial(cell.cellX, cell.cellY) ===
+            BARN_POSTS_SOURCE_ID
+          );
+        },
+      };
+      this.mobNavigation = createTerrainNavigationService(
+        this.terrainRuntime.getGameplayGrid() as unknown as TerrainNavigationGrid,
+        barnPostsOverride,
+      );
+    }
 
     if (worldBootstrap?.catalog) {
       this.entitySystem = new EntitySystem({
@@ -384,6 +429,8 @@ export class WorldSceneAssembly {
     this.diagnostics.reset();
     this.entityRegistry = null;
     this.navigation = null;
+    this.mobNavigation = null;
+    this.terrainDetailStore = null;
     this.wasd = null;
     this.shiftKey = null;
     this.rKey = null;

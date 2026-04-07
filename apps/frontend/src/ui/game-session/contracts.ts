@@ -31,6 +31,8 @@ export type PlaceableGroupViewModel<TPlaceable extends PlaceableViewModel> = {
 export type EntityToolbarViewModel = {
   groups: PlaceableGroupViewModel<EntityPlaceableViewModel>[];
   onDragStart: (event: DragEvent, placeable: EntityPlaceableViewModel) => void;
+  onSpawnMob: (placeable: EntityPlaceableViewModel) => void;
+  spawnError: string | null;
 };
 
 export type TerrainPropToolbarViewModel = {

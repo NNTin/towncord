@@ -4,6 +4,7 @@ import type {
   OfficeSelectionChangedPayload,
 } from "../../contracts/office-editor";
 import type {
+  MobSpawnFailedPayload,
   PlayerPlacedPayload,
   PlayerStateChangedPayload,
   RuntimeBootstrapPayload,
@@ -87,6 +88,10 @@ export class WorldSceneProjectionEmitter {
 
   public emitTerrainSeedChanged(payload: TerrainSeedChangedPayload): void {
     this.emitProjection(RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED, payload);
+  }
+
+  public emitMobSpawnFailed(payload: MobSpawnFailedPayload): void {
+    this.emitProjection(RUNTIME_TO_UI_EVENTS.MOB_SPAWN_FAILED, payload);
   }
 
   private emitProjection<K extends RuntimeToUiEventName>(

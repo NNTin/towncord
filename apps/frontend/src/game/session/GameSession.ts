@@ -5,6 +5,7 @@ import type {
   OfficeSetEditorToolPayload,
 } from "../contracts/office-editor";
 import type {
+  MobSpawnFailedPayload,
   PlaceDragPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
@@ -53,6 +54,10 @@ export type RuntimeOfficeProjectionPort = {
   onOfficeSelectionChanged?: (payload: OfficeSelectionChangedPayload) => void;
 };
 
+export type RuntimeMobProjectionPort = {
+  onMobSpawnFailed?: (payload: MobSpawnFailedPayload) => void;
+};
+
 export type RuntimeTerrainPropProjectionPort = {
   onTerrainPropSelectionChanged?: (
     payload: TerrainPropSelectionChangedPayload,
@@ -65,10 +70,12 @@ export type GameSessionNotifications = RuntimeLifecycleProjectionPort &
   RuntimeTerrainDocumentProjectionPort &
   RuntimeDiagnosticsProjectionPort &
   RuntimeCameraProjectionPort &
-  RuntimeOfficeProjectionPort;
+  RuntimeOfficeProjectionPort &
+  RuntimeMobProjectionPort;
 
 export type RuntimePlacementCommandPort = {
   placeDragDrop: (payload: PlaceDragPayload, point: ScreenPoint) => void;
+  spawnMob: (entityId: string) => void;
 };
 
 export type RuntimeTerrainCommandPort = {

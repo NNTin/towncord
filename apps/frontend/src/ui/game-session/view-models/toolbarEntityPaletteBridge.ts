@@ -9,10 +9,14 @@ import { isPropEntityPlaceable } from "./toolbarPropPaletteBridge";
 
 type CreateToolbarEntityPaletteBridgeParams = {
   placeables: PlaceableViewModel[];
+  spawnMob: (entityId: string) => void;
+  spawnError: string | null;
 };
 
 export function createToolbarEntityPaletteBridge({
   placeables,
+  spawnMob,
+  spawnError,
 }: CreateToolbarEntityPaletteBridgeParams): EntityToolbarViewModel | null {
   const entityPlaceables = placeables.filter(
     (placeable) =>
@@ -27,5 +31,9 @@ export function createToolbarEntityPaletteBridge({
     onDragStart(event, placeable) {
       startPlaceableDrag(event, placeable);
     },
+    onSpawnMob(placeable) {
+      spawnMob(placeable.entityId);
+    },
+    spawnError,
   };
 }

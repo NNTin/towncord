@@ -10,6 +10,7 @@ import type {
   OfficeSelectionChangedPayload,
 } from "../../contracts/office-editor";
 import type {
+  MobSpawnFailedPayload,
   PlayerPlacedPayload,
   PlayerStateChangedPayload,
   PlaceableViewModel,
@@ -39,6 +40,7 @@ export type {
 } from "../../contracts/office-editor";
 
 export type {
+  MobSpawnFailedPayload,
   PlayerPlacedPayload,
   PlayerStateChangedPayload,
   RuntimeBootstrapPayload,
@@ -62,6 +64,7 @@ export const RUNTIME_TO_UI_EVENTS = {
   OFFICE_SELECTION_CHANGED: "officeSelectionChanged",
   TERRAIN_PROP_SELECTION_CHANGED: "terrainPropSelectionChanged",
   TERRAIN_SEED_CHANGED: "terrainSeedChanged",
+  MOB_SPAWN_FAILED: "mobSpawnFailed",
 } as const;
 
 export const RUNTIME_READY_EVENT = RUNTIME_TO_UI_EVENTS.RUNTIME_READY;
@@ -82,6 +85,7 @@ export const TERRAIN_PROP_SELECTION_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED;
 export const TERRAIN_SEED_CHANGED_EVENT =
   RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED;
+export const MOB_SPAWN_FAILED_EVENT = RUNTIME_TO_UI_EVENTS.MOB_SPAWN_FAILED;
 
 export type RuntimeToUiEventName =
   (typeof RUNTIME_TO_UI_EVENTS)[keyof typeof RUNTIME_TO_UI_EVENTS];
@@ -98,6 +102,7 @@ export type RuntimeToUiEventPayloadByName = {
   [RUNTIME_TO_UI_EVENTS.OFFICE_SELECTION_CHANGED]: OfficeSelectionChangedPayload;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_PROP_SELECTION_CHANGED]: TerrainPropSelectionChangedPayload;
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]: TerrainSeedChangedPayload;
+  [RUNTIME_TO_UI_EVENTS.MOB_SPAWN_FAILED]: MobSpawnFailedPayload;
 };
 
 type PayloadNormalizer<T> = (value: unknown) => T | undefined;
@@ -589,6 +594,23 @@ export function normalizeTerrainSeedChangedPayload(
   };
 }
 
+export function normalizeMobSpawnFailedPayload(
+  value: unknown,
+): MobSpawnFailedPayload | undefined {
+  if (
+    !isRecord(value) ||
+    typeof value.entityId !== "string" ||
+    value.reason !== "no-valid-spawn-area"
+  ) {
+    return undefined;
+  }
+
+  return {
+    entityId: value.entityId,
+    reason: "no-valid-spawn-area",
+  };
+}
+
 export function normalizeRuntimeBootstrapPayload(
   value: unknown,
 ): RuntimeBootstrapPayload | undefined {
@@ -625,6 +647,7 @@ const runtimeToUiEventNormalizers = {
     normalizeTerrainPropSelectionChangedPayload,
   [RUNTIME_TO_UI_EVENTS.TERRAIN_SEED_CHANGED]:
     normalizeTerrainSeedChangedPayload,
+  [RUNTIME_TO_UI_EVENTS.MOB_SPAWN_FAILED]: normalizeMobSpawnFailedPayload,
 } satisfies {
   [K in RuntimeToUiEventName]: PayloadNormalizer<
     RuntimeToUiEventPayloadByName[K]

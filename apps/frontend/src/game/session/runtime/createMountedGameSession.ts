@@ -167,6 +167,13 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
       );
     },
   );
+  const unbindMobSpawnFailed = bindRuntimeToUiEvent(
+    runtime,
+    RUNTIME_TO_UI_EVENTS.MOB_SPAWN_FAILED,
+    (payload) => {
+      forEachSubscriber((subscriber) => subscriber.onMobSpawnFailed?.(payload));
+    },
+  );
 
   hydrateBootstrapSnapshotFromRegistry();
 
@@ -186,6 +193,7 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
     unbindOfficeFloorPicked();
     unbindOfficeSelectionChanged();
     unbindTerrainPropSelectionChanged();
+    unbindMobSpawnFailed();
     runtime.destroy(true);
   };
 
@@ -227,6 +235,15 @@ export function createMountedGameSession(runtime: RuntimeHost): GameSession {
         runtime,
         toPlaceDropPayload(payload, point.screenX, point.screenY),
       );
+    },
+    spawnMob(entityId) {
+      if (destroyed) {
+        return;
+      }
+
+      emitUiToRuntimeCommand(runtime, UI_TO_RUNTIME_COMMANDS.SPAWN_MOB, {
+        entityId,
+      });
     },
     selectTerrainTool(tool) {
       if (destroyed) {

@@ -7,6 +7,7 @@ import type {
   EntityDefinition,
   EntityId,
 } from "../../world/entities/model";
+import type { WorldNavigationService } from "../../../engine/world-runtime/spatial";
 
 export type WorldPoint = {
   x: number;
@@ -48,6 +49,8 @@ export type WorldActor = {
   animationAction: string;
   autonomy: EntityAutonomyState;
   terrainPropPlacement?: WorldTerrainPropPlacement;
+  /** Optional per-entity navigation override (e.g. barn.posts constraint for mobs). */
+  navigation?: WorldNavigationService;
 };
 
 export interface WorldAnimationSprite {

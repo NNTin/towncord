@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import type { MutableRefObject } from "react";
 import type {
   OfficeFloorPickedPayload,
@@ -7,6 +14,7 @@ import type {
 import type { OfficeSceneLayout } from "../../../game/contracts/office-scene";
 import type { TerrainSeedDocument } from "../../../game";
 import type {
+  MobSpawnFailedPayload,
   RuntimeBootstrapPayload,
   RuntimePerfPayload,
   RuntimeZoomState,
@@ -40,14 +48,13 @@ type RuntimeGatewayLifecycleOptions = {
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onZoomChanged: (payload: RuntimeZoomState) => void;
-  onOfficeSelectionChanged?: (
-    payload: OfficeSelectionChangedPayload,
-  ) => void;
+  onOfficeSelectionChanged?: (payload: OfficeSelectionChangedPayload) => void;
   onOfficeLayoutChanged?: ((layout: OfficeSceneLayout) => void) | undefined;
   onTerrainSeedChanged?: ((seed: TerrainSeedDocument) => void) | undefined;
   onOfficeFloorPicked?:
     | ((payload: OfficeFloorPickedPayload) => void)
     | undefined;
+  onMobSpawnFailed?: ((payload: MobSpawnFailedPayload) => void) | undefined;
 };
 
 type RuntimeInteractionOptions = {
@@ -66,6 +73,7 @@ export function useRuntimeGatewayLifecycle({
   onOfficeLayoutChanged,
   onTerrainSeedChanged,
   onOfficeFloorPicked,
+  onMobSpawnFailed,
 }: RuntimeGatewayLifecycleOptions): {
   runtimeRootRef: MutableRefObject<HTMLDivElement | null>;
   sessionRef: MutableRefObject<GameSession | null>;
@@ -80,6 +88,7 @@ export function useRuntimeGatewayLifecycle({
   const onOfficeLayoutChangedRef = useLatestRef(onOfficeLayoutChanged);
   const onTerrainSeedChangedRef = useLatestRef(onTerrainSeedChanged);
   const onOfficeFloorPickedRef = useLatestRef(onOfficeFloorPicked);
+  const onMobSpawnFailedRef = useLatestRef(onMobSpawnFailed);
 
   useEffect(() => {
     const container = runtimeRootRef.current;
@@ -113,6 +122,9 @@ export function useRuntimeGatewayLifecycle({
       },
       onOfficeFloorPicked(payload) {
         onOfficeFloorPickedRef.current?.(payload);
+      },
+      onMobSpawnFailed(payload) {
+        onMobSpawnFailedRef.current?.(payload);
       },
     });
 
@@ -222,9 +234,7 @@ export function useRuntimeSyncAdapter(): {
   activeTerrainTool: TerrainToolSelection;
   onBootstrap: (payload: RuntimeBootstrapPayload) => void;
   onClearInspectedTile: () => void;
-  onOfficeSelectionChanged: (
-    payload: OfficeSelectionChangedPayload,
-  ) => void;
+  onOfficeSelectionChanged: (payload: OfficeSelectionChangedPayload) => void;
   onRuntimeDiagnostics: (payload: RuntimePerfPayload) => void;
   onSelectTerrainTool: (tool: TerrainToolSelection) => void;
   onTerrainTileInspected: (payload: TerrainTileInspectedPayload) => void;
@@ -232,12 +242,16 @@ export function useRuntimeSyncAdapter(): {
   officeSelection: OfficeSelectionChangedPayload | null;
   runtimeSidebarProjection: ReturnType<typeof selectRuntimeSidebarProjection>;
   zoomState: RuntimeZoomState | null;
+  mobSpawnError: string | null;
+  onMobSpawnFailed: (payload: MobSpawnFailedPayload) => void;
+  clearMobSpawnError: () => void;
 } {
   const [state, dispatch] = useReducer(
     reduceRuntimeBridgeState,
     undefined,
     createRuntimeBridgeState,
   );
+  const [mobSpawnError, setMobSpawnError] = useState<string | null>(null);
 
   const onBootstrap = useCallback((payload: RuntimeBootstrapPayload) => {
     dispatch({ type: "runtimeBootstrapped", payload });
@@ -273,6 +287,16 @@ export function useRuntimeSyncAdapter(): {
     [],
   );
 
+  const onMobSpawnFailed = useCallback((_payload: MobSpawnFailedPayload) => {
+    setMobSpawnError(
+      "No barn.posts terrain found. Paint barn.posts tiles before spawning mobs.",
+    );
+  }, []);
+
+  const clearMobSpawnError = useCallback(() => {
+    setMobSpawnError(null);
+  }, []);
+
   return {
     activeTerrainTool: state.activeTerrainTool,
     onBootstrap,
@@ -285,5 +309,8 @@ export function useRuntimeSyncAdapter(): {
     officeSelection: state.officeSelection,
     runtimeSidebarProjection: selectRuntimeSidebarProjection(state),
     zoomState: state.zoomState,
+    mobSpawnError,
+    onMobSpawnFailed,
+    clearMobSpawnError,
   };
 }

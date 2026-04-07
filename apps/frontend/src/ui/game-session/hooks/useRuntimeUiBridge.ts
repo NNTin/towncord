@@ -62,6 +62,7 @@ export function useRuntimeUiBridge(options: {
       options.onTerrainSeedChanged?.(seed);
     },
     onOfficeFloorPicked: options.onOfficeFloorPicked,
+    onMobSpawnFailed: runtimeSync.onMobSpawnFailed,
   });
   const { runtimeRootBindings, zoomViewModel } = useRuntimeInteractionAdapter({
     runtimeRootRef,
@@ -146,8 +147,14 @@ export function useRuntimeUiBridge(options: {
 
     return createToolbarEntityPaletteBridge({
       placeables: projection.placeables,
+      spawnMob: (entityId) => sessionRef.current?.spawnMob(entityId),
+      spawnError: runtimeSync.mobSpawnError,
     });
-  }, [runtimeSync.runtimeSidebarProjection]);
+  }, [
+    runtimeSync.runtimeSidebarProjection,
+    runtimeSync.mobSpawnError,
+    sessionRef,
+  ]);
 
   const propToolbarViewModel =
     useMemo<TerrainPropToolbarViewModel | null>(() => {

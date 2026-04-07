@@ -14,6 +14,7 @@ import type {
   PlaceTerrainDropPayload,
   SelectedTerrainToolPayload,
   SelectedTerrainPropToolPayload,
+  SpawnMobPayload,
   TerrainPropSelectionActionPayload,
 } from "../../contracts/runtime";
 import {
@@ -41,6 +42,7 @@ export type {
 export type { SelectedTerrainToolPayload } from "../../contracts/runtime";
 export type {
   SelectedTerrainPropToolPayload,
+  SpawnMobPayload,
   TerrainPropSelectionActionPayload,
 } from "../../contracts/runtime";
 
@@ -50,6 +52,7 @@ export const UI_TO_RUNTIME_COMMANDS = {
   SELECT_TERRAIN_TOOL: "selectTerrainTool",
   SET_TERRAIN_PROP_TOOL: "setTerrainPropTool",
   TERRAIN_PROP_SELECTION_ACTION: "terrainPropSelectionAction",
+  SPAWN_MOB: "spawnMob",
   SET_ZOOM: "setZoom",
   OFFICE_SET_EDITOR_TOOL: "officeSetEditorTool",
   OFFICE_SELECTION_ACTION: "officeSelectionAction",
@@ -83,6 +86,7 @@ export type UiToRuntimeCommandPayloadByName = {
   [UI_TO_RUNTIME_COMMANDS.SELECT_TERRAIN_TOOL]: SelectedTerrainToolPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_TERRAIN_PROP_TOOL]: SelectedTerrainPropToolPayload;
   [UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION]: TerrainPropSelectionActionPayload;
+  [UI_TO_RUNTIME_COMMANDS.SPAWN_MOB]: SpawnMobPayload;
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: SetZoomPayload;
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]: OfficeSetEditorToolPayload;
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SELECTION_ACTION]: OfficeSelectionActionPayload;
@@ -351,6 +355,14 @@ export function normalizeTerrainPropSelectionActionPayload(
   };
 }
 
+function normalizeSpawnMobPayload(value: unknown): SpawnMobPayload | undefined {
+  if (!isRecord(value) || typeof value.entityId !== "string") {
+    return undefined;
+  }
+
+  return { entityId: value.entityId };
+}
+
 const uiToRuntimeCommandNormalizers = {
   [UI_TO_RUNTIME_COMMANDS.PLACE_ENTITY_DROP]: normalizePlaceEntityDropPayload,
   [UI_TO_RUNTIME_COMMANDS.PLACE_TERRAIN_DROP]: normalizePlaceTerrainDropPayload,
@@ -360,6 +372,7 @@ const uiToRuntimeCommandNormalizers = {
     normalizeSelectedTerrainPropToolPayload,
   [UI_TO_RUNTIME_COMMANDS.TERRAIN_PROP_SELECTION_ACTION]:
     normalizeTerrainPropSelectionActionPayload,
+  [UI_TO_RUNTIME_COMMANDS.SPAWN_MOB]: normalizeSpawnMobPayload,
   [UI_TO_RUNTIME_COMMANDS.SET_ZOOM]: normalizeSetZoomPayload,
   [UI_TO_RUNTIME_COMMANDS.OFFICE_SET_EDITOR_TOOL]:
     normalizeOfficeSetEditorToolPayload,

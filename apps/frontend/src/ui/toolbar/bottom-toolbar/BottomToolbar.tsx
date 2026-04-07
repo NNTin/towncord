@@ -1496,6 +1496,10 @@ function LayoutOverviewSubPanel({
   );
 }
 
+function isMobPlaceable(entityId: string): boolean {
+  return entityId.startsWith("npc.");
+}
+
 function EntitiesSubPanel({
   viewModel,
 }: {
@@ -1512,6 +1516,10 @@ function EntitiesSubPanel({
       .find((placeable) => placeable.id === hoveredPlaceableId) ??
     firstPlaceable;
 
+  const isMobPreview = previewPlaceable
+    ? isMobPlaceable(previewPlaceable.entityId)
+    : false;
+
   return (
     <div style={{ ...subPanel, maxWidth: 420 }}>
       <PreviewCard
@@ -1525,11 +1533,27 @@ function EntitiesSubPanel({
         }
         description={
           previewPlaceable
-            ? "Preview the entity that will be dragged into the world."
+            ? isMobPreview
+              ? "Click to spawn on the nearest barn.posts tile."
+              : "Preview the entity that will be dragged into the world."
             : "Hover an entity to preview it."
         }
         title={previewPlaceable?.label ?? "Entity preview"}
       />
+      {viewModel.spawnError ? (
+        <div
+          style={{
+            fontFamily: "monospace",
+            fontSize: 11,
+            color: "var(--pixel-error, #f55)",
+            background: "rgba(255,64,64,0.08)",
+            border: "1px solid rgba(255,64,64,0.3)",
+            padding: "4px 6px",
+          }}
+        >
+          {viewModel.spawnError}
+        </div>
+      ) : null}
       <div
         style={{
           display: "flex",
@@ -1556,38 +1580,48 @@ function EntitiesSubPanel({
               {group.label}
             </div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-              {group.placeables.map((placeable) => (
-                <div
-                  key={placeable.id}
-                  draggable
-                  tabIndex={0}
-                  title={`Spawn ${placeable.label}`}
-                  onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
-                  onMouseLeave={() => setHoveredPlaceableId(null)}
-                  onFocus={() => setHoveredPlaceableId(placeable.id)}
-                  onBlur={() => setHoveredPlaceableId(null)}
-                  onDragStart={(event) =>
-                    viewModel.onDragStart(event, placeable)
-                  }
-                  style={{
-                    background: "var(--pixel-btn-bg)",
-                    border: "2px solid transparent",
-                    color: "var(--pixel-text)",
-                    cursor: "grab",
-                    fontFamily: "monospace",
-                    fontSize: 12,
-                    padding: placeable.previewFrameKey ? "4px" : "5px 8px",
-                    userSelect: "none",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {placeable.previewFrameKey ? (
-                    <EntityPreviewSprite frameKey={placeable.previewFrameKey} />
-                  ) : (
-                    `⊕ ${placeable.label}`
-                  )}
-                </div>
-              ))}
+              {group.placeables.map((placeable) => {
+                const isMob = isMobPlaceable(placeable.entityId);
+                return (
+                  <div
+                    key={placeable.id}
+                    draggable={!isMob}
+                    tabIndex={0}
+                    title={`Spawn ${placeable.label}`}
+                    onMouseEnter={() => setHoveredPlaceableId(placeable.id)}
+                    onMouseLeave={() => setHoveredPlaceableId(null)}
+                    onFocus={() => setHoveredPlaceableId(placeable.id)}
+                    onBlur={() => setHoveredPlaceableId(null)}
+                    onDragStart={
+                      isMob
+                        ? undefined
+                        : (event) => viewModel.onDragStart(event, placeable)
+                    }
+                    onClick={
+                      isMob ? () => viewModel.onSpawnMob(placeable) : undefined
+                    }
+                    style={{
+                      background: "var(--pixel-btn-bg)",
+                      border: "2px solid transparent",
+                      color: "var(--pixel-text)",
+                      cursor: isMob ? "pointer" : "grab",
+                      fontFamily: "monospace",
+                      fontSize: 12,
+                      padding: placeable.previewFrameKey ? "4px" : "5px 8px",
+                      userSelect: "none",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {placeable.previewFrameKey ? (
+                      <EntityPreviewSprite
+                        frameKey={placeable.previewFrameKey}
+                      />
+                    ) : (
+                      `⊕ ${placeable.label}`
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
